@@ -1,12 +1,16 @@
-name: "BloomSail"
+name: BloomSail
 output_dir: ../docs
 navbar:
-  title: "BloomSail"
+  title: BloomSail
   left:
   - text: Home
     href: index.html
   - text: License
     href: license.html
+  right:
+  - icon: fa-github
+    text: Source code
+    href: https://github.com/jens-daniel-mueller/BloomSail
 output:
   workflowr::wflow_html:
     toc: yes
