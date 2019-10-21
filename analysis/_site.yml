@@ -5,6 +5,10 @@ navbar:
   left:
   - text: Home
     href: index.html
+  - text: Data base
+    href: data_base.html
+  - text: Response time correction
+    href: response_time.html
   - text: License
     href: license.html
   right:
