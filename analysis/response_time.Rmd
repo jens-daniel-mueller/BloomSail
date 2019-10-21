@@ -23,7 +23,7 @@ editor_options:
 
 # Pre-smoothing
 
-# RT correction
+# Response time correction
 
 # Post-smoothing
 
@@ -31,5 +31,5 @@ editor_options:
 
 # Open tasks / questions
 
-- differnt response time correction methods (Bittig vs. Fiedler, Miloshevich, Fietzek)
+- Compare differnt response time correction methods (Bittig vs. Fiedler, Miloshevich, Fietzek)
 
