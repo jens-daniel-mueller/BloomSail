@@ -1,5 +1,5 @@
 ---
-title: "Response time correction of Contros HydroC pCO2 data"
+title: "Response time correction of Contros HydroC pCO~2~ data"
 author: "Jens Daniel Müller"
 date:  "`r format(Sys.time(), '%d %B, %Y')`"
 output: workflowr::wflow_html
