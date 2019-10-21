@@ -8,4 +8,10 @@ editor_options:
   chunk_output_type: console
 ---
 
-Welcome to my research website.
+On this website we present our ongoing ambition to quantify net primary production during cyanobacteria blooms in the Baltic Sea through vertically resolved pCO~2~ measurements.
+
+Please navigate trough the navbar on top to take a look at the various chapters of this project.
+
+The links in the upper right corner bring you to the source code of this project and back to Jens' main homepage.
+
+Dr. Jens Daniel Müller, "`r format(Sys.time(), '%Y')`"
