@@ -13,5 +13,9 @@ editor_options:
 
 # Merging observations
 
-## Temporal interpolation
+## pCO~2~ & CTD
+
+### Time lag correction
+
+### Temporal interpolation
 

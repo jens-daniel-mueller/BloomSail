@@ -7,8 +7,29 @@ editor_options:
   chunk_output_type: console
 ---
 
+# Sensitivity considerations
+
 # Subset vertical profiling data
 
 # HydroC sensor settings
 
-# 
+# Response time determination
+
+## This approach
+
+## Contros in-house
+
+## Comparison
+
+# Pre-smoothing
+
+# RT correction
+
+# Post-smoothing
+
+# Response time optimization
+
+# Open tasks / questions
+
+- differnt response time correction methods (Bittig vs. Fiedler, Miloshevich, Fietzek)
+
