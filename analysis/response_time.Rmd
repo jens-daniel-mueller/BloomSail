@@ -1,5 +1,5 @@
 ---
-title: "response_time"
+title: "Response time correction of Contros HydroC pCO2 data"
 author: "Jens Daniel Müller"
 date:  "`r format(Sys.time(), '%d %B, %Y')`"
 output: workflowr::wflow_html
@@ -7,9 +7,8 @@ editor_options:
   chunk_output_type: console
 ---
 
-## Introduction
+# Subset vertical profiling data
 
-```{r}
+# HydroC sensor settings
 
-```
-
+# 
