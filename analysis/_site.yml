@@ -7,6 +7,8 @@ navbar:
     href: index.html
   - text: Data base
     href: data_base.html
+  - text: Merging and interpolation
+    href: merging_interpolation.html
   - text: Response time correction
     href: response_time.html
   - text: License

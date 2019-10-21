@@ -1,11 +1,16 @@
 ---
-title: "data_base"
+title: "Data base"
 author: "Jens Daniel Müller"
 date:  "`r format(Sys.time(), '%d %B, %Y')`"
 output: workflowr::wflow_html
 editor_options:
   chunk_output_type: console
 ---
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
+
 
 ```{r packages}
 library(tidyverse)
@@ -18,7 +23,7 @@ library(lubridate)
 
 ## Regular profiles and transects
 
-Reading the CTD Sensor data including recordings from auxillary pH, O~2~, Chla and pCO~2~ data. pCO~2~ data were also internally recorded on the Contros HydroC instrument and will later be replaced.
+CTD Sensor data including recordings from auxillary pH, O~2~, Chla and pCO~2~ data were read-in. Measurement frequency was 15 sec.  pCO~2~ data were also internally recorded on the Contros HydroC instrument with higher temporal resolution and will later be replaced.
 
 ```{r read_profile_transect_CTD_data}
 
@@ -58,7 +63,7 @@ for (file in files){
 }
 
 
-df <- dataset
+CTD <- dataset
 rm(dataset, file, files)
 
 
@@ -69,7 +74,7 @@ rm(dataset, file, files)
 
 # Temperature
 
-# df %>% 
+# CTD %>% 
 #   filter(type == "P") %>% 
 #   ggplot(aes(Tem.S, Dep.S, col=label, linetype = cast))+
 #   geom_line()+
@@ -77,65 +82,65 @@ rm(dataset, file, files)
 #   geom_vline(xintercept = c(10, 20))+
 #   facet_wrap(~transect.ID)
 
-df[transect.ID == "180723" & label == "P07" & Dep.S < 2 & cast == "up"]$Tem.S <- NA
+CTD[transect.ID == "180723" & label == "P07" & Dep.S < 2 & cast == "up"]$Tem.S <- NA
 
 # Salinity
 
-# df %>% 
+# CTD %>% 
 #   filter(type == "P") %>% 
 #   ggplot(aes(Sal.S, Dep.S, col=label, linetype = cast))+
 #   geom_path()+
 #   scale_y_reverse()+
 #   facet_wrap(~transect.ID)
 
-df[Sal.S < 6]$Sal.S <- NA
+CTD[Sal.S < 6]$Sal.S <- NA
 
 # pH
 
-# df %>% 
+# CTD %>% 
 #   filter(type == "P") %>% 
 #   ggplot(aes(pH, Dep.S, col=label, linetype=cast))+
 #   geom_path()+
 #   scale_y_reverse()+
 #   facet_wrap(~transect.ID)
 # 
-# df %>% 
+# CTD %>% 
 #   filter(type == "P") %>% 
 #   ggplot(aes(V_pH, Dep.S, col=label, linetype=cast))+
 #   geom_path()+
 #   scale_y_reverse()+
 #   facet_wrap(~transect.ID)
 
-df[pH < 7.5]$V_pH <- NA
-df[pH < 7.5]$pH <- NA
+CTD[pH < 7.5]$V_pH <- NA
+CTD[pH < 7.5]$pH <- NA
 
-df[transect.ID == "180709" & label == "P03" & Dep.S < 5 & cast == "down"]$pH <- NA
-df[transect.ID == "180709" & label == "P05" & Dep.S < 10 & cast == "down"]$pH <- NA
-df[transect.ID == "180718" & label == "P10" & Dep.S < 3 & cast == "down"]$pH <- NA
-df[transect.ID == "180815" & label == "P03" & Dep.S < 2 & cast == "down"]$pH <- NA
-df[transect.ID == "180820" & label == "P11" & Dep.S < 15 & cast == "down"]$pH <- NA
+CTD[transect.ID == "180709" & label == "P03" & Dep.S < 5 & cast == "down"]$pH <- NA
+CTD[transect.ID == "180709" & label == "P05" & Dep.S < 10 & cast == "down"]$pH <- NA
+CTD[transect.ID == "180718" & label == "P10" & Dep.S < 3 & cast == "down"]$pH <- NA
+CTD[transect.ID == "180815" & label == "P03" & Dep.S < 2 & cast == "down"]$pH <- NA
+CTD[transect.ID == "180820" & label == "P11" & Dep.S < 15 & cast == "down"]$pH <- NA
 
-df[transect.ID == "180709" & label == "P03" & Dep.S < 5 & cast == "down"]$V_pH <- NA
-df[transect.ID == "180709" & label == "P05" & Dep.S < 10 & cast == "down"]$V_pH <- NA
-df[transect.ID == "180718" & label == "P10" & Dep.S < 3 & cast == "down"]$V_pH <- NA
-df[transect.ID == "180815" & label == "P03" & Dep.S < 2 & cast == "down"]$V_pH <- NA
-df[transect.ID == "180820" & label == "P11" & Dep.S < 15 & cast == "down"]$V_pH <- NA
+CTD[transect.ID == "180709" & label == "P03" & Dep.S < 5 & cast == "down"]$V_pH <- NA
+CTD[transect.ID == "180709" & label == "P05" & Dep.S < 10 & cast == "down"]$V_pH <- NA
+CTD[transect.ID == "180718" & label == "P10" & Dep.S < 3 & cast == "down"]$V_pH <- NA
+CTD[transect.ID == "180815" & label == "P03" & Dep.S < 2 & cast == "down"]$V_pH <- NA
+CTD[transect.ID == "180820" & label == "P11" & Dep.S < 15 & cast == "down"]$V_pH <- NA
 
 
 # pCO2
 
-# df %>% 
+# CTD %>% 
 #   filter(type == "P") %>% 
 #   ggplot(aes(pCO2, Dep.S, col=label, linetype = cast))+
 #   geom_path()+
 #   scale_y_reverse()+
 #   facet_wrap(~transect.ID)
 
-df[transect.ID == "180616"]$pCO2 <- NA
+CTD[transect.ID == "180616"]$pCO2 <- NA
 
 # O2
 
-# df %>% 
+# CTD %>% 
 #   filter(type == "P") %>% 
 #   ggplot(aes(O2, Dep.S, col=label, linetype = cast))+
 #   geom_path()+
@@ -144,66 +149,66 @@ df[transect.ID == "180616"]$pCO2 <- NA
 
 # Chlorophyll
 
-# df %>% 
+# CTD %>% 
 #   filter(type == "P") %>% 
 #   ggplot(aes(Chl, Dep.S, col=label, linetype = cast))+
 #   geom_path()+
 #   scale_y_reverse()+
 #   facet_wrap(~transect.ID)
 
-df[Chl > 100]$Chl <- NA
+CTD[Chl > 100]$Chl <- NA
 
 
 #### Surface transect data
 
-# df %>% 
+# CTD %>% 
 #   filter(type == "T") %>% 
 #   ggplot(aes(date, Dep.S, col=label))+
 #   geom_point()+
 #   scale_y_reverse()+
 #   facet_wrap(~transect.ID, scales = "free_x")
 # 
-# df %>% 
+# CTD %>% 
 #   filter(type == "T") %>% 
 #   ggplot(aes(date, Tem.S, col=label))+
 #   geom_point()+
 #   facet_wrap(~transect.ID, scales = "free_x")
 # 
-# df %>% 
+# CTD %>% 
 #   filter(type == "T") %>% 
 #   ggplot(aes(date, Sal.S, col=label))+
 #   geom_point()+
 #   facet_wrap(~transect.ID, scales = "free_x")
 # 
-# df %>% 
+# CTD %>% 
 #   filter(type == "T") %>% 
 #   ggplot(aes(date, pCO2, col=label))+
 #   geom_point()+
 #   facet_wrap(~transect.ID, scales = "free_x")
 # 
-# df %>% 
+# CTD %>% 
 #   filter(type == "T") %>% 
 #   ggplot(aes(date, pH, col=label))+
 #   geom_point()+
 #   facet_wrap(~transect.ID, scales = "free_x")
 # 
-# df %>% 
+# CTD %>% 
 #   filter(type == "T") %>% 
 #   ggplot(aes(date, Chl, col=label))+
 #   geom_point()+
 #   facet_wrap(~transect.ID, scales = "free_x")
 
-df[type == "T" & Chl > 10]$Chl <- NA
+CTD[type == "T" & Chl > 10]$Chl <- NA
 
 
-# df %>% 
+# CTD %>% 
 #   filter(type == "T") %>% 
 #   ggplot(aes(date, O2, col=label))+
 #   geom_point()+
 #   facet_wrap(~transect.ID, scales = "free_x")
 
-df <-
-  df %>% 
+CTD <-
+  CTD %>% 
   select(date_time=date,
          ID=transect.ID,
          type,
@@ -214,34 +219,211 @@ df <-
          tem=Tem.S,
          pCO2,pH,V_pH,O2,Chl)
 
-df %>% 
+CTD <- CTD %>% 
+  filter(station %in% c("P01", "P02", "P03", "P04", "P05", "P06", "P07", "P08", 
+                        "P09", "P10", "P11", "P12", "P13"))
+
+setwd("C:/Mueller_Jens_Data/Research/Projects/BloomSail/")
+
+CTD %>% 
   write_csv(here::here("data/_summarized_data_files", "Tina_V_Sensor_Profiles_Transects.csv"))
 
 ```
 
-```{r Overview_temperature_profiles}
-# df %>% 
-#   filter(type == "P") %>% 
-#   ggplot(aes(Sal.S, Dep.S, col=label, linetype = cast))+
-#   geom_path()+
-#   scale_y_reverse()+
-#   facet_wrap(~transect.ID)
+```{r Overview_temperature_profiles, fig.cap="Temperature profiles recorded on regular stations P01-P13. ID refers to the starting date of each cruise.", fig.asp = 1.3}
+
+CTD %>%
+  arrange(date_time) %>% 
+  filter(type == "P") %>%
+  ggplot(aes(tem, dep, col=station, linetype = cast))+
+  geom_path()+
+  scale_y_reverse()+
+  labs(x="Temperature (°C)", y="Depth (m)")+
+  facet_wrap(~ID, labeller = label_both)
+
+```
+
+```{r Overview_pCO2_analog_profiles, fig.cap="pCO~2~ profiles (analog output from HydroC) recorded on regular stations P01-P13. ID refers to the starting date of each cruise. Please note that pCO~2~ measurement range is restricted to 100-500  µatm here due to the settings of the analog voltage output of the sensor.", fig.asp = 1.3}
+
+CTD %>%
+  arrange(date_time) %>% 
+  filter(type == "P") %>%
+  ggplot(aes(pCO2, dep, col=station, linetype = cast))+
+  geom_path()+
+  scale_y_reverse()+
+  labs(x=expression(pCO[2]~(µatm)), y="Depth (m)")+
+  facet_wrap(~ID, labeller = label_both)
+
+```
+
+
+# pCO~2~ data
+
+HydroC pCO~2~ data  were provided by KM Contros after applying a drift correction to the raw data, which was based on pre- and post-deployment calibration results. 
+
+```{r read_HydroC_raw_data}
+
+# Read Contros corrected data file
+
+HC <-
+  read_csv2(here::here("Data/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
+                       "parameter&pCO2s(method 43).txt"),
+            col_names = c("date_time", "Zero", "Flush", "p_NDIR",
+                          "p_in", "T_control", "T_gas", "%rH_gas",
+                          "Signal_raw", "Signal_ref", "T_sensor",
+                          "pCO2", "Runtime", "nr.ave")) %>% 
+  mutate(Flush = as.factor(as.character(Flush)),
+         Zero = as.factor(as.character(Zero))) %>% 
+  select(date_time, Zero, Flush, pCO2)
+
+```
+
+Individual deployments (periods of observations with less than 30 sec between recordings) were identified and relevant deployment periods were subsetted.
+
+```{r HydroC_deployment}
+# Deployments: Identification
+
+HC <- HC %>% 
+  mutate(date_time = dmy_hms(date_time),
+         deployment = cumsum(c(TRUE,diff(date_time)>=30)))
+
+
+# Deployments: Plots ------------------------------------------------------
+
+# for (i in unique(HC$deployment)) {
+# 
+#   HC %>%
+#     filter(deployment == i) %>%
+#     ggplot(aes(date_time, pCO2_corr, col=as.factor(Zero)))+
+#     geom_line()
+# 
+#   ggsave(here::here("/Plots/TinaV/Sensor/HydroC_diagnostics/Deployments",
+#                     paste(i,"_deployment_HydroC_timeseries.jpg", sep="")),
+#          width = 15, height = 4)
+# 
+# }
+# 
+# HC %>%
+#   ggplot(aes(date_time, pCO2_corr, col=as.factor(deployment)))+
+#   geom_line()
+# 
+# ggsave(here::here("/Plots/TinaV/Sensor/HydroC_diagnostics/Deployments",
+#                   "all_deployment_HydroC_timeseries.jpg"),
+#        width = 40, height = 4)
+
+
+
+
+# Deployments: Subset relevant periods ------------------------------------
+
+# Subset deployment 29 for high resolution response time determination
+
+# HC %>%
+#   filter(deployment == 29) %>%
+#   write_csv(here::here("Data/_summarized_data_files",
+#                        "Tina_V_Sensor_HydroC_RT-experiment_29.csv"))
+
+HC <- HC %>% 
+  filter(deployment %in% c(2,6,9,14,17,21,23,27,29,31,33,34,35,37))
+         
+```
+
+Individual zeroings were labeled with a counter and a period of 10 min after the zeroing was labelled as Flush period (overriding the internal Flush flag). A flag mixing was introduced, flagging the initial 20 sec of each Flush period as "mixing" and the rest as "equilibration".
+
+```{r HC_zeroing}
+# Zeroing ID labelling ----------------------------------------------------
+
+HC <- HC %>% 
+  group_by(Zero) %>% 
+  mutate(Zero_ID = as.factor(cumsum(c(TRUE,diff(date_time)>=30)))) %>% 
+  ungroup()
+
+
+# Flush: Identification ---------------------------------------------------
+
+HC <- HC %>% 
+  mutate(Flush = 0) %>% 
+  group_by(Zero, Zero_ID) %>% 
+  mutate(start = min(date_time),
+         duration = date_time - start,
+         Flush = if_else(Zero == 0 & duration < 600, "1", "0")) %>% 
+  ungroup()
+
+
+#  Flush: Identify equilibration and internal gas mixing periods ----------
+
+HC <- HC %>% 
+  mutate(mixing = if_else(duration < 20, "mixing", "equilibration"))
+
+# Flush <- HC %>% 
+#   filter(Flush == 1, duration <=300)
+
+
+# Flush: Plot individual periods ------------------------------------------
+
+# for (i in unique(Flush$Zero_ID)) {
+# 
+#   Flush %>%
+#     filter(Zero_ID == i) %>%
+#     ggplot(aes(duration, pCO2, col=mixing))+
+#     geom_point() +
+#     scale_color_brewer(palette = "Set1")
+# 
+#   ggsave(here::here("/Plots/TinaV/Sensor/HydroC_diagnostics/Flush",
+#                     paste(i,"_Zero_ID_HydroC_Flush.jpg", sep="")),
+#          width = 10, height = 4)
+# 
+# }
+# 
+# for (i in unique(HC$Zero_ID)) {
+# 
+#   HC %>%
+#     filter(Flush == 1, Zero_ID == i) %>%
+#     ggplot(aes(duration, pCO2, col=mixing))+
+#     geom_point() +
+#     scale_color_brewer(palette = "Set1")
+# 
+#   ggsave(here::here("/Plots/TinaV/Sensor/HydroC_diagnostics/Flush",
+#                     paste(i,"_Zero_ID_HydroC_HC.jpg", sep="")),
+#          width = 10, height = 4)
+# 
+# }
+
+
+# Clean data: Plot deployments --------------------------------------------
+
+# for (i in unique(HC$deployment)) {
+# 
+#   HC %>%
+#     filter(Zero ==0, Flush == 0, deployment == i) %>%
+#     ggplot(aes(date_time, pCO2_corr, col=Zero_ID))+
+#     geom_line()
+# 
+#   ggsave(here::here("/Plots/TinaV/Sensor/HydroC_diagnostics/Deployments_clean", paste(i,"_deployment_only_HydroC_timeseries.jpg", sep="")),
+#          width = 15, height = 4)
+# 
+# }
+
+
+# Write summarized data files ----------------------------------------------
+
+HC %>% 
+  write_csv(here::here("Data/_summarized_data_files",
+                       "Tina_V_HydroC.csv"))
+
+# Flush %>%
+#   write_csv(here::here("Data/_summarized_data_files",
+#                        "Tina_V_HydroC_Flush.csv"))
 
 ```
 
 
 
-## Around Ostergarnsholm island
 
-## Crossing large vessels 
+# Tasks / open questions
 
-# pCO~2~ data
+- include data around Ostergarnsholm island and crossing large vessels 
 
-# Merging observations
+- Include information about HydroC calibration results and raw data correction by Contros
 
-## pCO~2~ & CTD
-
-### Time lag correction
-
-### Temporal interpolation
-
+- Check results from field response time experiment (high zeroing frequency)
