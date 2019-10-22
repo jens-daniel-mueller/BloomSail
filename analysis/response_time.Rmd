@@ -7,13 +7,312 @@ editor_options:
   chunk_output_type: console
 ---
 
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
+
+
+```{r packages}
+library(tidyverse)
+library(seacarb)
+library(data.table)
+library(broom)
+library(lubridate)
+```
+
 # Sensitivity considerations
 
-# Subset vertical profiling data
+A change in DIC of 1 µmol kg^-1^ corresponds to a change in pCO~2~ of around 1 µatm, in the Central Baltic Sea at a pCO~2~ of around 100 µatm (summertime conditions).
+
+```{r sensitivity_estimate, fig.cap="pCO~2~ sensitivity to changes in DIC."}
+
+df <- data.frame(cbind(
+  (c(1720)),
+  (c(7))))
+
+Tem <- seq(5,25,5)
+pCO2<-seq(50,500,20)
+
+df<-merge(df, Tem)
+names(df) <- c("AT", "S", "Tem")  
+
+df<-merge(df, pCO2)
+names(df) <- c("AT", "S", "Tem", "pCO2")  
+
+df<-data.table(df)
+df$AT<-df$AT*1e-6
+
+df$DIC<-carb(flag=24, var1=df$pCO2, var2=df$AT, S=df$S, T=df$Tem, k1k2="m10", kf="dg", pHscale="T")[,16]
+df$pCO2.corr<-carb(flag=15, var1=df$AT, var2=df$DIC, S=df$S, T=df$Tem, k1k2="m10", kf="dg", pHscale="T")[,9]
+
+df$pCO2.2<-df$pCO2.corr + 25
+df$DIC.2<-carb(flag=24, var1=df$pCO2.2, var2=df$AT, S=df$S, T=df$Tem, k1k2="m10", kf="dg", pHscale="T")[,16]
+
+
+df$ratio<-(df$pCO2.2-df$pCO2.corr)/(df$DIC.2*1e6-df$DIC*1e6)
+
+df %>% 
+  ggplot(aes(pCO2, ratio, col=as.factor(Tem)))+
+  geom_line()+
+  scale_color_viridis_d(option = "C",name="Tem [°C]")+
+  labs(x=expression(pCO[2]~(µatm)), y=expression(Delta~pCO[2]~"/"~Delta~DIC~(µatm~µmol^{-1}~kg)))+
+  scale_y_continuous(limits = c(0,8), breaks = seq(0,10,1))
+
+rm(df, Tem, pCO2)
+
+```
+
 
 # HydroC sensor settings
 
+The sensor was first run with a low power pump (1W), later and for most parts of the expedition with a stronger (8W) pump. Pumps were switched between recordings (data file: SD_datafile_20180718_170417CO2-0618-001.txt):  
+
+* 2018-07-17;13:08:34
+* 2018-07-17;13:08:35
+
+Logging frequency for all measurement modes (Measure, Zero, Flush) was set to:  
+
+10 sec for all recordings including SD_datafile_20180714_073641CO2-0618-001.txt  
+
+Increase to 2 sec in SD_datafile_20180717_121052CO2-0618-001.txt at:  
+
+* 2018-07-14;07:52:02
+* 2018-07-14;07:52:12
+* 2018-07-14;07:52:14
+
+Increase to 2 sec in SD_datafile_20180718_170417CO2-0618-001 at:  
+
+* 2018-07-17;12:27:25
+* 2018-07-17;12:27:27
+* 2018-07-17;12:27:28
+
 # Response time determination
+
+Response times were determined by fitting a nonlinear least-squares model as described [here](http://douglas-watson.github.io/post/2018-09_exponential_curve_fitting/) by Douglas Watson.
+
+* Flush period length: 300 sec
+
+
+```{r response_determination_data_preparation}
+
+# Read and prepare data
+
+df <- read_csv(here::here("data/_merged_data_files",
+                          "BloomSail_CTD_HydroC.csv"),
+               col_types = cols(ID = col_character(),
+                                pCO2_analog = col_double(),
+                                pCO2 = col_double(),
+                                Zero = col_factor(),
+                                Flush = col_factor(),
+                                Zero_ID = col_integer(),
+                                duration = col_double(),
+                                mixing = col_character()))
+
+df <- df %>%
+  select(date_time, ID, dep, tem, Flush, pCO2, Zero_ID, duration, mixing)
+
+df <- df %>%
+  filter(Flush == 1, duration <=300)
+
+# df <- df %>% 
+#   filter(Flush == 1, duration <=500, !(Zero_ID %in% c(13, 34, 49, 50, 89, 105, 109)))
+
+# df <- df %>%
+#   filter(Zero_ID != 53)
+
+df <- df %>% 
+  group_by(Zero_ID, mixing) %>% 
+  mutate(duration_equi = duration- min(duration))
+
+```
+
+```{r response_determination_plot, fig.cap="Example response time determination by non-linear least squares fit to the pCO~2~ recovery signal after zeroing. The vertical line indicates the determined response time tau."}
+
+# Plot individual Flush periods with exponential fit ----------------------
+
+i <- 95
+
+df_ID <- df %>%
+  filter(Zero_ID == i)
+
+fit <- df_ID %>%
+  filter(mixing == "equilibration") %>%
+  nls(pCO2 ~ SSasymp(duration_equi, yf, y0, log_alpha), data = .)
+
+tau <- as.numeric(exp(-tidy(fit)[3,2]))
+#RSS <- sum(resid(fit)^2)
+
+augment(fit) %>%
+  ggplot(aes(duration_equi, pCO2))+
+  geom_point()+
+  geom_line(aes(y = .fitted))+
+  geom_vline(xintercept = tau)+
+  labs(y=expression(pCO[2]~(µatm)), x="Duration of Flush period (s)")
+
+rm(df_ID, fit, i, tau)
+
+# Plot individual Flush periods with exponential fit ----------------------
+
+# for (i in unique(df$Zero_ID)) {
+# 
+# df_ID <- df %>%
+#   filter(Zero_ID == i)
+# 
+# fit <- df_ID %>%
+#   filter(mixing == "equilibration") %>%
+#   nls(pCO2 ~ SSasymp(duration_equi, yf, y0, log_alpha), data = .)
+# 
+# tau <- as.numeric(exp(-tidy(fit)[3,2]))
+# #RSS <- sum(resid(fit)^2)
+# 
+# augment(fit) %>%
+#   ggplot(aes(duration_equi, pCO2))+
+#   geom_point()+
+#   geom_line(aes(y = .fitted))+
+#   geom_vline(xintercept = tau)
+# 
+# ggsave(here::here("/Plots/TinaV/Sensor/HydroC_diagnostics/Response_time_fits",
+#                   paste(i,"_Zero_ID_HydroC_RT_exp.jpg", sep="")),
+#          width = 10, height = 4)
+# }
+
+
+# Plot individual Flush periods with linearized response variable  --------
+
+
+# for (i in unique(df$Zero_ID)) {
+# 
+# #i <- 50
+# df_ID <- df %>%
+#   filter(Zero_ID == i,
+#          mixing == "equilibration")
+# 
+# mean_pCO2 <- df_ID %>% 
+#   slice((n()-4) : n()) %>% 
+#   summarise(mean_pCO2 = mean(pCO2))
+# 
+# df_ID <- full_join(df_ID, mean_pCO2) %>% 
+#   mutate(dpCO2 = max(pCO2) - pCO2,
+#          ln_dpCO2 = log(dpCO2))
+# 
+# 
+# df_ID %>%
+#   ggplot(aes(duration_equi, ln_dpCO2))+
+#   geom_point()+
+#   geom_smooth(method = "lm")+
+#   theme_bw()
+# 
+# # augment(fit) %>%
+# #   ggplot(aes(duration_equi, pCO2))+
+# #   geom_point()+
+# #   geom_line(aes(y = .fitted))+
+# #   geom_vline(xintercept = tau)
+# 
+# ggsave(here::here("/Plots/TinaV/Sensor/HydroC_diagnostics/Response_time_fits",
+#                   paste(i,"_Zero_ID_HydroC_RT_linear.jpg", sep="")),
+#          width = 10, height = 4)
+# }
+
+
+```
+
+```{r response_determination}
+
+# Response time fitting ---------------------------------------------------
+
+RT <- df %>% 
+  filter(mixing == "equilibration") %>% 
+  group_by(Zero_ID) %>% 
+  do(fit = nls(pCO2 ~ SSasymp(duration_equi, yf, y0, log_alpha), data = .)) %>% 
+  tidy(fit) %>% 
+  select(Zero_ID, term, estimate) %>% 
+  spread(term, estimate) %>% 
+  select(1,2) %>% 
+  mutate(tau = exp(-log_alpha))
+
+
+# Residuals from fit ------------------------------------------------------
+
+augmented <- df %>% 
+  filter(mixing == "equilibration") %>% 
+  group_by(Zero_ID) %>% 
+  do(fit = nls(pCO2 ~ SSasymp(duration_equi, yf, y0, log_alpha), data = .)) %>% 
+  augment(fit)
+
+# qplot(duration_equi, pCO2_corr, data = augmented, geom = 'point', colour = as.factor(Zero_ID)) +
+#   geom_line(aes(y=.fitted))
+# 
+# qplot(duration_equi, .resid, data = augmented, geom = 'point', colour = as.factor(Zero_ID))
+
+augmented_sum <- augmented %>% 
+  group_by(Zero_ID) %>% 
+  summarise(mean_resid = mean(abs(.resid)),
+            mean_resid_rel = mean(abs(.resid))/max(pCO2),
+            max_pCO2_corr = max(pCO2))
+
+# Standard error of tau ---------------------------------------------------
+
+St_Err <- df %>% 
+  filter(mixing == "equilibration") %>% 
+  group_by(Zero_ID) %>% 
+  do(fit = nls(pCO2 ~ SSasymp(duration_equi, yf, y0, log_alpha), data = .)) %>% 
+  tidy(fit) %>% 
+  select(Zero_ID, term, std.error) %>% 
+  spread(term, std.error) %>% 
+  select(1,2) %>% 
+  rename(tau_st_err = log_alpha)
+
+
+# Merge RT, mean residuals and St error -----------------------------------
+
+RT <- full_join(RT, augmented_sum)
+RT <- full_join(RT, St_Err)
+
+rm(augmented, augmented_sum, St_Err)
+
+
+
+# Identify residual threshold ---------------------------------------------
+
+# RT %>% 
+#   ggplot(aes(mean_resid_rel, Zero_ID, label=Zero_ID)) +
+#   geom_point(shape=21)+
+#   scale_fill_viridis_c()+
+#   geom_label()
+
+RT %>% 
+  filter(mean_resid_rel >= 0.0065)
+
+# RT %>% 
+#   filter(mean_resid_rel < 0.0065) %>% 
+#   ggplot(aes(Zero_ID, tau, label=round(mean_resid_rel,4))) +
+#   geom_label(data=RT, aes(Zero_ID, tau, label=round(mean_resid_rel,4)), col="red") +
+#   geom_point(shape=21)+
+#   scale_fill_viridis_c()+
+#   geom_label()
+
+RT %>% 
+  filter(mean_resid_rel < 0.0065) %>% 
+  ggplot(aes(Zero_ID, tau))+
+  geom_point()
+
+
+
+# Mean tau ----------------------------------------------------------------
+
+max(unique(df[df$date_time < ymd_hms("2018-07-17;13:08:34"),]$Zero_ID))
+unique(df[df$date_time > ymd_hms("2018-07-17;13:08:34"),]$Zero_ID)
+
+RT %>% 
+  filter(mean_resid_rel < 0.0065) %>% 
+  mutate(pump_power = if_else(Zero_ID <= 20, "1W", "8W")) %>% 
+  group_by(pump_power) %>% 
+  summarise(tau = mean(tau))
+
+```
+
+
 
 ## This approach
 
@@ -31,5 +330,8 @@ editor_options:
 
 # Open tasks / questions
 
+- Compare Contros and own response time estimates
 - Compare differnt response time correction methods (Bittig vs. Fiedler, Miloshevich, Fietzek)
-
+- Test impact of duration for response time estimation on final mean response time
+- Test impact of selection criterion for "good" response time estimates on final mean response time
+- Check results from field response time experiment (high zeroing frequency)
