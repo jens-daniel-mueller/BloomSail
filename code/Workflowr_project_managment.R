@@ -87,8 +87,9 @@ wflow_open("analysis/first-analysis.Rmd")
 
 # After opening a new analysis file, do the following:
 
-# change: author: "Jens Daniel Müller"
-# change: date:  "`r format(Sys.time(), '%d %B, %Y')`"
+# change:
+# author: "Jens Daniel Müller"
+# date:  "`r format(Sys.time(), '%d %B, %Y')`"
 
 # include link to new html file in _site.yml
 
