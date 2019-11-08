@@ -418,7 +418,7 @@ div.section {
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -427,7 +427,7 @@ div.section {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -439,7 +439,7 @@ div.section {
 <strong>Last updated:</strong> 2019-11-08
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>BloomSail/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
@@ -455,12 +455,12 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
 </div>
 </div>
 </div>
@@ -527,10 +527,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeefcf0d61c03027279374fdae69c3cfb69d4b538ctargetblankefcf0d6a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/efcf0d61c03027279374fdae69c3cfb69d4b538c" target="_blank">efcf0d6</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb8dac9c23da38412f84138535be86e4510610b1btargetblankb8dac9ca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b8dac9c23da38412f84138535be86e4510610b1b" target="_blank">b8dac9c</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeefcf0d61c03027279374fdae69c3cfb69d4b538ctargetblankefcf0d6a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb8dac9c23da38412f84138535be86e4510610b1btargetblankb8dac9ca" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -539,10 +539,13 @@ Great! You are using Git for version control. Tracking code development and conn
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
+
+Unstaged changes:
+    Modified:   analysis/response_time.Rmd
+    Modified:   output/Plots/response_time/RT_determination.pdf
 
 </code></pre>
 <p>
@@ -581,6 +584,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/b8dac9c23da38412f84138535be86e4510610b1b/docs/response_time.html" target="_blank">b8dac9c</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1172,99 +1192,118 @@ jens-daniel-mueller
 <pre class="r"><code>duration_intervals &lt;- seq(150,500,50)</code></pre>
 <p>As there was some speculation about the dependence of determined response times (<span class="math inline">\(\tau\)</span>) on the chosen duration of the fit interval, <span class="math inline">\(\tau\)</span> was determined for all zeroings and for total durations of:<br />
 150, 200, 250, 300, 350, 400, 450, 500 secs</p>
-<p>A pdf with plots of all individual response time fits can be accessed <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output" target="_blank">here</a></p>
-<pre class="r"><code>tau_df &lt;- read_csv(here::here(&quot;data/_summarized_data_files&quot;, &quot;Tina_V_HydroC_response_times_all.csv&quot;))
+<pre class="r"><code># Plot all individual Flush periods with exponential fit ----------------------
 
-# define subsetting parameters
-resid_limit &lt;- 1
+pdf(file=here::here(&quot;output/Plots/response_time&quot;,
+    &quot;RT_determination.pdf&quot;), onefile = TRUE, width = 7, height = 4)
 
-# subset determined tau values by residual threshold
-tau_resid &lt;- tau_df %&gt;% 
-  group_by(Zero_ID) %&gt;% 
-  mutate(resid_max = max(resid, na.rm = TRUE)) %&gt;% 
-  filter(resid_max &lt; resid_limit) %&gt;% 
-  select(-resid_max) %&gt;% 
-  ungroup()
+for (i in unique(df$Zero_ID)) {
+  for (max_duration in duration_intervals) {
+    
+    df_ID &lt;- df %&gt;%
+      filter(Zero_ID == i, duration &lt;= max_duration)
+    
+    fit &lt;- 
+      try(
+      df_ID %&gt;%
+          nls(pCO2 ~ SSasymp(duration, yf, y0, log_alpha), data = .),
+      TRUE)
+    
+    if (class(fit) == &quot;nls&quot;){
+    
+      tau &lt;- as.numeric(exp(-tidy(fit)[3,2]))
+      pCO2_end &lt;- as.numeric(tidy(fit)[1,2])
+      pCO2_start &lt;- as.numeric(tidy(fit)[2,2])
+      dpCO2 = pCO2_end - pCO2_start
+      mean_abs_resid &lt;- mean(abs(resid(fit))/pCO2_end)*100
+      
+      temp &lt;- as_tibble(bind_cols(Zero_ID = i, duration = max_duration, tau = tau, resid = mean_abs_resid))
+      
+      if (exists(&quot;tau_df&quot;)){tau_df &lt;- bind_rows(tau_df, temp)}
+        else {tau_df &lt;- temp}
+      
+      if (mean_abs_resid &gt; 1){warn &lt;- &quot;orange&quot;}
+        else {warn &lt;- &quot;black&quot;}
+      
+      print(
+      augment(fit) %&gt;%
+        ggplot(aes(duration, pCO2))+
+        geom_point(col = warn)+
+        geom_line(aes(y = .fitted))+
+        geom_vline(xintercept = tau)+
+        geom_hline(yintercept = pCO2_start + 0.63 *(dpCO2))+
+        labs(y=expression(pCO[2]~(µatm)), x=&quot;Duration of Flush period (s)&quot;,
+             title = paste(&quot;Zero_ID: &quot;, i,
+                           &quot;Tau: &quot;, round(tau,1),
+                           &quot;Mean absolute residual (%): &quot;, round(mean_abs_resid, 2)))+
+        xlim(0,600)
+      )
+      
+    }
+    
+    
+    else {
+    
+      temp &lt;- as_tibble(bind_cols(Zero_ID = i, duration = max_duration, tau = NaN, resid = NaN))
+      
+      if (exists(&quot;tau_df&quot;)){tau_df &lt;- bind_rows(tau_df, temp)}
+        else {tau_df &lt;- temp}
+      
+      print(
+      df_ID %&gt;%
+        ggplot(aes(duration, pCO2))+
+        geom_point(col=&quot;red&quot;)+
+        labs(y=expression(pCO[2]~(µatm)), x=&quot;Duration of Flush period (s)&quot;,
+             title = paste(&quot;Zero_ID: &quot;, i,
+                           &quot;nls model failed&quot;))+
+        xlim(0,600)
+      )
+      
+    }
+  }
+}
 
-tau_resid_out &lt;- tau_df %&gt;% 
-  group_by(Zero_ID) %&gt;% 
-  mutate(resid_max = max(resid, na.rm = TRUE)) %&gt;% 
-  filter(resid_max &gt; resid_limit) %&gt;% 
-  select(-resid_max) %&gt;% 
-  ungroup()
+dev.off()
 
-# Flush periods where model failure occured
+rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, temp, max_duration, mean_abs_resid, warn)
+
 tau_df %&gt;% 
-  filter(is.na(resid)) %&gt;% 
-  group_by(Zero_ID) %&gt;% 
-  summarise(n()) %&gt;% 
-  ungroup()</code></pre>
-<pre><code># A tibble: 11 x 2
-   Zero_ID `n()`
-     &lt;dbl&gt; &lt;int&gt;
- 1      13     3
- 2      34     4
- 3      48     1
- 4      49     2
- 5      50     1
- 6      58     2
- 7      84     1
- 8      89     4
- 9     105     1
-10     108     2
-11     109     2</code></pre>
-<pre class="r"><code># Flush periods removed due to residual criterion
-tau_resid_out %&gt;% 
-  group_by(Zero_ID) %&gt;% 
-  summarise(n()) %&gt;% 
-  ungroup()</code></pre>
-<pre><code># A tibble: 17 x 2
-   Zero_ID `n()`
-     &lt;dbl&gt; &lt;int&gt;
- 1       6     8
- 2      13     8
- 3      34     8
- 4      36     8
- 5      48     8
- 6      49     8
- 7      50     8
- 8      58     8
- 9      60     8
-10      61     8
-11      84     8
-12      89     8
-13      99     8
-14     105     8
-15     108     8
-16     109     8
-17     112     8</code></pre>
-<pre class="r"><code># mean tau of first RT determination
-tau_resid %&gt;% 
-  filter(Zero_ID == 2) %&gt;% 
-  summarise(tau = mean(tau))</code></pre>
-<pre><code># A tibble: 1 x 1
-    tau
-  &lt;dbl&gt;
-1  152.</code></pre>
-<pre class="r"><code># mean tau of all RT determinations before pump switch, except first
-tau_resid %&gt;% 
-  filter(Zero_ID != 2, Zero_ID &lt;= 20) %&gt;% 
-  summarise(tau = mean(tau))</code></pre>
-<pre><code># A tibble: 1 x 1
-    tau
-  &lt;dbl&gt;
-1  77.4</code></pre>
-<pre class="r"><code>tau_resid &lt;- tau_resid %&gt;% 
-  filter(Zero_ID != 2)
+  write_csv(here::here(&quot;data/_summarized_data_files&quot;, &quot;Tina_V_HydroC_response_times_all.csv&quot;))
 
-# calculate some metrics for the subsetting
-n_Zero_IDs &lt;- tau_df %&gt;% 
-  group_by(Zero_ID) %&gt;% 
-  n_groups()
-n_duration_intervals &lt;- length(duration_intervals)
-n_tau_max &lt;- n_Zero_IDs * length(duration_intervals)
-n_tau_total &lt;- nrow(tau_df %&gt;% filter(!is.na(resid)))
-n_tau_resid &lt;- nrow(tau_resid)</code></pre>
+# Plot individual Flush periods with linearized response variable  --------
+# for (i in unique(df$Zero_ID)) {
+# 
+# #i &lt;- 50
+# df_ID &lt;- df %&gt;%
+#   filter(Zero_ID == i,
+#          mixing == &quot;equilibration&quot;)
+# 
+# mean_pCO2 &lt;- df_ID %&gt;% 
+#   slice((n()-4) : n()) %&gt;% 
+#   summarise(mean_pCO2 = mean(pCO2))
+# 
+# df_ID &lt;- full_join(df_ID, mean_pCO2) %&gt;% 
+#   mutate(dpCO2 = max(pCO2) - pCO2,
+#          ln_dpCO2 = log(dpCO2))
+# 
+# 
+# df_ID %&gt;%
+#   ggplot(aes(duration_equi, ln_dpCO2))+
+#   geom_point()+
+#   geom_smooth(method = &quot;lm&quot;)+
+#   theme_bw()
+# 
+# # augment(fit) %&gt;%
+# #   ggplot(aes(duration_equi, pCO2))+
+# #   geom_point()+
+# #   geom_line(aes(y = .fitted))+
+# #   geom_vline(xintercept = tau)
+# 
+# ggsave(here::here(&quot;/Plots/TinaV/Sensor/HydroC_diagnostics/Response_time_fits&quot;,
+#                   paste(i,&quot;_Zero_ID_HydroC_RT_linear.jpg&quot;, sep=&quot;&quot;)),
+#          width = 10, height = 4)
+# }</code></pre>
+<p>A pdf with plots of all individual response time fits can be accessed <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output" target="_blank">here</a></p>
 </div>
 <div id="outcome" class="section level2">
 <h2>Outcome</h2>
@@ -1362,6 +1401,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b8dac9c23da38412f84138535be86e4510610b1b/docs/figure/response_time.Rmd/tau_for_all_zero_ID-1.png" target="_blank">b8dac9c</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f3277a56d2db9b7d61260255dab9134e2da26b67/docs/figure/response_time.Rmd/tau_for_all_zero_ID-1.png" target="_blank">f3277a5</a>
 </td>
 <td>
@@ -1414,6 +1464,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b8dac9c23da38412f84138535be86e4510610b1b/docs/figure/response_time.Rmd/tau_duration_individual-1.png" target="_blank">b8dac9c</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f3277a56d2db9b7d61260255dab9134e2da26b67/docs/figure/response_time.Rmd/tau_duration_individual-1.png" target="_blank">f3277a5</a>
 </td>
 <td>
@@ -1462,6 +1523,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b8dac9c23da38412f84138535be86e4510610b1b/docs/figure/response_time.Rmd/r tau_duration_mean-1.png" target="_blank">b8dac9c</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f3277a56d2db9b7d61260255dab9134e2da26b67/docs/figure/response_time.Rmd/r tau_duration_mean-1.png" target="_blank">f3277a5</a>

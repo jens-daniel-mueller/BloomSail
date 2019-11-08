@@ -166,7 +166,7 @@ As there was some speculation about the dependence of determined response times 
 `r duration_intervals` secs
 
 
-```{r all_response_times, include=FALSE, echo=TRUE}
+```{r all_response_times, include=TRUE, eval=FALSE}
 
 # Plot all individual Flush periods with exponential fit ----------------------
 
@@ -285,7 +285,7 @@ tau_df %>%
 A pdf with plots of all individual response time fits can be accessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output){target="_blank"}
 
 
-```{r thresholds_for_tau_and_fit_residual}
+```{r thresholds_for_tau_and_fit_residual, include=FALSE}
 
 tau_df <- read_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_response_times_all.csv"))
 
