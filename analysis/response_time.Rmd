@@ -166,7 +166,7 @@ As there was some speculation about the dependence of determined response times 
 `r duration_intervals` secs
 
 
-```{r all_response_times, eval=FALSE, echo=TRUE}
+```{r all_response_times, include=FALSE, echo=TRUE}
 
 # Plot all individual Flush periods with exponential fit ----------------------
 
@@ -198,15 +198,40 @@ for (i in unique(df$Zero_ID)) {
       if (exists("tau_df")){tau_df <- bind_rows(tau_df, temp)}
         else {tau_df <- temp}
       
+      if (mean_abs_resid > 1){warn <- "orange"}
+        else {warn <- "black"}
+      
       print(
       augment(fit) %>%
         ggplot(aes(duration, pCO2))+
-        geom_point()+
+        geom_point(col = warn)+
         geom_line(aes(y = .fitted))+
         geom_vline(xintercept = tau)+
         geom_hline(yintercept = pCO2_start + 0.63 *(dpCO2))+
         labs(y=expression(pCO[2]~(µatm)), x="Duration of Flush period (s)",
-             title = paste("Zero_ID: ", i, "Mean absolute residual (%): ", round(mean_abs_resid*100, 2)))+
+             title = paste("Zero_ID: ", i,
+                           "Tau: ", round(tau,1),
+                           "Mean absolute residual (%): ", round(mean_abs_resid, 2)))+
+        xlim(0,600)
+      )
+      
+    }
+    
+    
+    else {
+    
+      temp <- as_tibble(bind_cols(Zero_ID = i, duration = max_duration, tau = NaN, resid = NaN))
+      
+      if (exists("tau_df")){tau_df <- bind_rows(tau_df, temp)}
+        else {tau_df <- temp}
+      
+      print(
+      df_ID %>%
+        ggplot(aes(duration, pCO2))+
+        geom_point(col="red")+
+        labs(y=expression(pCO[2]~(µatm)), x="Duration of Flush period (s)",
+             title = paste("Zero_ID: ", i,
+                           "nls model failed"))+
         xlim(0,600)
       )
       
@@ -216,14 +241,12 @@ for (i in unique(df$Zero_ID)) {
 
 dev.off()
 
-rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, temp, max_duration, mean_abs_resid)
+rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, temp, max_duration, mean_abs_resid, warn)
 
 tau_df %>% 
   write_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_response_times_all.csv"))
 
 # Plot individual Flush periods with linearized response variable  --------
-
-
 # for (i in unique(df$Zero_ID)) {
 # 
 # #i <- 50
@@ -267,26 +290,57 @@ A pdf with plots of all individual response time fits can be accessed [here](htt
 tau_df <- read_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_response_times_all.csv"))
 
 # define subsetting parameters
-tau_high <- 120
-tau_low <- 20
 resid_limit <- 1
 
-# subset determined tau values
+# subset determined tau values by residual threshold
 tau_resid <- tau_df %>% 
-  filter(resid < resid_limit)
+  group_by(Zero_ID) %>% 
+  mutate(resid_max = max(resid, na.rm = TRUE)) %>% 
+  filter(resid_max < resid_limit) %>% 
+  select(-resid_max) %>% 
+  ungroup()
 
-tau_resid_min_max <- tau_resid %>% 
-  filter(tau > tau_low, tau < tau_high)
+tau_resid_out <- tau_df %>% 
+  group_by(Zero_ID) %>% 
+  mutate(resid_max = max(resid, na.rm = TRUE)) %>% 
+  filter(resid_max > resid_limit) %>% 
+  select(-resid_max) %>% 
+  ungroup()
+
+# Flush periods where model failure occured
+tau_df %>% 
+  filter(is.na(resid)) %>% 
+  group_by(Zero_ID) %>% 
+  summarise(n()) %>% 
+  ungroup()
+
+# Flush periods removed due to residual criterion
+tau_resid_out %>% 
+  group_by(Zero_ID) %>% 
+  summarise(n()) %>% 
+  ungroup()
+
+# mean tau of first RT determination
+tau_resid %>% 
+  filter(Zero_ID == 2) %>% 
+  summarise(tau = mean(tau))
+
+# mean tau of all RT determinations before pump switch, except first
+tau_resid %>% 
+  filter(Zero_ID != 2, Zero_ID <= 20) %>% 
+  summarise(tau = mean(tau))
+
+tau_resid <- tau_resid %>% 
+  filter(Zero_ID != 2)
 
 # calculate some metrics for the subsetting
-n_Zero_IDs <- df %>% 
+n_Zero_IDs <- tau_df %>% 
   group_by(Zero_ID) %>% 
   n_groups()
 n_duration_intervals <- length(duration_intervals)
 n_tau_max <- n_Zero_IDs * length(duration_intervals)
-n_tau_total <- nrow(tau_df)
+n_tau_total <- nrow(tau_df %>% filter(!is.na(resid)))
 n_tau_resid <- nrow(tau_resid)
-n_tau_resid_min_max <- nrow(tau_resid_min_max)
 
 ```
 
@@ -294,9 +348,7 @@ n_tau_resid_min_max <- nrow(tau_resid_min_max)
 ## Outcome
 
 
-Estimated $\tau$ values were restricted to 
-* mean absolute fit residual above `r resid_limit` % of the final equilibrium pCO~2~
-* $\tau$ falling between `r tau_low` and `r tau_high` seconds
+Estimated $\tau$ values were only taken into account when stable environmental pCO~2~ levels were present. Absence of stable environmental pCO~2~ was assumed when the mean absolute fit residual was above `r resid_limit` % of the final equilibrium pCO~2~, for any model fit of that flush period irrespective of the chosen fit interval length. Usually, fits with the higher duration did not meet this criterion. For some unexplained reason the first $\tau$ determination resulted in values about twice as high as all other Flush periods and was therefore removed as an outlier.
 
 Metrics to characterize the fitting procedure include the number of:
 
@@ -304,10 +356,11 @@ Metrics to characterize the fitting procedure include the number of:
 * Duration intervals: `r n_duration_intervals`
 * Exercised response time fits: `r n_tau_max`
 * Succesful response times determinations: `r n_tau_total` (`r round(100*n_tau_total/n_tau_max, 1)`)%
-* $\tau$'s after removing fits with high absolute fit residual: `r n_tau_resid` (`r round(100*n_tau_resid/n_tau_total, 1)` %)
-* $\tau$'s after restriction to $\tau$ thresholds: `r n_tau_resid_min_max` (`r round(100*n_tau_resid_min_max/n_tau_total, 1)` %)
+* $\tau$'s after removing groups of fits with high absolute fit residual: `r n_tau_resid` (`r round(100*n_tau_resid/n_tau_max, 1)` %)
 
-`r rm(n_Zero_IDs, n_duration_intervals,n_tau_max, n_tau_total, n_tau_resid, n_tau_resid_min_max)`
+It should be noted that all failed model fits occured in flush periods where the residual criterion was not meet by at least one other fit (i.e. fitting only failed under unstable conditions).
+
+`r rm(n_Zero_IDs, n_duration_intervals,n_tau_max, n_tau_total, n_tau_resid, n_tau_resid_min_max, mean_abs_resid, tau_resid_out)`
 
 ```{r fit_residuals, fig.cap="Histogram of residuals from fit displayed for the investigate durations of the fit interval. Vertical line represents the chosen threshold."}
 
@@ -320,29 +373,18 @@ tau_df %>%
 
 ```
 
-```{r number_of_tau, fig.cap="Number of determined tau values as a function of the fit interval length, after applying a fit residual threshold"}
-
-tau_resid %>% 
-  group_by(duration) %>% 
-  mutate(n_tau = n()) %>% 
-  ggplot(aes(duration, n_tau))+
-  geom_point()+
-  labs(x="Fit interval duration (sec)", y="Number of tau values")
-
-```
-
 ```{r tau_for_all_zero_ID, fig.cap="Tau for all Zeroings with color representing the fit interval duration."}
-tau_resid_min_max %>% 
+tau_resid %>% 
   ggplot(aes(Zero_ID, tau, col=duration))+
   geom_point()+
   scale_color_viridis_c(name="Duration (sec)")+
   labs(y="Tau (sec)")
-
 ```
+
 
 ```{r tau_duration_individual, fig.cap="Determined tau values as a function of the fit interval duration, displayed individually for each flush period.", fig.asp=2}
 
-tau_resid_min_max %>% 
+tau_resid %>% 
   group_by(Zero_ID) %>% 
   mutate(d_tau = tau - mean(tau)) %>% 
   ggplot(aes(duration, d_tau))+
@@ -357,7 +399,7 @@ tau_resid_min_max %>%
 
 ```{r r tau_duration_mean, fig.cap="Determined tau values as a function of the fit interval duration, pooled for all flush period."}
 
-tau_resid_min_max %>% 
+tau_resid %>% 
   group_by(Zero_ID) %>% 
   mutate(d_tau = tau - mean(tau)) %>% 
   ggplot(aes(duration, d_tau))+
@@ -462,6 +504,28 @@ RT %>%
 
 ```
 
+## Mean response time
+
+Finally, the mean response times are:
+
+```{r mean_response_time}
+
+
+max_Zero_ID <- max(unique(df[df$date_time < ymd_hms("2018-07-17;13:08:34"),]$Zero_ID))
+min_Zero_ID <- min(unique(df[df$date_time > ymd_hms("2018-07-17;13:08:34"),]$Zero_ID))
+
+# tau_df %>% 
+#   mutate(pump_power = if_else(Zero_ID <= 20, "1W", "8W")) %>% 
+#   group_by(pump_power) %>% 
+#   summarise(tau = mean(tau, na.rm = TRUE))
+
+tau_resid %>% 
+  mutate(pump_power = if_else(Zero_ID <= max_Zero_ID, "1W", "8W")) %>% 
+  group_by(pump_power) %>% 
+  summarise(tau = mean(tau))
+
+```
+
 
 
 # Pre-smoothing
@@ -472,7 +536,4 @@ RT %>%
 
 - Compare Contros and own response time estimates
 - Compare differnt response time correction methods (Bittig vs. Fiedler, Miloshevich, Fietzek)
-- Test impact of duration for response time estimation on final mean response time
-- Test impact of selection criterion for "good" response time estimates on final mean response time
 - Check results from field response time experiment (high zeroing frequency)
-- Why does nls model failure increase with higher fit duration
