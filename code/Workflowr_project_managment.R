@@ -105,7 +105,7 @@ wflow_open("analysis/first-analysis.Rmd")
 wflow_build()
 
 # commit regular changes (locally) and rebuild site
-wflow_publish("analysis/*", message = "XXX")
+wflow_publish(all = TRUE, message = "XXX")
 
 # commit changes including _site.yml (locally) and rebuild site
 wflow_publish(c("analysis/*"), message = "XXX", republish = TRUE)
