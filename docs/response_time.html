@@ -527,10 +527,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeaa27fd4aea1661e0410b87a1d91320e91968cd02targetblankaa27fd4a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/aa27fd4aea1661e0410b87a1d91320e91968cd02" target="_blank">aa27fd4</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeefcf0d61c03027279374fdae69c3cfb69d4b538ctargetblankefcf0d6a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/efcf0d61c03027279374fdae69c3cfb69d4b538c" target="_blank">efcf0d6</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeaa27fd4aea1661e0410b87a1d91320e91968cd02targetblankaa27fd4a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeefcf0d61c03027279374fdae69c3cfb69d4b538ctargetblankefcf0d6a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -539,12 +539,10 @@ Great! You are using Git for version control. Tracking code development and conn
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
-
-Unstaged changes:
-    Modified:   output/Plots/response_time/RT_determination.pdf
 
 </code></pre>
 <p>
@@ -583,6 +581,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/efcf0d61c03027279374fdae69c3cfb69d4b538c/analysis/response_time.Rmd" target="_blank">efcf0d6</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+<td>
+Finalized and cleaned RT determination
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/f3277a56d2db9b7d61260255dab9134e2da26b67/docs/response_time.html" target="_blank">f3277a5</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1140,131 +1172,112 @@ jens-daniel-mueller
 <pre class="r"><code>duration_intervals &lt;- seq(150,500,50)</code></pre>
 <p>As there was some speculation about the dependence of determined response times (<span class="math inline">\(\tau\)</span>) on the chosen duration of the fit interval, <span class="math inline">\(\tau\)</span> was determined for all zeroings and for total durations of:<br />
 150, 200, 250, 300, 350, 400, 450, 500 secs</p>
-<pre class="r"><code># Plot all individual Flush periods with exponential fit ----------------------
-
-pdf(file=here::here(&quot;output/Plots/response_time&quot;,
-    &quot;RT_determination.pdf&quot;), onefile = TRUE, width = 7, height = 4)
-
-for (i in unique(df$Zero_ID)) {
-  for (max_duration in duration_intervals) {
-    
-    df_ID &lt;- df %&gt;%
-      filter(Zero_ID == i, duration &lt;= max_duration)
-    
-    fit &lt;- 
-      try(
-      df_ID %&gt;%
-          nls(pCO2 ~ SSasymp(duration, yf, y0, log_alpha), data = .),
-      TRUE)
-    
-    if (class(fit) == &quot;nls&quot;){
-    
-      tau &lt;- as.numeric(exp(-tidy(fit)[3,2]))
-      pCO2_end &lt;- as.numeric(tidy(fit)[1,2])
-      pCO2_start &lt;- as.numeric(tidy(fit)[2,2])
-      dpCO2 = pCO2_end - pCO2_start
-      mean_abs_resid &lt;- mean(abs(resid(fit))/pCO2_end)*100
-      
-      temp &lt;- as_tibble(bind_cols(Zero_ID = i, duration = max_duration, tau = tau, resid = mean_abs_resid))
-      
-      if (exists(&quot;tau_df&quot;)){tau_df &lt;- bind_rows(tau_df, temp)}
-        else {tau_df &lt;- temp}
-      
-      print(
-      augment(fit) %&gt;%
-        ggplot(aes(duration, pCO2))+
-        geom_point()+
-        geom_line(aes(y = .fitted))+
-        geom_vline(xintercept = tau)+
-        geom_hline(yintercept = pCO2_start + 0.63 *(dpCO2))+
-        labs(y=expression(pCO[2]~(µatm)), x=&quot;Duration of Flush period (s)&quot;,
-             title = paste(&quot;Zero_ID: &quot;, i, &quot;Mean absolute residual (%): &quot;, round(mean_abs_resid*100, 2)))+
-        xlim(0,600)
-      )
-      
-    }
-  }
-}
-
-dev.off()
-
-rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, temp, max_duration, mean_abs_resid)
-
-tau_df %&gt;% 
-  write_csv(here::here(&quot;data/_summarized_data_files&quot;, &quot;Tina_V_HydroC_response_times_all.csv&quot;))
-
-# Plot individual Flush periods with linearized response variable  --------
-
-
-# for (i in unique(df$Zero_ID)) {
-# 
-# #i &lt;- 50
-# df_ID &lt;- df %&gt;%
-#   filter(Zero_ID == i,
-#          mixing == &quot;equilibration&quot;)
-# 
-# mean_pCO2 &lt;- df_ID %&gt;% 
-#   slice((n()-4) : n()) %&gt;% 
-#   summarise(mean_pCO2 = mean(pCO2))
-# 
-# df_ID &lt;- full_join(df_ID, mean_pCO2) %&gt;% 
-#   mutate(dpCO2 = max(pCO2) - pCO2,
-#          ln_dpCO2 = log(dpCO2))
-# 
-# 
-# df_ID %&gt;%
-#   ggplot(aes(duration_equi, ln_dpCO2))+
-#   geom_point()+
-#   geom_smooth(method = &quot;lm&quot;)+
-#   theme_bw()
-# 
-# # augment(fit) %&gt;%
-# #   ggplot(aes(duration_equi, pCO2))+
-# #   geom_point()+
-# #   geom_line(aes(y = .fitted))+
-# #   geom_vline(xintercept = tau)
-# 
-# ggsave(here::here(&quot;/Plots/TinaV/Sensor/HydroC_diagnostics/Response_time_fits&quot;,
-#                   paste(i,&quot;_Zero_ID_HydroC_RT_linear.jpg&quot;, sep=&quot;&quot;)),
-#          width = 10, height = 4)
-# }</code></pre>
 <p>A pdf with plots of all individual response time fits can be accessed <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output" target="_blank">here</a></p>
 <pre class="r"><code>tau_df &lt;- read_csv(here::here(&quot;data/_summarized_data_files&quot;, &quot;Tina_V_HydroC_response_times_all.csv&quot;))
 
 # define subsetting parameters
-tau_high &lt;- 120
-tau_low &lt;- 20
 resid_limit &lt;- 1
 
-# subset determined tau values
+# subset determined tau values by residual threshold
 tau_resid &lt;- tau_df %&gt;% 
-  filter(resid &lt; resid_limit)
+  group_by(Zero_ID) %&gt;% 
+  mutate(resid_max = max(resid, na.rm = TRUE)) %&gt;% 
+  filter(resid_max &lt; resid_limit) %&gt;% 
+  select(-resid_max) %&gt;% 
+  ungroup()
 
-tau_resid_min_max &lt;- tau_resid %&gt;% 
-  filter(tau &gt; tau_low, tau &lt; tau_high)
+tau_resid_out &lt;- tau_df %&gt;% 
+  group_by(Zero_ID) %&gt;% 
+  mutate(resid_max = max(resid, na.rm = TRUE)) %&gt;% 
+  filter(resid_max &gt; resid_limit) %&gt;% 
+  select(-resid_max) %&gt;% 
+  ungroup()
+
+# Flush periods where model failure occured
+tau_df %&gt;% 
+  filter(is.na(resid)) %&gt;% 
+  group_by(Zero_ID) %&gt;% 
+  summarise(n()) %&gt;% 
+  ungroup()</code></pre>
+<pre><code># A tibble: 11 x 2
+   Zero_ID `n()`
+     &lt;dbl&gt; &lt;int&gt;
+ 1      13     3
+ 2      34     4
+ 3      48     1
+ 4      49     2
+ 5      50     1
+ 6      58     2
+ 7      84     1
+ 8      89     4
+ 9     105     1
+10     108     2
+11     109     2</code></pre>
+<pre class="r"><code># Flush periods removed due to residual criterion
+tau_resid_out %&gt;% 
+  group_by(Zero_ID) %&gt;% 
+  summarise(n()) %&gt;% 
+  ungroup()</code></pre>
+<pre><code># A tibble: 17 x 2
+   Zero_ID `n()`
+     &lt;dbl&gt; &lt;int&gt;
+ 1       6     8
+ 2      13     8
+ 3      34     8
+ 4      36     8
+ 5      48     8
+ 6      49     8
+ 7      50     8
+ 8      58     8
+ 9      60     8
+10      61     8
+11      84     8
+12      89     8
+13      99     8
+14     105     8
+15     108     8
+16     109     8
+17     112     8</code></pre>
+<pre class="r"><code># mean tau of first RT determination
+tau_resid %&gt;% 
+  filter(Zero_ID == 2) %&gt;% 
+  summarise(tau = mean(tau))</code></pre>
+<pre><code># A tibble: 1 x 1
+    tau
+  &lt;dbl&gt;
+1  152.</code></pre>
+<pre class="r"><code># mean tau of all RT determinations before pump switch, except first
+tau_resid %&gt;% 
+  filter(Zero_ID != 2, Zero_ID &lt;= 20) %&gt;% 
+  summarise(tau = mean(tau))</code></pre>
+<pre><code># A tibble: 1 x 1
+    tau
+  &lt;dbl&gt;
+1  77.4</code></pre>
+<pre class="r"><code>tau_resid &lt;- tau_resid %&gt;% 
+  filter(Zero_ID != 2)
 
 # calculate some metrics for the subsetting
-n_Zero_IDs &lt;- df %&gt;% 
+n_Zero_IDs &lt;- tau_df %&gt;% 
   group_by(Zero_ID) %&gt;% 
   n_groups()
 n_duration_intervals &lt;- length(duration_intervals)
 n_tau_max &lt;- n_Zero_IDs * length(duration_intervals)
-n_tau_total &lt;- nrow(tau_df)
-n_tau_resid &lt;- nrow(tau_resid)
-n_tau_resid_min_max &lt;- nrow(tau_resid_min_max)</code></pre>
+n_tau_total &lt;- nrow(tau_df %&gt;% filter(!is.na(resid)))
+n_tau_resid &lt;- nrow(tau_resid)</code></pre>
 </div>
 <div id="outcome" class="section level2">
 <h2>Outcome</h2>
-<p>Estimated <span class="math inline">\(\tau\)</span> values were restricted to * mean absolute fit residual above 1 % of the final equilibrium pCO<sub>2</sub> * <span class="math inline">\(\tau\)</span> falling between 20 and 120 seconds</p>
+<p>Estimated <span class="math inline">\(\tau\)</span> values were only taken into account when stable environmental pCO<sub>2</sub> levels were present. Absence of stable environmental pCO<sub>2</sub> was assumed when the mean absolute fit residual was above 1 % of the final equilibrium pCO<sub>2</sub>, for any model fit of that flush period irrespective of the chosen fit interval length. Usually, fits with the higher duration did not meet this criterion. For some unexplained reason the first <span class="math inline">\(\tau\)</span> determination resulted in values about twice as high as all other Flush periods and was therefore removed as an outlier.</p>
 <p>Metrics to characterize the fitting procedure include the number of:</p>
 <ul>
 <li>Flush periods: 55</li>
 <li>Duration intervals: 8</li>
 <li>Exercised response time fits: 440</li>
 <li>Succesful response times determinations: 417 (94.8)%</li>
-<li><span class="math inline">\(\tau\)</span>’s after removing fits with high absolute fit residual: 375 (89.9 %)</li>
-<li><span class="math inline">\(\tau\)</span>’s after restriction to <span class="math inline">\(\tau\)</span> thresholds: 365 (87.5 %)</li>
+<li><span class="math inline">\(\tau\)</span>’s after removing groups of fits with high absolute fit residual: 296 (67.3 %)</li>
 </ul>
+<p>It should be noted that all failed model fits occured in flush periods where the residual criterion was not meet by at least one other fit (i.e. fitting only failed under unstable conditions).</p>
 <pre class="r"><code>tau_df %&gt;% 
   ggplot(aes(resid))+
   geom_histogram()+
@@ -1277,19 +1290,44 @@ n_tau_resid_min_max &lt;- nrow(tau_resid_min_max)</code></pre>
 Histogram of residuals from fit displayed for the investigate durations of the fit interval. Vertical line represents the chosen threshold.
 </p>
 </div>
-<pre class="r"><code>tau_resid %&gt;% 
-  group_by(duration) %&gt;% 
-  mutate(n_tau = n()) %&gt;% 
-  ggplot(aes(duration, n_tau))+
-  geom_point()+
-  labs(x=&quot;Fit interval duration (sec)&quot;, y=&quot;Number of tau values&quot;)</code></pre>
-<div class="figure" style="text-align: center">
-<img src="figure/response_time.Rmd/number_of_tau-1.png" alt="Number of determined tau values as a function of the fit interval length, after applying a fit residual threshold" width="672" />
-<p class="caption">
-Number of determined tau values as a function of the fit interval length, after applying a fit residual threshold
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-fit_residuals-1">
+Past versions of fit_residuals-1.png
+</button>
 </p>
+<div id="fig-fit_residuals-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f3277a56d2db9b7d61260255dab9134e2da26b67/docs/figure/response_time.Rmd/fit_residuals-1.png" target="_blank">f3277a5</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+</tr>
+</tbody>
+</table>
 </div>
-<pre class="r"><code>tau_resid_min_max %&gt;% 
+</div>
+<pre class="r"><code>tau_resid %&gt;% 
   ggplot(aes(Zero_ID, tau, col=duration))+
   geom_point()+
   scale_color_viridis_c(name=&quot;Duration (sec)&quot;)+
@@ -1300,7 +1338,44 @@ Number of determined tau values as a function of the fit interval length, after 
 Tau for all Zeroings with color representing the fit interval duration.
 </p>
 </div>
-<pre class="r"><code>tau_resid_min_max %&gt;% 
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-tau_for_all_zero_ID-1">
+Past versions of tau_for_all_zero_ID-1.png
+</button>
+</p>
+<div id="fig-tau_for_all_zero_ID-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f3277a56d2db9b7d61260255dab9134e2da26b67/docs/figure/response_time.Rmd/tau_for_all_zero_ID-1.png" target="_blank">f3277a5</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>tau_resid %&gt;% 
   group_by(Zero_ID) %&gt;% 
   mutate(d_tau = tau - mean(tau)) %&gt;% 
   ggplot(aes(duration, d_tau))+
@@ -1315,7 +1390,44 @@ Tau for all Zeroings with color representing the fit interval duration.
 Determined tau values as a function of the fit interval duration, displayed individually for each flush period.
 </p>
 </div>
-<pre class="r"><code>tau_resid_min_max %&gt;% 
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-tau_duration_individual-1">
+Past versions of tau_duration_individual-1.png
+</button>
+</p>
+<div id="fig-tau_duration_individual-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f3277a56d2db9b7d61260255dab9134e2da26b67/docs/figure/response_time.Rmd/tau_duration_individual-1.png" target="_blank">f3277a5</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>tau_resid %&gt;% 
   group_by(Zero_ID) %&gt;% 
   mutate(d_tau = tau - mean(tau)) %&gt;% 
   ggplot(aes(duration, d_tau))+
@@ -1328,6 +1440,64 @@ Determined tau values as a function of the fit interval duration, displayed indi
 Determined tau values as a function of the fit interval duration, pooled for all flush period.
 </p>
 </div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-r-tau_duration_mean-1">
+Past versions of “r tau_duration_mean-1.png”
+</button>
+</p>
+<div id="fig-no-spaces-r-tau_duration_mean-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f3277a56d2db9b7d61260255dab9134e2da26b67/docs/figure/response_time.Rmd/r tau_duration_mean-1.png" target="_blank">f3277a5</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="mean-response-time" class="section level2">
+<h2>Mean response time</h2>
+<p>Finally, the mean response times are:</p>
+<pre class="r"><code>max_Zero_ID &lt;- max(unique(df[df$date_time &lt; ymd_hms(&quot;2018-07-17;13:08:34&quot;),]$Zero_ID))
+min_Zero_ID &lt;- min(unique(df[df$date_time &gt; ymd_hms(&quot;2018-07-17;13:08:34&quot;),]$Zero_ID))
+
+# tau_df %&gt;% 
+#   mutate(pump_power = if_else(Zero_ID &lt;= 20, &quot;1W&quot;, &quot;8W&quot;)) %&gt;% 
+#   group_by(pump_power) %&gt;% 
+#   summarise(tau = mean(tau, na.rm = TRUE))
+
+tau_resid %&gt;% 
+  mutate(pump_power = if_else(Zero_ID &lt;= max_Zero_ID, &quot;1W&quot;, &quot;8W&quot;)) %&gt;% 
+  group_by(pump_power) %&gt;% 
+  summarise(tau = mean(tau))</code></pre>
+<pre><code># A tibble: 2 x 2
+  pump_power   tau
+  &lt;chr&gt;      &lt;dbl&gt;
+1 1W          77.4
+2 8W          56.6</code></pre>
 </div>
 </div>
 <div id="pre-smoothing" class="section level1">
@@ -1347,10 +1517,7 @@ Determined tau values as a function of the fit interval duration, pooled for all
 <ul>
 <li>Compare Contros and own response time estimates</li>
 <li>Compare differnt response time correction methods (Bittig vs. Fiedler, Miloshevich, Fietzek)</li>
-<li>Test impact of duration for response time estimation on final mean response time</li>
-<li>Test impact of selection criterion for “good” response time estimates on final mean response time</li>
 <li>Check results from field response time experiment (high zeroing frequency)</li>
-<li>Why does nls model failure increase with higher fit duration</li>
 </ul>
 <br>
 <p>
@@ -1388,21 +1555,22 @@ loaded via a namespace (and not attached):
  [1] tidyselect_0.2.5  xfun_0.10         haven_2.1.1      
  [4] lattice_0.20-35   colorspace_1.4-1  vctrs_0.2.0      
  [7] generics_0.0.2    viridisLite_0.3.0 htmltools_0.4.0  
-[10] yaml_2.2.0        rlang_0.4.1       pillar_1.4.2     
-[13] glue_1.3.1        withr_2.1.2       modelr_0.1.5     
-[16] readxl_1.3.1      lifecycle_0.1.0   munsell_0.5.0    
-[19] gtable_0.3.0      workflowr_1.4.0   cellranger_1.1.0 
-[22] rvest_0.3.4       evaluate_0.14     labeling_0.3     
-[25] knitr_1.25        highr_0.8         Rcpp_1.0.2       
-[28] scales_1.0.0      backports_1.1.5   jsonlite_1.6     
-[31] fs_1.3.1          hms_0.5.1         digest_0.6.22    
-[34] stringi_1.4.3     grid_3.5.0        rprojroot_1.3-2  
-[37] here_0.1          cli_1.1.0         tools_3.5.0      
-[40] magrittr_1.5      lazyeval_0.2.2    crayon_1.3.4     
-[43] whisker_0.4       pkgconfig_2.0.3   zeallot_0.1.0    
-[46] xml2_1.2.2        assertthat_0.2.1  rmarkdown_1.16   
-[49] httr_1.4.1        rstudioapi_0.10   R6_2.4.0         
-[52] nlme_3.1-137      git2r_0.26.1      compiler_3.5.0   </code></pre>
+[10] yaml_2.2.0        utf8_1.1.4        rlang_0.4.1      
+[13] pillar_1.4.2      glue_1.3.1        withr_2.1.2      
+[16] modelr_0.1.5      readxl_1.3.1      lifecycle_0.1.0  
+[19] munsell_0.5.0     gtable_0.3.0      workflowr_1.4.0  
+[22] cellranger_1.1.0  rvest_0.3.4       evaluate_0.14    
+[25] labeling_0.3      knitr_1.25        fansi_0.4.0      
+[28] highr_0.8         Rcpp_1.0.2        scales_1.0.0     
+[31] backports_1.1.5   jsonlite_1.6      fs_1.3.1         
+[34] hms_0.5.1         digest_0.6.22     stringi_1.4.3    
+[37] grid_3.5.0        rprojroot_1.3-2   here_0.1         
+[40] cli_1.1.0         tools_3.5.0       magrittr_1.5     
+[43] lazyeval_0.2.2    crayon_1.3.4      whisker_0.4      
+[46] pkgconfig_2.0.3   zeallot_0.1.0     xml2_1.2.2       
+[49] assertthat_0.2.1  rmarkdown_1.16    httr_1.4.1       
+[52] rstudioapi_0.10   R6_2.4.0          nlme_3.1-137     
+[55] git2r_0.26.1      compiler_3.5.0   </code></pre>
 </div>
 </div>
 
