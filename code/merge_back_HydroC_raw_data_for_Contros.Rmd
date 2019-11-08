@@ -1,0 +1,144 @@
+---
+title: "Merging back clean data with Contros corrected data file"
+author: "Jens Daniel Müller"
+date:  "`r format(Sys.time(), '%d %B, %Y')`"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
+
+
+```{r packages}
+library(tidyverse)
+library(lubridate)
+library(zoo)
+# library(dygraphs)
+# library(xts)
+```
+
+
+# CTD and pCO~2~ data
+
+## Merging summarized data sets
+
+
+```{r load_summarized_data}
+# Load Sensor and HydroC data ---------------------------------------------
+
+CTD <- read_csv(here::here("Data/_summarized_data_files",
+                              "Tina_V_Sensor_Profiles_Transects.csv"),
+                   col_types = list("pCO2" = col_double())) %>%
+  rename(pCO2_analog = pCO2)
+
+HC <- read_csv(here::here("Data/_summarized_data_files", "Tina_V_HydroC.csv"))
+
+# Time offset correction ----------------------------------------------
+
+# Time offset was determined by comparing zeroing reads from Sensor and HC
+# in the plots produced in the section Time stamp synchronzity below
+# before applying this correction
+
+CTD <- CTD %>%
+  mutate(day = yday(date_time),
+         date_time = if_else(day >= 206 & day <= 220,
+                             date_time - 80, date_time - 10)) %>%
+  select(-day)
+
+# Merge Sensor and HydroC data --------------------------------------------
+
+df <- full_join(CTD, HC) %>%
+  arrange(date_time)
+
+rm(HC, CTD)
+```
+
+
+## Interpolation to common time stamp
+
+CTD and auxillary recordings (15 sec measurment interval) are interpolated to HydroC time stamps (first 10 sec, than 1 sec measurement interval) when gaps between observations are not larger than 20. Thereafter, HydroC readings not falling in regular transects/profilings are removed, by removing rows with NA depth values. Furthermore, CTD readings without corresponding HydroC reading are removed, except during periods when HydroC was not operating.
+
+```{r interpolation}
+
+# Interpolate Sensor data to HydroC timestamp
+
+df <-
+  df %>%
+  mutate(dep = na.approx(dep, na.rm = FALSE, maxgap = 20),
+         sal = na.approx(sal, na.rm = FALSE, maxgap = 20),
+         tem = na.approx(tem, na.rm = FALSE, maxgap = 20),
+         pCO2_analog = na.approx(pCO2_analog, na.rm = FALSE, maxgap = 20),
+         pH = na.approx(pH, na.rm = FALSE, maxgap = 20),
+         V_pH = na.approx(V_pH, na.rm = FALSE, maxgap = 20),
+         O2 = na.approx(O2, na.rm = FALSE, maxgap = 20),
+         Chl = na.approx(Chl, na.rm = FALSE, maxgap = 20)) %>%
+  filter(!is.na(dep)) %>% #remove HC readings not falling in regular transects/profilings
+  fill(ID, type, station, cast) %>%
+  filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
+
+```
+
+
+```{r merge_back_with_HydroC_raw_data}
+
+HC <-
+  read_csv2(here::here("Data/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
+                       "parameter&pCO2s(method 43).txt"),
+            col_names = c("date_time", "Zero_HC", "Flush_HC", "p_NDIR",
+                          "p_in", "T_control", "T_gas", "%rH_gas",
+                          "Signal_raw", "Signal_ref", "T_sensor",
+                          "pCO2", "Runtime", "nr.ave")) %>%
+  mutate(date_time = dmy_hms(date_time))
+
+df <- df %>% 
+  select(-c(pCO2))
+
+df <- full_join(df, HC)
+
+df <- df %>% 
+  filter(!is.na(ID))
+
+rm(list=setdiff(ls(), "df"))
+
+```
+
+
+```{r clean_douplicated_time_stamps}
+
+# add counter for date_time observations
+
+df <- df %>%
+  add_count(date_time)
+
+# find triplicated time stamp and select only first observation, and merge
+
+df_no_triple <- df %>%
+  filter(n <= 2)
+
+df_triple_clean <- df %>%
+  filter(n > 2) %>%
+  group_by(date_time) %>% 
+  slice(1)
+
+df <- full_join(df_no_triple, df_triple_clean)
+
+#no doubles detected
+
+rm(list=setdiff(ls(), "df"))
+
+
+```
+
+
+```{r safe_merged_data_file}
+write_csv(df, here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_Contros_clean.csv"))
+```
+
+
+
+# Tasks / open questions
+
+- for some reason the merged data file (Contros raw + clean df) has more lines than df, bot after left_join of full_join and filter NA's in dep column
