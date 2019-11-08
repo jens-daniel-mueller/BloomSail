@@ -120,11 +120,109 @@ df <-
 #   }
 # }
 
-# Safe merged data file ---------------------------------------------------
+```
 
-write_csv(df, here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC.csv"))
+```{r clean_douplicated_time_stamps}
+
+# add counter for date_time observations
+
+df <- df %>% 
+  add_count(date_time)
+
+# find triplicated time stamp and select only first observation, and merge
+
+df_no_triple <- df %>% 
+  filter(n <= 2)
+
+df_triple_clean <- df %>% 
+  filter(n > 2) %>% 
+  slice(1)
+
+df <- full_join(df_no_triple, df_triple_clean)
+
+rm(list=setdiff(ls(), "df"))
+
+
+# find duplicated time stamps and shift first by one second, and merge
+
+df %>% 
+  distinct(date_time)
+
+df_no_duplicated <- df %>%
+  filter(n == 1)
+
+df_duplicated <- df %>% 
+  filter(n == 2)
+
+df_duplicated_first <- df_duplicated %>% 
+  group_by(date_time) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  mutate(date_time = date_time - 1)
+
+df_duplicated_second <- df_duplicated %>% 
+  group_by(date_time) %>% 
+  slice(2) %>% 
+  ungroup()
+
+df_duplicated_clean <- full_join(df_duplicated_first, df_duplicated_second) %>% 
+  arrange(date_time)
+
+df <- full_join(df_no_duplicated, df_duplicated_clean)
+
+df %>% 
+  distinct(date_time)
+
+rm(list=setdiff(ls(), "df"))
+
+# remaining duplicates are observations where other observations with a +/- 1 sec timestamp exist
+# for those cases, only the first duplicated observation is selected (similar to triplicate treatment)
+
+df_still_no_duplicated <- df %>% 
+  select(-n) %>% 
+  add_count(date_time) %>% 
+  filter(n == 1)
+
+df_still_duplicated_first <- df %>% 
+  select(-n) %>% 
+  add_count(date_time) %>% 
+  filter(n == 2) %>% 
+  group_by(date_time) %>% 
+  slice(1)
+
+df <- full_join(df_still_no_duplicated, df_still_duplicated_first)
+
+df %>% 
+  distinct(date_time)
+
+rm(list=setdiff(ls(), "df"))
+
+df <- df %>% 
+  select(-n)
 
 ```
+
+
+```{r safe_merged_data_file}
+write_csv(df, here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC.csv"))
+```
+
+
+```{r merge_back_with_HydroC_raw_data}
+
+HC <-
+  read_csv2(here::here("Data/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
+                       "parameter&pCO2s(method 43).txt"),
+            col_names = c("date_time", "Zero", "Flush", "p_NDIR",
+                          "p_in", "T_control", "T_gas", "%rH_gas",
+                          "Signal_raw", "Signal_ref", "T_sensor",
+                          "pCO2", "Runtime", "nr.ave")) %>% 
+  mutate(Flush = as.factor(as.character(Flush)),
+         Zero = as.factor(as.character(Zero)))
+
+```
+
+
 
 ```{r timeseries_pCO2, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO~2~ measurement range is restricted to 100-500  µatm here due to the settings of the analog voltage output of the sensor. Zeroing periods are included.", fig.asp = 2.3}
 
