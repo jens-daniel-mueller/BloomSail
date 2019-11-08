@@ -405,7 +405,7 @@ div.section {
 
 <h1 class="title toc-ignore">Response time correction of Contros HydroC pCO<sub>2</sub> data</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">22 October, 2019</h4>
+<h4 class="date">08 November, 2019</h4>
 
 </div>
 
@@ -430,7 +430,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-10-22
+<strong>Last updated:</strong> 2019-11-08
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -521,10 +521,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeefcafd1ebe5788d1df6286ff32a5cf5b8011e15atargetblankefcafd1a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/efcafd1ebe5788d1df6286ff32a5cf5b8011e15a" target="_blank">efcafd1</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree6cb193534f83709f84affeec26fdbe899cfed7b2targetblank6cb1935a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/6cb193534f83709f84affeec26fdbe899cfed7b2" target="_blank">6cb1935</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeefcafd1ebe5788d1df6286ff32a5cf5b8011e15atargetblankefcafd1a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree6cb193534f83709f84affeec26fdbe899cfed7b2targetblank6cb1935a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -536,12 +536,13 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
+    Ignored:    output/Plots/
 
 Untracked files:
-    Untracked:  docs/figure/merging_interpolation.Rmd/
+    Untracked:  code/merge_back_HydroC_raw_data_for_Contros.Rmd
 
 Unstaged changes:
-    Modified:   code/Workflowr_project_managment.R
+    Deleted:    docs/.nojekyll
 
 </code></pre>
 <p>
@@ -580,6 +581,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/6cb193534f83709f84affeec26fdbe899cfed7b2/analysis/response_time.Rmd" target="_blank">6cb1935</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+<td>
+response_time updated
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/33e36593b130fdd9b6ad3d8e0709800436046f60/docs/response_time.html" target="_blank">33e3659</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-10-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -836,6 +871,43 @@ df %&gt;%
 pCO<sub>2</sub> sensitivity to changes in DIC.
 </p>
 </div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-sensitivity_estimate-1">
+Past versions of sensitivity_estimate-1.png
+</button>
+</p>
+<div id="fig-sensitivity_estimate-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/33e36593b130fdd9b6ad3d8e0709800436046f60/docs/figure/response_time.Rmd/sensitivity_estimate-1.png" target="_blank">33e3659</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-10-22
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>rm(df, Tem, pCO2)</code></pre>
 </div>
 <div id="hydroc-sensor-settings" class="section level1">
@@ -862,14 +934,16 @@ pCO<sub>2</sub> sensitivity to changes in DIC.
 </div>
 <div id="response-time-determination" class="section level1">
 <h1>Response time determination</h1>
-<p>Response times were determined by fitting a nonlinear least-squares model as described <a href="http://douglas-watson.github.io/post/2018-09_exponential_curve_fitting/">here</a> by Douglas Watson.</p>
+<p>Response times were determined by fitting a nonlinear least-squares model with the <code>nls</code> function as described <a href="http://douglas-watson.github.io/post/2018-09_exponential_curve_fitting/">here</a> by Douglas Watson.</p>
 <ul>
-<li>Flush period length: 300 sec</li>
+<li>Flush period length: variable</li>
+<li>Flush period restricted to equilibration phase, avoiding initial gas mixing effects occuring at the start of each Flush period</li>
+<li>only completet Flush periods (duration &gt; 500 sec) included</li>
 </ul>
 <pre class="r"><code># Read and prepare data
 
 df &lt;- read_csv(here::here(&quot;data/_merged_data_files&quot;,
-                          &quot;BloomSail_CTD_HydroC.csv&quot;),
+                          &quot;BloomSail_CTD_HydroC_Contros_clean.csv&quot;),
                col_types = cols(ID = col_character(),
                                 pCO2_analog = col_double(),
                                 pCO2 = col_double(),
@@ -883,70 +957,100 @@ df &lt;- df %&gt;%
   select(date_time, ID, dep, tem, Flush, pCO2, Zero_ID, duration, mixing)
 
 df &lt;- df %&gt;%
-  filter(Flush == 1, duration &lt;=300)
-
-# df &lt;- df %&gt;% 
-#   filter(Flush == 1, duration &lt;=500, !(Zero_ID %in% c(13, 34, 49, 50, 89, 105, 109)))
-
-# df &lt;- df %&gt;%
-#   filter(Zero_ID != 53)
+  filter(Flush == 1, mixing == &quot;equilibration&quot;)
 
 df &lt;- df %&gt;% 
-  group_by(Zero_ID, mixing) %&gt;% 
-  mutate(duration_equi = duration- min(duration))</code></pre>
-<pre class="r"><code># Plot individual Flush periods with exponential fit ----------------------
+  group_by(Zero_ID) %&gt;% 
+  mutate(duration = duration- min(duration),
+         max_duration = max(duration)) %&gt;% 
+  ungroup() %&gt;% 
+  filter(max_duration &gt;= 500) %&gt;% 
+  select(-max_duration)</code></pre>
+<p>An example plot for a <code>nls</code> model fitted to pCO<sub>2</sub> observations during a Flush phase is shown below.</p>
+<pre class="r"><code># Plot example Flush period with exponential fit ----------------------
 
 i &lt;- 95
 
 df_ID &lt;- df %&gt;%
-  filter(Zero_ID == i)
+  filter(Zero_ID == i, duration &lt;= 300)
 
-fit &lt;- df_ID %&gt;%
-  filter(mixing == &quot;equilibration&quot;) %&gt;%
-  nls(pCO2 ~ SSasymp(duration_equi, yf, y0, log_alpha), data = .)
+fit &lt;-
+df_ID %&gt;%
+  nls(pCO2 ~ SSasymp(duration, yf, y0, log_alpha), data = .)
 
 tau &lt;- as.numeric(exp(-tidy(fit)[3,2]))
-#RSS &lt;- sum(resid(fit)^2)
+pCO2_end &lt;- as.numeric(tidy(fit)[1,2])
+pCO2_start &lt;- as.numeric(tidy(fit)[2,2])
+dpCO2 = pCO2_end - pCO2_start
+mean_abs_resid &lt;- mean(abs(resid(fit)))
 
 augment(fit) %&gt;%
-  ggplot(aes(duration_equi, pCO2))+
+  ggplot(aes(duration, pCO2))+
   geom_point()+
   geom_line(aes(y = .fitted))+
   geom_vline(xintercept = tau)+
+  geom_hline(yintercept = pCO2_start + 0.63 *(dpCO2))+
   labs(y=expression(pCO[2]~(µatm)), x=&quot;Duration of Flush period (s)&quot;)</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/response_time.Rmd/response_determination_plot-1.png" alt="Example response time determination by non-linear least squares fit to the pCO~2~ recovery signal after zeroing. The vertical line indicates the determined response time tau." width="672" />
+<img src="figure/response_time.Rmd/response_determination_example_plot-1.png" alt="Example response time determination by non-linear least squares fit to the pCO~2~ recovery signal after zeroing. The vertical line indicates the determined response time tau." width="672" />
 <p class="caption">
 Example response time determination by non-linear least squares fit to the pCO<sub>2</sub> recovery signal after zeroing. The vertical line indicates the determined response time tau.
 </p>
 </div>
-<pre class="r"><code>rm(df_ID, fit, i, tau)
+<pre class="r"><code>rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start)</code></pre>
+<pre class="r"><code>duration_intervals &lt;- seq(150,500,50)</code></pre>
+<p>In the following we determine the response time tau for all zeroings and for total durations of:<br />
+150, 200, 250, 300, 350, 400, 450, 500 secs</p>
+<pre class="r"><code># Plot all individual Flush periods with exponential fit ----------------------
 
-# Plot individual Flush periods with exponential fit ----------------------
+pdf(file=here::here(&quot;docs/figure&quot;,
+    &quot;RT_determination.pdf&quot;), onefile = TRUE, width = 7, height = 4)
 
-# for (i in unique(df$Zero_ID)) {
-# 
-# df_ID &lt;- df %&gt;%
-#   filter(Zero_ID == i)
-# 
-# fit &lt;- df_ID %&gt;%
-#   filter(mixing == &quot;equilibration&quot;) %&gt;%
-#   nls(pCO2 ~ SSasymp(duration_equi, yf, y0, log_alpha), data = .)
-# 
-# tau &lt;- as.numeric(exp(-tidy(fit)[3,2]))
-# #RSS &lt;- sum(resid(fit)^2)
-# 
-# augment(fit) %&gt;%
-#   ggplot(aes(duration_equi, pCO2))+
-#   geom_point()+
-#   geom_line(aes(y = .fitted))+
-#   geom_vline(xintercept = tau)
-# 
-# ggsave(here::here(&quot;/Plots/TinaV/Sensor/HydroC_diagnostics/Response_time_fits&quot;,
-#                   paste(i,&quot;_Zero_ID_HydroC_RT_exp.jpg&quot;, sep=&quot;&quot;)),
-#          width = 10, height = 4)
-# }
+for (i in unique(df$Zero_ID)) {
+  for (max_duration in duration_intervals) {
+    
+    df_ID &lt;- df %&gt;%
+      filter(Zero_ID == i, duration &lt;= max_duration)
+    
+    fit &lt;- 
+      try(
+      df_ID %&gt;%
+          nls(pCO2 ~ SSasymp(duration, yf, y0, log_alpha), data = .),
+      TRUE)
+    
+    if (class(fit) == &quot;nls&quot;){
+    
+      tau &lt;- as.numeric(exp(-tidy(fit)[3,2]))
+      pCO2_end &lt;- as.numeric(tidy(fit)[1,2])
+      pCO2_start &lt;- as.numeric(tidy(fit)[2,2])
+      dpCO2 = pCO2_end - pCO2_start
+      mean_abs_resid &lt;- mean(abs(resid(fit))/pCO2_end)*100
+      
+      temp &lt;- as_tibble(bind_cols(Zero_ID = i, duration = max_duration, tau = tau, resid = mean_abs_resid))
+      
+      if (exists(&quot;tau_df&quot;)){tau_df &lt;- bind_rows(tau_df, temp)}
+        else {tau_df &lt;- temp}
+      
+      print(
+      augment(fit) %&gt;%
+        ggplot(aes(duration, pCO2))+
+        geom_point()+
+        geom_line(aes(y = .fitted))+
+        geom_vline(xintercept = tau)+
+        geom_hline(yintercept = pCO2_start + 0.63 *(dpCO2))+
+        labs(y=expression(pCO[2]~(µatm)), x=&quot;Duration of Flush period (s)&quot;,
+             title = paste(&quot;Zero_ID: &quot;, i, &quot;Mean absolute residual (%): &quot;, round(mean_abs_resid*100, 2)))+
+        xlim(0,600)
+      )
+      
+    }
+  }
+}
 
+dev.off()</code></pre>
+<pre><code>png 
+  2 </code></pre>
+<pre class="r"><code>rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, temp, max_duration, mean_abs_resid)
 
 # Plot individual Flush periods with linearized response variable  --------
 
@@ -983,113 +1087,52 @@ Example response time determination by non-linear least squares fit to the pCO<s
 #                   paste(i,&quot;_Zero_ID_HydroC_RT_linear.jpg&quot;, sep=&quot;&quot;)),
 #          width = 10, height = 4)
 # }</code></pre>
-<pre class="r"><code># Response time fitting ---------------------------------------------------
+<p>A pdf with plots of all individual response time fits can be accessed <a href="docs/figure/response_time.Rmd/RT_determination.pdf">here</a></p>
+<pre class="r"><code>tau_high &lt;- 120
+tau_low &lt;- 20
+resid_limit &lt;- 1
 
-RT &lt;- df %&gt;% 
-  filter(mixing == &quot;equilibration&quot;) %&gt;% 
+tau_df_sub &lt;- tau_df %&gt;% 
+  filter(resid &lt; resid_limit, tau &gt; tau_low, tau &lt; tau_high)
+
+tau_total &lt;- nrow(tau_df)
+tau_sub &lt;- nrow(tau_df_sub)</code></pre>
+</div>
+<div id="outcome" class="section level1">
+<h1>Outcome</h1>
+<p>Response times were determined sucessfully determined by <code>nls</code> in a total number of 417 cases.<br />
+Restriction of the determined tau values to those falling between 20 and 120 seconds and corresponding to a fit with a mean absolute residual below 1 % of the final equilibrium pCO<sub>2</sub>, results in 365 remaining tau values (87.5 %).</p>
+<pre class="r"><code>tau_df_sub %&gt;% 
+  ggplot(aes(resid))+
+  geom_histogram()+
+  facet_wrap(~duration)</code></pre>
+<p><img src="figure/response_time.Rmd/plot_response_times-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tau_df_sub %&gt;% 
+  ggplot(aes(Zero_ID, tau, col=duration))+
+  geom_point()+
+  scale_color_viridis_c()</code></pre>
+<p><img src="figure/response_time.Rmd/plot_response_times-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tau_df_sub %&gt;% 
   group_by(Zero_ID) %&gt;% 
-  do(fit = nls(pCO2 ~ SSasymp(duration_equi, yf, y0, log_alpha), data = .)) %&gt;% 
-  tidy(fit) %&gt;% 
-  select(Zero_ID, term, estimate) %&gt;% 
-  spread(term, estimate) %&gt;% 
-  select(1,2) %&gt;% 
-  mutate(tau = exp(-log_alpha))
-
-
-# Residuals from fit ------------------------------------------------------
-
-augmented &lt;- df %&gt;% 
-  filter(mixing == &quot;equilibration&quot;) %&gt;% 
-  group_by(Zero_ID) %&gt;% 
-  do(fit = nls(pCO2 ~ SSasymp(duration_equi, yf, y0, log_alpha), data = .)) %&gt;% 
-  augment(fit)
-
-# qplot(duration_equi, pCO2_corr, data = augmented, geom = &#39;point&#39;, colour = as.factor(Zero_ID)) +
-#   geom_line(aes(y=.fitted))
-# 
-# qplot(duration_equi, .resid, data = augmented, geom = &#39;point&#39;, colour = as.factor(Zero_ID))
-
-augmented_sum &lt;- augmented %&gt;% 
-  group_by(Zero_ID) %&gt;% 
-  summarise(mean_resid = mean(abs(.resid)),
-            mean_resid_rel = mean(abs(.resid))/max(pCO2),
-            max_pCO2_corr = max(pCO2))
-
-# Standard error of tau ---------------------------------------------------
-
-St_Err &lt;- df %&gt;% 
-  filter(mixing == &quot;equilibration&quot;) %&gt;% 
-  group_by(Zero_ID) %&gt;% 
-  do(fit = nls(pCO2 ~ SSasymp(duration_equi, yf, y0, log_alpha), data = .)) %&gt;% 
-  tidy(fit) %&gt;% 
-  select(Zero_ID, term, std.error) %&gt;% 
-  spread(term, std.error) %&gt;% 
-  select(1,2) %&gt;% 
-  rename(tau_st_err = log_alpha)
-
-
-# Merge RT, mean residuals and St error -----------------------------------
-
-RT &lt;- full_join(RT, augmented_sum)
-RT &lt;- full_join(RT, St_Err)
-
-rm(augmented, augmented_sum, St_Err)
-
-
-
-# Identify residual threshold ---------------------------------------------
-
-# RT %&gt;% 
-#   ggplot(aes(mean_resid_rel, Zero_ID, label=Zero_ID)) +
-#   geom_point(shape=21)+
-#   scale_fill_viridis_c()+
-#   geom_label()
-
-RT %&gt;% 
-  filter(mean_resid_rel &gt;= 0.0065)</code></pre>
-<pre><code># A tibble: 7 x 7
-# Groups:   Zero_ID [7]
-  Zero_ID log_alpha   tau mean_resid mean_resid_rel max_pCO2_corr
-    &lt;int&gt;     &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;         &lt;dbl&gt;
-1      13     -4.55  94.9      1.19         0.00740         161. 
-2      50     -3.51  33.5     11.2          0.0176          638. 
-3      58     -6.46 639.       4.69         0.0312          150. 
-4      60     -4.12  61.6      0.674        0.0108           62.3
-5      89     -5.12 168.       2.27         0.0233           97.7
-6     108     -5.89 363.      13.3          0.0200          662. 
-7     112     -3.98  53.3      2.12         0.00704         301. 
-# ... with 1 more variable: tau_st_err &lt;dbl&gt;</code></pre>
-<pre class="r"><code># RT %&gt;% 
-#   filter(mean_resid_rel &lt; 0.0065) %&gt;% 
-#   ggplot(aes(Zero_ID, tau, label=round(mean_resid_rel,4))) +
-#   geom_label(data=RT, aes(Zero_ID, tau, label=round(mean_resid_rel,4)), col=&quot;red&quot;) +
-#   geom_point(shape=21)+
-#   scale_fill_viridis_c()+
-#   geom_label()
-
-RT %&gt;% 
-  filter(mean_resid_rel &lt; 0.0065) %&gt;% 
-  ggplot(aes(Zero_ID, tau))+
+  mutate(d_tau = tau - mean(tau)) %&gt;% 
+  ggplot(aes(duration, d_tau))+
+  geom_violin(aes(group=duration))+
   geom_point()</code></pre>
-<p><img src="figure/response_time.Rmd/response_determination-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code># Mean tau ----------------------------------------------------------------
-
-max(unique(df[df$date_time &lt; ymd_hms(&quot;2018-07-17;13:08:34&quot;),]$Zero_ID))</code></pre>
-<pre><code>[1] 20</code></pre>
-<pre class="r"><code>unique(df[df$date_time &gt; ymd_hms(&quot;2018-07-17;13:08:34&quot;),]$Zero_ID)</code></pre>
-<pre><code> [1]  33  34  35  36  37  39  40  42  43  44  47  48  49  50  51  58  59
-[18]  60  61  81  82  83  84  85  86  89  90  91  92  93  94  95  98  99
-[35] 100 101 102 103 105 106 107 108 109 112</code></pre>
-<pre class="r"><code>RT %&gt;% 
-  filter(mean_resid_rel &lt; 0.0065) %&gt;% 
-  mutate(pump_power = if_else(Zero_ID &lt;= 20, &quot;1W&quot;, &quot;8W&quot;)) %&gt;% 
-  group_by(pump_power) %&gt;% 
-  summarise(tau = mean(tau))</code></pre>
-<pre><code># A tibble: 2 x 2
-  pump_power   tau
-  &lt;chr&gt;      &lt;dbl&gt;
-1 1W          85.5
-2 8W          56.1</code></pre>
+<p><img src="figure/response_time.Rmd/plot_response_times-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tau_df_sub %&gt;% 
+  group_by(Zero_ID) %&gt;% 
+  mutate(d_tau = tau - mean(tau)) %&gt;% 
+  ggplot(aes(duration, d_tau))+
+  geom_smooth()+
+  geom_point()+
+  facet_wrap(~Zero_ID)</code></pre>
+<p><img src="figure/response_time.Rmd/plot_response_times-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tau_df_sub %&gt;% 
+  group_by(duration) %&gt;% 
+  mutate(n_tau = n()) %&gt;% 
+  ggplot(aes(duration, n_tau))+
+  geom_point()</code></pre>
+<p><img src="figure/response_time.Rmd/plot_response_times-5.png" width="672" style="display: block; margin: auto;" /></p>
 <div id="this-approach" class="section level2">
 <h2>This approach</h2>
 </div>
@@ -1120,6 +1163,7 @@ max(unique(df[df$date_time &lt; ymd_hms(&quot;2018-07-17;13:08:34&quot;),]$Zero_
 <li>Test impact of duration for response time estimation on final mean response time</li>
 <li>Test impact of selection criterion for “good” response time estimates on final mean response time</li>
 <li>Check results from field response time experiment (high zeroing frequency)</li>
+<li>Why does nls model failure increase with higher fit duration</li>
 </ul>
 <br>
 <p>
@@ -1146,33 +1190,32 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] lubridate_1.7.4   broom_0.5.2       data.table_1.12.2
- [4] seacarb_3.2.12    oce_0.9-23        gsw_1.0-5        
+ [1] lubridate_1.7.4   broom_0.5.2       data.table_1.12.6
+ [4] seacarb_3.2.12    oce_1.1-1         gsw_1.0-5        
  [7] testthat_2.2.1    forcats_0.4.0     stringr_1.4.0    
-[10] dplyr_0.8.3       purrr_0.3.2       readr_1.3.1      
+[10] dplyr_0.8.3       purrr_0.3.3       readr_1.3.1      
 [13] tidyr_1.0.0       tibble_2.1.3      ggplot2_3.2.1    
 [16] tidyverse_1.2.1  
 
 loaded via a namespace (and not attached):
- [1] tidyselect_0.2.5  xfun_0.9          haven_2.1.1      
- [4] lattice_0.20-35   colorspace_1.3-2  vctrs_0.2.0      
- [7] generics_0.0.2    viridisLite_0.3.0 htmltools_0.3.6  
-[10] yaml_2.2.0        utf8_1.1.4        rlang_0.4.0      
-[13] pillar_1.3.1      glue_1.3.1        withr_2.1.2      
-[16] modelr_0.1.5      readxl_1.3.1      lifecycle_0.1.0  
-[19] plyr_1.8.4        munsell_0.5.0     gtable_0.2.0     
-[22] workflowr_1.4.0   cellranger_1.1.0  rvest_0.3.4      
-[25] evaluate_0.14     labeling_0.3      knitr_1.25       
-[28] fansi_0.4.0       highr_0.7         Rcpp_1.0.1       
-[31] scales_0.5.0      backports_1.1.2   jsonlite_1.6     
-[34] fs_1.3.1          hms_0.5.1         digest_0.6.18    
-[37] stringi_1.1.7     grid_3.5.0        rprojroot_1.3-2  
-[40] here_0.1          cli_1.1.0         tools_3.5.0      
-[43] magrittr_1.5      lazyeval_0.2.1    crayon_1.3.4     
-[46] whisker_0.3-2     pkgconfig_2.0.2   zeallot_0.1.0    
-[49] xml2_1.2.2        assertthat_0.2.0  rmarkdown_1.15   
-[52] httr_1.4.1        rstudioapi_0.10   R6_2.2.2         
-[55] nlme_3.1-137      git2r_0.23.0      compiler_3.5.0   </code></pre>
+ [1] tidyselect_0.2.5  xfun_0.10         haven_2.1.1      
+ [4] lattice_0.20-35   colorspace_1.4-1  vctrs_0.2.0      
+ [7] generics_0.0.2    viridisLite_0.3.0 htmltools_0.4.0  
+[10] yaml_2.2.0        rlang_0.4.1       pillar_1.4.2     
+[13] glue_1.3.1        withr_2.1.2       modelr_0.1.5     
+[16] readxl_1.3.1      lifecycle_0.1.0   munsell_0.5.0    
+[19] gtable_0.3.0      workflowr_1.4.0   cellranger_1.1.0 
+[22] rvest_0.3.4       evaluate_0.14     labeling_0.3     
+[25] knitr_1.25        highr_0.8         Rcpp_1.0.2       
+[28] scales_1.0.0      backports_1.1.5   jsonlite_1.6     
+[31] fs_1.3.1          hms_0.5.1         digest_0.6.22    
+[34] stringi_1.4.3     grid_3.5.0        rprojroot_1.3-2  
+[37] here_0.1          cli_1.1.0         tools_3.5.0      
+[40] magrittr_1.5      lazyeval_0.2.2    crayon_1.3.4     
+[43] whisker_0.4       pkgconfig_2.0.3   zeallot_0.1.0    
+[46] xml2_1.2.2        assertthat_0.2.1  rmarkdown_1.16   
+[49] httr_1.4.1        rstudioapi_0.10   R6_2.4.0         
+[52] nlme_3.1-137      git2r_0.26.1      compiler_3.5.0   </code></pre>
 </div>
 </div>
 
