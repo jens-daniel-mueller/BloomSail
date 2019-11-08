@@ -176,7 +176,7 @@ In the following we determine the response time tau for all zeroings and for tot
 
 # Plot all individual Flush periods with exponential fit ----------------------
 
-pdf(file=here::here("docs/figure",
+pdf(file=here::here("output/Plots/response_time",
     "RT_determination.pdf"), onefile = TRUE, width = 7, height = 4)
 
 for (i in unique(df$Zero_ID)) {
@@ -262,7 +262,7 @@ rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, temp, max_duration, mean_abs
 
 ```
 
-A pdf with plots of all individual response time fits can be accessed [here](docs/figure/response_time.Rmd/RT_determination.pdf)
+A pdf with plots of all individual response time fits can be accessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output)
 
 
 ```{r set_tau_and_residual_thresholds}
