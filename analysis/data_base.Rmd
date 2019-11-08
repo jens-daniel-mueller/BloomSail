@@ -442,6 +442,8 @@ HC %>%
 
 # Tasks / open questions
 
+- include standardized data quality checks after each step of read-in and merging 
+
 - Include data around Ostergarnsholm island and crossing large vessels 
 
 - Include information about HydroC calibration results and raw data correction by Contros

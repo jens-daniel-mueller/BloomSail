@@ -12,7 +12,6 @@ editor_options:
 knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 ```
 
-
 ```{r packages}
 library(tidyverse)
 library(seacarb)
@@ -63,8 +62,9 @@ rm(df, Tem, pCO2)
 
 ```
 
+# Response time determination
 
-# HydroC sensor settings
+## HydroC sensor settings
 
 The sensor was first run with a low power pump (1W), later and for most parts of the expedition with a stronger (8W) pump. Pumps were switched between recordings (data file: SD_datafile_20180718_170417CO2-0618-001.txt):  
 
@@ -87,7 +87,7 @@ Increase to 2 sec in SD_datafile_20180718_170417CO2-0618-001 at:
 * 2018-07-17;12:27:27
 * 2018-07-17;12:27:28
 
-# Response time determination
+## Model fitting
 
 Response times were determined by fitting a nonlinear least-squares model with the `nls` function as described [here](http://douglas-watson.github.io/post/2018-09_exponential_curve_fitting/) by Douglas Watson.
 
@@ -97,8 +97,6 @@ Response times were determined by fitting a nonlinear least-squares model with t
 
 
 ```{r response_determination_data_preparation}
-
-# Read and prepare data
 
 df <- read_csv(here::here("data/_merged_data_files",
                           "BloomSail_CTD_HydroC_Contros_clean.csv"),
@@ -129,10 +127,7 @@ df <- df %>%
 
 An example plot for a `nls` model fitted to pCO~2~ observations during a Flush phase is shown below.
 
-
 ```{r response_determination_example_plot, fig.cap="Example response time determination by non-linear least squares fit to the pCO~2~ recovery signal after zeroing. The vertical line indicates the determined response time tau."}
-
-# Plot example Flush period with exponential fit ----------------------
 
 i <- 95
 
@@ -160,19 +155,18 @@ augment(fit) %>%
 rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start)
 ```
 
+
+
 ```{r set_flush_duration_intervals}
-
 duration_intervals <- seq(150,500,50)
-
 ```
 
 
-
-In the following we determine the response time tau for all zeroings and for total durations of:  
+As there was some speculation about the dependence of determined response times ($\tau$) on the chosen duration of the fit interval, $\tau$ was determined for all zeroings and for total durations of:  
 `r duration_intervals` secs
 
 
-```{r all_response_times}
+```{r all_response_times, eval=FALSE, echo=TRUE}
 
 # Plot all individual Flush periods with exponential fit ----------------------
 
@@ -224,6 +218,9 @@ dev.off()
 
 rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, temp, max_duration, mean_abs_resid)
 
+tau_df %>% 
+  write_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_response_times_all.csv"))
+
 # Plot individual Flush periods with linearized response variable  --------
 
 
@@ -265,65 +262,113 @@ rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, temp, max_duration, mean_abs
 A pdf with plots of all individual response time fits can be accessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output){target="_blank"}
 
 
-```{r set_tau_and_residual_thresholds}
+```{r thresholds_for_tau_and_fit_residual}
 
+tau_df <- read_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_response_times_all.csv"))
+
+# define subsetting parameters
 tau_high <- 120
 tau_low <- 20
 resid_limit <- 1
 
-tau_df_sub <- tau_df %>% 
-  filter(resid < resid_limit, tau > tau_low, tau < tau_high)
+# subset determined tau values
+tau_resid <- tau_df %>% 
+  filter(resid < resid_limit)
 
-tau_total <- nrow(tau_df)
-tau_sub <- nrow(tau_df_sub)
+tau_resid_min_max <- tau_resid %>% 
+  filter(tau > tau_low, tau < tau_high)
+
+# calculate some metrics for the subsetting
+n_Zero_IDs <- df %>% 
+  group_by(Zero_ID) %>% 
+  n_groups()
+n_duration_intervals <- length(duration_intervals)
+n_tau_max <- n_Zero_IDs * length(duration_intervals)
+n_tau_total <- nrow(tau_df)
+n_tau_resid <- nrow(tau_resid)
+n_tau_resid_min_max <- nrow(tau_resid_min_max)
 
 ```
 
 
-# Outcome
-
-Response times were determined sucessfully determined by `nls` in a total number of `r tau_total` cases.  
-Restriction of the determined tau values to those falling between `r tau_low` and `r tau_high` seconds and corresponding to a fit with a mean absolute residual below `r resid_limit` % of the final equilibrium pCO~2~, results in `r tau_sub` remaining tau values (`r round(100*tau_sub/tau_total, 1)` %).
+## Outcome
 
 
+Estimated $\tau$ values were restricted to 
+* mean absolute fit residual above `r resid_limit` % of the final equilibrium pCO~2~
+* $\tau$ falling between `r tau_low` and `r tau_high` seconds
 
-```{r plot_response_times}
+Metrics to characterize the fitting procedure include the number of:
 
-tau_df_sub %>% 
+* Flush periods: `r n_Zero_IDs`
+* Duration intervals: `r n_duration_intervals`
+* Exercised response time fits: `r n_tau_max`
+* Succesful response times determinations: `r n_tau_total` (`r round(100*n_tau_total/n_tau_max, 1)`)%
+* $\tau$'s after removing fits with high absolute fit residual: `r n_tau_resid` (`r round(100*n_tau_resid/n_tau_total, 1)` %)
+* $\tau$'s after restriction to $\tau$ thresholds: `r n_tau_resid_min_max` (`r round(100*n_tau_resid_min_max/n_tau_total, 1)` %)
+
+`r rm(n_Zero_IDs, n_duration_intervals,n_tau_max, n_tau_total, n_tau_resid, n_tau_resid_min_max)`
+
+```{r fit_residuals, fig.cap="Histogram of residuals from fit displayed for the investigate durations of the fit interval. Vertical line represents the chosen threshold."}
+
+tau_df %>% 
   ggplot(aes(resid))+
   geom_histogram()+
-  facet_wrap(~duration)
+  facet_wrap(~duration, labeller = label_both)+
+  geom_vline(xintercept = resid_limit)+
+  labs(x=expression(Mean~absolute~residuals~("%"~of~equilibrium~pCO[2])))
 
-tau_df_sub %>% 
+```
+
+```{r number_of_tau, fig.cap="Number of determined tau values as a function of the fit interval length, after applying a fit residual threshold"}
+
+tau_resid %>% 
+  group_by(duration) %>% 
+  mutate(n_tau = n()) %>% 
+  ggplot(aes(duration, n_tau))+
+  geom_point()+
+  labs(x="Fit interval duration (sec)", y="Number of tau values")
+
+```
+
+```{r tau_for_all_zero_ID, fig.cap="Tau for all Zeroings with color representing the fit interval duration."}
+tau_resid_min_max %>% 
   ggplot(aes(Zero_ID, tau, col=duration))+
   geom_point()+
-  scale_color_viridis_c()
+  scale_color_viridis_c(name="Duration (sec)")+
+  labs(y="Tau (sec)")
 
-tau_df_sub %>% 
+```
+
+```{r tau_duration_individual, fig.cap="Determined tau values as a function of the fit interval duration, displayed individually for each flush period.", fig.asp=2}
+
+tau_resid_min_max %>% 
+  group_by(Zero_ID) %>% 
+  mutate(d_tau = tau - mean(tau)) %>% 
+  ggplot(aes(duration, d_tau))+
+  geom_hline(yintercept = 0)+
+  geom_smooth()+
+  geom_point()+
+  facet_wrap(~Zero_ID, ncol = 4, labeller = label_both)+
+  labs(x="Duration (sec)", y="Deviation from mean tau (sec)")
+
+```
+
+
+```{r r tau_duration_mean, fig.cap="Determined tau values as a function of the fit interval duration, pooled for all flush period."}
+
+tau_resid_min_max %>% 
   group_by(Zero_ID) %>% 
   mutate(d_tau = tau - mean(tau)) %>% 
   ggplot(aes(duration, d_tau))+
   geom_violin(aes(group=duration))+
-  geom_point()
-
-tau_df_sub %>% 
-  group_by(Zero_ID) %>% 
-  mutate(d_tau = tau - mean(tau)) %>% 
-  ggplot(aes(duration, d_tau))+
-  geom_smooth()+
   geom_point()+
-  facet_wrap(~Zero_ID)
-
-tau_df_sub %>% 
-  group_by(duration) %>% 
-  mutate(n_tau = n()) %>% 
-  ggplot(aes(duration, n_tau))+
-  geom_point()
+  labs(x="Duration (sec)", y="Deviation from mean tau (sec)")
 
 ```
 
 
-```{r response_determination, eval=FALSE, include=FALSE}
+```{r old_script_response_time_determination, eval=FALSE, include=FALSE}
 
 # Response time fitting ---------------------------------------------------
 
@@ -419,20 +464,10 @@ RT %>%
 
 
 
-## This approach
-
-## Contros in-house
-
-## Comparison
-
 # Pre-smoothing
-
 # Response time correction
-
 # Post-smoothing
-
 # Response time optimization
-
 # Open tasks / questions
 
 - Compare Contros and own response time estimates
