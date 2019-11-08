@@ -311,6 +311,12 @@ div.tocify {
   border-radius: 0px;
 }
 
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
 
 </style>
 
@@ -521,10 +527,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree7f52e6653a629617c12a3039d04bf1dfd228b538targetblank7f52e66a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/7f52e6653a629617c12a3039d04bf1dfd228b538" target="_blank">7f52e66</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeaa27fd4aea1661e0410b87a1d91320e91968cd02targetblankaa27fd4a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/aa27fd4aea1661e0410b87a1d91320e91968cd02" target="_blank">aa27fd4</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree7f52e6653a629617c12a3039d04bf1dfd228b538targetblank7f52e66a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeaa27fd4aea1661e0410b87a1d91320e91968cd02targetblankaa27fd4a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -537,12 +543,8 @@ Ignored files:
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
 
-Untracked files:
-    Untracked:  code/merge_back_HydroC_raw_data_for_Contros.Rmd
-    Untracked:  output/Plots/
-
 Unstaged changes:
-    Modified:   .gitignore
+    Modified:   output/Plots/response_time/RT_determination.pdf
 
 </code></pre>
 <p>
@@ -581,6 +583,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/aa27fd4aea1661e0410b87a1d91320e91968cd02/analysis/response_time.Rmd" target="_blank">aa27fd4</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+<td>
+Finalized RT determination
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/4256bcf3b7e3d2cc88cdb4c090b36a50fb62d340/docs/response_time.html" target="_blank">4256bcf</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -978,8 +1014,10 @@ jens-daniel-mueller
 </div>
 <pre class="r"><code>rm(df, Tem, pCO2)</code></pre>
 </div>
-<div id="hydroc-sensor-settings" class="section level1">
-<h1>HydroC sensor settings</h1>
+<div id="response-time-determination" class="section level1">
+<h1>Response time determination</h1>
+<div id="hydroc-sensor-settings" class="section level2">
+<h2>HydroC sensor settings</h2>
 <p>The sensor was first run with a low power pump (1W), later and for most parts of the expedition with a stronger (8W) pump. Pumps were switched between recordings (data file: SD_datafile_20180718_170417CO2-0618-001.txt):</p>
 <ul>
 <li>2018-07-17;13:08:34</li>
@@ -1000,17 +1038,15 @@ jens-daniel-mueller
 <li>2018-07-17;12:27:28</li>
 </ul>
 </div>
-<div id="response-time-determination" class="section level1">
-<h1>Response time determination</h1>
+<div id="model-fitting" class="section level2">
+<h2>Model fitting</h2>
 <p>Response times were determined by fitting a nonlinear least-squares model with the <code>nls</code> function as described <a href="http://douglas-watson.github.io/post/2018-09_exponential_curve_fitting/">here</a> by Douglas Watson.</p>
 <ul>
 <li>Flush period length: variable</li>
 <li>Flush period restricted to equilibration phase, avoiding initial gas mixing effects occuring at the start of each Flush period</li>
 <li>only completet Flush periods (duration &gt; 500 sec) included</li>
 </ul>
-<pre class="r"><code># Read and prepare data
-
-df &lt;- read_csv(here::here(&quot;data/_merged_data_files&quot;,
+<pre class="r"><code>df &lt;- read_csv(here::here(&quot;data/_merged_data_files&quot;,
                           &quot;BloomSail_CTD_HydroC_Contros_clean.csv&quot;),
                col_types = cols(ID = col_character(),
                                 pCO2_analog = col_double(),
@@ -1035,9 +1071,7 @@ df &lt;- df %&gt;%
   filter(max_duration &gt;= 500) %&gt;% 
   select(-max_duration)</code></pre>
 <p>An example plot for a <code>nls</code> model fitted to pCO<sub>2</sub> observations during a Flush phase is shown below.</p>
-<pre class="r"><code># Plot example Flush period with exponential fit ----------------------
-
-i &lt;- 95
+<pre class="r"><code>i &lt;- 95
 
 df_ID &lt;- df %&gt;%
   filter(Zero_ID == i, duration &lt;= 300)
@@ -1104,7 +1138,7 @@ jens-daniel-mueller
 </div>
 <pre class="r"><code>rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start)</code></pre>
 <pre class="r"><code>duration_intervals &lt;- seq(150,500,50)</code></pre>
-<p>In the following we determine the response time tau for all zeroings and for total durations of:<br />
+<p>As there was some speculation about the dependence of determined response times (<span class="math inline">\(\tau\)</span>) on the chosen duration of the fit interval, <span class="math inline">\(\tau\)</span> was determined for all zeroings and for total durations of:<br />
 150, 200, 250, 300, 350, 400, 450, 500 secs</p>
 <pre class="r"><code># Plot all individual Flush periods with exponential fit ----------------------
 
@@ -1152,10 +1186,12 @@ for (i in unique(df$Zero_ID)) {
   }
 }
 
-dev.off()</code></pre>
-<pre><code>png 
-  2 </code></pre>
-<pre class="r"><code>rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, temp, max_duration, mean_abs_resid)
+dev.off()
+
+rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, temp, max_duration, mean_abs_resid)
+
+tau_df %&gt;% 
+  write_csv(here::here(&quot;data/_summarized_data_files&quot;, &quot;Tina_V_HydroC_response_times_all.csv&quot;))
 
 # Plot individual Flush periods with linearized response variable  --------
 
@@ -1193,244 +1229,105 @@ dev.off()</code></pre>
 #          width = 10, height = 4)
 # }</code></pre>
 <p>A pdf with plots of all individual response time fits can be accessed <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output" target="_blank">here</a></p>
-<pre class="r"><code>tau_high &lt;- 120
+<pre class="r"><code>tau_df &lt;- read_csv(here::here(&quot;data/_summarized_data_files&quot;, &quot;Tina_V_HydroC_response_times_all.csv&quot;))
+
+# define subsetting parameters
+tau_high &lt;- 120
 tau_low &lt;- 20
 resid_limit &lt;- 1
 
-tau_df_sub &lt;- tau_df %&gt;% 
-  filter(resid &lt; resid_limit, tau &gt; tau_low, tau &lt; tau_high)
+# subset determined tau values
+tau_resid &lt;- tau_df %&gt;% 
+  filter(resid &lt; resid_limit)
 
-tau_total &lt;- nrow(tau_df)
-tau_sub &lt;- nrow(tau_df_sub)</code></pre>
+tau_resid_min_max &lt;- tau_resid %&gt;% 
+  filter(tau &gt; tau_low, tau &lt; tau_high)
+
+# calculate some metrics for the subsetting
+n_Zero_IDs &lt;- df %&gt;% 
+  group_by(Zero_ID) %&gt;% 
+  n_groups()
+n_duration_intervals &lt;- length(duration_intervals)
+n_tau_max &lt;- n_Zero_IDs * length(duration_intervals)
+n_tau_total &lt;- nrow(tau_df)
+n_tau_resid &lt;- nrow(tau_resid)
+n_tau_resid_min_max &lt;- nrow(tau_resid_min_max)</code></pre>
 </div>
-<div id="outcome" class="section level1">
-<h1>Outcome</h1>
-<p>Response times were determined sucessfully determined by <code>nls</code> in a total number of 417 cases.<br />
-Restriction of the determined tau values to those falling between 20 and 120 seconds and corresponding to a fit with a mean absolute residual below 1 % of the final equilibrium pCO<sub>2</sub>, results in 365 remaining tau values (87.5 %).</p>
-<pre class="r"><code>tau_df_sub %&gt;% 
+<div id="outcome" class="section level2">
+<h2>Outcome</h2>
+<p>Estimated <span class="math inline">\(\tau\)</span> values were restricted to * mean absolute fit residual above 1 % of the final equilibrium pCO<sub>2</sub> * <span class="math inline">\(\tau\)</span> falling between 20 and 120 seconds</p>
+<p>Metrics to characterize the fitting procedure include the number of:</p>
+<ul>
+<li>Flush periods: 55</li>
+<li>Duration intervals: 8</li>
+<li>Exercised response time fits: 440</li>
+<li>Succesful response times determinations: 417 (94.8)%</li>
+<li><span class="math inline">\(\tau\)</span>’s after removing fits with high absolute fit residual: 375 (89.9 %)</li>
+<li><span class="math inline">\(\tau\)</span>’s after restriction to <span class="math inline">\(\tau\)</span> thresholds: 365 (87.5 %)</li>
+</ul>
+<pre class="r"><code>tau_df %&gt;% 
   ggplot(aes(resid))+
   geom_histogram()+
-  facet_wrap(~duration)</code></pre>
-<p><img src="figure/response_time.Rmd/plot_response_times-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_response_times-1">
-Past versions of plot_response_times-1.png
-</button>
+  facet_wrap(~duration, labeller = label_both)+
+  geom_vline(xintercept = resid_limit)+
+  labs(x=expression(Mean~absolute~residuals~(&quot;%&quot;~of~equilibrium~pCO[2])))</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/response_time.Rmd/fit_residuals-1.png" alt="Histogram of residuals from fit displayed for the investigate durations of the fit interval. Vertical line represents the chosen threshold." width="672" />
+<p class="caption">
+Histogram of residuals from fit displayed for the investigate durations of the fit interval. Vertical line represents the chosen threshold.
 </p>
-<div id="fig-plot_response_times-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/74212a6eb6af254907e20d8d11d60f31435cc63d/docs/figure/response_time.Rmd/plot_response_times-1.png" target="_blank">74212a6</a>
-</td>
-<td>
-jens-daniel-mueller
-</td>
-<td>
-2019-11-08
-</td>
-</tr>
-</tbody>
-</table>
 </div>
+<pre class="r"><code>tau_resid %&gt;% 
+  group_by(duration) %&gt;% 
+  mutate(n_tau = n()) %&gt;% 
+  ggplot(aes(duration, n_tau))+
+  geom_point()+
+  labs(x=&quot;Fit interval duration (sec)&quot;, y=&quot;Number of tau values&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/response_time.Rmd/number_of_tau-1.png" alt="Number of determined tau values as a function of the fit interval length, after applying a fit residual threshold" width="672" />
+<p class="caption">
+Number of determined tau values as a function of the fit interval length, after applying a fit residual threshold
+</p>
 </div>
-<pre class="r"><code>tau_df_sub %&gt;% 
+<pre class="r"><code>tau_resid_min_max %&gt;% 
   ggplot(aes(Zero_ID, tau, col=duration))+
   geom_point()+
-  scale_color_viridis_c()</code></pre>
-<p><img src="figure/response_time.Rmd/plot_response_times-2.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_response_times-2">
-Past versions of plot_response_times-2.png
-</button>
+  scale_color_viridis_c(name=&quot;Duration (sec)&quot;)+
+  labs(y=&quot;Tau (sec)&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/response_time.Rmd/tau_for_all_zero_ID-1.png" alt="Tau for all Zeroings with color representing the fit interval duration." width="672" />
+<p class="caption">
+Tau for all Zeroings with color representing the fit interval duration.
 </p>
-<div id="fig-plot_response_times-2" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/74212a6eb6af254907e20d8d11d60f31435cc63d/docs/figure/response_time.Rmd/plot_response_times-2.png" target="_blank">74212a6</a>
-</td>
-<td>
-jens-daniel-mueller
-</td>
-<td>
-2019-11-08
-</td>
-</tr>
-</tbody>
-</table>
 </div>
+<pre class="r"><code>tau_resid_min_max %&gt;% 
+  group_by(Zero_ID) %&gt;% 
+  mutate(d_tau = tau - mean(tau)) %&gt;% 
+  ggplot(aes(duration, d_tau))+
+  geom_hline(yintercept = 0)+
+  geom_smooth()+
+  geom_point()+
+  facet_wrap(~Zero_ID, ncol = 4, labeller = label_both)+
+  labs(x=&quot;Duration (sec)&quot;, y=&quot;Deviation from mean tau (sec)&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/response_time.Rmd/tau_duration_individual-1.png" alt="Determined tau values as a function of the fit interval duration, displayed individually for each flush period." width="672" />
+<p class="caption">
+Determined tau values as a function of the fit interval duration, displayed individually for each flush period.
+</p>
 </div>
-<pre class="r"><code>tau_df_sub %&gt;% 
+<pre class="r"><code>tau_resid_min_max %&gt;% 
   group_by(Zero_ID) %&gt;% 
   mutate(d_tau = tau - mean(tau)) %&gt;% 
   ggplot(aes(duration, d_tau))+
   geom_violin(aes(group=duration))+
-  geom_point()</code></pre>
-<p><img src="figure/response_time.Rmd/plot_response_times-3.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_response_times-3">
-Past versions of plot_response_times-3.png
-</button>
-</p>
-<div id="fig-plot_response_times-3" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/74212a6eb6af254907e20d8d11d60f31435cc63d/docs/figure/response_time.Rmd/plot_response_times-3.png" target="_blank">74212a6</a>
-</td>
-<td>
-jens-daniel-mueller
-</td>
-<td>
-2019-11-08
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<pre class="r"><code>tau_df_sub %&gt;% 
-  group_by(Zero_ID) %&gt;% 
-  mutate(d_tau = tau - mean(tau)) %&gt;% 
-  ggplot(aes(duration, d_tau))+
-  geom_smooth()+
   geom_point()+
-  facet_wrap(~Zero_ID)</code></pre>
-<p><img src="figure/response_time.Rmd/plot_response_times-4.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_response_times-4">
-Past versions of plot_response_times-4.png
-</button>
+  labs(x=&quot;Duration (sec)&quot;, y=&quot;Deviation from mean tau (sec)&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/response_time.Rmd/r%20tau_duration_mean-1.png" alt="Determined tau values as a function of the fit interval duration, pooled for all flush period." width="672" />
+<p class="caption">
+Determined tau values as a function of the fit interval duration, pooled for all flush period.
 </p>
-<div id="fig-plot_response_times-4" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/74212a6eb6af254907e20d8d11d60f31435cc63d/docs/figure/response_time.Rmd/plot_response_times-4.png" target="_blank">74212a6</a>
-</td>
-<td>
-jens-daniel-mueller
-</td>
-<td>
-2019-11-08
-</td>
-</tr>
-</tbody>
-</table>
 </div>
-</div>
-<pre class="r"><code>tau_df_sub %&gt;% 
-  group_by(duration) %&gt;% 
-  mutate(n_tau = n()) %&gt;% 
-  ggplot(aes(duration, n_tau))+
-  geom_point()</code></pre>
-<p><img src="figure/response_time.Rmd/plot_response_times-5.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_response_times-5">
-Past versions of plot_response_times-5.png
-</button>
-</p>
-<div id="fig-plot_response_times-5" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/74212a6eb6af254907e20d8d11d60f31435cc63d/docs/figure/response_time.Rmd/plot_response_times-5.png" target="_blank">74212a6</a>
-</td>
-<td>
-jens-daniel-mueller
-</td>
-<td>
-2019-11-08
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="this-approach" class="section level2">
-<h2>This approach</h2>
-</div>
-<div id="contros-in-house" class="section level2">
-<h2>Contros in-house</h2>
-</div>
-<div id="comparison" class="section level2">
-<h2>Comparison</h2>
 </div>
 </div>
 <div id="pre-smoothing" class="section level1">
@@ -1572,7 +1469,7 @@ $(document).ready(function ()  {
 
     // establish options
     var options = {
-      selectors: "h1,h2,h3",
+      selectors: "h1,h2",
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
@@ -1581,7 +1478,7 @@ $(document).ready(function ()  {
       ignoreSelector: ".toc-ignore",
       scrollTo: 0
     };
-    options.showAndHide = true;
+    options.showAndHide = false;
     options.smoothScroll = true;
 
     // tocify
