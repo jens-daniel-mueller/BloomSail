@@ -527,10 +527,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree76e38c615db09986acc1cc035a319af4b811a060targetblank76e38c6a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/76e38c615db09986acc1cc035a319af4b811a060" target="_blank">76e38c6</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree252f84d2a1b1de7ec936e65f1f45e5ea82faf7abtargetblank252f84da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/252f84d2a1b1de7ec936e65f1f45e5ea82faf7ab" target="_blank">252f84d</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree76e38c615db09986acc1cc035a319af4b811a060targetblank76e38c6a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree252f84d2a1b1de7ec936e65f1f45e5ea82faf7abtargetblank252f84da" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -542,6 +542,9 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
+
+Untracked files:
+    Untracked:  docs/reports/
 
 </code></pre>
 <p>
@@ -580,6 +583,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/d61a468cb1d37a4e7cb5be8a5b880d1980a39b56/docs/merging_interpolation.html" target="_blank">d61a468</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -819,120 +839,6 @@ df &lt;-
 #     
 #   }
 # }</code></pre>
-<pre class="r"><code># add counter for date_time observations
-
-df &lt;- df %&gt;% 
-  add_count(date_time)
-
-# find triplicated time stamp and select only first observation, and merge
-
-df_no_triple &lt;- df %&gt;% 
-  filter(n &lt;= 2)
-
-df_triple_clean &lt;- df %&gt;% 
-  filter(n &gt; 2) %&gt;% 
-  slice(1)
-
-df &lt;- full_join(df_no_triple, df_triple_clean)
-
-rm(list=setdiff(ls(), &quot;df&quot;))
-
-
-# find duplicated time stamps and shift first by one second, and merge
-
-df %&gt;% 
-  distinct(date_time)</code></pre>
-<pre><code># A tibble: 603,770 x 1
-   date_time          
-   &lt;dttm&gt;             
- 1 2018-06-16 03:58:45
- 2 2018-06-16 03:59:00
- 3 2018-06-16 03:59:15
- 4 2018-06-16 03:59:30
- 5 2018-06-16 03:59:45
- 6 2018-06-16 04:00:00
- 7 2018-06-16 04:00:15
- 8 2018-06-16 04:00:30
- 9 2018-06-16 04:00:45
-10 2018-06-16 04:01:00
-# ... with 603,760 more rows</code></pre>
-<pre class="r"><code>df_no_duplicated &lt;- df %&gt;%
-  filter(n == 1)
-
-df_duplicated &lt;- df %&gt;% 
-  filter(n == 2)
-
-df_duplicated_first &lt;- df_duplicated %&gt;% 
-  group_by(date_time) %&gt;% 
-  slice(1) %&gt;% 
-  ungroup() %&gt;% 
-  mutate(date_time = date_time - 1)
-
-df_duplicated_second &lt;- df_duplicated %&gt;% 
-  group_by(date_time) %&gt;% 
-  slice(2) %&gt;% 
-  ungroup()
-
-df_duplicated_clean &lt;- full_join(df_duplicated_first, df_duplicated_second) %&gt;% 
-  arrange(date_time)
-
-df &lt;- full_join(df_no_duplicated, df_duplicated_clean)
-
-df %&gt;% 
-  distinct(date_time)</code></pre>
-<pre><code># A tibble: 607,747 x 1
-   date_time          
-   &lt;dttm&gt;             
- 1 2018-06-16 03:58:45
- 2 2018-06-16 03:59:00
- 3 2018-06-16 03:59:15
- 4 2018-06-16 03:59:30
- 5 2018-06-16 03:59:45
- 6 2018-06-16 04:00:00
- 7 2018-06-16 04:00:15
- 8 2018-06-16 04:00:30
- 9 2018-06-16 04:00:45
-10 2018-06-16 04:01:00
-# ... with 607,737 more rows</code></pre>
-<pre class="r"><code>rm(list=setdiff(ls(), &quot;df&quot;))
-
-# remaining duplicates are observations where other observations with a +/- 1 sec timestamp exist
-# for those cases, only the first duplicated observation is selected (similar to triplicate treatment)
-
-df_still_no_duplicated &lt;- df %&gt;% 
-  select(-n) %&gt;% 
-  add_count(date_time) %&gt;% 
-  filter(n == 1)
-
-df_still_duplicated_first &lt;- df %&gt;% 
-  select(-n) %&gt;% 
-  add_count(date_time) %&gt;% 
-  filter(n == 2) %&gt;% 
-  group_by(date_time) %&gt;% 
-  slice(1)
-
-df &lt;- full_join(df_still_no_duplicated, df_still_duplicated_first)
-
-df %&gt;% 
-  distinct(date_time)</code></pre>
-<pre><code># A tibble: 607,747 x 1
-   date_time          
-   &lt;dttm&gt;             
- 1 2018-06-16 03:58:45
- 2 2018-06-16 03:59:00
- 3 2018-06-16 03:59:15
- 4 2018-06-16 03:59:30
- 5 2018-06-16 03:59:45
- 6 2018-06-16 04:00:00
- 7 2018-06-16 04:00:15
- 8 2018-06-16 04:00:30
- 9 2018-06-16 04:00:45
-10 2018-06-16 04:01:00
-# ... with 607,737 more rows</code></pre>
-<pre class="r"><code>rm(list=setdiff(ls(), &quot;df&quot;))
-
-df &lt;- df %&gt;% 
-  select(-n)</code></pre>
 <pre class="r"><code>write_csv(df, here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC.csv&quot;))</code></pre>
 <pre class="r"><code>HC &lt;-
   read_csv2(here::here(&quot;Data/TinaV/Sensor/HydroC-pCO2/corrected_Contros&quot;,
