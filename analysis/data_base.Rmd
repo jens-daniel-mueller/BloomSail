@@ -16,6 +16,7 @@ knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 library(tidyverse)
 library(data.table)
 library(lubridate)
+library(DataExplorer)
 ```
 
 # CTD Sensor data
@@ -239,8 +240,15 @@ CTD %>%
   write_csv(here::here("data/_summarized_data_files", "Tina_V_Sensor_Profiles_Transects.csv"))
 ```
 
+```{r CTD_EDA, eval=FALSE, include=FALSE}
+
+CTD %>% 
+  create_report(output_dir = "docs/reports/", output_file = "CTD_EDA_report.html")
+
+```
 
 
+The output of an automated Exploratory Data Analysis (EDA) performed with the package `DataExplorer` can be accessed [here](https://jens-daniel-mueller.github.io/BloomSail/docs/CTD_EDA_report.html){target="_blank}
 
 
 ```{r Overview_temperature_profiles, fig.cap="Temperature profiles recorded on regular stations P01-P13. ID refers to the starting date of each cruise.", fig.asp = 1.3}

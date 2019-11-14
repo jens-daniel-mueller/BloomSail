@@ -523,14 +523,81 @@ min_Zero_ID <- min(unique(df[df$date_time > ymd_hms("2018-07-17;13:08:34"),]$Zer
 #   group_by(pump_power) %>% 
 #   summarise(tau = mean(tau, na.rm = TRUE))
 
-tau_resid %>% 
+tau_final <- tau_resid %>% 
   mutate(pump_power = if_else(Zero_ID <= max_Zero_ID, "1W", "8W")) %>% 
   group_by(pump_power) %>% 
   summarise(tau = mean(tau))
 
+tau_final
+
+rm(list=setdiff(ls(), "tau_final"))
+
 ```
 
 # Response time correction
+
+
+```{r response_correction_data_preparation, eval=FALSE, include=FALSE}
+
+df <- read_csv(here::here("data/_merged_data_files",
+                          "BloomSail_CTD_HydroC_Contros_clean.csv"),
+               col_types = cols(ID = col_character(),
+                                pCO2_analog = col_double(),
+                                pCO2 = col_double()))
+
+df <- df %>%
+  select(date_time, ID, dep, tem, Flush, pCO2, Zero_ID, duration, mixing)
+
+# Load profile meta data --------------------------------------------------
+
+meta <- read_csv(here::here("Data/_summarized_data_files",
+                          "Tina_V_Sensor_meta.csv"))
+
+# Select profile data only ------------------------------------------------
+
+df <- df %>% 
+  filter(type == "P",
+         !(station %in% c("PX1", "PX2"))) %>% 
+  select(date_time, ID, station, cast, Zero, Flush, dep, pCO2_analog, pCO2)
+
+
+# Merge data and meta information -----------------------------------------
+
+df <- full_join(df, meta)
+rm(meta)
+
+
+# Select example profiles --------------------------------------------------
+
+df <- df %>% 
+  filter(ID == "180705" & station == "P05" |
+           ID == "180709" & station == "P11" |
+           ID == "180718" & station == "P02" |
+           ID == "180718" & station == "P03")
+
+
+# creating descriptive variables ------------------------------------------
+
+
+df <- df %>%
+  group_by(ID, station) %>% 
+  mutate(duration = as.numeric(date_time - min(date_time))) %>%
+  arrange(date_time)
+
+df <- df %>% 
+  mutate(phase = "standby",
+         phase = if_else(duration >= start & duration < down & !is.na(down) & !is.na(start),   "down", phase),
+         phase = if_else(duration >= down  & duration < lift & !is.na(lift) & !is.na(down ),   "low",  phase),
+         phase = if_else(duration >= lift   & duration < up   & !is.na(up  ) & !is.na(lift  ), "mid",  phase),
+         phase = if_else(duration >= up    & duration < end  & !is.na(end ) & !is.na(up   ),   "up",   phase))
+
+
+df <- df %>% 
+  filter(Zero == 0, Flush == 0)
+
+
+
+```
 
 ## Pre-smoothing
 ## Response time correction
