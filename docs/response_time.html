@@ -411,7 +411,7 @@ div.section {
 
 <h1 class="title toc-ignore">Response time correction of Contros HydroC pCO<sub>2</sub> data</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">08 November, 2019</h4>
+<h4 class="date">14 November, 2019</h4>
 
 </div>
 
@@ -436,7 +436,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-11-08
+<strong>Last updated:</strong> 2019-11-14
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -527,10 +527,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreead4aa1215773f23101e37ce2fde9f039d250ee5dtargetblankad4aa12a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ad4aa1215773f23101e37ce2fde9f039d250ee5d" target="_blank">ad4aa12</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree76e38c615db09986acc1cc035a319af4b811a060targetblank76e38c6a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/76e38c615db09986acc1cc035a319af4b811a060" target="_blank">76e38c6</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreead4aa1215773f23101e37ce2fde9f039d250ee5dtargetblankad4aa12a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree76e38c615db09986acc1cc035a319af4b811a060targetblank76e38c6a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -580,6 +580,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/76e38c615db09986acc1cc035a319af4b811a060/analysis/response_time.Rmd" target="_blank">76e38c6</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-14
+</td>
+<td>
+rebuild site, new toc depth
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/08b9a38d546b262e5f73c9c59035d1395ed21392/docs/response_time.html" target="_blank">08b9a38</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1100,20 +1134,20 @@ jens-daniel-mueller
 <h1>Response time determination</h1>
 <div id="hydroc-sensor-settings" class="section level2">
 <h2>HydroC sensor settings</h2>
-<p>The sensor was first run with a low power pump (1W), later and for most parts of the expedition with a stronger (8W) pump. Pumps were switched between recordings (data file: SD_datafile_20180718_170417CO2-0618-001.txt):</p>
+<p>The sensor was first run with a low power pump (1W). Later - and for most parts of the expedition - with a stronger (8W) pump. Pumps were switched between recordings (data file: SD_datafile_20180718_170417CO2-0618-001.txt):</p>
 <ul>
 <li>2018-07-17;13:08:34</li>
 <li>2018-07-17;13:08:35</li>
 </ul>
-<p>Logging frequency for all measurement modes (Measure, Zero, Flush) was set to:</p>
+<p>Logging frequency for all measurement modes (Measure, Zero, Flush) was increased in two steps, It was:</p>
 <p>10 sec for all recordings including SD_datafile_20180714_073641CO2-0618-001.txt</p>
-<p>Increase to 2 sec in SD_datafile_20180717_121052CO2-0618-001.txt at:</p>
+<p>2 sec after change in SD_datafile_20180717_121052CO2-0618-001.txt at:</p>
 <ul>
 <li>2018-07-14;07:52:02</li>
 <li>2018-07-14;07:52:12</li>
 <li>2018-07-14;07:52:14</li>
 </ul>
-<p>Increase to 2 sec in SD_datafile_20180718_170417CO2-0618-001 at:</p>
+<p>1 sec after change in SD_datafile_20180718_170417CO2-0618-001 at:</p>
 <ul>
 <li>2018-07-17;12:27:25</li>
 <li>2018-07-17;12:27:27</li>
@@ -1126,7 +1160,7 @@ jens-daniel-mueller
 <ul>
 <li>Flush period length: variable</li>
 <li>Flush period restricted to equilibration phase, avoiding initial gas mixing effects occuring at the start of each Flush period</li>
-<li>only completet Flush periods (duration &gt; 500 sec) included</li>
+<li>only completed Flush periods (duration &gt; 500 sec) included</li>
 </ul>
 <pre class="r"><code>df &lt;- read_csv(here::here(&quot;data/_merged_data_files&quot;,
                           &quot;BloomSail_CTD_HydroC_Contros_clean.csv&quot;),
@@ -1176,9 +1210,9 @@ augment(fit) %&gt;%
   geom_hline(yintercept = pCO2_start + 0.63 *(dpCO2))+
   labs(y=expression(pCO[2]~(µatm)), x=&quot;Duration of Flush period (s)&quot;)</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/response_time.Rmd/response_determination_example_plot-1.png" alt="Example response time determination by non-linear least squares fit to the pCO~2~ recovery signal after zeroing. The vertical line indicates the determined response time tau." width="672" />
+<img src="figure/response_time.Rmd/response_determination_example_plot-1.png" alt="Example response time determination by non-linear least squares fit to the pCO~2~ recovery signal after zeroing. The vertical line indicates the determined response time tau. The horizontal line indicates 63% of the difference between start and final fitted pCO~2~." width="672" />
 <p class="caption">
-Example response time determination by non-linear least squares fit to the pCO<sub>2</sub> recovery signal after zeroing. The vertical line indicates the determined response time tau.
+Example response time determination by non-linear least squares fit to the pCO<sub>2</sub> recovery signal after zeroing. The vertical line indicates the determined response time tau. The horizontal line indicates 63% of the difference between start and final fitted pCO<sub>2</sub>.
 </p>
 </div>
 <p>
@@ -1220,8 +1254,8 @@ jens-daniel-mueller
 </div>
 <pre class="r"><code>rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start)</code></pre>
 <pre class="r"><code>duration_intervals &lt;- seq(150,500,50)</code></pre>
-<p>As there was some speculation about the dependence of determined response times (<span class="math inline">\(\tau\)</span>) on the chosen duration of the fit interval, <span class="math inline">\(\tau\)</span> was determined for all zeroings and for total durations of:<br />
-150, 200, 250, 300, 350, 400, 450, 500 secs</p>
+<p>As there was some speculation about the dependence of determined response times (<span class="math inline">\(\tau\)</span>) on the chosen duration of the fit interval, the response time <span class="math inline">\(\tau\)</span> was determined for all zeroings and for total durations of:</p>
+<p>150, 200, 250, 300, 350, 400, 450, 500 secs</p>
 <pre class="r"><code># Plot all individual Flush periods with exponential fit ----------------------
 
 pdf(file=here::here(&quot;output/Plots/response_time&quot;,
@@ -1337,7 +1371,9 @@ tau_df %&gt;%
 </div>
 <div id="outcome" class="section level2">
 <h2>Outcome</h2>
-<p>Estimated <span class="math inline">\(\tau\)</span> values were only taken into account when stable environmental pCO<sub>2</sub> levels were present. Absence of stable environmental pCO<sub>2</sub> was assumed when the mean absolute fit residual was above 1 % of the final equilibrium pCO<sub>2</sub>, for any model fit of that flush period irrespective of the chosen fit interval length. Usually, fits with the higher duration did not meet this criterion. For some unexplained reason the first <span class="math inline">\(\tau\)</span> determination resulted in values about twice as high as all other Flush periods and was therefore removed as an outlier.</p>
+<div id="general-cosiderations" class="section level3">
+<h3>General cosiderations</h3>
+<p>Estimated <span class="math inline">\(\tau\)</span> values were only taken into account when stable environmental pCO<sub>2</sub> levels were present. Absence of stable environmental pCO<sub>2</sub> was assumed when the mean absolute fit residual was above 1 % of the final equilibrium pCO<sub>2</sub>. If one model fit (irrespective the chosen fit interval length) of a particular flush period did not match that criterion, the flush period was ignored. Usually, fits with the higher duration did not meet this criterion. For some unexplained reason the first <span class="math inline">\(\tau\)</span> determination resulted in values about twice as high as all other Flush periods and was therefore removed as an outlier.</p>
 <p>Metrics to characterize the fitting procedure include the number of:</p>
 <ul>
 <li>Flush periods: 55</li>
@@ -1455,6 +1491,9 @@ jens-daniel-mueller
 </table>
 </div>
 </div>
+</div>
+<div id="fit-interval-length" class="section level3">
+<h3>Fit interval length</h3>
 <pre class="r"><code>tau_resid %&gt;% 
   group_by(Zero_ID) %&gt;% 
   mutate(d_tau = tau - mean(tau)) %&gt;% 
@@ -1580,8 +1619,8 @@ jens-daniel-mueller
 </div>
 </div>
 </div>
-<div id="mean-response-time" class="section level2">
-<h2>Mean response time</h2>
+<div id="mean-response-time" class="section level3">
+<h3>Mean response time</h3>
 <p>Finally, the mean response times are:</p>
 <pre class="r"><code>max_Zero_ID &lt;- max(unique(df[df$date_time &lt; ymd_hms(&quot;2018-07-17;13:08:34&quot;),]$Zero_ID))
 min_Zero_ID &lt;- min(unique(df[df$date_time &gt; ymd_hms(&quot;2018-07-17;13:08:34&quot;),]$Zero_ID))
@@ -1602,14 +1641,18 @@ tau_resid %&gt;%
 2 8W          56.6</code></pre>
 </div>
 </div>
-<div id="pre-smoothing" class="section level1">
-<h1>Pre-smoothing</h1>
 </div>
 <div id="response-time-correction" class="section level1">
 <h1>Response time correction</h1>
+<div id="pre-smoothing" class="section level2">
+<h2>Pre-smoothing</h2>
 </div>
-<div id="post-smoothing" class="section level1">
-<h1>Post-smoothing</h1>
+<div id="response-time-correction-1" class="section level2">
+<h2>Response time correction</h2>
+</div>
+<div id="post-smoothing" class="section level2">
+<h2>Post-smoothing</h2>
+</div>
 </div>
 <div id="response-time-optimization" class="section level1">
 <h1>Response time optimization</h1>
@@ -1739,7 +1782,7 @@ $(document).ready(function ()  {
 
     // establish options
     var options = {
-      selectors: "h1,h2",
+      selectors: "h1,h2,h3",
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
