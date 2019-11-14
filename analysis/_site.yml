@@ -26,7 +26,7 @@ output:
     toc: yes
     toc_float:
       collapsed: false
-    toc_depth: 2
+    toc_depth: 3
     theme: flatly
     code_folding: hide
     highlight: textmate

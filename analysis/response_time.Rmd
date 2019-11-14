@@ -66,22 +66,22 @@ rm(df, Tem, pCO2)
 
 ## HydroC sensor settings
 
-The sensor was first run with a low power pump (1W), later and for most parts of the expedition with a stronger (8W) pump. Pumps were switched between recordings (data file: SD_datafile_20180718_170417CO2-0618-001.txt):  
+The sensor was first run with a low power pump (1W). Later - and for most parts of the expedition - with a stronger (8W) pump. Pumps were switched between recordings (data file: SD_datafile_20180718_170417CO2-0618-001.txt):  
 
 * 2018-07-17;13:08:34
 * 2018-07-17;13:08:35
 
-Logging frequency for all measurement modes (Measure, Zero, Flush) was set to:  
+Logging frequency for all measurement modes (Measure, Zero, Flush) was increased in two steps, It was:  
 
 10 sec for all recordings including SD_datafile_20180714_073641CO2-0618-001.txt  
 
-Increase to 2 sec in SD_datafile_20180717_121052CO2-0618-001.txt at:  
+2 sec after change in SD_datafile_20180717_121052CO2-0618-001.txt at:  
 
 * 2018-07-14;07:52:02
 * 2018-07-14;07:52:12
 * 2018-07-14;07:52:14
 
-Increase to 2 sec in SD_datafile_20180718_170417CO2-0618-001 at:  
+1 sec after change in SD_datafile_20180718_170417CO2-0618-001 at:  
 
 * 2018-07-17;12:27:25
 * 2018-07-17;12:27:27
@@ -93,7 +93,7 @@ Response times were determined by fitting a nonlinear least-squares model with t
 
 * Flush period length: variable
 * Flush period restricted to equilibration phase, avoiding initial gas mixing effects occuring at the start of each Flush period
-* only completet Flush periods (duration > 500 sec) included
+* only completed Flush periods (duration > 500 sec) included
 
 
 ```{r response_determination_data_preparation}
@@ -127,7 +127,7 @@ df <- df %>%
 
 An example plot for a `nls` model fitted to pCO~2~ observations during a Flush phase is shown below.
 
-```{r response_determination_example_plot, fig.cap="Example response time determination by non-linear least squares fit to the pCO~2~ recovery signal after zeroing. The vertical line indicates the determined response time tau."}
+```{r response_determination_example_plot, fig.cap="Example response time determination by non-linear least squares fit to the pCO~2~ recovery signal after zeroing. The vertical line indicates the determined response time tau. The horizontal line indicates 63% of the difference between start and final fitted pCO~2~."}
 
 i <- 95
 
@@ -162,7 +162,8 @@ duration_intervals <- seq(150,500,50)
 ```
 
 
-As there was some speculation about the dependence of determined response times ($\tau$) on the chosen duration of the fit interval, $\tau$ was determined for all zeroings and for total durations of:  
+As there was some speculation about the dependence of determined response times ($\tau$) on the chosen duration of the fit interval, the response time $\tau$ was determined for all zeroings and for total durations of:  
+
 `r duration_intervals` secs
 
 
@@ -347,8 +348,9 @@ n_tau_resid <- nrow(tau_resid)
 
 ## Outcome
 
+### General cosiderations
 
-Estimated $\tau$ values were only taken into account when stable environmental pCO~2~ levels were present. Absence of stable environmental pCO~2~ was assumed when the mean absolute fit residual was above `r resid_limit` % of the final equilibrium pCO~2~, for any model fit of that flush period irrespective of the chosen fit interval length. Usually, fits with the higher duration did not meet this criterion. For some unexplained reason the first $\tau$ determination resulted in values about twice as high as all other Flush periods and was therefore removed as an outlier.
+Estimated $\tau$ values were only taken into account when stable environmental pCO~2~ levels were present. Absence of stable environmental pCO~2~ was assumed when the mean absolute fit residual was above `r resid_limit` % of the final equilibrium pCO~2~. If one model fit (irrespective the chosen fit interval length) of a particular flush period did not match that criterion, the flush period was ignored. Usually, fits with the higher duration did not meet this criterion. For some unexplained reason the first $\tau$ determination resulted in values about twice as high as all other Flush periods and was therefore removed as an outlier.
 
 Metrics to characterize the fitting procedure include the number of:
 
@@ -381,6 +383,8 @@ tau_resid %>%
   labs(y="Tau (sec)")
 ```
 
+
+### Fit interval length
 
 ```{r tau_duration_individual, fig.cap="Determined tau values as a function of the fit interval duration, displayed individually for each flush period.", fig.asp=2}
 
@@ -504,7 +508,7 @@ RT %>%
 
 ```
 
-## Mean response time
+### Mean response time
 
 Finally, the mean response times are:
 
@@ -526,11 +530,11 @@ tau_resid %>%
 
 ```
 
-
-
-# Pre-smoothing
 # Response time correction
-# Post-smoothing
+
+## Pre-smoothing
+## Response time correction
+## Post-smoothing
 # Response time optimization
 # Open tasks / questions
 
