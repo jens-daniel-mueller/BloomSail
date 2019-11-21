@@ -494,6 +494,9 @@ HC <- HC %>%
 
 ```
 
+A pdf with plots of all Flush periods (mixing and equilibration identified) can be found here:
+
+[Link to Flush period plots](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/data_base/Flush_periods_all.pdf){target="_blank"}
 
 ```{r HydroC_deployment_plots, eval=FALSE, eval=FALSE}
 
@@ -525,7 +528,7 @@ rm(sub, start_date, i)
 
 A pdf with pCO2 timeseries plots of all deployments can be found here:
 
-[Link to pCO~2~ timeseries plots](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/data_base){target="_blank"}
+[Link to pCO~2~ timeseries plots](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/data_base/HydroC_pCO2_deployments.pdf){target="_blank"}
 
 
 ```{r HydroC_EDA, eval=FALSE}
