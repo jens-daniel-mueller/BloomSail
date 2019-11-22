@@ -411,7 +411,7 @@ div.section {
 
 <h1 class="title toc-ignore">Merging and interpolation of observations</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">14 November, 2019</h4>
+<h4 class="date">22 November, 2019</h4>
 
 </div>
 
@@ -436,7 +436,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-11-14
+<strong>Last updated:</strong> 2019-11-22
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -527,10 +527,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree252f84d2a1b1de7ec936e65f1f45e5ea82faf7abtargetblank252f84da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/252f84d2a1b1de7ec936e65f1f45e5ea82faf7ab" target="_blank">252f84d</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef875795e46b170b876c7ccff57e6862f7264e50ctargetblankf875795a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f875795e46b170b876c7ccff57e6862f7264e50c" target="_blank">f875795</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree252f84d2a1b1de7ec936e65f1f45e5ea82faf7abtargetblank252f84da" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef875795e46b170b876c7ccff57e6862f7264e50ctargetblankf875795a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -542,9 +542,6 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
-
-Untracked files:
-    Untracked:  docs/reports/
 
 </code></pre>
 <p>
@@ -583,6 +580,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f875795e46b170b876c7ccff57e6862f7264e50c/analysis/merging_interpolation.Rmd" target="_blank">f875795</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-22
+</td>
+<td>
+now clean
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/d92106599fd27722059ee0e8ae087eda82406fe7/docs/merging_interpolation.html" target="_blank">d921065</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2019-11-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -760,6 +791,7 @@ CTD &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
   rename(pCO2_analog = pCO2)
 
 HC &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;Tina_V_HydroC.csv&quot;))
+HC_full &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;Tina_V_HydroC_full.csv&quot;))
 
 # Time offset correction ----------------------------------------------
 
@@ -778,7 +810,10 @@ CTD &lt;- CTD %&gt;%
 df &lt;- full_join(CTD, HC) %&gt;% 
   arrange(date_time)
 
-rm(HC, CTD)</code></pre>
+df_full &lt;- full_join(CTD, HC_full) %&gt;% 
+  arrange(date_time)
+
+rm(HC, HC_full, CTD)</code></pre>
 </div>
 <div id="interpolation-to-common-time-stamp" class="section level2">
 <h2>Interpolation to common time stamp</h2>
@@ -796,7 +831,21 @@ df &lt;-
          O2 = na.approx(O2, na.rm = FALSE, maxgap = 20),
          Chl = na.approx(Chl, na.rm = FALSE, maxgap = 20)) %&gt;% 
   filter(!is.na(dep)) %&gt;% #remove HC readings not falling in regular transects/profilings
-  fill(ID, type, station, cast) %&gt;% 
+  fill(ID, type, station) %&gt;% 
+  filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
+
+df_full &lt;-
+  df_full %&gt;%
+  mutate(dep = na.approx(dep, na.rm = FALSE, maxgap = 20),
+         sal = na.approx(sal, na.rm = FALSE, maxgap = 20),
+         tem = na.approx(tem, na.rm = FALSE, maxgap = 20),
+         pCO2_analog = na.approx(pCO2_analog, na.rm = FALSE, maxgap = 20),
+         pH = na.approx(pH, na.rm = FALSE, maxgap = 20),
+         V_pH = na.approx(V_pH, na.rm = FALSE, maxgap = 20),
+         O2 = na.approx(O2, na.rm = FALSE, maxgap = 20),
+         Chl = na.approx(Chl, na.rm = FALSE, maxgap = 20)) %&gt;% 
+  filter(!is.na(dep)) %&gt;% #remove HC readings not falling in regular transects/profilings
+  fill(ID, type, station) %&gt;% 
   filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
 
 # Time stamp synchronzity -------------------------------------------------
@@ -839,17 +888,24 @@ df &lt;-
 #     
 #   }
 # }</code></pre>
-<pre class="r"><code>write_csv(df, here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC.csv&quot;))</code></pre>
-<pre class="r"><code>HC &lt;-
-  read_csv2(here::here(&quot;Data/TinaV/Sensor/HydroC-pCO2/corrected_Contros&quot;,
-                       &quot;parameter&amp;pCO2s(method 43).txt&quot;),
-            col_names = c(&quot;date_time&quot;, &quot;Zero&quot;, &quot;Flush&quot;, &quot;p_NDIR&quot;,
-                          &quot;p_in&quot;, &quot;T_control&quot;, &quot;T_gas&quot;, &quot;%rH_gas&quot;,
-                          &quot;Signal_raw&quot;, &quot;Signal_ref&quot;, &quot;T_sensor&quot;,
-                          &quot;pCO2&quot;, &quot;Runtime&quot;, &quot;nr.ave&quot;)) %&gt;% 
-  mutate(Flush = as.factor(as.character(Flush)),
-         Zero = as.factor(as.character(Zero)))</code></pre>
-<pre class="r"><code>df %&gt;% 
+<pre class="r"><code>write_csv(df, here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC.csv&quot;))
+write_csv(df_full, here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_full.csv&quot;))
+
+rm(df, df_full)</code></pre>
+<pre class="r"><code>df &lt;- read_csv(here::here(&quot;data/_merged_data_files&quot;,
+                          &quot;BloomSail_CTD_HydroC.csv&quot;),
+               col_types = cols(ID = col_character(),
+                                pCO2_analog = col_double(),
+                                pCO2 = col_double(),
+                                Zero = col_factor(),
+                                Flush = col_factor(),
+                                Zero_ID = col_integer(),
+                                deployment = col_integer(),
+                                duration = col_double(),
+                                mixing = col_character()))
+
+
+df %&gt;% 
   filter(!is.na(pCO2)) %&gt;% 
   ggplot()+
   geom_path(aes(date_time, pCO2, col = &quot;HydroC, drift corrected&quot;))+
@@ -962,23 +1018,22 @@ loaded via a namespace (and not attached):
  [1] tidyselect_0.2.5   xfun_0.10          haven_2.1.1       
  [4] lattice_0.20-35    colorspace_1.4-1   vctrs_0.2.0       
  [7] generics_0.0.2     htmltools_0.4.0    yaml_2.2.0        
-[10] utf8_1.1.4         rlang_0.4.1        pillar_1.4.2      
-[13] glue_1.3.1         withr_2.1.2        RColorBrewer_1.1-2
-[16] modelr_0.1.5       readxl_1.3.1       lifecycle_0.1.0   
-[19] munsell_0.5.0      gtable_0.3.0       workflowr_1.4.0   
-[22] cellranger_1.1.0   rvest_0.3.4        evaluate_0.14     
-[25] labeling_0.3       knitr_1.25         fansi_0.4.0       
-[28] highr_0.8          broom_0.5.2        Rcpp_1.0.2        
-[31] scales_1.0.0       backports_1.1.5    jsonlite_1.6      
-[34] fs_1.3.1           hms_0.5.1          digest_0.6.22     
-[37] stringi_1.4.3      grid_3.5.0         rprojroot_1.3-2   
-[40] here_0.1           cli_1.1.0          tools_3.5.0       
-[43] magrittr_1.5       lazyeval_0.2.2     crayon_1.3.4      
-[46] whisker_0.4        pkgconfig_2.0.3    zeallot_0.1.0     
-[49] ellipsis_0.3.0     xml2_1.2.2         assertthat_0.2.1  
-[52] rmarkdown_1.16     httr_1.4.1         rstudioapi_0.10   
-[55] R6_2.4.0           nlme_3.1-137       git2r_0.26.1      
-[58] compiler_3.5.0    </code></pre>
+[10] rlang_0.4.1        pillar_1.4.2       glue_1.3.1        
+[13] withr_2.1.2        RColorBrewer_1.1-2 modelr_0.1.5      
+[16] readxl_1.3.1       lifecycle_0.1.0    munsell_0.5.0     
+[19] gtable_0.3.0       workflowr_1.4.0    cellranger_1.1.0  
+[22] rvest_0.3.4        evaluate_0.14      labeling_0.3      
+[25] knitr_1.25         highr_0.8          broom_0.5.2       
+[28] Rcpp_1.0.2         scales_1.0.0       backports_1.1.5   
+[31] jsonlite_1.6       fs_1.3.1           hms_0.5.1         
+[34] digest_0.6.22      stringi_1.4.3      grid_3.5.0        
+[37] rprojroot_1.3-2    here_0.1           cli_1.1.0         
+[40] tools_3.5.0        magrittr_1.5       lazyeval_0.2.2    
+[43] crayon_1.3.4       whisker_0.4        pkgconfig_2.0.3   
+[46] zeallot_0.1.0      xml2_1.2.2         assertthat_0.2.1  
+[49] rmarkdown_1.16     httr_1.4.1         rstudioapi_0.10   
+[52] R6_2.4.0           nlme_3.1-137       git2r_0.26.1      
+[55] compiler_3.5.0    </code></pre>
 </div>
 </div>
 
