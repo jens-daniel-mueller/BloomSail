@@ -99,13 +99,14 @@ Response times were determined by fitting a nonlinear least-squares model with t
 ```{r response_determination_data_preparation}
 
 df <- read_csv(here::here("data/_merged_data_files",
-                          "BloomSail_CTD_HydroC_Contros_clean.csv"),
+                          "BloomSail_CTD_HydroC.csv"),
                col_types = cols(ID = col_character(),
                                 pCO2_analog = col_double(),
                                 pCO2 = col_double(),
                                 Zero = col_factor(),
                                 Flush = col_factor(),
                                 Zero_ID = col_integer(),
+                                deployment = col_integer(),
                                 duration = col_double(),
                                 mixing = col_character()))
 
@@ -129,7 +130,7 @@ An example plot for a `nls` model fitted to pCO~2~ observations during a Flush p
 
 ```{r response_determination_example_plot, fig.cap="Example response time determination by non-linear least squares fit to the pCO~2~ recovery signal after zeroing. The vertical line indicates the determined response time tau. The horizontal line indicates 63% of the difference between start and final fitted pCO~2~."}
 
-i <- 95
+i <- unique(df$Zero_ID)[30]
 
 df_ID <- df %>%
   filter(Zero_ID == i, duration <= 300)
@@ -152,7 +153,7 @@ augment(fit) %>%
   geom_hline(yintercept = pCO2_start + 0.63 *(dpCO2))+
   labs(y=expression(pCO[2]~(µatm)), x="Duration of Flush period (s)")
 
-rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start)
+rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, mean_abs_resid)
 ```
 
 
@@ -246,6 +247,8 @@ rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, temp, max_duration, mean_abs
 
 tau_df %>% 
   write_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_response_times_all.csv"))
+
+rm(tau_df, df)
 
 # Plot individual Flush periods with linearized response variable  --------
 # for (i in unique(df$Zero_ID)) {

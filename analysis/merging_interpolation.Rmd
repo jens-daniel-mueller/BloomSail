@@ -189,6 +189,19 @@ df %>%
 
 ```
 
+```{r measurement_frequency, eval=FALSE, include=FALSE}
+
+df <- df %>% 
+  mutate(dt = c(0,diff(date_time)))
+
+df %>% 
+  filter(dt < 30) %>% 
+  ggplot(aes(date_time, dt))+
+  geom_point()
+
+```
+
+
 
 # Tasks / open questions
 
