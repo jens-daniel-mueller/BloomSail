@@ -327,7 +327,7 @@ HC <- HC %>%
 
 ```
 
-```{r duplicated_timestamp_currection, eval=FALSE}
+```{r duplicated_timestamp_correction, eval=FALSE}
 
 
 # add counter for date_time observations
@@ -586,6 +586,11 @@ Summarized pCO~2~ date were written to file.
 ```{r writing_summary_file, eval=FALSE}
 
 HC %>% 
+  write_csv(here::here("Data/_summarized_data_files",
+                       "Tina_V_HydroC_full.csv"))
+
+HC %>% 
+  select(date_time, Zero, Flush, pCO2, deployment, Zero_ID, duration, mixing) %>% 
   write_csv(here::here("Data/_summarized_data_files",
                        "Tina_V_HydroC.csv"))
 

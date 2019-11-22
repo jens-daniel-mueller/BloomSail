@@ -26,7 +26,7 @@ library(zoo)
 ## Merging summarized data sets
 
 
-```{r load_summarized_data}
+```{r load_summarized_data, eval=FALSE}
 # Load Sensor and HydroC data ---------------------------------------------
 
 CTD <- read_csv(here::here("Data/_summarized_data_files",
@@ -35,6 +35,7 @@ CTD <- read_csv(here::here("Data/_summarized_data_files",
   rename(pCO2_analog = pCO2)
 
 HC <- read_csv(here::here("Data/_summarized_data_files", "Tina_V_HydroC.csv"))
+HC_full <- read_csv(here::here("Data/_summarized_data_files", "Tina_V_HydroC_full.csv"))
 
 # Time offset correction ----------------------------------------------
 
@@ -53,7 +54,10 @@ CTD <- CTD %>%
 df <- full_join(CTD, HC) %>% 
   arrange(date_time)
 
-rm(HC, CTD)
+df_full <- full_join(CTD, HC_full) %>% 
+  arrange(date_time)
+
+rm(HC, HC_full, CTD)
 ```
 
 
@@ -61,7 +65,7 @@ rm(HC, CTD)
 
 CTD and auxillary recordings (15 sec measurment interval) are interpolated to HydroC time stamps (first 10 sec, than 1 sec measurement interval) when gaps between observations are not larger than 20. Thereafter, HydroC readings not falling in regular transects/profilings are removed, by removing rows with NA depth values. Furthermore, CTD readings without corresponding HydroC reading are removed, except during periods when HydroC was not operating.
 
-```{r interpolation}
+```{r interpolation, eval=FALSE}
 
 # Interpolate Sensor data to HydroC timestamp
 
@@ -76,7 +80,21 @@ df <-
          O2 = na.approx(O2, na.rm = FALSE, maxgap = 20),
          Chl = na.approx(Chl, na.rm = FALSE, maxgap = 20)) %>% 
   filter(!is.na(dep)) %>% #remove HC readings not falling in regular transects/profilings
-  fill(ID, type, station, cast) %>% 
+  fill(ID, type, station) %>% 
+  filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
+
+df_full <-
+  df_full %>%
+  mutate(dep = na.approx(dep, na.rm = FALSE, maxgap = 20),
+         sal = na.approx(sal, na.rm = FALSE, maxgap = 20),
+         tem = na.approx(tem, na.rm = FALSE, maxgap = 20),
+         pCO2_analog = na.approx(pCO2_analog, na.rm = FALSE, maxgap = 20),
+         pH = na.approx(pH, na.rm = FALSE, maxgap = 20),
+         V_pH = na.approx(V_pH, na.rm = FALSE, maxgap = 20),
+         O2 = na.approx(O2, na.rm = FALSE, maxgap = 20),
+         Chl = na.approx(Chl, na.rm = FALSE, maxgap = 20)) %>% 
+  filter(!is.na(dep)) %>% #remove HC readings not falling in regular transects/profilings
+  fill(ID, type, station) %>% 
   filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
 
 # Time stamp synchronzity -------------------------------------------------
@@ -122,109 +140,31 @@ df <-
 
 ```
 
-```{r clean_douplicated_time_stamps, include=FALSE}
 
-# add counter for date_time observations
+```{r safe_merged_data_file, eval=FALSE}
 
-df <- df %>% 
-  add_count(date_time)
-
-# find triplicated time stamp and select only first observation, and merge
-
-df_no_triple <- df %>% 
-  filter(n <= 2)
-
-df_triple_clean <- df %>% 
-  filter(n > 2) %>% 
-  slice(1)
-
-df <- full_join(df_no_triple, df_triple_clean)
-
-rm(list=setdiff(ls(), "df"))
-
-
-# find duplicated time stamps and shift first by one second, and merge
-
-df %>% 
-  distinct(date_time)
-
-df_no_duplicated <- df %>%
-  filter(n == 1)
-
-df_duplicated <- df %>% 
-  filter(n == 2)
-
-df_duplicated_first <- df_duplicated %>% 
-  group_by(date_time) %>% 
-  slice(1) %>% 
-  ungroup() %>% 
-  mutate(date_time = date_time - 1)
-
-df_duplicated_second <- df_duplicated %>% 
-  group_by(date_time) %>% 
-  slice(2) %>% 
-  ungroup()
-
-df_duplicated_clean <- full_join(df_duplicated_first, df_duplicated_second) %>% 
-  arrange(date_time)
-
-df <- full_join(df_no_duplicated, df_duplicated_clean)
-
-df %>% 
-  distinct(date_time)
-
-rm(list=setdiff(ls(), "df"))
-
-# remaining duplicates are observations where other observations with a +/- 1 sec timestamp exist
-# for those cases, only the first duplicated observation is selected (similar to triplicate treatment)
-
-df_still_no_duplicated <- df %>% 
-  select(-n) %>% 
-  add_count(date_time) %>% 
-  filter(n == 1)
-
-df_still_duplicated_first <- df %>% 
-  select(-n) %>% 
-  add_count(date_time) %>% 
-  filter(n == 2) %>% 
-  group_by(date_time) %>% 
-  slice(1)
-
-df <- full_join(df_still_no_duplicated, df_still_duplicated_first)
-
-df %>% 
-  distinct(date_time)
-
-rm(list=setdiff(ls(), "df"))
-
-df <- df %>% 
-  select(-n)
-
-```
-
-
-```{r safe_merged_data_file}
 write_csv(df, here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC.csv"))
-```
+write_csv(df_full, here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_full.csv"))
 
-
-```{r merge_back_with_HydroC_raw_data}
-
-HC <-
-  read_csv2(here::here("Data/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
-                       "parameter&pCO2s(method 43).txt"),
-            col_names = c("date_time", "Zero", "Flush", "p_NDIR",
-                          "p_in", "T_control", "T_gas", "%rH_gas",
-                          "Signal_raw", "Signal_ref", "T_sensor",
-                          "pCO2", "Runtime", "nr.ave")) %>% 
-  mutate(Flush = as.factor(as.character(Flush)),
-         Zero = as.factor(as.character(Zero)))
+rm(df, df_full)
 
 ```
-
 
 
 ```{r timeseries_pCO2, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO~2~ measurement range is restricted to 100-500  µatm here due to the settings of the analog voltage output of the sensor. Zeroing periods are included.", fig.asp = 2.3}
+
+df <- read_csv(here::here("data/_merged_data_files",
+                          "BloomSail_CTD_HydroC.csv"),
+               col_types = cols(ID = col_character(),
+                                pCO2_analog = col_double(),
+                                pCO2 = col_double(),
+                                Zero = col_factor(),
+                                Flush = col_factor(),
+                                Zero_ID = col_integer(),
+                                deployment = col_integer(),
+                                duration = col_double(),
+                                mixing = col_character()))
+
 
 df %>% 
   filter(!is.na(pCO2)) %>% 
