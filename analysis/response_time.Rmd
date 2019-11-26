@@ -195,7 +195,14 @@ for (i in unique(df$Zero_ID)) {
       dpCO2 = pCO2_end - pCO2_start
       mean_abs_resid <- mean(abs(resid(fit))/pCO2_end)*100
       
-      temp <- as_tibble(bind_cols(Zero_ID = i, duration = max_duration, tau = tau, resid = mean_abs_resid))
+      temp <- as_tibble(bind_cols(Zero_ID = i,
+                                  duration = max_duration,
+                                  date_time = mean(df_ID$date_time),
+                                  dep = mean(df_ID$dep),
+                                  tem = mean(df_ID$tem),
+                                  pCO2 = pCO2_end,
+                                  tau = tau,
+                                  resid = mean_abs_resid))
       
       if (exists("tau_df")){tau_df <- bind_rows(tau_df, temp)}
         else {tau_df <- temp}
@@ -222,7 +229,14 @@ for (i in unique(df$Zero_ID)) {
     
     else {
     
-      temp <- as_tibble(bind_cols(Zero_ID = i, duration = max_duration, tau = NaN, resid = NaN))
+      temp <- as_tibble(bind_cols(Zero_ID = i,
+                                  duration = max_duration,
+                                  date_time = mean(df_ID$date_time),
+                                  dep = mean(df_ID$dep),
+                                  tem = mean(df_ID$tem),
+                                  pCO2 = pCO2_end,
+                                  tau = NaN,
+                                  resid = NaN))
       
       if (exists("tau_df")){tau_df <- bind_rows(tau_df, temp)}
         else {tau_df <- temp}
@@ -279,9 +293,6 @@ rm(tau_df, df)
 # #   geom_line(aes(y = .fitted))+
 # #   geom_vline(xintercept = tau)
 # 
-# ggsave(here::here("/Plots/TinaV/Sensor/HydroC_diagnostics/Response_time_fits",
-#                   paste(i,"_Zero_ID_HydroC_RT_linear.jpg", sep="")),
-#          width = 10, height = 4)
 # }
 
 ```
@@ -292,6 +303,12 @@ A pdf with plots of all individual response time fits can be accessed [here](htt
 ```{r thresholds_for_tau_and_fit_residual, include=FALSE}
 
 tau_df <- read_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_response_times_all.csv"))
+
+max_Zero_ID <- max(unique(tau_df[tau_df$date_time < ymd_hms("2018-07-17;13:08:34"),]$Zero_ID))
+
+tau_df <- tau_df %>% 
+  mutate(pump_power = if_else(Zero_ID <= max_Zero_ID, "1W", "8W"))
+
 
 # define subsetting parameters
 resid_limit <- 1
@@ -351,7 +368,7 @@ n_tau_resid <- nrow(tau_resid)
 
 ## Outcome
 
-### General cosiderations
+### General considerations
 
 Estimated $\tau$ values were only taken into account when stable environmental pCO~2~ levels were present. Absence of stable environmental pCO~2~ was assumed when the mean absolute fit residual was above `r resid_limit` % of the final equilibrium pCO~2~. If one model fit (irrespective the chosen fit interval length) of a particular flush period did not match that criterion, the flush period was ignored. Usually, fits with the higher duration did not meet this criterion. For some unexplained reason the first $\tau$ determination resulted in values about twice as high as all other Flush periods and was therefore removed as an outlier.
 
@@ -367,7 +384,7 @@ It should be noted that all failed model fits occured in flush periods where the
 
 `r rm(n_Zero_IDs, n_duration_intervals,n_tau_max, n_tau_total, n_tau_resid, n_tau_resid_min_max, mean_abs_resid, tau_resid_out)`
 
-```{r fit_residuals, fig.cap="Histogram of residuals from fit displayed for the investigate durations of the fit interval. Vertical line represents the chosen threshold."}
+```{r tau_fit_residuals, fig.cap="Histogram of residuals from fit displayed for the investigate durations of the fit interval. Vertical line represents the chosen threshold."}
 
 tau_df %>% 
   ggplot(aes(resid))+
@@ -378,14 +395,50 @@ tau_df %>%
 
 ```
 
-```{r tau_for_all_zero_ID, fig.cap="Tau for all Zeroings with color representing the fit interval duration."}
+```{r tau_vs_date, fig.cap="Tau for all Zeroings with color representing water depth."}
 tau_resid %>% 
-  ggplot(aes(Zero_ID, tau, col=duration))+
+  ggplot(aes(date_time, tau, col=dep, shape=pump_power))+
   geom_point()+
-  scale_color_viridis_c(name="Duration (sec)")+
+  scale_color_viridis_c(name="Depth (m)")+
   labs(y="Tau (sec)")
+
 ```
 
+### Depth and temperature dependence
+
+```{r tau_vs_dep, fig.cap="Tau as a function of depth for all zeroings determined with low power (left) and strong (right) pump. Color represents the water temperature."}
+tau_resid %>% 
+  ggplot(aes(dep, tau, col=tem))+
+  geom_smooth(method = "lm")+
+  geom_point()+
+  scale_color_viridis_c(name="Temp (deg C)")+
+  labs(y="Tau (sec)", x="Depth (m)")+
+  facet_wrap(~pump_power)
+
+```
+
+```{r tau_vs_tem, fig.cap="Tau as a function of temperature for all zeroings determined with low power (left) and strong (right) pump. Color represents the water depth."}
+tau_resid %>% 
+  ggplot(aes(tem, tau, col=dep))+
+  geom_smooth(method = "lm")+
+  geom_point()+
+  scale_color_viridis_c(name="Depth (m)")+
+  labs(y="Tau (sec)", x="Temp (deg C)")+
+  facet_wrap(~pump_power)
+
+```
+
+```{r tau_vs_tem_surface, fig.cap="Surface tau (<10m) as a function of temperature for all zeroings determined with low power (left) and strong (right) pump. Color represents the water depth."}
+tau_resid %>% 
+  filter(dep < 10) %>% 
+  ggplot(aes(tem, tau, col=dep))+
+  geom_smooth(method = "lm")+
+  geom_point()+
+  scale_color_viridis_c(name="Depth (m)")+
+  labs(y="Tau (sec)", x="Tem (deg C)")+
+  facet_wrap(~pump_power)
+
+```
 
 ### Fit interval length
 
@@ -409,8 +462,8 @@ tau_resid %>%
 tau_resid %>% 
   group_by(Zero_ID) %>% 
   mutate(d_tau = tau - mean(tau)) %>% 
-  ggplot(aes(duration, d_tau))+
-  geom_violin(aes(group=duration))+
+  ggplot(aes(duration, d_tau, group=duration))+
+  geom_violin()+
   geom_point()+
   labs(x="Duration (sec)", y="Deviation from mean tau (sec)")
 
@@ -511,29 +564,36 @@ RT %>%
 
 ```
 
-### Mean response time
+### Mean response time fits
 
 Finally, the mean response times are:
 
 ```{r mean_response_time}
 
-
-max_Zero_ID <- max(unique(df[df$date_time < ymd_hms("2018-07-17;13:08:34"),]$Zero_ID))
-min_Zero_ID <- min(unique(df[df$date_time > ymd_hms("2018-07-17;13:08:34"),]$Zero_ID))
-
-# tau_df %>% 
-#   mutate(pump_power = if_else(Zero_ID <= 20, "1W", "8W")) %>% 
-#   group_by(pump_power) %>% 
-#   summarise(tau = mean(tau, na.rm = TRUE))
-
-tau_final <- tau_resid %>% 
-  mutate(pump_power = if_else(Zero_ID <= max_Zero_ID, "1W", "8W")) %>% 
+RT_mean <- tau_resid %>% 
   group_by(pump_power) %>% 
   summarise(tau = mean(tau))
 
-tau_final
+RT_mean
 
-rm(list=setdiff(ls(), "tau_final"))
+```
+
+But we can also fit response times as a function of water temperature:
+
+```{r linear_model_response_time}
+
+
+RT_fit <- tau_resid %>% 
+  group_by(pump_power) %>% 
+  do(fit = lm(tau ~ tem, data = .)) %>% 
+  tidy(fit) %>% 
+  select(pump_power, term, estimate) %>% 
+  spread(term, estimate)
+
+RT_fit
+
+
+rm(list=setdiff(ls(), "tau_resid"))
 
 ```
 
@@ -543,25 +603,23 @@ rm(list=setdiff(ls(), "tau_final"))
 ```{r response_correction_data_preparation, eval=FALSE, include=FALSE}
 
 df <- read_csv(here::here("data/_merged_data_files",
-                          "BloomSail_CTD_HydroC_Contros_clean.csv"),
+                          "BloomSail_CTD_HydroC.csv"),
                col_types = cols(ID = col_character(),
                                 pCO2_analog = col_double(),
                                 pCO2 = col_double()))
 
-df <- df %>%
-  select(date_time, ID, dep, tem, Flush, pCO2, Zero_ID, duration, mixing)
-
 # Load profile meta data --------------------------------------------------
 
 meta <- read_csv(here::here("Data/_summarized_data_files",
-                          "Tina_V_Sensor_meta.csv"))
+                          "Tina_V_Sensor_meta.csv"),
+                 col_types = cols(ID = col_character()))
 
 # Select profile data only ------------------------------------------------
 
 df <- df %>% 
   filter(type == "P",
          !(station %in% c("PX1", "PX2"))) %>% 
-  select(date_time, ID, station, cast, Zero, Flush, dep, pCO2_analog, pCO2)
+  select(date_time, ID, station, Zero, Flush, dep, pCO2_analog, pCO2)
 
 
 # Merge data and meta information -----------------------------------------
