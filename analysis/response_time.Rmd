@@ -1090,7 +1090,7 @@ i_station <- "P01"
       
 ```
 
-A pdf with all absolute pCO~2~ offset profiles can be assessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/RT_correction_delta_pCO2_relative_profiles_discrete.pdf){target="_blank"}
+A pdf with all relative pCO~2~ offset profiles can be assessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/RT_correction_delta_pCO2_relative_profiles_discrete.pdf){target="_blank"}
 
 
 ```{r plot_delta_pCO2_relative_profiles, eval=FALSE}
@@ -1178,14 +1178,31 @@ equi_RT_diff_sum <- equi_RT_diff %>%
 ```
 
 
+```{r tau_optimum_reference_pCO2, fig.cap="Mean pCO2 offset from reference values as a function of the factor applied to tau."}
 
-```{r summary_plots, eval=FALSE}
-
+equi_RT_diff_sum <- equi_RT_diff_sum %>% 
+  mutate(tau_factor = as.numeric(tau_factor))
 
 equi_RT_diff_sum %>%
-  ggplot(aes(tau_factor, d_pCO2_equi, col=RT, shape=correction))+
+  ggplot(aes(tau_factor, d_pCO2_equi, col=RT, shape=correction, linetype=correction))+
   geom_hline(yintercept = 0)+
+  geom_smooth(method = "lm")+
   geom_point()
+
+equi_RT_diff_sum %>% 
+  filter(correction == "pCO2_RT_mean") %>% 
+  group_by(RT) %>% 
+  do(fit = lm(d_pCO2_equi ~ tau_factor, data = .)) %>% 
+  tidy(fit) %>% 
+  select(RT, term, estimate) %>% 
+  spread(term, estimate)
+  
+
+```
+
+
+
+```{r summary_plots, eval=FALSE}
 
 
 RT_diff_sum %>% 
