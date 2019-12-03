@@ -533,10 +533,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree216ad8aa55784b061277c673ed17f813f0891d0atargetblank216ad8aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/216ad8aa55784b061277c673ed17f813f0891d0a" target="_blank">216ad8a</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree8da790dbbf72c3e5cf1483c07fdaa03b7cd255fatargetblank8da790da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/8da790dbbf72c3e5cf1483c07fdaa03b7cd255fa" target="_blank">8da790d</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree216ad8aa55784b061277c673ed17f813f0891d0atargetblank216ad8aa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree8da790dbbf72c3e5cf1483c07fdaa03b7cd255fatargetblank8da790da" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -548,12 +548,6 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
-
-Untracked files:
-    Untracked:  output/Plots/response_time/
-
-Unstaged changes:
-    Modified:   code/Workflowr_project_managment.R
 
 </code></pre>
 <p>
@@ -1560,7 +1554,7 @@ i_station &lt;- &quot;P01&quot;
 Example plot of relative offset pCO<sub>2</sub> profiles. Panels highlight the effect of constant vs T-dependent tau estimates. Colour indicates the optimization by applying a constant factor to tau. Vertical red lines mark an arbitray 10% threshold.
 </p>
 </div>
-<p>A pdf with all absolute pCO<sub>2</sub> offset profiles can be assessed <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/RT_correction_delta_pCO2_relative_profiles_discrete.pdf" target="_blank">here</a></p>
+<p>A pdf with all relative pCO<sub>2</sub> offset profiles can be assessed <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/RT_correction_delta_pCO2_relative_profiles_discrete.pdf" target="_blank">here</a></p>
 <pre class="r"><code>pdf(file=here::here(&quot;output/Plots/response_time&quot;,
     &quot;RT_correction_delta_pCO2_relative_profiles_discrete.pdf&quot;), onefile = TRUE, width = 7, height = 7)
 
@@ -1631,13 +1625,34 @@ equi_RT_diff_sum &lt;- equi_RT_diff %&gt;%
   group_by(correction, RT, tau_factor) %&gt;% 
   summarise(d_pCO2_equi = mean(d_pCO2_equi, na.rm = TRUE)) %&gt;% 
   ungroup()</code></pre>
-<pre class="r"><code>equi_RT_diff_sum %&gt;%
-  ggplot(aes(tau_factor, d_pCO2_equi, col=RT, shape=correction))+
+<pre class="r"><code>equi_RT_diff_sum &lt;- equi_RT_diff_sum %&gt;% 
+  mutate(tau_factor = as.numeric(tau_factor))
+
+equi_RT_diff_sum %&gt;%
+  ggplot(aes(tau_factor, d_pCO2_equi, col=RT, shape=correction, linetype=correction))+
   geom_hline(yintercept = 0)+
-  geom_point()
-
-
-RT_diff_sum %&gt;% 
+  geom_smooth(method = &quot;lm&quot;)+
+  geom_point()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/response_time.Rmd/tau_optimum_reference_pCO2-1.png" alt="Mean pCO2 offset from reference values as a function of the factor applied to tau." width="672" />
+<p class="caption">
+Mean pCO2 offset from reference values as a function of the factor applied to tau.
+</p>
+</div>
+<pre class="r"><code>equi_RT_diff_sum %&gt;% 
+  filter(correction == &quot;pCO2_RT_mean&quot;) %&gt;% 
+  group_by(RT) %&gt;% 
+  do(fit = lm(d_pCO2_equi ~ tau_factor, data = .)) %&gt;% 
+  tidy(fit) %&gt;% 
+  select(RT, term, estimate) %&gt;% 
+  spread(term, estimate)</code></pre>
+<pre><code># A tibble: 2 x 3
+# Groups:   RT [2]
+  RT          `(Intercept)` tau_factor
+  &lt;chr&gt;               &lt;dbl&gt;      &lt;dbl&gt;
+1 constant            -11.6       3.88
+2 T-dependent         -10.2       4.34</code></pre>
+<pre class="r"><code>RT_diff_sum %&gt;% 
   filter(correction == &quot;pCO2_RT_mean&quot;, p_type == &quot;1&quot;) %&gt;% 
   ggplot()+
   geom_path(aes(dpCO2, dep_int, col=tau_factor))+
