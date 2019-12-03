@@ -13,12 +13,12 @@ wflow_start("XXX")
 
 # Copy this Workflowr_project_managment.R file in /code
 
-# copy in .gitignore
+# copy in .gitignore after starting the project
 /data
 /output
 #
 
-# delete license.Rmd in /analysis and analysis/_site.yml
+# delete about.Rmd and license.Rmd in /analysis and analysis/_site.yml
 
 # copy or adapt in analysis/_site.yml:
 navbar:
@@ -33,7 +33,7 @@ output:
 
 wflow_build()
 wflow_status()
-wflow_publish(c("analysis/*"),
+wflow_publish(c("analysis/index.Rmd"),
               "Publish the initial files for myproject")
 
 # Deploy the website ------------------------------------------------------
@@ -44,7 +44,10 @@ jens-daniel-mueller
 
 # Final changes after first deployment ------------------------------------
 
-
+# creates a source code link in the navbar
+wflow_publish(c("analysis/index.Rmd"),
+              "Publish with source code link")
+			  
 # to also set a link to jens homepage in the navbar
 # copy or adapt in analysis/_site.yml:
 # - icon: fa-home
@@ -52,17 +55,14 @@ jens-daniel-mueller
 #   href: https://jens-daniel-mueller.github.io/
 
 
-# creates a source code link in the navbar
-wflow_publish("analysis/*",
-              "Publish with source code link")
 
 # Change short project description in analysis/index.Rmd and README.md
 
 # On this website we present our ongoing ambition to XXX
-#
+# 
 # Please navigate trough the navbar on top to take a look at the various chapters of this project.
 # The links in the upper right corner bring you to the source code of this project and back to Jens' main homepage.
-#
+# 
 # (c) Dr. Jens Daniel Müller, 2019
 
 # Change description in README.md
@@ -70,9 +70,9 @@ wflow_publish("analysis/*",
 # In this repo we present our ongoing ambition XXX
 # Results can be accessed under:
 # https://jens-daniel-mueller.github.io/XXX
-#
-#
-# Dr. Jens Daniel Müller, "`r format(Sys.time(), '%Y')`"
+# 
+# 
+# Dr. Jens Daniel Müller, 2019
 
 
 # Lastly, now that your code is on GitHub, you need to tell GitHub that you want
@@ -87,9 +87,8 @@ wflow_open("analysis/first-analysis.Rmd")
 
 # After opening a new analysis file, do the following:
 
-# change:
-# author: "Jens Daniel Müller"
-# date:  "`r format(Sys.time(), '%d %B, %Y')`"
+# change: author: "Jens Daniel Müller"
+# change: date:  "`r format(Sys.time(), '%d %B, %Y')`"
 
 # include link to new html file in _site.yml
 
@@ -105,7 +104,7 @@ wflow_open("analysis/first-analysis.Rmd")
 wflow_build()
 
 # commit regular changes (locally) and rebuild site
-wflow_publish(all = TRUE, message = "XXX")
+wflow_publish("analysis/*", message = "XXX")
 
 # commit changes including _site.yml (locally) and rebuild site
 wflow_publish(c("analysis/*"), message = "XXX", republish = TRUE)
