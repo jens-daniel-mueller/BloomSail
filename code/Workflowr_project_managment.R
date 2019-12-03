@@ -47,7 +47,7 @@ jens-daniel-mueller
 # creates a source code link in the navbar
 wflow_publish(c("analysis/index.Rmd"),
               "Publish with source code link")
-			  
+
 # to also set a link to jens homepage in the navbar
 # copy or adapt in analysis/_site.yml:
 # - icon: fa-home
@@ -59,10 +59,10 @@ wflow_publish(c("analysis/index.Rmd"),
 # Change short project description in analysis/index.Rmd and README.md
 
 # On this website we present our ongoing ambition to XXX
-# 
+#
 # Please navigate trough the navbar on top to take a look at the various chapters of this project.
 # The links in the upper right corner bring you to the source code of this project and back to Jens' main homepage.
-# 
+#
 # (c) Dr. Jens Daniel Müller, 2019
 
 # Change description in README.md
@@ -70,8 +70,8 @@ wflow_publish(c("analysis/index.Rmd"),
 # In this repo we present our ongoing ambition XXX
 # Results can be accessed under:
 # https://jens-daniel-mueller.github.io/XXX
-# 
-# 
+#
+#
 # Dr. Jens Daniel Müller, 2019
 
 
@@ -105,6 +105,9 @@ wflow_build()
 
 # commit regular changes (locally) and rebuild site
 wflow_publish("analysis/*", message = "XXX")
+
+# commit regular changes (locally) and rebuild site
+wflow_publish(all = TRUE, message = "XXX")
 
 # commit changes including _site.yml (locally) and rebuild site
 wflow_publish(c("analysis/*"), message = "XXX", republish = TRUE)
