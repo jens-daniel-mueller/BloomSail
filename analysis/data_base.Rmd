@@ -45,6 +45,9 @@ for (file in files){
   tempo$type <- substr(file, 8,8)
   tempo$label <- substr(file, 8,10)
   
+  tempo$cast <- "up"
+  tempo[date < mean(tempo[Dep.S == max(tempo$Dep.S)]$date)]$cast <- "down"
+  
   if (exists("dataset")){
     dataset <- rbind(dataset, tempo)
   }
@@ -66,6 +69,65 @@ setwd("C:/Mueller_Jens_Data/Research/Projects/BloomSail/")
 
 ```
 
+```{r read_profile_transect_CTD_data_Ostergarnsholm, eval=FALSE}
+
+setwd("C:/Mueller_Jens_Data/Research/Projects/BloomSail/data/TinaV/Sensor/Ostergarnsholm")
+files <- list.files(pattern = "[.]cnv$")
+#file <- files[1]
+
+for (file in files){
+  
+  start.date <- data.table(read.delim(file, sep="#", nrows = 160))[[78,1]]
+  start.date <- substr(start.date, 15, 34)
+  start.date <- mdy_hms(start.date, tz="UTC")
+  
+  tempo <- read.delim(file, sep="", skip = 160, header = FALSE)
+  tempo <- data.table(tempo[,c(2,3,4,5,6,7,9,11,13)])
+  names(tempo) <- c("date", "Dep.S", "Tem.S", "Sal.S", "V_pH", "pH", "Chl", "O2", "pCO2")
+  tempo$start.date <- start.date
+  tempo$date <- tempo$date + tempo$start.date
+  
+  tempo$transect.ID <- substr(file, 1, 6)
+  tempo$type <- substr(file, 8,8)
+  tempo$label <- substr(file, 11,12)
+    
+  tempo$cast <- "up"
+  tempo[date < mean(tempo[Dep.S == max(tempo$Dep.S)]$date)]$cast <- "down"
+  
+  if (exists("dataset")){
+    dataset <- rbind(dataset, tempo)
+  }
+  
+  if (!exists("dataset")){
+    dataset <- tempo
+  }
+  
+  rm(start.date)
+  rm(tempo)
+}
+
+
+OGB <- dataset
+rm(dataset, file, files)
+
+OGB <- OGB %>% 
+  mutate(type = if_else(label=="bo", "P", "T"),
+         label = if_else(label == "bo", "P14", label),
+         label = if_else(label == "in", "T14", label),
+         label = if_else(label == "ou", "T15", label))
+
+setwd("C:/Mueller_Jens_Data/Research/Projects/BloomSail/")
+
+```
+
+```{r merge_regular_CTD_and_Ostergarnsholm, eval=FALSE}
+CTD <- bind_rows(CTD, OGB) %>% 
+  arrange(date)
+
+rm(OGB)
+```
+
+
 ```{r CTD_EDA_raw, eval=FALSE}
 
 source("code/eda.R")
@@ -82,12 +144,15 @@ CTD recordings were cleaned from obviously erroneous readings, by setting values
 
 ```{r clean_CTD_data, eval=FALSE}
 
+class(CTD)
+CTD <- data.table(CTD)
+
 # Profiling data
 
 # Temperature
 
-# CTD %>% 
-#   filter(type == "P") %>% 
+# CTD %>%
+#   filter(type == "P") %>%
 #   ggplot(aes(Tem.S, Dep.S, col=label, linetype = cast))+
 #   geom_line()+
 #   scale_y_reverse()+
@@ -98,8 +163,8 @@ CTD[transect.ID == "180723" & label == "P07" & Dep.S < 2 & cast == "up"]$Tem.S <
 
 # Salinity
 
-# CTD %>% 
-#   filter(type == "P") %>% 
+# CTD %>%
+#   filter(type == "P") %>%
 #   ggplot(aes(Sal.S, Dep.S, col=label, linetype = cast))+
 #   geom_path()+
 #   scale_y_reverse()+
@@ -109,15 +174,15 @@ CTD[Sal.S < 6]$Sal.S <- NA
 
 # pH
 
-# CTD %>% 
-#   filter(type == "P") %>% 
+# CTD %>%
+#   filter(type == "P") %>%
 #   ggplot(aes(pH, Dep.S, col=label, linetype=cast))+
 #   geom_path()+
 #   scale_y_reverse()+
 #   facet_wrap(~transect.ID)
 # 
-# CTD %>% 
-#   filter(type == "P") %>% 
+# CTD %>%
+#   filter(type == "P") %>%
 #   ggplot(aes(V_pH, Dep.S, col=label, linetype=cast))+
 #   geom_path()+
 #   scale_y_reverse()+
@@ -141,8 +206,8 @@ CTD[transect.ID == "180820" & label == "P11" & Dep.S < 15 & cast == "down"]$V_pH
 
 # pCO2
 
-# CTD %>% 
-#   filter(type == "P") %>% 
+# CTD %>%
+#   filter(type == "P") %>%
 #   ggplot(aes(pCO2, Dep.S, col=label, linetype = cast))+
 #   geom_path()+
 #   scale_y_reverse()+
@@ -161,8 +226,8 @@ CTD[transect.ID == "180616"]$pCO2 <- NA
 
 # Chlorophyll
 
-# CTD %>% 
-#   filter(type == "P") %>% 
+# CTD %>%
+#   filter(type == "P") %>%
 #   ggplot(aes(Chl, Dep.S, col=label, linetype = cast))+
 #   geom_path()+
 #   scale_y_reverse()+
@@ -173,39 +238,39 @@ CTD[Chl > 100]$Chl <- NA
 
 #### Surface transect data
 
-# CTD %>% 
-#   filter(type == "T") %>% 
+# CTD %>%
+#   filter(type == "T") %>%
 #   ggplot(aes(date, Dep.S, col=label))+
 #   geom_point()+
 #   scale_y_reverse()+
 #   facet_wrap(~transect.ID, scales = "free_x")
 # 
-# CTD %>% 
-#   filter(type == "T") %>% 
+# CTD %>%
+#   filter(type == "T") %>%
 #   ggplot(aes(date, Tem.S, col=label))+
 #   geom_point()+
 #   facet_wrap(~transect.ID, scales = "free_x")
 # 
-# CTD %>% 
-#   filter(type == "T") %>% 
+# CTD %>%
+#   filter(type == "T") %>%
 #   ggplot(aes(date, Sal.S, col=label))+
 #   geom_point()+
 #   facet_wrap(~transect.ID, scales = "free_x")
 # 
-# CTD %>% 
-#   filter(type == "T") %>% 
+# CTD %>%
+#   filter(type == "T") %>%
 #   ggplot(aes(date, pCO2, col=label))+
 #   geom_point()+
 #   facet_wrap(~transect.ID, scales = "free_x")
 # 
-# CTD %>% 
-#   filter(type == "T") %>% 
+# CTD %>%
+#   filter(type == "T") %>%
 #   ggplot(aes(date, pH, col=label))+
 #   geom_point()+
 #   facet_wrap(~transect.ID, scales = "free_x")
 # 
-# CTD %>% 
-#   filter(type == "T") %>% 
+# CTD %>%
+#   filter(type == "T") %>%
 #   ggplot(aes(date, Chl, col=label))+
 #   geom_point()+
 #   facet_wrap(~transect.ID, scales = "free_x")
@@ -236,8 +301,8 @@ CTD <-
          tem=Tem.S,
          pCO2,pH,V_pH,O2,Chl)
 
-CTD <- CTD %>% 
-  filter( !(station %in% c("PX1", "PX2", "TX1", "TX2") ))
+# CTD <- CTD %>% 
+#   filter( !(station %in% c("PX1", "PX2", "TX1", "TX2") ))
 
 CTD %>% 
   write_csv(here::here("data/_summarized_data_files", "Tina_V_Sensor_Profiles_Transects.csv"))
@@ -257,6 +322,7 @@ CTD <-
 source("code/eda.R")
 eda(CTD, "CTD")
 
+rm(eda)
 ```
 
 
@@ -269,7 +335,7 @@ The output of an automated Exploratory Data Analysis (EDA) performed with the pa
 
 CTD %>%
   arrange(date_time) %>% 
-  filter(type == "P") %>%
+  filter(type == "P", !(station %in% c("POG",  "PX1", "PX2"))) %>%
   ggplot(aes(tem, dep, col=station))+
   geom_path()+
   scale_y_reverse()+
@@ -282,7 +348,7 @@ CTD %>%
 
 CTD %>%
   arrange(date_time) %>% 
-  filter(type == "P") %>%
+  filter(type == "P", !(station %in% c("POG",  "PX1", "PX2"))) %>%
   ggplot(aes(pCO2, dep, col=station))+
   geom_path()+
   scale_y_reverse()+

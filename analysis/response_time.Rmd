@@ -535,8 +535,6 @@ df <- df %>%
 df <- df %>% 
   select(-c(start, down, lift, up, end, comment))
 
-
-
 df <- df %>% 
   filter(Zero == 0, Flush == 0)
 
@@ -552,6 +550,11 @@ df_equi <- df %>%
             pCO2 = mean(pCO2, na.rm = TRUE),
             dep = mean(dep, na.rm = TRUE)) %>% 
   ungroup()
+
+
+df_equi %>% 
+ write_csv(here::here("data/_merged_data_files",
+                      "BloomSail_CTD_HydroC_reference_pCO2.csv"))
 
 ```
 
@@ -844,7 +847,6 @@ A pdf with all timeseries plots of profiling depth and pCO~2~ can be accessed [h
 pdf(file=here::here("output/Plots/response_time",
     "RT_correction_pCO2_profiles.pdf"), onefile = TRUE, width = 7, height = 11)
 
-
 for(i_ID in unique(df$ID)){
   for(i_station in unique(df$station)){
 
@@ -898,7 +900,7 @@ First, we take a look at individual profiles.
 
 ### Down- vs upcast
 
-```{r compute_pCO2_offset_profiles}
+```{r compute_pCO2_offset_profiles, eval=FALSE}
 
 # pCO2 offset up - down cast
 
@@ -907,7 +909,7 @@ RT_diff <- df %>%
   mutate(dep_int = as.numeric(as.character( cut(dep, seq(0,40,2),seq(1,39,2)))),
          tau_factor = as.factor(tau_factor)) %>% 
   select(ID, station, RT, tau_factor, p_type, dep_int, phase, pCO2, pCO2_RT_mean) %>% 
-  group_by(ID, station, RT, tau_factor, dep_int, phase) %>%
+  group_by(ID, station, RT, tau_factor, p_type, dep_int, phase) %>%
   summarise_all("mean", na.rm = TRUE) %>% 
   ungroup() %>% 
   pivot_longer(cols = c(pCO2, pCO2_RT_mean), names_to = "correction") %>% 
@@ -923,9 +925,31 @@ equi_diff <- df_equi %>%
   select(ID, station, dep_int, pCO2_equi=pCO2)
 
 
+RT_diff %>% 
+ write_csv(here::here("data/_merged_data_files",
+                      "BloomSail_CTD_HydroC_profiles_RT_cast-offset.csv"))
+
+equi_diff %>% 
+ write_csv(here::here("data/_merged_data_files",
+                      "BloomSail_CTD_HydroC_profiles_RT_reference-offset.csv"))
+
+
 ```
 
 ```{r plot_corrected_discretized_pCO2_profiles_example, fig.cap="Example plot of discretized, response time corrected and raw pCO~2~ profiles. Panels highlight the effect of constant vs T-dependent tau estimates (columns) and the optimization by applying a constant factor (rows). The black point indicates the reference pCO2 value.", fig.asp = 2.3}
+
+
+RT_diff <-
+ read_csv(here::here("data/_merged_data_files",
+                      "BloomSail_CTD_HydroC_profiles_RT_cast-offset.csv"),
+               col_types = cols(ID = col_character()))
+
+equi_diff <- 
+ read_csv(here::here("data/_merged_data_files",
+                      "BloomSail_CTD_HydroC_profiles_RT_reference-offset.csv"),
+               col_types = cols(ID = col_character()))
+
+
 
 i_ID <- "180730"
 i_station <- "P01"
@@ -1161,6 +1185,7 @@ In order to decide, which conditions resulted in the best response correction, a
 ```{r calculate_performance_metrics}
 
  RT_diff_sum <- RT_diff %>% 
+  #filter(p_type != "4") %>% 
   group_by(RT, tau_factor, dep_int, correction, p_type) %>% 
   summarise(mean = mean(d_pCO2, na.rm = TRUE),
             mean_abs = mean(abs(d_pCO2), na.rm = TRUE),
@@ -1172,7 +1197,8 @@ In order to decide, which conditions resulted in the best response correction, a
 
 equi_RT_diff_sum <- equi_RT_diff %>% 
   group_by(correction, RT, tau_factor) %>% 
-  summarise(d_pCO2_equi = mean(d_pCO2_equi, na.rm = TRUE)) %>% 
+  summarise(d_pCO2_equi = mean(d_pCO2_equi, na.rm = TRUE),
+            d_pCO2_equi_abs = mean(abs(d_pCO2_equi), na.rm = TRUE)) %>% 
   ungroup()
 
 ```
@@ -1187,9 +1213,17 @@ equi_RT_diff_sum %>%
   ggplot(aes(tau_factor, d_pCO2_equi, col=RT, shape=correction, linetype=correction))+
   geom_hline(yintercept = 0)+
   geom_smooth(method = "lm")+
-  geom_point()
+  geom_point()+
+  labs(y = "Mean delta pCO2 from reference [µatm]")
 
-equi_RT_diff_sum %>% 
+equi_RT_diff_sum %>%
+  ggplot(aes(tau_factor, d_pCO2_equi_abs, col=RT, shape=correction, linetype=correction))+
+  geom_hline(yintercept = 0)+
+  stat_smooth(method = "lm", formula = y ~ x + I(x^2), se=FALSE)+
+  geom_point()+
+  labs(y = "Mean delta pCO2 from reference [µatm]")
+
+fit_factor_ref <- equi_RT_diff_sum %>% 
   filter(correction == "pCO2_RT_mean") %>% 
   group_by(RT) %>% 
   do(fit = lm(d_pCO2_equi ~ tau_factor, data = .)) %>% 
@@ -1197,18 +1231,14 @@ equi_RT_diff_sum %>%
   select(RT, term, estimate) %>% 
   spread(term, estimate)
   
-
 ```
 
-
-
-```{r summary_plots, eval=FALSE}
-
+```{r plot_cast_delta_pCO2}
 
 RT_diff_sum %>% 
-  filter(correction == "pCO2_RT_mean", p_type == "1") %>% 
+  filter(correction == "pCO2_RT_mean") %>% 
   ggplot()+
-  geom_path(aes(dpCO2, dep_int, col=tau_factor))+
+  geom_path(aes(dpCO2, dep_int, col=as.factor(tau_factor)))+
   scale_y_reverse()+
   coord_cartesian(xlim = c(-30,30))+
   geom_vline(xintercept = 0)+
@@ -1216,60 +1246,37 @@ RT_diff_sum %>%
   geom_hline(yintercept = 20)+
   geom_vline(xintercept = 0)+
   geom_vline(xintercept = c(-10,10), col="red")+
-  facet_grid(estimate~RT)
+  facet_grid(estimate~RT*p_type)
 
-RT_diff_sum %>% 
-  filter(dep_int < 20, tau_factor == 1, p_type != 4) %>% 
-  group_by(RT, estimate, p_type, correction) %>% 
-  summarise(mean_dpCO2 = mean(dpCO2)) %>% 
-  ungroup() %>% 
-  ggplot(aes(correction, mean_dpCO2, fill=estimate))+
-  geom_boxplot()+
-  expand_limits(y=0)+
-  theme_bw()+
-  facet_wrap(.~RT)
+```
+
+```{r plot_mean_cast_delta_pCO2}
 
 RT_diff %>% 
   filter(dep_int < 20) %>% 
-  ggplot(aes(tau_factor, d_pCO2, fill=correction))+
+  ggplot(aes(as.factor(tau_factor), d_pCO2, fill=correction))+
   geom_violin()+
   geom_hline(yintercept = 0)+
-  geom_vline(xintercept = 1)+
-  facet_grid(RT~p_type)+
   theme_bw()
 
+```
+
+
+```{r tau_optimum_cast_delta_pCO2}
+
 RT_diff_sum %>% 
-  filter(dep_int < 20) %>% 
-  group_by(RT, estimate, p_type, correction, tau_factor) %>% 
+  filter(dep_int < 20, p_type == 1) %>% 
+  group_by(RT, estimate, correction, tau_factor) %>% 
   summarise(mean_dpCO2 = mean(dpCO2)) %>% 
   ungroup() %>% 
   filter(correction == "pCO2_RT_mean") %>% 
   ggplot(aes(tau_factor, mean_dpCO2, col=RT))+
   geom_point()+
   geom_hline(yintercept = 0)+
-  facet_grid(estimate~p_type)+
+  stat_smooth(method = "lm", formula = y ~ x + I(x^2), se=FALSE)+
+  facet_grid(~estimate)+
   theme_bw()
 
-
-# RT_diff %>%
-#   group_by(ID, station) %>% 
-#   mutate(max_pCO2 = max(mean_pCO2)) %>% 
-#   ungroup() %>% 
-#   filter(tau_factor == 1) %>%
-#   ggplot(aes(max_pCO2, d_pCO2, col=as.factor(p_type)))+
-#   geom_point()+
-#   #scale_color_viridis_d()+
-#   facet_wrap(~correction)
-# 
-# RT_diff %>%
-#   filter(tau_factor == 1) %>%
-#   ggplot(aes(mean_pCO2, d_pCO2, col=dep_int))+
-#   geom_point()+
-#   scale_color_viridis_c()+
-#   facet_wrap(~correction)
-
-
-# equilibrated reference pCO2 values
 
 ```
 
@@ -1279,6 +1286,8 @@ RT_diff_sum %>%
 
 # Open tasks / questions
 
+- Check why type 2, 3, and 4 profiles exceed 10 µatm absolute mean pCO2 deviation at depth > 10m
+- Check whether irregular profiles can be excluded from response time optimization
 - Compare Contros and own response time estimates
 - Compare differnt response time correction methods (Bittig vs. Fiedler, Miloshevich, Fietzek)
 - Check results from field response time experiment (high zeroing frequency)
