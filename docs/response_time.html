@@ -533,10 +533,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree25aeefd5eee8427c45b2e9ba69e24193f7e631edtargetblank25aeefda"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/25aeefd5eee8427c45b2e9ba69e24193f7e631ed" target="_blank">25aeefd</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec6cfca504991c62874697f6e567382a11a9bb29dtargetblankc6cfca5a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c6cfca504991c62874697f6e567382a11a9bb29d" target="_blank">c6cfca5</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree25aeefd5eee8427c45b2e9ba69e24193f7e631edtargetblank25aeefda" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec6cfca504991c62874697f6e567382a11a9bb29dtargetblankc6cfca5a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -548,6 +548,9 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
+
+Untracked files:
+    Untracked:  output/Plots/response_time/RT_exploration_depth-pCO2_timeseries_raw.pdf
 
 </code></pre>
 <p>
@@ -868,11 +871,11 @@ rm(df)</code></pre>
 <p>Estimated <span class="math inline">\(\tau\)</span> values were only taken into account when stable environmental pCO<sub>2</sub> levels were present. Absence of stable environmental pCO<sub>2</sub> was assumed when the mean absolute fit residual was above 1 % of the final equilibrium pCO<sub>2</sub>. If one model fit (irrespective the chosen fit interval length) of a particular flush period did not match that criterion, the flush period was ignored. Usually, fits with the higher duration did not meet this criterion. For some unexplained reason the first <span class="math inline">\(\tau\)</span> determination resulted in values about twice as high as all other Flush periods and was therefore removed as an outlier.</p>
 <p>Metrics to characterize the fitting procedure include the number of:</p>
 <ul>
-<li>Flush periods: 55</li>
+<li>Flush periods: 75</li>
 <li>Duration intervals: 8</li>
-<li>Exercised response time fits: 440</li>
-<li>Succesful response times determinations: 417 (94.8)%</li>
-<li><span class="math inline">\(\tau\)</span>’s after removing groups of fits with high absolute fit residual: 296 (67.3 %)</li>
+<li>Exercised response time fits: 600</li>
+<li>Succesful response times determinations: 576 (96)%</li>
+<li><span class="math inline">\(\tau\)</span>’s after removing groups of fits with high absolute fit residual: 408 (68 %)</li>
 </ul>
 <p>It should be noted that all failed model fits occured in flush periods where the residual criterion was not meet by at least one other fit (i.e. fitting only failed under unstable conditions).</p>
 <pre class="r"><code>tau_df %&gt;% 
@@ -975,7 +978,7 @@ RT_mean</code></pre>
 <pre><code># A tibble: 2 x 2
   pump_power   tau
   &lt;chr&gt;      &lt;dbl&gt;
-1 1W          77.4
+1 1W          77.2
 2 8W          56.6</code></pre>
 <p>But we can also fit response times as a function of water temperature:</p>
 <pre class="r"><code>RT_fit &lt;- tau_resid %&gt;% 
@@ -990,8 +993,8 @@ RT_fit</code></pre>
 # Groups:   pump_power [2]
   pump_power `(Intercept)`    tem
   &lt;chr&gt;              &lt;dbl&gt;  &lt;dbl&gt;
-1 1W                  98.4 -1.36 
-2 8W                  74.8 -0.871</code></pre>
+1 1W                  97.6 -1.29 
+2 8W                  72.9 -0.763</code></pre>
 <pre class="r"><code>rm(list=setdiff(ls(), c(&quot;tau_resid&quot;, &quot;RT_mean&quot;, &quot;RT_fit&quot;)))</code></pre>
 <p>Both response time estimated (constant mean vs T-dependent) will be used to correct the recorded pCO<sub>2</sub> profiles.</p>
 </div>
@@ -1004,8 +1007,8 @@ RT_fit</code></pre>
 <p>Following tasks were performed to prepare data for the response time correction:</p>
 <ul>
 <li>Select only profiles</li>
-<li>Include manually derived meta-information about the profiling status</li>
 <li>Assign deployment periods with 1W- and 8W- pump</li>
+<li>Include manually derived meta-information about the profiling status</li>
 <li>Subset reference pCO<sub>2</sub> recordings at the end of equilibration periods executed at constant depth</li>
 </ul>
 <pre class="r"><code>df &lt;- read_csv(here::here(&quot;data/_merged_data_files&quot;,
@@ -1028,7 +1031,46 @@ df &lt;- df %&gt;%
 df &lt;- df %&gt;% 
   filter(type == &quot;P&quot;)
 
-# Load profile meta data 
+df &lt;- df %&gt;%
+  group_by(ID, station) %&gt;% 
+  mutate(duration = as.numeric(date_time - min(date_time)),
+         pump_power = if_else(date_time &lt; ymd_hms(&quot;2018-07-17;13:08:34&quot;), &quot;1W&quot;, &quot;8W&quot;)) %&gt;%
+  arrange(date_time)</code></pre>
+<pre class="r"><code>cast_dep &lt;- df %&gt;% 
+  pivot_longer(c(dep, pCO2), names_to = &quot;parameter&quot;, values_to = &quot;value&quot;)
+
+pdf(file=here::here(&quot;output/Plots/response_time&quot;,
+    &quot;RT_exploration_depth-pCO2_timeseries_raw.pdf&quot;), onefile = TRUE, width = 7, height = 4)
+
+for(i_ID in unique(cast_dep$ID)){
+  for(i_station in unique(cast_dep$station)){
+
+    if (nrow(cast_dep %&gt;% filter(ID == i_ID, station == i_station)) &gt; 0){
+      
+      print(
+      
+        cast_dep %&gt;%
+        filter(ID == i_ID,
+               station == i_station) %&gt;%
+        ggplot(aes(duration, value))+
+        geom_point(size=0.5)+
+        scale_y_reverse()+
+        scale_x_continuous(breaks = seq(0,6000,100))+
+        labs(title = str_c(&quot;Date: &quot;,i_ID,&quot; | Station: &quot;,i_station))+
+        facet_grid(parameter~., scales = &quot;free_y&quot;)+
+        theme_bw()
+      
+      )
+
+    }
+
+  }
+}
+
+dev.off()
+
+rm(cast_dep, i_station, i_ID)</code></pre>
+<pre class="r"><code># Load profile meta data 
 
 meta &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
                           &quot;Tina_V_Sensor_meta.csv&quot;),
@@ -1042,30 +1084,19 @@ rm(meta)
 
 
 # creating descriptive variables ------------------------------------------
-
-df &lt;- df %&gt;%
-  group_by(ID, station) %&gt;% 
-  mutate(duration = as.numeric(date_time - min(date_time)),
-         pump_power = if_else(date_time &lt; ymd_hms(&quot;2018-07-17;13:08:34&quot;), &quot;1W&quot;, &quot;8W&quot;)) %&gt;%
-  arrange(date_time)
-
 df &lt;- df %&gt;% 
   mutate(phase = &quot;standby&quot;,
          phase = if_else(duration &gt;= start &amp; duration &lt; down &amp; !is.na(down) &amp; !is.na(start),   &quot;down&quot;, phase),
          phase = if_else(duration &gt;= down  &amp; duration &lt; lift &amp; !is.na(lift) &amp; !is.na(down ),   &quot;low&quot;,  phase),
-         phase = if_else(duration &gt;= lift   &amp; duration &lt; up   &amp; !is.na(up  ) &amp; !is.na(lift  ), &quot;mid&quot;,  phase),
+         phase = if_else(duration &gt;= lift  &amp; duration &lt; up   &amp; !is.na(up  ) &amp; !is.na(lift  ),  &quot;mid&quot;,  phase),
          phase = if_else(duration &gt;= up    &amp; duration &lt; end  &amp; !is.na(end ) &amp; !is.na(up   ),   &quot;up&quot;,   phase))
 
 df &lt;- df %&gt;% 
   select(-c(start, down, lift, up, end, comment))
 
 df &lt;- df %&gt;% 
-  filter(Zero == 0, Flush == 0)
-
-
-# subset equilibrated pCO2 levels as reference values
-
-df_equi &lt;- df %&gt;% 
+  filter(Zero == 0, Flush == 0)</code></pre>
+<pre class="r"><code>df_equi &lt;- df %&gt;% 
   filter(phase %in% c(&quot;mid&quot;)) %&gt;% 
   group_by(ID, station, p_type, phase) %&gt;% 
   top_n(5, row_number()) %&gt;% 
@@ -1161,11 +1192,6 @@ for(i_ID in unique(cast_dep$ID)){
 dev.off()
 
 rm(cast_dep, cast_dep_equi, cast_dep_equi_sub, i_station, i_ID, max_duration)</code></pre>
-<pre class="r"><code>df &lt;- df %&gt;% 
-  filter(ID == &quot;180705&quot; &amp; station == &quot;P05&quot; |
-           ID == &quot;180709&quot; &amp; station == &quot;P11&quot; |
-           ID == &quot;180718&quot; &amp; station == &quot;P02&quot; |
-           ID == &quot;180718&quot; &amp; station == &quot;P03&quot;)</code></pre>
 </div>
 <div id="reponse-time-correction" class="section level2">
 <h2>Reponse time correction</h2>
@@ -1505,10 +1531,11 @@ i_station &lt;- &quot;P01&quot;
                station == i_station,
                correction == &quot;pCO2_RT_mean&quot;) %&gt;%
         arrange(dep_int) %&gt;%
-        ggplot(aes(d_pCO2, dep_int, col=tau_factor))+
+        ggplot(aes(d_pCO2, dep_int, col=as.factor(tau_factor)))+
         geom_path()+
         geom_point()+
         scale_y_reverse(breaks=seq(0,40,2))+
+        scale_color_discrete(name=&quot;tau factor&quot;)+
         labs(x = &quot;delta pCO2 [µatm]&quot;, y=&quot;Depth [m]&quot;, title = str_c(&quot;Date: &quot;,i_ID,&quot; | Station: &quot;,i_station))+
         geom_vline(xintercept = 0)+
         geom_vline(xintercept = c(-10,10), col=&quot;red&quot;)+
@@ -1535,10 +1562,11 @@ for(i_ID in unique(RT_diff$ID)){
                station == i_station,
                correction == &quot;pCO2_RT_mean&quot;) %&gt;%
         arrange(dep_int) %&gt;%
-        ggplot(aes(d_pCO2, dep_int, col=tau_factor))+
+        ggplot(aes(d_pCO2, dep_int, col=as.factor(tau_factor)))+
         geom_path()+
         geom_point()+
         scale_y_reverse(breaks=seq(0,40,2))+
+        scale_color_discrete(name=&quot;tau factor&quot;)+
         labs(x = &quot;delta pCO2 [µatm]&quot;, y=&quot;Depth [m]&quot;, title = str_c(&quot;Date: &quot;,i_ID,&quot; | Station: &quot;,i_station))+
         geom_vline(xintercept = 0)+
         geom_vline(xintercept = c(-10,10), col=&quot;red&quot;)+
@@ -1562,10 +1590,11 @@ i_station &lt;- &quot;P01&quot;
                station == i_station,
                correction == &quot;pCO2_RT_mean&quot;) %&gt;%
         arrange(dep_int) %&gt;%
-        ggplot(aes(d_pCO2_rel, dep_int, col=tau_factor))+
+        ggplot(aes(d_pCO2_rel, dep_int, col=as.factor(tau_factor)))+
         geom_path()+
         geom_point()+
         scale_y_reverse(breaks=seq(0,40,2))+
+        scale_color_discrete(name=&quot;tau factor&quot;)+
         labs(x = &quot;delta pCO2 [% of absolute value]&quot;, y=&quot;Depth [m]&quot;, title = str_c(&quot;Date: &quot;,i_ID,&quot; | Station: &quot;,i_station))+
         geom_vline(xintercept = 0)+
         geom_vline(xintercept = c(-10,10), col=&quot;red&quot;)+
@@ -1593,10 +1622,11 @@ for(i_ID in unique(RT_diff$ID)){
                station == i_station,
                correction == &quot;pCO2_RT_mean&quot;) %&gt;%
         arrange(dep_int) %&gt;%
-        ggplot(aes(d_pCO2_rel, dep_int, col=tau_factor))+
+        ggplot(aes(d_pCO2_rel, dep_int, col=as.factor(tau_factor)))+
         geom_path()+
         geom_point()+
         scale_y_reverse(breaks=seq(0,40,2))+
+        scale_color_discrete(name=&quot;tau factor&quot;)+
         labs(x = &quot;delta pCO2 [% of absolute value]&quot;, y=&quot;Depth [m]&quot;, title = str_c(&quot;Date: &quot;,i_ID,&quot; | Station: &quot;,i_station))+
         geom_vline(xintercept = 0)+
         geom_vline(xintercept = c(-10,10), col=&quot;red&quot;)+
@@ -1618,14 +1648,26 @@ dev.off()</code></pre>
   filter(!is.na(pCO2_equi)) %&gt;% 
   mutate(d_pCO2_equi = down - pCO2_equi)</code></pre>
 <pre class="r"><code>equi_RT_diff %&gt;% 
-  ggplot(aes(tau_factor, d_pCO2_equi, fill=correction))+
+  filter(RT == &quot;T-dependent&quot;, tau_factor == 1.2, correction==&quot;pCO2_RT_mean&quot;) %&gt;% 
+  ggplot(aes(pCO2_equi, d_pCO2_equi))+
+  geom_hline(yintercept = 0)+
+  geom_point()+
+  labs(x=&quot;Reference pCO2 [µatm]&quot;, y=&quot;Offset downcast to reference pCO2 [µatm]&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/response_time.Rmd/plot_pCO2_offset_reference_value-1.png" alt="Offset between pCO~2~ downcast and upcast reference value as a function of absolute pCO2. (T-dependent tau estimates, tau factor: 1.2." width="672" />
+<p class="caption">
+Offset between pCO<sub>2</sub> downcast and upcast reference value as a function of absolute pCO2. (T-dependent tau estimates, tau factor: 1.2.
+</p>
+</div>
+<pre class="r"><code>equi_RT_diff %&gt;% 
+  ggplot(aes(as.factor(tau_factor), d_pCO2_equi, fill=correction))+
   geom_hline(yintercept = 0)+
   geom_violin()+
   labs(y = &quot;delta pCO2 from reference [µatm]&quot;, y=&quot;Depth [m]&quot;)+
   scale_fill_brewer(palette = &quot;Set1&quot;)+
   facet_wrap(~RT, labeller = label_both)</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/response_time.Rmd/plot_pCO2_offset_reference_value-1.png" alt="Offset between pCO~2~ downcast and upcast reference value. Panels highlight the effect of constant vs T-dependent tau estimates. Colour distinguish raw and corrected offsets." width="672" />
+<img src="figure/response_time.Rmd/plot_pCO2_offset_reference_value_violin-1.png" alt="Offset between pCO~2~ downcast and upcast reference value. Panels highlight the effect of constant vs T-dependent tau estimates. Colour distinguish raw and corrected offsets." width="672" />
 <p class="caption">
 Offset between pCO<sub>2</sub> downcast and upcast reference value. Panels highlight the effect of constant vs T-dependent tau estimates. Colour distinguish raw and corrected offsets.
 </p>
@@ -1634,11 +1676,16 @@ Offset between pCO<sub>2</sub> downcast and upcast reference value. Panels highl
 <div id="summary-metrics" class="section level3">
 <h3>Summary metrics</h3>
 <p>In order to decide, which conditions resulted in the best response correction, all profiles were pooled and some metrics derived.</p>
-<pre class="r"><code> RT_diff_sum &lt;- RT_diff %&gt;% 
-  #filter(p_type != &quot;4&quot;) %&gt;% 
+<pre class="r"><code>RT_diff_20 &lt;- RT_diff %&gt;% 
+  group_by(ID, station) %&gt;% 
+  filter(!any(is.na(d_pCO2))) %&gt;% 
+  ungroup()
+
+RT_diff_sum &lt;- RT_diff_20 %&gt;% 
+  filter(dep_int &lt;= 20) %&gt;% 
   group_by(RT, tau_factor, dep_int, correction, p_type) %&gt;% 
-  summarise(mean = mean(d_pCO2, na.rm = TRUE),
-            mean_abs = mean(abs(d_pCO2), na.rm = TRUE),
+  summarise(mean = mean(d_pCO2),
+            mean_abs = mean(abs(d_pCO2)),
             mean_rel = mean(d_pCO2_rel, na.rm = TRUE),
             mean_rel_abs = mean(abs(d_pCO2_rel), na.rm = TRUE)) %&gt;% 
   ungroup() %&gt;% 
@@ -1650,10 +1697,7 @@ equi_RT_diff_sum &lt;- equi_RT_diff %&gt;%
   summarise(d_pCO2_equi = mean(d_pCO2_equi, na.rm = TRUE),
             d_pCO2_equi_abs = mean(abs(d_pCO2_equi), na.rm = TRUE)) %&gt;% 
   ungroup()</code></pre>
-<pre class="r"><code>equi_RT_diff_sum &lt;- equi_RT_diff_sum %&gt;% 
-  mutate(tau_factor = as.numeric(tau_factor))
-
-equi_RT_diff_sum %&gt;%
+<pre class="r"><code>equi_RT_diff_sum %&gt;%
   ggplot(aes(tau_factor, d_pCO2_equi, col=RT, shape=correction, linetype=correction))+
   geom_hline(yintercept = 0)+
   geom_smooth(method = &quot;lm&quot;)+
@@ -1697,8 +1741,7 @@ Mean pCO2 offset from reference values as a function of the factor applied to ta
   geom_vline(xintercept = c(-10,10), col=&quot;red&quot;)+
   facet_grid(estimate~RT*p_type)</code></pre>
 <p><img src="figure/response_time.Rmd/plot_cast_delta_pCO2-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>RT_diff %&gt;% 
-  filter(dep_int &lt; 20) %&gt;% 
+<pre class="r"><code>RT_diff_20 %&gt;% 
   ggplot(aes(as.factor(tau_factor), d_pCO2, fill=correction))+
   geom_violin()+
   geom_hline(yintercept = 0)+
