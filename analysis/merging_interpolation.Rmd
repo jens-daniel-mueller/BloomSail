@@ -151,7 +151,7 @@ rm(df, df_full)
 ```
 
 
-```{r timeseries_pCO2, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO~2~ measurement range is restricted to 100-500  µatm here due to the settings of the analog voltage output of the sensor. Zeroing periods are included.", fig.asp = 2.3}
+```{r timeseries_pCO2, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO~2~ measurement range is restricted to 100-500  µatm here due to the settings of the analog voltage output of the sensor. Zeroing periods are included.", fig.asp = 3}
 
 df <- read_csv(here::here("data/_merged_data_files",
                           "BloomSail_CTD_HydroC.csv"),

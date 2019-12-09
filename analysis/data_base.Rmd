@@ -335,7 +335,7 @@ The output of an automated Exploratory Data Analysis (EDA) performed with the pa
 
 CTD %>%
   arrange(date_time) %>% 
-  filter(type == "P", !(station %in% c("POG",  "PX1", "PX2"))) %>%
+  filter(type == "P", !(station %in% c("PX1", "PX2"))) %>%
   ggplot(aes(tem, dep, col=station))+
   geom_path()+
   scale_y_reverse()+
@@ -348,7 +348,7 @@ CTD %>%
 
 CTD %>%
   arrange(date_time) %>% 
-  filter(type == "P", !(station %in% c("POG",  "PX1", "PX2"))) %>%
+  filter(type == "P", !(station %in% c("PX1", "PX2"))) %>%
   ggplot(aes(pCO2, dep, col=station))+
   geom_path()+
   scale_y_reverse()+
