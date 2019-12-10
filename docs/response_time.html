@@ -533,10 +533,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree935bc85a127f5aae01cb4eabe9675c771b96da18targetblank935bc85a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/935bc85a127f5aae01cb4eabe9675c771b96da18" target="_blank">935bc85</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0fcfdbffaf645dc390f1c81f1d188bfd7504fbfbtargetblank0fcfdbfa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/0fcfdbffaf645dc390f1c81f1d188bfd7504fbfb" target="_blank">0fcfdbf</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree935bc85a127f5aae01cb4eabe9675c771b96da18targetblank935bc85a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0fcfdbffaf645dc390f1c81f1d188bfd7504fbfbtargetblank0fcfdbfa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -545,7 +545,6 @@ Great! You are using Git for version control. Tracking code development and conn
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
@@ -1675,15 +1674,20 @@ Offset between pCO<sub>2</sub> downcast and upcast reference value. Panels highl
 <h3>Summary metrics</h3>
 <p>In order to decide, which conditions resulted in the best response correction, all profiles were pooled and some metrics derived.</p>
 <pre class="r"><code>RT_diff_20 &lt;- RT_diff %&gt;% 
-  group_by(ID, station) %&gt;% 
-  filter(!any(is.na(d_pCO2))) %&gt;% 
-  ungroup()
-
-RT_diff_sum &lt;- RT_diff_20 %&gt;% 
   filter(dep_int &lt;= 20) %&gt;% 
+  group_by(ID, station, RT, tau_factor, p_type, correction) %&gt;% 
+  mutate(nr_na = sum(is.na(d_pCO2))) %&gt;% 
+  ungroup() %&gt;% 
+  filter(nr_na &lt;= 2)
+
+RT_diff_20 %&gt;% 
+  ggplot(aes(ID, nr_na))+
+  geom_point()</code></pre>
+<p><img src="figure/response_time.Rmd/calculate_performance_metrics-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>RT_diff_sum &lt;- RT_diff_20 %&gt;% 
   group_by(RT, tau_factor, dep_int, correction, p_type) %&gt;% 
-  summarise(mean = mean(d_pCO2),
-            mean_abs = mean(abs(d_pCO2)),
+  summarise(mean = mean(d_pCO2, na.rm = TRUE),
+            mean_abs = mean(abs(d_pCO2), na.rm = TRUE),
             mean_rel = mean(d_pCO2_rel, na.rm = TRUE),
             mean_rel_abs = mean(abs(d_pCO2_rel), na.rm = TRUE)) %&gt;% 
   ungroup() %&gt;% 
