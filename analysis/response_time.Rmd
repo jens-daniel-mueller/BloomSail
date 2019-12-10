@@ -1236,15 +1236,20 @@ In order to decide, which conditions resulted in the best response correction, a
 ```{r calculate_performance_metrics}
 
 RT_diff_20 <- RT_diff %>% 
-  group_by(ID, station) %>% 
-  filter(!any(is.na(d_pCO2))) %>% 
-  ungroup()
+  filter(dep_int <= 20) %>% 
+  group_by(ID, station, RT, tau_factor, p_type, correction) %>% 
+  mutate(nr_na = sum(is.na(d_pCO2))) %>% 
+  ungroup() %>% 
+  filter(nr_na <= 2)
+
+RT_diff_20 %>% 
+  ggplot(aes(ID, nr_na))+
+  geom_point()
 
 RT_diff_sum <- RT_diff_20 %>% 
-  filter(dep_int <= 20) %>% 
   group_by(RT, tau_factor, dep_int, correction, p_type) %>% 
-  summarise(mean = mean(d_pCO2),
-            mean_abs = mean(abs(d_pCO2)),
+  summarise(mean = mean(d_pCO2, na.rm = TRUE),
+            mean_abs = mean(abs(d_pCO2), na.rm = TRUE),
             mean_rel = mean(d_pCO2_rel, na.rm = TRUE),
             mean_rel_abs = mean(abs(d_pCO2_rel), na.rm = TRUE)) %>% 
   ungroup() %>% 
