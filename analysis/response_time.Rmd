@@ -941,7 +941,7 @@ First, we take a look at individual profiles.
 
 RT_diff <- df %>% 
   filter(phase %in% c("down", "up")) %>% 
-  mutate(dep_int = as.numeric(as.character( cut(dep, seq(0,40,2),seq(1,39,2)))),
+  mutate(dep_int = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1)))),
          tau_factor = as.factor(tau_factor)) %>% 
   select(ID, station, RT, tau_factor, p_type, dep_int, phase, pCO2, pCO2_RT_mean) %>% 
   group_by(ID, station, RT, tau_factor, p_type, dep_int, phase) %>%
@@ -956,7 +956,7 @@ RT_diff <- df %>%
 # descritize depth recordings of equilibrated pCO2 values
 
 equi_diff <- df_equi %>%
-  mutate(dep_int = as.numeric(as.character( cut(dep, seq(0,40,2),seq(1,39,2))))) %>% 
+  mutate(dep_int = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1))))) %>% 
   select(ID, station, dep_int, pCO2_equi=pCO2)
 
 
