@@ -417,7 +417,7 @@ div.section {
 
 <h1 class="title toc-ignore">Response time correction of Contros HydroC pCO<sub>2</sub> data</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">09 December, 2019</h4>
+<h4 class="date">10 December, 2019</h4>
 
 </div>
 
@@ -442,7 +442,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-12-09
+<strong>Last updated:</strong> 2019-12-10
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -533,10 +533,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec6cfca504991c62874697f6e567382a11a9bb29dtargetblankc6cfca5a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c6cfca504991c62874697f6e567382a11a9bb29d" target="_blank">c6cfca5</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree935bc85a127f5aae01cb4eabe9675c771b96da18targetblank935bc85a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/935bc85a127f5aae01cb4eabe9675c771b96da18" target="_blank">935bc85</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec6cfca504991c62874697f6e567382a11a9bb29dtargetblankc6cfca5a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree935bc85a127f5aae01cb4eabe9675c771b96da18targetblank935bc85a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -545,12 +545,10 @@ Great! You are using Git for version control. Tracking code development and conn
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
-
-Untracked files:
-    Untracked:  output/Plots/response_time/RT_exploration_depth-pCO2_timeseries_raw.pdf
 
 </code></pre>
 <p>
@@ -1417,7 +1415,7 @@ rm(equi_cast)</code></pre>
 
 RT_diff &lt;- df %&gt;% 
   filter(phase %in% c(&quot;down&quot;, &quot;up&quot;)) %&gt;% 
-  mutate(dep_int = as.numeric(as.character( cut(dep, seq(0,40,2),seq(1,39,2)))),
+  mutate(dep_int = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1)))),
          tau_factor = as.factor(tau_factor)) %&gt;% 
   select(ID, station, RT, tau_factor, p_type, dep_int, phase, pCO2, pCO2_RT_mean) %&gt;% 
   group_by(ID, station, RT, tau_factor, p_type, dep_int, phase) %&gt;%
@@ -1432,7 +1430,7 @@ RT_diff &lt;- df %&gt;%
 # descritize depth recordings of equilibrated pCO2 values
 
 equi_diff &lt;- df_equi %&gt;%
-  mutate(dep_int = as.numeric(as.character( cut(dep, seq(0,40,2),seq(1,39,2))))) %&gt;% 
+  mutate(dep_int = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1))))) %&gt;% 
   select(ID, station, dep_int, pCO2_equi=pCO2)
 
 
