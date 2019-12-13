@@ -1248,18 +1248,40 @@ RT_diff_20 <- RT_diff %>%
   mutate(nr_na = sum(is.na(d_pCO2))) %>% 
   ungroup() %>% 
   filter(nr_na <= 2)
+
+RT_diff_30 <- RT_diff %>% 
+  filter(dep_int <= 30) %>% 
+  group_by(ID, station, RT, tau_factor, correction) %>% 
+  mutate(nr_na = sum(is.na(d_pCO2))) %>% 
+  ungroup() %>% 
+  filter(nr_na <= 2)
   
+
+RT_diff_sum_profile_30 <- RT_diff_30 %>% 
+  mutate(d_pCO2_abs = abs(d_pCO2),
+         d_pCO2_rel_abs = abs(d_pCO2_rel)) %>% 
+  group_by(RT, tau_factor, dep_int, correction) %>% 
+  summarise(mean         = mean(d_pCO2, na.rm = TRUE),
+            sd           = sd(d_pCO2, na.rm = TRUE),
+            mean_abs     = mean(d_pCO2_abs, na.rm = TRUE),
+            mean_rel     = mean(d_pCO2_rel, na.rm = TRUE),
+            sd_rel       = sd(d_pCO2_rel, na.rm = TRUE),
+            mean_rel_abs = mean(d_pCO2_rel_abs, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  pivot_longer(cols = 5:10, names_to = "estimate", values_to = "dpCO2")
 
 RT_diff_sum_profile <- RT_diff_20 %>% 
   mutate(d_pCO2_abs = abs(d_pCO2),
          d_pCO2_rel_abs = abs(d_pCO2_rel)) %>% 
   group_by(RT, tau_factor, dep_int, correction) %>% 
   summarise(mean         = mean(d_pCO2, na.rm = TRUE),
+            sd           = sd(d_pCO2, na.rm = TRUE),
             mean_abs     = mean(d_pCO2_abs, na.rm = TRUE),
             mean_rel     = mean(d_pCO2_rel, na.rm = TRUE),
+            sd_rel       = sd(d_pCO2_rel, na.rm = TRUE),
             mean_rel_abs = mean(d_pCO2_rel_abs, na.rm = TRUE)) %>% 
   ungroup() %>% 
-  pivot_longer(cols = 5:8, names_to = "estimate", values_to = "dpCO2")
+  pivot_longer(cols = 5:10, names_to = "estimate", values_to = "dpCO2")
 
 
 equi_diff_sum <- equi_diff %>% 
@@ -1305,11 +1327,12 @@ equi_diff_sum_highres %>%
 
 ```{r plot_cast_delta_pCO2}
 
-RT_diff_sum_profile %>% 
+RT_diff_sum_profile_30 %>% 
   filter(correction == "pCO2_RT_mean",
-         estimate %in% c("mean_abs", "mean_rel_abs")) %>% 
+         estimate %in% c("mean_abs", "mean_rel_abs", "sd", "sd_rel")) %>% 
   ggplot()+
   geom_vline(xintercept = 0)+
+  geom_hline(yintercept = 20)+
   geom_vline(xintercept = c(10), col="red")+
   geom_path(aes(dpCO2, dep_int, col=as.factor(tau_factor)))+
   scale_y_reverse()+
