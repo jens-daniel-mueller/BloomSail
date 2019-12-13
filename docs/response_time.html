@@ -424,7 +424,7 @@ div.section {
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -433,7 +433,7 @@ div.section {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -445,7 +445,7 @@ div.section {
 <strong>Last updated:</strong> 2019-12-13
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
 </p>
 <p>
 <strong>Knit directory:</strong> <code>BloomSail/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
@@ -461,12 +461,12 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
 </div>
 </div>
 </div>
@@ -533,10 +533,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9a4e5c33ccd0a1673200311536fd6a1d2ed97fa8targetblank9a4e5c3a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/9a4e5c33ccd0a1673200311536fd6a1d2ed97fa8" target="_blank">9a4e5c3</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb9c2b8fcae0a58d5ab988c0bf06cbc72ff21ce03targetblankb9c2b8fa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b9c2b8fcae0a58d5ab988c0bf06cbc72ff21ce03" target="_blank">b9c2b8f</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9a4e5c33ccd0a1673200311536fd6a1d2ed97fa8targetblank9a4e5c3a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb9c2b8fcae0a58d5ab988c0bf06cbc72ff21ce03targetblankb9c2b8fa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -548,9 +548,6 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
-
-Unstaged changes:
-    Modified:   analysis/response_time.Rmd
 
 </code></pre>
 <p>
@@ -1818,9 +1815,9 @@ equi_diff_sum %&gt;%
   labs(x=&quot;Tau factor&quot;, y=expression(Mean~Delta~pCO[2]))+
   facet_wrap(~estimate)</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/response_time.Rmd/tau_optimum_reference_pCO2-1.png" alt="Mean pCO~2~ offset from reference values as a function of the factor applied to tau. The lines between discrete tau factors result from the same analysis performed with high resolution of the tau factor." width="672" />
+<img src="figure/response_time.Rmd/tau_optimum_reference_pCO2-1.png" alt="Mean pCO~2~ offset from reference values as a function of the factor applied to tau. The lines between discrete tau factors result from the same analysis performed with high resolution of the tau factor. Left Panel: Mean absolute offset (µatm). Right panel: Mean relative offset (% of absolute value)." width="672" />
 <p class="caption">
-Mean pCO<sub>2</sub> offset from reference values as a function of the factor applied to tau. The lines between discrete tau factors result from the same analysis performed with high resolution of the tau factor.
+Mean pCO<sub>2</sub> offset from reference values as a function of the factor applied to tau. The lines between discrete tau factors result from the same analysis performed with high resolution of the tau factor. Left Panel: Mean absolute offset (µatm). Right panel: Mean relative offset (% of absolute value).
 </p>
 </div>
 <p>Below we determined the tau factor that corresponds to lowest absolute and relative mean offsets, respectively.</p>
@@ -1846,6 +1843,11 @@ Mean pCO<sub>2</sub> offset from reference values as a function of the factor ap
 </div>
 <div id="conclusion" class="section level1">
 <h1><span class="header-section-number">5</span> Conclusion</h1>
+<ul>
+<li>Taking the temperature dependence of tau into account resulted in a slightly better agreement between up- and downcast, as well as downcast and reference value</li>
+<li>For all quality metrics we find improved agreement for slightly positive tau factor ranging from 1.04 - 1.24</li>
+<li>As the focus is on pCO<sub>2</sub> changes in the upper 10 m of the water column, we will apply the tau factor 1.24 leading to the lowest relative offset between up- and downcast</li>
+</ul>
 </div>
 <div id="list-of-relevant-parameters" class="section level1">
 <h1><span class="header-section-number">6</span> List of relevant parameters</h1>
@@ -1871,6 +1873,7 @@ Mean pCO<sub>2</sub> offset from reference values as a function of the factor ap
 <div id="open-tasks-questions" class="section level1">
 <h1><span class="header-section-number">7</span> Open tasks / questions</h1>
 <ul>
+<li>Condering the summary metrics: If the standard deviation of the offset between up- and downcast is as large as the offset itself, does it make sense to apply the tau factor? In other words: Does it make the profiles significantly better?</li>
 <li>Compare Contros and own response time estimates</li>
 </ul>
 <br>
