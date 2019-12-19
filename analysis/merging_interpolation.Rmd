@@ -201,6 +201,46 @@ df %>%
 
 ```
 
+# Sensor and track data
+
+```{r merge_sensor_track, eval=FALSE}
+
+Sensor <- read_csv(here::here("data/_merged_data_files",
+                          "BloomSail_CTD_HydroC.csv"),
+               col_types = cols(ID = col_character(),
+                                pCO2_analog = col_double(),
+                                pCO2 = col_double(),
+                                Zero = col_factor(),
+                                Flush = col_factor(),
+                                Zero_ID = col_integer(),
+                                deployment = col_integer(),
+                                duration = col_double(),
+                                mixing = col_character()))
+
+
+track <- 
+  read_csv(here::here("Data/_summarized_data_files",
+                       "TinaV_Track.csv"))
+
+
+df <- full_join(Sensor, track) %>% 
+  arrange(date_time)
+
+# interpolate track data and than remove columns that originate from track time stamp
+df <-
+  df %>%
+  mutate(lat = na.approx(lat, na.rm = FALSE, maxgap = 20),
+         lon = na.approx(lon, na.rm = FALSE, maxgap = 20)) %>% 
+  filter(!is.na(dep))
+
+df %>% 
+  write_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_track.csv"))
+
+rm(df)
+```
+
+
+```
 
 
 # Tasks / open questions

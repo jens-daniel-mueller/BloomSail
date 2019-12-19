@@ -679,8 +679,8 @@ for (file in files){
   if (exists("dataset")){
     
     tempo<-data.table ( read.delim(file, sep=",")[,c(2,3,4)])
-    names(tempo) <- c("date", "lat", "lon")
-    tempo$date<- ymd_hms(tempo$date, tz="UTC")
+    names(tempo) <- c("date_time", "lat", "lon")
+    tempo$date_time<- ymd_hms(tempo$date, tz="UTC")
     
     dataset<-rbind(dataset, tempo)
     rm(tempo)
@@ -689,8 +689,8 @@ for (file in files){
   # if the merged dataset doesn't exist, create it
   if (!exists("dataset")){
     dataset<-data.table ( read.delim(file, sep=",")[,c(2,3,4)])
-    names(dataset) <- c("date", "lat", "lon")
-    dataset$date<- ymd_hms(dataset$date, tz="UTC")
+    names(dataset) <- c("date_time", "lat", "lon")
+    dataset$date_time<- ymd_hms(dataset$date_time, tz="UTC")
     
   }
 }

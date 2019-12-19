@@ -470,6 +470,7 @@ RT_fit <- tau_resid %>%
 
 RT_fit
 
+RT_fit %>% write_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_RT_fit.csv"))
 
 rm(list=setdiff(ls(), c("tau_resid", "RT_mean", "RT_fit")))
 
@@ -1410,6 +1411,139 @@ equi_diff_sum_highres %>%
 * Taking the temperature dependence of tau into account resulted in a slightly better agreement between up- and downcast, as well as downcast and reference value
 * For all quality metrics we find improved agreement for slightly positive tau factor ranging from 1.04 - 1.24
 * As the focus is on pCO~2~ changes in the upper 10 m of the water column, we will apply the tau factor 1.24 leading to the lowest relative offset between up- and downcast
+
+# Correct entire data set
+
+Finally, the response time correction was applied to the full data set (not only profile data) based on the optimum parameterization determined above.
+
+
+```{r RT_correction_all, eval=FALSE}
+
+
+# Response time correction approach after Bittig --------------------------
+RT_corr <- function(c1, c0, dt, tau) {
+  ( 1 / ( 2* (( 1+(2*tau/dt) )^(-1) ))) * (c1 - (1-(2* (( 1+(2*tau/dt) )^(-1) ))) * c0)
+}
+
+
+# load data and response times
+df <- 
+  read_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_track.csv"),
+               col_types = cols(ID = col_character(),
+                                pCO2_analog = col_double(),
+                                pCO2 = col_double(),
+                                Zero = col_factor(),
+                                Flush = col_factor(),
+                                mixing = col_factor(),
+                                Zero_ID = col_integer(),
+                                deployment = col_integer(),
+                                duration = col_double(),
+                                lon = col_double(),
+                                lat = col_double()))
+
+df <- df %>%
+  group_by(ID) %>% 
+  mutate(duration = as.numeric(date_time - min(date_time)),
+         pump_power = if_else(date_time < ymd_hms("2018-07-17;13:08:34"), "1W", "8W")) %>%
+  arrange(date_time)
+
+
+
+RT_fit <- read_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_RT_fit.csv"))
+
+
+
+# Assign T-dependent response time (tau) values ----------------------------------------------
+
+RT_fit <- RT_fit %>% 
+  rename(tau_intercept = `(Intercept)`, tau_slope=tem)
+
+df <- full_join(df, RT_fit)
+
+
+#Assign tau
+df <- df %>% 
+  mutate(tau = tau_intercept + tau_slope *tem) %>% 
+  select(-tau_intercept, -tau_slope)
+
+
+# Prepare data set for RT correction --------------------------------------
+
+df <- df %>% 
+  group_by(ID, station) %>% 
+  arrange(date_time) %>% 
+  mutate(dt = as.numeric(as.character(date_time - lag(date_time)))) %>% 
+  ungroup()
+
+# measurement frequency
+
+freq <- df %>% 
+  filter(dt < 13) %>% 
+  group_by(ID) %>% 
+  summarise(dt_mean = round(mean(dt, na.rm = TRUE),0))
+
+df <- full_join(df, freq)
+
+# tau factors
+
+df <- expand_grid(df, tau_factor = seq(1.2))
+
+df <- df %>%
+  mutate(tau_test = tau*tau_factor)
+
+
+# Apply RT correction to entire data set
+
+for(i_ID in unique(df$ID)){
+  
+#i_ID <- "180716"
+  
+  freq_sub <- freq %>% filter(ID == i_ID) %>% pull(dt_mean)
+  
+  window <- 30 / freq_sub
+  rolling_mean   <- rollify(~mean(.x, na.rm = TRUE), window = window)
+
+  df_sub <- df %>%
+    filter(ID == i_ID) %>% 
+    group_by(station) %>% 
+    mutate(pCO2_RT = RT_corr(pCO2, lag(pCO2), dt, tau_test),
+           pCO2_RT = if_else(pCO2_RT %in% c(Inf, -Inf), NaN, pCO2_RT),
+           window = window,
+           pCO2_RT_mean = rolling_mean(pCO2_RT)
+           #pCO2_RT_median = rolling_median(pCO2_RT)
+           ) %>% 
+    ungroup()
+  
+  # time shift RT corrected data
+  shift <- as.integer(as.character(window/2))
+  
+  df_sub <- df_sub %>%
+    group_by(station) %>% 
+    mutate(pCO2_RT_mean = lead(pCO2_RT_mean, shift)) %>% 
+    ungroup()
+  
+  
+  if (exists("df_corr")){df_corr <- bind_rows(df_corr, df_sub)}
+  else{df_corr <- df_sub}
+  
+  rm(df_sub, freq_sub, rolling_mean, shift, window)
+  
+}
+
+
+df <- df_corr
+rm(RT_corr, i_ID, freq, df_corr)
+
+df <- df %>% 
+  select(-c(tau, tau_factor, tau_test, window))
+
+df %>% 
+ write_csv(here::here("data/_merged_data_files",
+                      "BloomSail_CTD_HydroC_track_RT.csv"))
+rm(df)
+
+```
+
 
 
 # List of relevant parameters
