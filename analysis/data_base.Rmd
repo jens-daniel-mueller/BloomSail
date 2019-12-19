@@ -747,7 +747,7 @@ leaflet() %>%
   addMeasure(
     primaryLengthUnit = "kilometers",
     secondaryLengthUnit = 'miles', 
-    primaryAreaUnit = "hectares",
+    primaryAreaUnit = "sqmeters",
     secondaryAreaUnit="acres", 
     position = 'topleft') %>% 
   addPolylines(data = track_sub, ~lon, ~lat,
