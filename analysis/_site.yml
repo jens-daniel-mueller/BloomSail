@@ -12,7 +12,7 @@ navbar:
   - text: Response time correction
     href: response_time.html
   - text: CT dynamics
-    href: CT_changes.html
+    href: CT_dynamics.html
   - text: License
     href: license.html
   right:
