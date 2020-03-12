@@ -536,10 +536,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3c17c460052669b58cdfd0c53619e2576e211667targetblank3c17c46a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/3c17c460052669b58cdfd0c53619e2576e211667" target="_blank">3c17c46</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee9725fe16a74f1f90ff8ddc9ed68c9d8b9bd4bbctargetblanke9725fea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/e9725fe16a74f1f90ff8ddc9ed68c9d8b9bd4bbc" target="_blank">e9725fe</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3c17c460052669b58cdfd0c53619e2576e211667targetblank3c17c46a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee9725fe16a74f1f90ff8ddc9ed68c9d8b9bd4bbctargetblanke9725fea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -555,10 +555,6 @@ Ignored files:
 
 Untracked files:
     Untracked:  output/Plots/sensor_data/
-
-Unstaged changes:
-    Deleted:    analysis/CT_changes.Rmd
-    Deleted:    analysis/sensor_data.Rmd
 
 </code></pre>
 <p>
@@ -597,7 +593,7 @@ library(scico)
 <li>Discarding profiles with 3 or more observation missing within upper 20m (except shallow coastal station at Ostergarnsholm “P14”)</li>
 </ul>
 <div id="pco2-profile-overview" class="section level2">
-<h2><span class="header-section-number">1.1</span> pCO2 profile overview</h2>
+<h2><span class="header-section-number">1.1</span> pCO<sub>2</sub> profile overview</h2>
 <pre class="r"><code>df &lt;-
  read_csv(here::here(&quot;data/_merged_data_files&quot;,
                       &quot;BloomSail_CTD_HydroC_track_RT.csv&quot;),
@@ -788,7 +784,31 @@ CO2_ts %&gt;%
   scale_color_brewer(palette = &quot;Set1&quot;)+
   facet_grid(parameter~., scales = &quot;free_y&quot;)+
   labs(x=&quot;Transect starting date (from ID)&quot;)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/plot_bottle_CO2_surface_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_bottle_CO2_surface_timeseries-1.png" alt="Time series of bottle data. Shown are mean values of samples collected at water depths &lt; 10m (usually at 0 and 5 m) at both staions." width="672" />
+<p class="caption">
+Time series of bottle data. Shown are mean values of samples collected at water depths &lt; 10m (usually at 0 and 5 m) at both staions.
+</p>
+</div>
+<pre class="r"><code>AT_mean &lt;- CO2_ts %&gt;% 
+  filter(parameter == &quot;AT&quot;) %&gt;% 
+  summarise(AT = mean(value, na.rm = TRUE)) %&gt;%
+  pull()
+
+CO2_ts %&gt;% 
+  filter(parameter == &quot;CT_AT_ratio&quot;) %&gt;% 
+  ggplot(aes(lubridate::ymd(ID), value*AT_mean, col=station))+
+  geom_point()+
+  geom_path()+
+  scale_fill_viridis_d()+
+  scale_color_brewer(palette = &quot;Set1&quot;)+
+  labs(x=&quot;Transect starting date (from ID)&quot;, y=&quot;CT-AT-ratio * mean AT&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_bottle_CT_surface_timeseries-1.png" alt="CT timeseries, derived by multiplying the CT-AT-ratio with mean AT" width="672" />
+<p class="caption">
+CT timeseries, derived by multiplying the CT-AT-ratio with mean AT
+</p>
+</div>
 </div>
 <div id="mean-alkalinity" class="section level2">
 <h2><span class="header-section-number">2.3</span> Mean alkalinity</h2>
