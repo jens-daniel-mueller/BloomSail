@@ -9,6 +9,8 @@ editor_options:
 ```{r global_options, include = FALSE}
 knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 ```
+
+
 ```{r packages}
 library(tidyverse)
 library(data.table)
@@ -662,6 +664,32 @@ HC %>%
                        "Tina_V_HydroC.csv"))
 
 ```
+
+
+# Bottle data
+
+## CO~2~
+
+```{r read_bottle_CO2, eval=FALSE}
+
+
+Bottle <- read_csv(here::here("Data/TinaV/Bottle/Tracegases", "BloomSail_bottle_CO2_all.csv"),
+                   col_types = list("c","c","n","n","n","n","n"))
+
+Bottle <- Bottle %>% 
+  select(ID=transect.ID,
+         station=label,
+         dep=Dep,
+         sal=Sal,
+         CT, AT,
+         pH_Mosley = pH.Mosley)
+
+Bottle %>% 
+  write_csv(here::here("Data/_summarized_data_files", "Tina_V_Bottle_CO2_lab.csv"))
+
+```
+
+
 
 # GPS Track
 
