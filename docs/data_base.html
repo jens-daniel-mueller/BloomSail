@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
@@ -251,6 +250,7 @@ $(document).ready(function () {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -385,7 +385,7 @@ div.tocify {
   <a href="response_time.html">Response time correction</a>
 </li>
 <li>
-  <a href="sensor_data.html">Sensor data</a>
+  <a href="CT_changes.html">CT dynamics</a>
 </li>
 <li>
   <a href="license.html">License</a>
@@ -432,7 +432,7 @@ div.section {
 
 <h1 class="title toc-ignore">Data base</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">19 December, 2019</h4>
+<h4 class="date">12 March, 2020</h4>
 
 </div>
 
@@ -457,7 +457,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-12-19
+<strong>Last updated:</strong> 2020-03-12
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
@@ -467,7 +467,7 @@ div.section {
 </p>
 <p>
 This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
-  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.5.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
 </p>
 <hr>
 </div>
@@ -596,10 +596,10 @@ data/TinaV/Track/GPS_Logger_Track
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree5ed32f9caab3633358680c5c55e73bde75fc9a50targetblank5ed32f9a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/5ed32f9caab3633358680c5c55e73bde75fc9a50" target="_blank">5ed32f9</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreefd3ace04b8cc36938f316e24a58ea8879932287dtargetblankfd3ace0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/fd3ace04b8cc36938f316e24a58ea8879932287d" target="_blank">fd3ace0</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree5ed32f9caab3633358680c5c55e73bde75fc9a50targetblank5ed32f9a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreefd3ace04b8cc36938f316e24a58ea8879932287dtargetblankfd3ace0a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -612,6 +612,12 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
+
+Untracked files:
+    Untracked:  output/Plots/sensor_data/
+
+Unstaged changes:
+    Deleted:    analysis/sensor_data.Rmd
 
 </code></pre>
 <p>
@@ -1179,6 +1185,25 @@ HC %&gt;%
   write_csv(here::here(&quot;Data/_summarized_data_files&quot;,
                        &quot;Tina_V_HydroC.csv&quot;))</code></pre>
 </div>
+<div id="bottle-data" class="section level1">
+<h1>Bottle data</h1>
+<div id="co2" class="section level2">
+<h2>CO<sub>2</sub></h2>
+<pre class="r"><code>Bottle &lt;- read_csv(here::here(&quot;Data/TinaV/Bottle/Tracegases&quot;, &quot;BloomSail_bottle_CO2_all.csv&quot;),
+                   col_types = list(&quot;c&quot;,&quot;c&quot;,&quot;n&quot;,&quot;n&quot;,&quot;n&quot;,&quot;n&quot;,&quot;n&quot;))
+
+Bottle &lt;- Bottle %&gt;% 
+  select(ID=transect.ID,
+         station=label,
+         dep=Dep,
+         sal=Sal,
+         CT, AT,
+         pH_Mosley = pH.Mosley)
+
+Bottle %&gt;% 
+  write_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;Tina_V_Bottle_CO2_lab.csv&quot;))</code></pre>
+</div>
+</div>
 <div id="gps-track" class="section level1">
 <h1>GPS Track</h1>
 <p>First, we read the GPS track data.</p>
@@ -1295,36 +1320,29 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] leaflet_2.0.2      DataExplorer_0.8.0 lubridate_1.7.4   
- [4] data.table_1.12.6  forcats_0.4.0      stringr_1.4.0     
- [7] dplyr_0.8.3        purrr_0.3.3        readr_1.3.1       
-[10] tidyr_1.0.0        tibble_2.1.3       ggplot2_3.2.1     
+ [1] leaflet_2.0.2      DataExplorer_0.8.0 lubridate_1.7.4    data.table_1.12.6 
+ [5] forcats_0.4.0      stringr_1.4.0      dplyr_0.8.3        purrr_0.3.3       
+ [9] readr_1.3.1        tidyr_1.0.0        tibble_2.1.3       ggplot2_3.3.0     
 [13] tidyverse_1.3.0   
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.2        here_0.1          lattice_0.20-35  
- [4] assertthat_0.2.1  zeallot_0.1.0     rprojroot_1.3-2  
- [7] digest_0.6.22     mime_0.7          R6_2.4.0         
-[10] cellranger_1.1.0  backports_1.1.5   reprex_0.3.0     
-[13] evaluate_0.14     httr_1.4.1        highr_0.8        
-[16] pillar_1.4.2      rlang_0.4.1       lazyeval_0.2.2   
-[19] readxl_1.3.1      rstudioapi_0.10   rmarkdown_1.17   
-[22] labeling_0.3      htmlwidgets_1.5.1 igraph_1.2.4.1   
-[25] munsell_0.5.0     shiny_1.4.0       broom_0.5.2      
-[28] compiler_3.5.0    httpuv_1.5.2      modelr_0.1.5     
-[31] xfun_0.10         pkgconfig_2.0.3   htmltools_0.4.0  
-[34] tidyselect_0.2.5  gridExtra_2.3     workflowr_1.5.0  
-[37] crayon_1.3.4      dbplyr_1.4.2      withr_2.1.2      
-[40] later_1.0.0       grid_3.5.0        xtable_1.8-4     
-[43] nlme_3.1-137      jsonlite_1.6      gtable_0.3.0     
-[46] lifecycle_0.1.0   DBI_1.0.0         git2r_0.26.1     
-[49] magrittr_1.5      scales_1.0.0      cli_1.1.0        
-[52] stringi_1.4.3     fs_1.3.1          promises_1.1.0   
-[55] xml2_1.2.2        generics_0.0.2    vctrs_0.2.0      
-[58] tools_3.5.0       glue_1.3.1        crosstalk_1.0.0  
-[61] hms_0.5.2         networkD3_0.4     fastmap_1.0.1    
-[64] parallel_3.5.0    yaml_2.2.0        colorspace_1.4-1 
-[67] rvest_0.3.5       knitr_1.25        haven_2.2.0      </code></pre>
+ [1] Rcpp_1.0.2        here_0.1          lattice_0.20-35   assertthat_0.2.1 
+ [5] zeallot_0.1.0     rprojroot_1.3-2   digest_0.6.22     mime_0.7         
+ [9] R6_2.4.0          cellranger_1.1.0  backports_1.1.5   reprex_0.3.0     
+[13] evaluate_0.14     httr_1.4.1        highr_0.8         pillar_1.4.2     
+[17] rlang_0.4.5       readxl_1.3.1      rstudioapi_0.10   rmarkdown_2.0    
+[21] labeling_0.3      htmlwidgets_1.5.1 igraph_1.2.4.1    munsell_0.5.0    
+[25] shiny_1.4.0       broom_0.5.3       compiler_3.5.0    httpuv_1.5.2     
+[29] modelr_0.1.5      xfun_0.10         pkgconfig_2.0.3   htmltools_0.4.0  
+[33] tidyselect_0.2.5  gridExtra_2.3     workflowr_1.6.0   crayon_1.3.4     
+[37] dbplyr_1.4.2      withr_2.1.2       later_1.0.0       grid_3.5.0       
+[41] xtable_1.8-4      nlme_3.1-137      jsonlite_1.6      gtable_0.3.0     
+[45] lifecycle_0.1.0   DBI_1.0.0         git2r_0.26.1      magrittr_1.5     
+[49] scales_1.0.0      cli_1.1.0         stringi_1.4.3     fs_1.3.1         
+[53] promises_1.1.0    xml2_1.2.2        generics_0.0.2    vctrs_0.2.0      
+[57] tools_3.5.0       glue_1.3.1        crosstalk_1.0.0   hms_0.5.2        
+[61] networkD3_0.4     fastmap_1.0.1     parallel_3.5.0    yaml_2.2.0       
+[65] colorspace_1.4-1  rvest_0.3.5       knitr_1.26        haven_2.2.0      </code></pre>
 </div>
 </div>
 
