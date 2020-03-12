@@ -29,7 +29,7 @@ library(scico)
 ```
 
 
-# Sensor profile data
+# Sensor data
 
 Profile data are prepared by:
 
@@ -38,6 +38,8 @@ Profile data are prepared by:
 - Selecting only continous downcast periods
 - Gridding profiles to 1m depth intervals
 - Discarding profiles with 3 or more observation missing within upper 20m (except shallow coastal station at Ostergarnsholm "P14")
+
+## pCO2 profile overview
 
 ```{r read_prepare_sensor_data, fig.cap="Overview pCO2 profiles at stations (P01-P14) and cruise dates (ID)", fig.asp = 1.3}
 
@@ -135,7 +137,7 @@ df %>%
   scale_y_reverse()+
   scale_color_brewer(palette = "Set1", direction = -1)+
   coord_cartesian(xlim = c(0,400))+
-  facet_grid(station~ID)
+  facet_grid(ID~station)
 
 df <- df %>%
   filter(select == "in") %>%
@@ -152,8 +154,8 @@ map <- read_csv(here::here("data/Maps","Bathymetry_Gotland_east_small.csv"))
 
 df %>% 
   ggplot()+
-  geom_raster(data=map, aes(lon, lat, fill=elev))+
-  scale_fill_scico(palette = "grayC", na.value = "grey", name="Depth [m]", direction = -1)+
+  geom_raster(data=map, aes(lon, lat, fill=-elev))+
+  scale_fill_scico(palette = "grayC", na.value = "grey", name="Depth [m]")+
   geom_point(aes(lon, lat, col=station))+
   coord_quickmap(expand = 0, xlim = c(18.7, 19.9), ylim = c(57.25,57.6))+
   theme_bw()+
@@ -183,7 +185,7 @@ rm(cover)
 
 # Bottle C~T~ and A~T~
 
-At stations P07 and P10 discrete samples for lab measurments of C~T~ and A~T~ were collected. Please not that - in contrast to the pCO2 profiles - samples were taken on June 16.
+At stations P07 and P10 discrete samples for lab measurments of C~T~ and A~T~ were collected. Please note that - in contrast to the pCO2 profiles - samples were taken on June 16.
 
 ```{r read_bottle_CO2}
 
@@ -212,8 +214,8 @@ CO2_long %>%
   scale_y_reverse()+
   scale_fill_viridis_d()+
   scale_color_viridis_d()+
-  facet_grid(station~parameter, scales = "free_x")
-
+  facet_grid(station~parameter, scales = "free_x")+
+  theme(legend.position = "bottom")
 
 ```
 
@@ -253,6 +255,12 @@ AT_mean <- CO2 %>%
 
 AT_mean
 
+```
+
+Likewise, the mean salinity amounts to:
+
+```{r bottle_sal}
+
 sal_mean <- CO2 %>% 
   filter(dep <= 20) %>% 
   summarise(sal = mean(sal, na.rm = TRUE)) %>%
@@ -261,6 +269,7 @@ sal_mean <- CO2 %>%
 sal_mean
 
 ```
+
 
 # C~T~ profiles
 
@@ -394,7 +403,9 @@ mean_profiles_long %>%
 
 # Timeseries
 
-```{r observed_timeseries}
+## Observed
+
+```{r observed_timeseries, fig.asp=1.3}
 
 timeseries <- mean_profiles_long %>% 
   mutate(dep = cut(dep, seq(0,30,5))) %>% 
@@ -410,6 +421,7 @@ timeseries %>%
 
 ```
 
+## Cumulative
 
 ```{r integrated_NCP}
 
