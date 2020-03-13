@@ -320,9 +320,9 @@ df %>%
 
 ## Mean profiles
 
-Mean vertical profiles are displayed for each cruise day (ID). Note that:
+Mean vertical profiles were calculated for each cruise day (ID). Note that:
 
-- ID represents the start date of the cruise, not the mean sampling date
+- ID represents the start date of the cruise, not the exact mean sampling date
 - Coastal station P14 was excluded so far from the analysis
 
 ```{r plot_CT_profiles, fig.cap="Mean vertical profiles per cruise day across all stations, except P14."}
@@ -359,6 +359,12 @@ mean_profiles_long %>%
 ```
 
 ## Individual profiles
+
+
+C~T~, pCO~2~, S, and T profiles were plotted individually 
+[pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/profiles_individual.pdf){target="_blank"} 
+and grouped by ID 
+[pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/profiles_by_ID.pdf){target="_blank"}. The later gives an idea of the differences between stations at one point in time.
 
 ```{r plot_all_discretized_profiles_individual, eval=FALSE}
 
@@ -489,15 +495,11 @@ rm(i_ID, df_long)
 
 ```
 
-C~T~, pCO~2~, S, and T profiles were plotted individually 
-[pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/profiles_individual.pdf){target="_blank"} 
-and grouped by ID 
-[pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/profiles_by_ID.pdf){target="_blank"}. 
 
 
 ## Profiles of incremental changes
 
-Changes of seawater parameters at each depth are calculated from one cruise day to next and divided by the number of days inbetween.
+Changes of seawater parameters at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.
 
 ```{r incremental_changes_profiles}
 
@@ -525,7 +527,7 @@ mean_profiles_long %>%
 
 ## Profiles of cumulative changes
 
-Cumulative changes of seawater parameters at each depth relative to the first cruise day on July 5.
+Cumulative changes of seawater parameters were calculated at each depth relative to the first cruise day on July 5.
 
 ```{r cumulative_changes_profiles}
 
@@ -542,7 +544,7 @@ mean_profiles_long %>%
 
 ```
 
-Cumulative positive vs negative changes of seawater parameters at each depth relative to the first cruise day on July 5.
+Cumulative positive and negative changes of seawater parameters were calculated separately at each depth relative to the first cruise day on July 5.
 
 ```{r cumulative_directional_changes_profiles}
 
@@ -572,6 +574,8 @@ mean_profiles_long %>%
 
 ## Observed
 
+Timeseries of changes in seawater parameters were calculated for 5m depth intervals.
+
 ```{r observed_timeseries, fig.asp=1.3}
 
 timeseries <- mean_profiles_long %>% 
@@ -589,6 +593,8 @@ timeseries %>%
 ```
 
 ## Cumulative
+
+Cumulative C~T~ changes were calculated for 5m depth intervals.
 
 ```{r integrated_NCP}
 
@@ -672,4 +678,4 @@ mean_profiles_long %>%
 
 - Significance of changes in AT for calculated CT changes
 - Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)
-- Compare stations
+- Use exact mean date instead of ID throughout
