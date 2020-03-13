@@ -41,7 +41,7 @@ Profile data are prepared by:
 
 ## pCO~2~ profile overview
 
-```{r read_prepare_sensor_data, fig.cap="Overview pCO2 profiles at stations (P01-P14) and cruise dates (ID)", fig.asp = 1.4}
+```{r read_prepare_sensor_data, fig.cap="Overview pCO2 profiles at stations (P01-P14) and cruise dates (ID)", fig.asp = 1.5}
 
 df <-
  read_csv(here::here("data/_merged_data_files",
@@ -129,12 +129,13 @@ df <- full_join(df, profiles_in)
 rm(profiles_in)
 
 df %>% 
-  filter(dep < 30) %>% 
+  #filter(dep < 30) %>% 
   arrange(date_time) %>% 
   ggplot(aes(pCO2, dep, col=select))+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
+  scale_x_continuous(breaks = c(0,300), labels = c(0,300))+
   scale_color_brewer(palette = "Set1", direction = -1)+
   coord_cartesian(xlim = c(0,400))+
   facet_grid(ID~station)
@@ -185,7 +186,7 @@ rm(cover)
 
 # Bottle C~T~ and A~T~
 
-At stations P07 and P10 discrete samples for lab measurments of C~T~ and A~T~ were collected. Please note that - in contrast to the pCO2 profiles - samples were taken on June 16.
+At stations P07 and P10 discrete samples for lab measurments of C~T~ and A~T~ were collected. Please note that - in contrast to the pCO~2~ profiles - samples were taken on June 16.
 
 ```{r read_bottle_CO2}
 
@@ -221,7 +222,7 @@ CO2_long %>%
 
 ## Surface time series
 
-```{r plot_bottle_CO2_surface_timeseries, fig.cap="Time series of bottle data. Shown are mean values of samples collected at water depths < 10m (usually at 0 and 5 m) at both staions.", fig.asp=1.2}
+```{r plot_bottle_CO2_surface_timeseries, fig.cap="Time series of bottle data. Shown are mean values of samples collected at water depths < 10m (usually at 0 and 5 m).", fig.asp=1.2}
 
 CO2_ts <- CO2_long %>% 
   filter(dep<10) %>% 
@@ -359,6 +360,8 @@ mean_profiles_long %>%
 
 ## Profiles of incremental changes
 
+Changes of seawater parameters at each depth are calculated from one cruise day to next and divided by the number of days inbetween.
+
 ```{r incremental_changes_profiles}
 
 mean_profiles_long <- mean_profiles_long %>%
@@ -378,11 +381,14 @@ mean_profiles_long %>%
   geom_path()+
   scale_y_reverse()+
   scale_color_viridis_d()+
-  facet_wrap(~parameter, scales = "free_x")
+  facet_wrap(~parameter, scales = "free_x")+
+  labs(x="Change of value inbetween cruises per day")
   
 ```
 
 ## Profiles of cumulative changes
+
+Cumulative changes of seawater parameters at each depth relative to the first cruise day on July 5.
 
 ```{r cumulative_changes_profiles}
 
@@ -394,9 +400,12 @@ mean_profiles_long %>%
   geom_path()+
   scale_y_reverse()+
   scale_color_viridis_d()+
-  facet_wrap(~parameter, scales = "free_x")
+  facet_wrap(~parameter, scales = "free_x")+
+  labs(x="Cumulative change of value")
 
 ```
+
+Cumulative positive vs negative changes of seawater parameters at each depth relative to the first cruise day on July 5.
 
 ```{r cumulative_directional_changes_profiles}
 
@@ -416,7 +425,8 @@ mean_profiles_long %>%
   scale_y_reverse()+
   scale_color_viridis_d()+
   scale_fill_viridis_d()+
-  facet_grid(sign~parameter, scales = "free_x")
+  facet_wrap(~interaction(sign, parameter), scales = "free_x", ncol=4)+
+  labs(x="Cumulative directional change of value")
 
 ```
 
@@ -447,23 +457,45 @@ timeseries %>%
 
 NCP <- mean_profiles_long %>% 
   filter(parameter == "CT") %>% 
-  group_by(ID, sign) %>% 
+  mutate(dep = cut(dep, seq(0,30,5))) %>% 
+  group_by(ID, dep, sign) %>% 
   summarise(date_time = mean(date_time),
             dCT = sum(cum_value_sign)/1000) %>% 
   ungroup()
 
 NCP <- NCP %>% 
-  group_by(sign) %>% 
+  group_by(sign, dep) %>% 
   arrange(date_time) %>%
   mutate(dCT_cum = cumsum(dCT)) %>% 
   ungroup()
 
+
+NCP_grid <- expand_grid(
+  unique(NCP$ID),
+  unique(NCP$dep),
+  unique(NCP$sign)
+)
+
+NCP_grid <- NCP_grid %>% 
+  set_names(c("ID", "dep", "sign"))
+
+NCP <- full_join(NCP, NCP_grid)
+
+NCP <- NCP %>% 
+  arrange(sign, dep, ID) %>% 
+  group_by(sign, dep) %>% 
+  fill(dCT_cum) %>% 
+  ungroup() %>% 
+  mutate(dCT_cum = if_else(is.na(dCT_cum), 0, dCT_cum))
+
 NCP %>% 
-  ggplot(aes(date_time, dCT_cum, col=sign))+
+  ggplot(aes(lubridate::ymd(ID), dCT_cum, fill=dep))+
   geom_hline(yintercept = 0)+
-  geom_point()+
-  geom_path()+
-  scale_color_brewer(palette = "Set1")+
+  geom_area(alpha = 0.8, col="white")+
+  scale_fill_viridis_d()+
+  scale_color_viridis_d()+
+  scale_y_continuous(breaks = seq(-100, 100, 1))+
+  facet_grid(rev(sign)~., scales = "free_y", space = "free_y")+
   labs(y="integrated, cumulative, directional CT changes [mol/m2]", x="date")
 
 
