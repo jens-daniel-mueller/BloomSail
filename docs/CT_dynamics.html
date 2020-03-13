@@ -536,10 +536,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef49ce78698e59e99df795845d046524cb24ccbdctargetblankf49ce78a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f49ce78698e59e99df795845d046524cb24ccbdc" target="_blank">f49ce78</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree39b841d766f959c5a6b80198d430c662d28478fatargetblank39b841da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/39b841d766f959c5a6b80198d430c662d28478fa" target="_blank">39b841d</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef49ce78698e59e99df795845d046524cb24ccbdctargetblankf49ce78a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree39b841d766f959c5a6b80198d430c662d28478fatargetblank39b841da" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -554,7 +554,7 @@ Ignored files:
     Ignored:    data/_summarized_data_files/
 
 Untracked files:
-    Untracked:  output/Plots/sensor_data/
+    Untracked:  output/Plots/CT_dynamics/
 
 </code></pre>
 <p>
@@ -680,7 +680,7 @@ df &lt;- full_join(df, profiles_in)
 rm(profiles_in)
 
 df %&gt;% 
-  #filter(dep &lt; 30) %&gt;% 
+  filter(dep &lt; 30) %&gt;% 
   arrange(date_time) %&gt;% 
   ggplot(aes(pCO2, dep, col=select))+
   geom_point()+
@@ -893,8 +893,129 @@ Mean vertical profiles per cruise day across all stations, except P14.
 </p>
 </div>
 </div>
+<div id="individual-profiles" class="section level2">
+<h2><span class="header-section-number">3.3</span> Individual profiles</h2>
+<pre class="r"><code>pdf(file=here::here(&quot;output/Plots/CT_dynamics&quot;,
+    &quot;profiles_individual.pdf&quot;), onefile = TRUE, width = 9, height = 5)
+
+for(i_ID in unique(df$ID)){
+  for(i_station in unique(df$station)){
+
+    if (nrow(df %&gt;% filter(ID == i_ID, station == i_station)) &gt; 0){
+      
+      
+      # i_ID      &lt;-      unique(df$ID)[1]
+      # i_station &lt;- unique(df$station)[1]
+
+      p_pCO2 &lt;- 
+        df %&gt;%
+        arrange(date_time) %&gt;% 
+        filter(ID == i_ID,
+               station == i_station) %&gt;%
+        ggplot(aes(pCO2, dep))+
+        geom_point(aes(pCO2_raw, dep), col=&quot;lightgrey&quot;)+
+        geom_point()+
+        geom_path()+
+        scale_y_reverse()+
+        scale_color_brewer(palette = &quot;Set1&quot;)+
+        labs(y=&quot;Depth [m]&quot;, x=&quot;pCO2 [µatm]&quot;, title = str_c(i_ID,&quot; | &quot;,i_station))+
+        coord_cartesian(xlim = c(0,200), ylim = c(30,0))+
+        theme_bw()+
+        theme(legend.position = &quot;left&quot;)
+      
+      p_tem &lt;- 
+        df %&gt;%
+        arrange(date_time) %&gt;% 
+        filter(ID == i_ID,
+               station == i_station) %&gt;%
+        ggplot(aes(tem, dep))+
+        geom_point()+
+        geom_path()+
+        scale_y_reverse()+
+        labs(y=&quot;Depth [m]&quot;, x=&quot;Tem [°C]&quot;)+
+        coord_cartesian(xlim = c(14,26), ylim = c(30,0))+
+        theme_bw()
+      
+      p_sal &lt;- 
+        df %&gt;%
+        arrange(date_time) %&gt;% 
+        filter(ID == i_ID,
+               station == i_station) %&gt;%
+        ggplot(aes(sal, dep))+
+        geom_point()+
+        geom_path()+
+        scale_y_reverse()+
+        labs(y=&quot;Depth [m]&quot;, x=&quot;Tem [°C]&quot;)+
+        coord_cartesian(xlim = c(6.5,7.5), ylim = c(30,0))+
+        theme_bw()
+      
+      p_CT &lt;- 
+        df %&gt;%
+        arrange(date_time) %&gt;% 
+        filter(ID == i_ID,
+               station == i_station) %&gt;%
+        ggplot(aes(CT, dep))+
+        geom_point()+
+        geom_path()+
+        scale_y_reverse()+
+        labs(y=&quot;Depth [m]&quot;, x=&quot;CT* [µmol/kg]&quot;)+
+        coord_cartesian(xlim = c(1400,1700), ylim = c(30,0))+
+        theme_bw()
+      
+
+      print(
+            p_pCO2 + p_tem + p_sal + p_CT
+            )
+      
+      rm(p_pCO2, p_sal, p_tem, p_CT)
+
+      
+    }
+  }
+}
+
+dev.off()
+
+rm(i_ID, i_station)</code></pre>
+<pre class="r"><code>df_long &lt;- df %&gt;%
+  select(-c(lat, lon, pCO2_raw)) %&gt;% 
+  filter(dep &lt; 25) %&gt;% 
+  pivot_longer(5:8, values_to = &quot;value&quot;, names_to = &quot;parameter&quot;)
+
+
+pdf(file=here::here(&quot;output/Plots/CT_dynamics&quot;,
+    &quot;profiles_by_ID.pdf&quot;), onefile = TRUE, width = 9, height = 5)
+
+for(i_ID in unique(df$ID)){
+
+  #i_ID &lt;- unique(df$ID)[1]
+  
+  sub_df_long &lt;- df_long %&gt;% 
+        arrange(date_time) %&gt;% 
+        filter(ID == i_ID)
+ 
+  print(
+  
+  sub_df_long %&gt;% 
+    ggplot()+
+    geom_path(data = df_long, aes(value, dep, group=interaction(station, ID)), col=&quot;grey&quot;)+
+    geom_path(aes(value, dep, col=station))+
+    scale_y_reverse()+
+    labs(y=&quot;Depth [m]&quot;, title = str_c(&quot;ID: &quot;, i_ID))+
+    theme_bw()+
+    facet_wrap(~parameter, scales = &quot;free_x&quot;)
+   
+  )  
+  rm(sub_df_long)
+}
+
+dev.off()
+
+rm(i_ID, df_long)</code></pre>
+<p>C<sub>T</sub>, pCO<sub>2</sub>, S, and T profiles were plotted individually <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/profiles_individual.pdf" target="_blank">pdf here</a> and grouped by ID <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/profiles_by_ID.pdf" target="_blank">pdf here</a>.</p>
+</div>
 <div id="profiles-of-incremental-changes" class="section level2">
-<h2><span class="header-section-number">3.3</span> Profiles of incremental changes</h2>
+<h2><span class="header-section-number">3.4</span> Profiles of incremental changes</h2>
 <p>Changes of seawater parameters at each depth are calculated from one cruise day to next and divided by the number of days inbetween.</p>
 <pre class="r"><code>mean_profiles_long &lt;- mean_profiles_long %&gt;%
     group_by(parameter, dep) %&gt;%
@@ -918,7 +1039,7 @@ mean_profiles_long %&gt;%
 <p><img src="figure/CT_dynamics.Rmd/incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="profiles-of-cumulative-changes" class="section level2">
-<h2><span class="header-section-number">3.4</span> Profiles of cumulative changes</h2>
+<h2><span class="header-section-number">3.5</span> Profiles of cumulative changes</h2>
 <p>Cumulative changes of seawater parameters at each depth relative to the first cruise day on July 5.</p>
 <pre class="r"><code>mean_profiles_long %&gt;% 
   arrange(dep) %&gt;% 
@@ -1013,6 +1134,8 @@ NCP %&gt;%
   scale_color_viridis_d()+
   scale_y_continuous(breaks = seq(-100, 100, 1))+
   facet_grid(rev(sign)~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
+  theme(strip.background = element_blank(),
+        strip.text = element_blank())+
   labs(y=&quot;integrated, cumulative, directional CT changes [mol/m2]&quot;, x=&quot;date&quot;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/integrated_NCP-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>mean_profiles %&gt;% 
@@ -1035,88 +1158,6 @@ mean_profiles_long %&gt;%
   geom_point()+
   scale_color_divergent()+
   scale_y_reverse()</code></pre>
-<pre class="r"><code>pdf(file=here::here(&quot;output/Plots/sensor_data&quot;,
-    &quot;profiles_check.pdf&quot;), onefile = TRUE, width = 9, height = 5)
-
-for(i_ID in unique(df$ID)){
-  for(i_station in unique(df$station)){
-
-    if (nrow(df %&gt;% filter(ID == i_ID, station == i_station)) &gt; 0){
-      
-      
-      # i_ID      &lt;-      unique(df$ID)[1]
-      # i_station &lt;- unique(df$station)[1]
-
-      p_pCO2 &lt;- 
-        df %&gt;%
-        arrange(date_time) %&gt;% 
-        filter(ID == i_ID,
-               station == i_station) %&gt;%
-        ggplot(aes(pCO2, dep))+
-        geom_point(aes(pCO2_raw, dep), col=&quot;lightgrey&quot;)+
-        geom_point()+
-        geom_path()+
-        scale_y_reverse()+
-        scale_color_brewer(palette = &quot;Set1&quot;)+
-        labs(y=&quot;Depth [m]&quot;, x=&quot;pCO2 [µatm]&quot;, title = str_c(i_ID,&quot; | &quot;,i_station))+
-        coord_cartesian(xlim = c(0,200), ylim = c(30,0))+
-        theme_bw()+
-        theme(legend.position = &quot;left&quot;)
-      
-      p_tem &lt;- 
-        df %&gt;%
-        arrange(date_time) %&gt;% 
-        filter(ID == i_ID,
-               station == i_station) %&gt;%
-        ggplot(aes(tem, dep))+
-        geom_point()+
-        geom_path()+
-        scale_y_reverse()+
-        labs(y=&quot;Depth [m]&quot;, x=&quot;Tem [°C]&quot;)+
-        coord_cartesian(xlim = c(14,26), ylim = c(30,0))+
-        theme_bw()
-      
-      p_sal &lt;- 
-        df %&gt;%
-        arrange(date_time) %&gt;% 
-        filter(ID == i_ID,
-               station == i_station) %&gt;%
-        ggplot(aes(sal, dep))+
-        geom_point()+
-        geom_path()+
-        scale_y_reverse()+
-        labs(y=&quot;Depth [m]&quot;, x=&quot;Tem [°C]&quot;)+
-        coord_cartesian(xlim = c(6.5,7.5), ylim = c(30,0))+
-        theme_bw()
-      
-      p_CT &lt;- 
-        df %&gt;%
-        arrange(date_time) %&gt;% 
-        filter(ID == i_ID,
-               station == i_station) %&gt;%
-        ggplot(aes(CT, dep))+
-        geom_point()+
-        geom_path()+
-        scale_y_reverse()+
-        labs(y=&quot;Depth [m]&quot;, x=&quot;CT* [µmol/kg]&quot;)+
-        coord_cartesian(xlim = c(1400,1700), ylim = c(30,0))+
-        theme_bw()
-      
-
-      print(
-            p_pCO2 + p_tem + p_sal + p_CT
-            )
-      
-      rm(p_pCO2, p_sal, p_tem, p_CT)
-
-      
-    }
-  }
-}
-
-dev.off()
-
-rm(i_ID, i_station)</code></pre>
 </div>
 </div>
 <div id="open-tasks-questions" class="section level1">
@@ -1124,7 +1165,7 @@ rm(i_ID, i_station)</code></pre>
 <ul>
 <li>Significance of changes in AT for calculated CT changes</li>
 <li>Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)</li>
-<li>Vergleich der Stationen</li>
+<li>Compare stations</li>
 </ul>
 <br>
 <p>
