@@ -129,7 +129,7 @@ df <- full_join(df, profiles_in)
 rm(profiles_in)
 
 df %>% 
-  #filter(dep < 30) %>% 
+  filter(dep < 30) %>% 
   arrange(date_time) %>% 
   ggplot(aes(pCO2, dep, col=select))+
   geom_point()+
@@ -358,6 +358,143 @@ mean_profiles_long %>%
 
 ```
 
+## Individual profiles
+
+```{r plot_all_discretized_profiles_individual, eval=FALSE}
+
+pdf(file=here::here("output/Plots/CT_dynamics",
+    "profiles_individual.pdf"), onefile = TRUE, width = 9, height = 5)
+
+for(i_ID in unique(df$ID)){
+  for(i_station in unique(df$station)){
+
+    if (nrow(df %>% filter(ID == i_ID, station == i_station)) > 0){
+      
+      
+      # i_ID      <-      unique(df$ID)[1]
+      # i_station <- unique(df$station)[1]
+
+      p_pCO2 <- 
+        df %>%
+        arrange(date_time) %>% 
+        filter(ID == i_ID,
+               station == i_station) %>%
+        ggplot(aes(pCO2, dep))+
+        geom_point(aes(pCO2_raw, dep), col="lightgrey")+
+        geom_point()+
+        geom_path()+
+        scale_y_reverse()+
+        scale_color_brewer(palette = "Set1")+
+        labs(y="Depth [m]", x="pCO2 [µatm]", title = str_c(i_ID," | ",i_station))+
+        coord_cartesian(xlim = c(0,200), ylim = c(30,0))+
+        theme_bw()+
+        theme(legend.position = "left")
+      
+      p_tem <- 
+        df %>%
+        arrange(date_time) %>% 
+        filter(ID == i_ID,
+               station == i_station) %>%
+        ggplot(aes(tem, dep))+
+        geom_point()+
+        geom_path()+
+        scale_y_reverse()+
+        labs(y="Depth [m]", x="Tem [°C]")+
+        coord_cartesian(xlim = c(14,26), ylim = c(30,0))+
+        theme_bw()
+      
+      p_sal <- 
+        df %>%
+        arrange(date_time) %>% 
+        filter(ID == i_ID,
+               station == i_station) %>%
+        ggplot(aes(sal, dep))+
+        geom_point()+
+        geom_path()+
+        scale_y_reverse()+
+        labs(y="Depth [m]", x="Tem [°C]")+
+        coord_cartesian(xlim = c(6.5,7.5), ylim = c(30,0))+
+        theme_bw()
+      
+      p_CT <- 
+        df %>%
+        arrange(date_time) %>% 
+        filter(ID == i_ID,
+               station == i_station) %>%
+        ggplot(aes(CT, dep))+
+        geom_point()+
+        geom_path()+
+        scale_y_reverse()+
+        labs(y="Depth [m]", x="CT* [µmol/kg]")+
+        coord_cartesian(xlim = c(1400,1700), ylim = c(30,0))+
+        theme_bw()
+      
+
+      print(
+            p_pCO2 + p_tem + p_sal + p_CT
+            )
+      
+      rm(p_pCO2, p_sal, p_tem, p_CT)
+
+      
+    }
+  }
+}
+
+dev.off()
+
+rm(i_ID, i_station)
+
+
+
+```
+
+```{r plot_all_discretized_profiles_by_ID, eval=FALSE}
+
+df_long <- df %>%
+  select(-c(lat, lon, pCO2_raw)) %>% 
+  filter(dep < 25) %>% 
+  pivot_longer(5:8, values_to = "value", names_to = "parameter")
+
+
+pdf(file=here::here("output/Plots/CT_dynamics",
+    "profiles_by_ID.pdf"), onefile = TRUE, width = 9, height = 5)
+
+for(i_ID in unique(df$ID)){
+
+  #i_ID <- unique(df$ID)[1]
+  
+  sub_df_long <- df_long %>% 
+        arrange(date_time) %>% 
+        filter(ID == i_ID)
+ 
+  print(
+  
+  sub_df_long %>% 
+    ggplot()+
+    geom_path(data = df_long, aes(value, dep, group=interaction(station, ID)), col="grey")+
+    geom_path(aes(value, dep, col=station))+
+    scale_y_reverse()+
+    labs(y="Depth [m]", title = str_c("ID: ", i_ID))+
+    theme_bw()+
+    facet_wrap(~parameter, scales = "free_x")
+   
+  )  
+  rm(sub_df_long)
+}
+
+dev.off()
+
+rm(i_ID, df_long)
+
+```
+
+C~T~, pCO~2~, S, and T profiles were plotted individually 
+[pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/profiles_individual.pdf){target="_blank"} 
+and grouped by ID 
+[pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/profiles_by_ID.pdf){target="_blank"}. 
+
+
 ## Profiles of incremental changes
 
 Changes of seawater parameters at each depth are calculated from one cruise day to next and divided by the number of days inbetween.
@@ -496,12 +633,12 @@ NCP %>%
   scale_color_viridis_d()+
   scale_y_continuous(breaks = seq(-100, 100, 1))+
   facet_grid(rev(sign)~., scales = "free_y", space = "free_y")+
+  theme(strip.background = element_blank(),
+        strip.text = element_blank())+
   labs(y="integrated, cumulative, directional CT changes [mol/m2]", x="date")
 
 
 ```
-
-
 
 
 ```{r plot_hovmoeller, eval=FALSE}
@@ -531,99 +668,8 @@ mean_profiles_long %>%
 ```
 
 
-```{r plot_corrected_discretized_pCO2_profiles, eval=FALSE}
-
-pdf(file=here::here("output/Plots/sensor_data",
-    "profiles_check.pdf"), onefile = TRUE, width = 9, height = 5)
-
-for(i_ID in unique(df$ID)){
-  for(i_station in unique(df$station)){
-
-    if (nrow(df %>% filter(ID == i_ID, station == i_station)) > 0){
-      
-      
-      # i_ID      <-      unique(df$ID)[1]
-      # i_station <- unique(df$station)[1]
-
-      p_pCO2 <- 
-        df %>%
-        arrange(date_time) %>% 
-        filter(ID == i_ID,
-               station == i_station) %>%
-        ggplot(aes(pCO2, dep))+
-        geom_point(aes(pCO2_raw, dep), col="lightgrey")+
-        geom_point()+
-        geom_path()+
-        scale_y_reverse()+
-        scale_color_brewer(palette = "Set1")+
-        labs(y="Depth [m]", x="pCO2 [µatm]", title = str_c(i_ID," | ",i_station))+
-        coord_cartesian(xlim = c(0,200), ylim = c(30,0))+
-        theme_bw()+
-        theme(legend.position = "left")
-      
-      p_tem <- 
-        df %>%
-        arrange(date_time) %>% 
-        filter(ID == i_ID,
-               station == i_station) %>%
-        ggplot(aes(tem, dep))+
-        geom_point()+
-        geom_path()+
-        scale_y_reverse()+
-        labs(y="Depth [m]", x="Tem [°C]")+
-        coord_cartesian(xlim = c(14,26), ylim = c(30,0))+
-        theme_bw()
-      
-      p_sal <- 
-        df %>%
-        arrange(date_time) %>% 
-        filter(ID == i_ID,
-               station == i_station) %>%
-        ggplot(aes(sal, dep))+
-        geom_point()+
-        geom_path()+
-        scale_y_reverse()+
-        labs(y="Depth [m]", x="Tem [°C]")+
-        coord_cartesian(xlim = c(6.5,7.5), ylim = c(30,0))+
-        theme_bw()
-      
-      p_CT <- 
-        df %>%
-        arrange(date_time) %>% 
-        filter(ID == i_ID,
-               station == i_station) %>%
-        ggplot(aes(CT, dep))+
-        geom_point()+
-        geom_path()+
-        scale_y_reverse()+
-        labs(y="Depth [m]", x="CT* [µmol/kg]")+
-        coord_cartesian(xlim = c(1400,1700), ylim = c(30,0))+
-        theme_bw()
-      
-
-      print(
-            p_pCO2 + p_tem + p_sal + p_CT
-            )
-      
-      rm(p_pCO2, p_sal, p_tem, p_CT)
-
-      
-    }
-  }
-}
-
-dev.off()
-
-rm(i_ID, i_station)
-
-```
-
-
-
-
-
 # Open tasks / questions
 
 - Significance of changes in AT for calculated CT changes
 - Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)
-- Vergleich der Stationen
+- Compare stations
