@@ -536,10 +536,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree39b841d766f959c5a6b80198d430c662d28478fatargetblank39b841da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/39b841d766f959c5a6b80198d430c662d28478fa" target="_blank">39b841d</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree94e12d80cb05305d4f25d6ddc7adeccb008997cdtargetblank94e12d8a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/94e12d80cb05305d4f25d6ddc7adeccb008997cd" target="_blank">94e12d8</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree39b841d766f959c5a6b80198d430c662d28478fatargetblank39b841da" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree94e12d80cb05305d4f25d6ddc7adeccb008997cdtargetblank94e12d8a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -854,9 +854,9 @@ df %&gt;%
 </div>
 <div id="mean-profiles" class="section level2">
 <h2><span class="header-section-number">3.2</span> Mean profiles</h2>
-<p>Mean vertical profiles are displayed for each cruise day (ID). Note that:</p>
+<p>Mean vertical profiles were calculated for each cruise day (ID). Note that:</p>
 <ul>
-<li>ID represents the start date of the cruise, not the mean sampling date</li>
+<li>ID represents the start date of the cruise, not the exact mean sampling date</li>
 <li>Coastal station P14 was excluded so far from the analysis</li>
 </ul>
 <pre class="r"><code># df %&gt;% 
@@ -895,6 +895,7 @@ Mean vertical profiles per cruise day across all stations, except P14.
 </div>
 <div id="individual-profiles" class="section level2">
 <h2><span class="header-section-number">3.3</span> Individual profiles</h2>
+<p>C<sub>T</sub>, pCO<sub>2</sub>, S, and T profiles were plotted individually <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/profiles_individual.pdf" target="_blank">pdf here</a> and grouped by ID <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/profiles_by_ID.pdf" target="_blank">pdf here</a>. The later gives an idea of the differences between stations at one point in time.</p>
 <pre class="r"><code>pdf(file=here::here(&quot;output/Plots/CT_dynamics&quot;,
     &quot;profiles_individual.pdf&quot;), onefile = TRUE, width = 9, height = 5)
 
@@ -1012,11 +1013,10 @@ for(i_ID in unique(df$ID)){
 dev.off()
 
 rm(i_ID, df_long)</code></pre>
-<p>C<sub>T</sub>, pCO<sub>2</sub>, S, and T profiles were plotted individually <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/profiles_individual.pdf" target="_blank">pdf here</a> and grouped by ID <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/profiles_by_ID.pdf" target="_blank">pdf here</a>.</p>
 </div>
 <div id="profiles-of-incremental-changes" class="section level2">
 <h2><span class="header-section-number">3.4</span> Profiles of incremental changes</h2>
-<p>Changes of seawater parameters at each depth are calculated from one cruise day to next and divided by the number of days inbetween.</p>
+<p>Changes of seawater parameters at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.</p>
 <pre class="r"><code>mean_profiles_long &lt;- mean_profiles_long %&gt;%
     group_by(parameter, dep) %&gt;%
     arrange(date_time) %&gt;%
@@ -1040,7 +1040,7 @@ mean_profiles_long %&gt;%
 </div>
 <div id="profiles-of-cumulative-changes" class="section level2">
 <h2><span class="header-section-number">3.5</span> Profiles of cumulative changes</h2>
-<p>Cumulative changes of seawater parameters at each depth relative to the first cruise day on July 5.</p>
+<p>Cumulative changes of seawater parameters were calculated at each depth relative to the first cruise day on July 5.</p>
 <pre class="r"><code>mean_profiles_long %&gt;% 
   arrange(dep) %&gt;% 
   ggplot(aes(cum_value, dep, col=ID))+
@@ -1052,7 +1052,7 @@ mean_profiles_long %&gt;%
   facet_wrap(~parameter, scales = &quot;free_x&quot;)+
   labs(x=&quot;Cumulative change of value&quot;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/cumulative_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>Cumulative positive vs negative changes of seawater parameters at each depth relative to the first cruise day on July 5.</p>
+<p>Cumulative positive and negative changes of seawater parameters were calculated separately at each depth relative to the first cruise day on July 5.</p>
 <pre class="r"><code>mean_profiles_long &lt;- mean_profiles_long %&gt;% 
   mutate(sign = if_else(diff_value &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;% 
   group_by(parameter, dep, sign) %&gt;%
@@ -1078,6 +1078,7 @@ mean_profiles_long %&gt;%
 <h1><span class="header-section-number">4</span> Timeseries</h1>
 <div id="observed" class="section level2">
 <h2><span class="header-section-number">4.1</span> Observed</h2>
+<p>Timeseries of changes in seawater parameters were calculated for 5m depth intervals.</p>
 <pre class="r"><code>timeseries &lt;- mean_profiles_long %&gt;% 
   mutate(dep = cut(dep, seq(0,30,5))) %&gt;% 
   group_by(ID, dep, parameter)  %&gt;% 
@@ -1093,6 +1094,7 @@ timeseries %&gt;%
 </div>
 <div id="cumulative" class="section level2">
 <h2><span class="header-section-number">4.2</span> Cumulative</h2>
+<p>Cumulative C<sub>T</sub> changes were calculated for 5m depth intervals.</p>
 <pre class="r"><code>NCP &lt;- mean_profiles_long %&gt;% 
   filter(parameter == &quot;CT&quot;) %&gt;% 
   mutate(dep = cut(dep, seq(0,30,5))) %&gt;% 
@@ -1165,7 +1167,7 @@ mean_profiles_long %&gt;%
 <ul>
 <li>Significance of changes in AT for calculated CT changes</li>
 <li>Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)</li>
-<li>Compare stations</li>
+<li>Use exact mean date instead of ID throughout</li>
 </ul>
 <br>
 <p>
