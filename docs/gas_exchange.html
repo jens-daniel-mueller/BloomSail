@@ -9,9 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Jens Daniel Müller" />
 
 
-<title>Home</title>
+<title>Gas exchange</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,6 +20,9 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
@@ -254,6 +258,75 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
 
 </head>
 
@@ -261,6 +334,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -338,7 +421,9 @@ div.section {
 
 
 
-<h1 class="title toc-ignore">Home</h1>
+<h1 class="title toc-ignore">Gas exchange</h1>
+<h4 class="author">Jens Daniel Müller</h4>
+<h4 class="date">16 March, 2020</h4>
 
 </div>
 
@@ -490,10 +575,172 @@ There are no past versions. Publish this analysis with <code>wflow_publish()</co
 </div>
 </div>
 </div>
-<p>On this website we present our ongoing ambition to quantify net primary production during cyanobacteria blooms in the Baltic Sea through vertically resolved pCO<sub>2</sub> measurements.</p>
-<p>Please navigate trough the navbar on top to take a look at the various chapters of this project.</p>
-<p>The links in the upper right corner bring you to the source code of this project and back to Jens’ main homepage.</p>
-<p>Dr. Jens Daniel Müller, 2020</p>
+<pre class="r"><code>library(tidyverse)
+#library(patchwork)
+library(seacarb)
+library(zoo)
+#library(metR)
+#library(scico)
+# library(broom)
+library(lubridate)
+# library(tibbletime)
+library(marelac)
+library(seacarb)</code></pre>
+<div id="sensor-data" class="section level1">
+<h1><span class="header-section-number">1</span> Sensor data</h1>
+<pre class="r"><code>water &lt;-
+  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_CT.csv&quot;))
+
+water &lt;- water %&gt;% 
+  filter(dep &lt; 3) %&gt;% 
+  select(date_time, ID, tem, pCO2_water = pCO2)
+
+water_ID &lt;- water %&gt;% 
+  group_by(ID) %&gt;% 
+  summarise_all(mean) %&gt;% 
+  ungroup() %&gt;% 
+  select(-ID)
+
+water_ID %&gt;% 
+  ggplot(aes(date_time, pCO2_water))+
+  geom_point(data=water, aes(date_time, pCO2_water), col=&quot;grey&quot;)+
+  geom_path()+
+  geom_point()</code></pre>
+<p><img src="figure/gas_exchange.Rmd/read_Tina-V_Sensor_data-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>start &lt;- min(water$date_time)
+end   &lt;- max(water$date_time)</code></pre>
+</div>
+<div id="wind-data" class="section level1">
+<h1><span class="header-section-number">2</span> Wind data</h1>
+<p>Metrological data were recorded on the flux tower located on Ostergarnsholm island.</p>
+<pre class="r"><code>air &lt;- read_delim(here::here(&quot;Data/Ostergarnsholm/Tower&quot;, &quot;Oes_Jens_atm_water_June_to_August_2018.csv&quot;),
+                 delim = &quot;;&quot;               )
+
+air &lt;- air %&gt;%
+  mutate(date_time = ymd_hms( paste(paste(year, month, day, sep = &quot;/&quot;),
+                                          paste(hour, min, sec, sep = &quot;:&quot;)))) %&gt;% 
+  select(&quot;date_time&quot;,
+         &quot;CO2 12m [ppm]&quot;,
+         &quot;w_c [ppm m/s]&quot;,
+         &quot;WS 12m [m/s]&quot;,
+         &quot;WD 12m [degrees]&quot;,
+         &quot;T 12m [degrees C]&quot;,
+         &quot;RIS [W/m^2]&quot;
+         ) %&gt;% 
+  filter(date_time &gt; start,
+         date_time &lt; end)
+
+rm(end, start)
+
+air &lt;- air %&gt;% 
+  mutate(freq = &quot;30 min&quot;) %&gt;% 
+  select(date_time, freq, pCO2_air = &quot;CO2 12m [ppm]&quot;, wind = &quot;WS 12m [m/s]&quot;)</code></pre>
+<pre class="r"><code>df &lt;- full_join(air, water_ID) %&gt;% 
+  arrange(date_time)
+
+df &lt;- df %&gt;% 
+  mutate(pCO2_water = na.approx(pCO2_water, rule = 2),
+         tem = na.approx(tem, rule = 2),
+         wind = na.approx(wind, rule = 2)) %&gt;% 
+  filter(!is.na(pCO2_air))
+
+df %&gt;% 
+  ggplot(aes(date_time, pCO2_water))+
+  geom_point(data=water, aes(date_time, pCO2_water, col=&quot;measured&quot;))+
+  geom_path()+
+  geom_point()+
+  geom_point(data = df, aes(date_time, pCO2_water, col=&quot;interpol&quot;))</code></pre>
+<p><img src="figure/gas_exchange.Rmd/join_interpolate_wind_water_data-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>df_daily &lt;- df %&gt;% 
+  mutate(day = yday(date_time)) %&gt;% 
+  group_by(day) %&gt;% 
+  summarise_all(mean, na.rm = TRUE) %&gt;% 
+  ungroup() %&gt;% 
+  select(-day) %&gt;% 
+  mutate(freq = &quot;daily&quot;)
+
+df &lt;- bind_rows(df, df_daily)
+
+
+rm(air, water_ID, water, df_daily)</code></pre>
+<div id="time-series-plot" class="section level2">
+<h2><span class="header-section-number">2.1</span> Time series plot</h2>
+<pre class="r"><code>df_long &lt;- df %&gt;% 
+  gather(&quot;parameter&quot;, &quot;value&quot;, 3:6)
+
+df_long %&gt;% 
+  ggplot(aes(date_time, value, col=freq))+
+  geom_line()+
+  facet_grid(parameter~., scales = &quot;free_y&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;, direction = -1)+
+  theme_bw()</code></pre>
+<p><img src="figure/gas_exchange.Rmd/plot_wind_Ostergarn_tower-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="gas-exchange" class="section level1">
+<h1><span class="header-section-number">3</span> Gas exchange</h1>
+<p>F = k * K0 * dpCO2 = k * dCO2</p>
+<p>Units used here are:</p>
+<ul>
+<li>pCO<sub>2</sub>: µatm</li>
+<li>K0: mol atm-1 kg-1</li>
+<li><p>CO<sub>2</sub>: µmol kg-1</p></li>
+<li><p>wind speed U: m s-1</p></li>
+<li>gas transfer velocities k: cm hr-1 (= 60<em>60</em>100 m s-1)</li>
+<li><p>Air sea CO<sub>2</sub> flux F: mol m–2 yr–1 (= 365 * mol m–2 d–1)</p></li>
+<li><p>Coefficient for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2</p></li>
+</ul>
+<p>W14_simplyfied: F = 7.7 * 10–4 * U2 * dpCO2</p>
+<pre class="r"><code>Sc_W14 &lt;- function(tem) {
+  2116.8 - 136.25 * tem + 4.7353 * tem^2 - 0.092307 * tem^3 + 0.0007555 * tem^4
+}
+
+Sc_W14(20)</code></pre>
+<pre><code>[1] 668.344</code></pre>
+<pre class="r"><code>df &lt;- df %&gt;% 
+  mutate(dpCO2 = pCO2_water - pCO2_air,
+         dCO2  = dpCO2 * K0(S=7, T=tem),
+         k_W92 = gas_transfer(t = tem, u10 = wind, species = &quot;CO2&quot;, method = &quot;Wanninkhof1&quot;)* 60^2 * 100,
+         k_W14 = 0.251 * wind^2 * (Sc_W14(tem)/660)^(-0.5),
+         #F_W14_simple = 7.7 * 10^(–4) wind^2,
+         k_SM18 = 0.24 * wind^2 * ((1943-119.6*tem + 3.488*tem^2 - 0.0417*tem^3) / 660)^(-0.5)) %&gt;% 
+  pivot_longer(9:11, names_to = &quot;k_para&quot;, values_to = &quot;k_value&quot;)
+
+# calculate flux F [mol m–2 yr–1]
+
+df &lt;- df %&gt;% 
+  mutate(flux = k_value*dCO2) 
+
+
+df %&gt;% 
+  ggplot(aes(date_time, flux, col=k_para))+
+  geom_line()+
+  labs(y=&quot;F (mol m-2 yr-1)&quot;)+
+  facet_wrap(~freq)</code></pre>
+<p><img src="figure/gas_exchange.Rmd/gas_exchange_calc_daily-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># scale flux to time interval
+
+df &lt;- df %&gt;% 
+  mutate(scale = if_else(freq == &quot;daily&quot;, 365, 365*24*2)) %&gt;% 
+  mutate(flux = flux / scale) %&gt;% 
+  group_by(freq, k_para) %&gt;% 
+  arrange(date_time) %&gt;% 
+  mutate(flux_cum = cumsum(flux)) %&gt;% 
+  ungroup()
+
+df %&gt;% 
+  ggplot(aes(date_time, flux_cum, col=k_para))+
+  geom_line()+
+  labs(y=&quot;F (mol m-2)&quot;)+
+  facet_wrap(~freq)</code></pre>
+<p><img src="figure/gas_exchange.Rmd/gas_exchange_calc_daily-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="open-tasks-questions" class="section level1">
+<h1><span class="header-section-number">4</span> Open tasks / questions</h1>
+<ul>
+<li>Calculate mean wind direction correctly for northerly winds</li>
+<li>Conversion of CO2 concentration from mol kg-1 to mol m-3 required?</li>
+</ul>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -518,13 +765,30 @@ locale:
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
+other attached packages:
+ [1] marelac_2.1.9   shape_1.4.4     lubridate_1.7.4 zoo_1.8-6      
+ [5] seacarb_3.2.12  oce_1.2-0       gsw_1.0-5       testthat_2.3.1 
+ [9] forcats_0.4.0   stringr_1.4.0   dplyr_0.8.3     purrr_0.3.3    
+[13] readr_1.3.1     tidyr_1.0.0     tibble_2.1.3    ggplot2_3.3.0  
+[17] tidyverse_1.3.0
+
 loaded via a namespace (and not attached):
- [1] workflowr_1.6.0 Rcpp_1.0.2      rprojroot_1.3-2 digest_0.6.22  
- [5] later_1.0.0     R6_2.4.0        backports_1.1.5 git2r_0.26.1   
- [9] magrittr_1.5    evaluate_0.14   stringi_1.4.3   rlang_0.4.5    
-[13] fs_1.3.1        promises_1.1.0  rmarkdown_2.0   tools_3.5.0    
-[17] stringr_1.4.0   glue_1.3.1      httpuv_1.5.2    xfun_0.10      
-[21] yaml_2.2.0      compiler_3.5.0  htmltools_0.4.0 knitr_1.26     </code></pre>
+ [1] Rcpp_1.0.2         here_0.1           lattice_0.20-35    assertthat_0.2.1  
+ [5] zeallot_0.1.0      rprojroot_1.3-2    digest_0.6.22      R6_2.4.0          
+ [9] cellranger_1.1.0   backports_1.1.5    reprex_0.3.0       evaluate_0.14     
+[13] httr_1.4.1         pillar_1.4.2       rlang_0.4.5        readxl_1.3.1      
+[17] rstudioapi_0.10    rmarkdown_2.0      labeling_0.3       munsell_0.5.0     
+[21] broom_0.5.3        compiler_3.5.0     httpuv_1.5.2       modelr_0.1.5      
+[25] xfun_0.10          pkgconfig_2.0.3    htmltools_0.4.0    tidyselect_0.2.5  
+[29] workflowr_1.6.0    crayon_1.3.4       dbplyr_1.4.2       withr_2.1.2       
+[33] later_1.0.0        grid_3.5.0         nlme_3.1-137       jsonlite_1.6      
+[37] gtable_0.3.0       lifecycle_0.1.0    DBI_1.0.0          git2r_0.26.1      
+[41] magrittr_1.5       scales_1.0.0       cli_1.1.0          stringi_1.4.3     
+[45] fs_1.3.1           promises_1.1.0     xml2_1.2.2         ellipsis_0.3.0    
+[49] generics_0.0.2     vctrs_0.2.0        RColorBrewer_1.1-2 tools_3.5.0       
+[53] glue_1.3.1         hms_0.5.2          yaml_2.2.0         colorspace_1.4-1  
+[57] rvest_0.3.5        knitr_1.26         haven_2.2.0       </code></pre>
+</div>
 </div>
 
 
@@ -541,6 +805,8 @@ footer is added to webpages before the MathJax javascript. -->
 </script>
 
 
+</div>
+</div>
 
 </div>
 
@@ -578,6 +844,32 @@ $(document).ready(function () {
 });
 </script>
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
