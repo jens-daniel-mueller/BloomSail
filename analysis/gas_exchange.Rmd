@@ -34,6 +34,8 @@ library(seacarb)
 
 # Sensor data
 
+The cruise mean pCO~2~ recorded in profiling-mode (stations only) and depths < 3m was used for gas exchange calcualtions.
+
 ```{r read_Tina-V_Sensor_data}
 
 water <-
@@ -106,13 +108,6 @@ df <- df %>%
          wind = na.approx(wind, rule = 2)) %>% 
   filter(!is.na(pCO2_air))
 
-df %>% 
-  ggplot(aes(date_time, pCO2_water))+
-  geom_point(data=water, aes(date_time, pCO2_water, col="measured"))+
-  geom_path()+
-  geom_point()+
-  geom_point(data = df, aes(date_time, pCO2_water, col="interpol"))
-
 df_daily <- df %>% 
   mutate(day = yday(date_time)) %>% 
   group_by(day) %>% 
@@ -147,20 +142,26 @@ df_long %>%
 
 # Gas exchange
 
-F = k * K0 * dpCO2 = k * dCO2
+F = k * dCO2
+
+with
+
+dCO2 = K0 * dpCO2 and 
+
+k = coeff * U^2 * (660/Sc)^0.5
 
 Units used here are:
 
-- pCO~2~: µatm
+- dpCO~2~: µatm
 - K0: mol atm-1 kg-1
-- CO~2~: µmol kg-1
+- dCO~2~: µmol kg-1
 
 - wind speed U: m s-1
 
 - gas transfer velocities k: cm hr-1 (= 60*60*100 m s-1)
-- Air sea CO~2~ flux F: mol m–2 yr–1 (= 365 * mol m–2 d–1)
+- air sea CO~2~ flux F: mol m–2 yr–1 (= 365 * mol m–2 d–1)
 
-- Coefficient for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2 
+- coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2 
 
 W14_simplyfied: F = 7.7 * 10–4 * U2 * dpCO2
 
@@ -176,29 +177,29 @@ Sc_W14(20)
 
 df <- df %>% 
   mutate(dpCO2 = pCO2_water - pCO2_air,
-         dCO2  = dpCO2 * K0(S=7, T=tem),
+         dCO2  = dpCO2 * K0(S=6.92, T=tem),
          k_W92 = gas_transfer(t = tem, u10 = wind, species = "CO2", method = "Wanninkhof1")* 60^2 * 100,
          k_W14 = 0.251 * wind^2 * (Sc_W14(tem)/660)^(-0.5),
          #F_W14_simple = 7.7 * 10^(–4) wind^2,
          k_SM18 = 0.24 * wind^2 * ((1943-119.6*tem + 3.488*tem^2 - 0.0417*tem^3) / 660)^(-0.5)) %>% 
   pivot_longer(9:11, names_to = "k_para", values_to = "k_value")
 
-# calculate flux F [mol m–2 yr–1]
+# calculate flux F [mol m–2 d–1]
 
 df <- df %>% 
-  mutate(flux = k_value*dCO2) 
+  mutate(flux = k_value*dCO2/365) 
 
 
 df %>% 
   ggplot(aes(date_time, flux, col=k_para))+
   geom_line()+
-  labs(y="F (mol m-2 yr-1)")+
+  labs(y="F (mol m-2 d-1)")+
   facet_wrap(~freq)
 
 # scale flux to time interval
 
 df <- df %>% 
-  mutate(scale = if_else(freq == "daily", 365, 365*24*2)) %>% 
+  mutate(scale = if_else(freq == "daily", 1, 24*2)) %>% 
   mutate(flux = flux / scale) %>% 
   group_by(freq, k_para) %>% 
   arrange(date_time) %>% 
