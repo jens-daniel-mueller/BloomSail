@@ -539,10 +539,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreecab4241d84d9e7120cbe18704f6edd200c009d86targetblankcab4241a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/cab4241d84d9e7120cbe18704f6edd200c009d86" target="_blank">cab4241</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9d13f18191e027c504d7f0864a7b7f5715c72baatargetblank9d13f18a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/9d13f18191e027c504d7f0864a7b7f5715c72baa" target="_blank">9d13f18</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreecab4241d84d9e7120cbe18704f6edd200c009d86targetblankcab4241a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9d13f18191e027c504d7f0864a7b7f5715c72baatargetblank9d13f18a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -588,6 +588,7 @@ library(marelac)
 library(seacarb)</code></pre>
 <div id="sensor-data" class="section level1">
 <h1><span class="header-section-number">1</span> Sensor data</h1>
+<p>The cruise mean pCO<sub>2</sub> recorded in profiling-mode (stations only) and depths &lt; 3m was used for gas exchange calcualtions.</p>
 <pre class="r"><code>water &lt;-
   read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_CT.csv&quot;))
 
@@ -644,14 +645,7 @@ df &lt;- df %&gt;%
          wind = na.approx(wind, rule = 2)) %&gt;% 
   filter(!is.na(pCO2_air))
 
-df %&gt;% 
-  ggplot(aes(date_time, pCO2_water))+
-  geom_point(data=water, aes(date_time, pCO2_water, col=&quot;measured&quot;))+
-  geom_path()+
-  geom_point()+
-  geom_point(data = df, aes(date_time, pCO2_water, col=&quot;interpol&quot;))</code></pre>
-<p><img src="figure/gas_exchange.Rmd/join_interpolate_wind_water_data-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>df_daily &lt;- df %&gt;% 
+df_daily &lt;- df %&gt;% 
   mutate(day = yday(date_time)) %&gt;% 
   group_by(day) %&gt;% 
   summarise_all(mean, na.rm = TRUE) %&gt;% 
@@ -679,16 +673,19 @@ df_long %&gt;%
 </div>
 <div id="gas-exchange" class="section level1">
 <h1><span class="header-section-number">3</span> Gas exchange</h1>
-<p>F = k * K0 * dpCO2 = k * dCO2</p>
+<p>F = k * dCO2</p>
+<p>with</p>
+<p>dCO2 = K0 * dpCO2 and</p>
+<p>k = coeff * U^2 * (660/Sc)^0.5</p>
 <p>Units used here are:</p>
 <ul>
-<li>pCO<sub>2</sub>: µatm</li>
+<li>dpCO<sub>2</sub>: µatm</li>
 <li>K0: mol atm-1 kg-1</li>
-<li><p>CO<sub>2</sub>: µmol kg-1</p></li>
+<li><p>dCO<sub>2</sub>: µmol kg-1</p></li>
 <li><p>wind speed U: m s-1</p></li>
 <li>gas transfer velocities k: cm hr-1 (= 60<em>60</em>100 m s-1)</li>
-<li><p>Air sea CO<sub>2</sub> flux F: mol m–2 yr–1 (= 365 * mol m–2 d–1)</p></li>
-<li><p>Coefficient for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2</p></li>
+<li><p>air sea CO<sub>2</sub> flux F: mol m–2 yr–1 (= 365 * mol m–2 d–1)</p></li>
+<li><p>coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2</p></li>
 </ul>
 <p>W14_simplyfied: F = 7.7 * 10–4 * U2 * dpCO2</p>
 <pre class="r"><code>Sc_W14 &lt;- function(tem) {
@@ -699,29 +696,29 @@ Sc_W14(20)</code></pre>
 <pre><code>[1] 668.344</code></pre>
 <pre class="r"><code>df &lt;- df %&gt;% 
   mutate(dpCO2 = pCO2_water - pCO2_air,
-         dCO2  = dpCO2 * K0(S=7, T=tem),
+         dCO2  = dpCO2 * K0(S=6.92, T=tem),
          k_W92 = gas_transfer(t = tem, u10 = wind, species = &quot;CO2&quot;, method = &quot;Wanninkhof1&quot;)* 60^2 * 100,
          k_W14 = 0.251 * wind^2 * (Sc_W14(tem)/660)^(-0.5),
          #F_W14_simple = 7.7 * 10^(–4) wind^2,
          k_SM18 = 0.24 * wind^2 * ((1943-119.6*tem + 3.488*tem^2 - 0.0417*tem^3) / 660)^(-0.5)) %&gt;% 
   pivot_longer(9:11, names_to = &quot;k_para&quot;, values_to = &quot;k_value&quot;)
 
-# calculate flux F [mol m–2 yr–1]
+# calculate flux F [mol m–2 d–1]
 
 df &lt;- df %&gt;% 
-  mutate(flux = k_value*dCO2) 
+  mutate(flux = k_value*dCO2/365) 
 
 
 df %&gt;% 
   ggplot(aes(date_time, flux, col=k_para))+
   geom_line()+
-  labs(y=&quot;F (mol m-2 yr-1)&quot;)+
+  labs(y=&quot;F (mol m-2 d-1)&quot;)+
   facet_wrap(~freq)</code></pre>
 <p><img src="figure/gas_exchange.Rmd/gas_exchange_calc_daily-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code># scale flux to time interval
 
 df &lt;- df %&gt;% 
-  mutate(scale = if_else(freq == &quot;daily&quot;, 365, 365*24*2)) %&gt;% 
+  mutate(scale = if_else(freq == &quot;daily&quot;, 1, 24*2)) %&gt;% 
   mutate(flux = flux / scale) %&gt;% 
   group_by(freq, k_para) %&gt;% 
   arrange(date_time) %&gt;% 
