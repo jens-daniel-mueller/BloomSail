@@ -13,6 +13,8 @@ navbar:
     href: response_time.html
   - text: CT dynamics
     href: CT_dynamics.html
+  - text: Gas exchange
+    href: gas_exchange.html
   - text: License
     href: license.html
   right:

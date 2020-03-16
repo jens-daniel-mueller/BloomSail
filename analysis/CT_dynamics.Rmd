@@ -107,6 +107,7 @@ df <- df %>%
   filter(phase == "down") %>% 
   select(-phase)
 
+df_highres <- df
 
 # grid observation to 1m depth intervals
 df <- df %>% 
@@ -385,8 +386,12 @@ for(i_ID in unique(df$ID)){
         arrange(date_time) %>% 
         filter(ID == i_ID,
                station == i_station) %>%
-        ggplot(aes(pCO2, dep))+
-        geom_point(aes(pCO2_raw, dep), col="lightgrey")+
+        ggplot(aes(pCO2, dep, col="grid_RT"))+
+        geom_point(data = df_highres %>% arrange(date_time) %>% filter(ID == i_ID, station == i_station),
+                   aes(pCO2_raw, dep, col="raw"))+
+        geom_point(data = df_highres %>% arrange(date_time) %>% filter(ID == i_ID, station == i_station),
+                   aes(pCO2, dep, col="raw_RT"))+
+        geom_point(aes(pCO2_raw, dep, col="grid"))+
         geom_point()+
         geom_path()+
         scale_y_reverse()+
@@ -592,9 +597,7 @@ timeseries %>%
 
 ```
 
-## Cumulative
-
-Cumulative C~T~ changes were calculated for 5m depth intervals.
+## Incremental changes
 
 ```{r integrated_NCP}
 
@@ -631,6 +634,31 @@ NCP <- NCP %>%
   ungroup() %>% 
   mutate(dCT_cum = if_else(is.na(dCT_cum), 0, dCT_cum))
 
+
+```
+
+```{r plot_integrated_NCP_timeseries}
+
+NCP %>% 
+  ggplot(aes(lubridate::ymd(ID), dCT, fill=dep))+
+  geom_hline(yintercept = 0)+
+  geom_bar(stat="identity")+
+  scale_fill_viridis_d()+
+  scale_color_viridis_d()+
+  scale_y_continuous(breaks = seq(-100, 100, 1))+
+  facet_grid(rev(sign)~., scales = "free_y", space = "free_y")+
+  theme(strip.background = element_blank(),
+        strip.text = element_blank())+
+  labs(y="integrated, directional CT changes [mol/m2]", x="date")
+
+```
+
+## Cumulative changes
+
+Cumulative C~T~ changes were calculated for 5m depth intervals.
+
+```{r plot_integrated_NCP_timeseries_cumulative}
+
 NCP %>% 
   ggplot(aes(lubridate::ymd(ID), dCT_cum, fill=dep))+
   geom_hline(yintercept = 0)+
@@ -645,6 +673,9 @@ NCP %>%
 
 
 ```
+
+
+
 
 
 ```{r plot_hovmoeller, eval=FALSE}
