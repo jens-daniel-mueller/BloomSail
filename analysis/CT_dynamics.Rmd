@@ -599,6 +599,8 @@ timeseries %>%
 
 ## Incremental changes
 
+Total incremental C~T~ changes inbetween cruise dates were calculated for 5m depth intervals.
+
 ```{r integrated_NCP}
 
 NCP <- mean_profiles_long %>% 
