@@ -140,7 +140,9 @@ df_long %>%
 
 ```
 
-# Gas exchange
+# Air-sea CO~2~ flux
+
+## Calculation
 
 F = k * dCO2
 
@@ -166,8 +168,7 @@ Units used here are:
 W14_simplyfied: F = 7.7 * 10–4 * U2 * dpCO2
 
 
-
-```{r gas_exchange_calc_daily}
+```{r gas_exchange_calc}
 
 Sc_W14 <- function(tem) {
   2116.8 - 136.25 * tem + 4.7353 * tem^2 - 0.092307 * tem^3 + 0.0007555 * tem^4
@@ -189,13 +190,6 @@ df <- df %>%
 df <- df %>% 
   mutate(flux = k_value*dCO2/365) 
 
-
-df %>% 
-  ggplot(aes(date_time, flux, col=k_para))+
-  geom_line()+
-  labs(y="F (mol m-2 d-1)")+
-  facet_wrap(~freq)
-
 # scale flux to time interval
 
 df <- df %>% 
@@ -206,14 +200,25 @@ df <- df %>%
   mutate(flux_cum = cumsum(flux)) %>% 
   ungroup()
 
+
+```
+
+Timeseries 
+
+```{r plot_daily_fluxes}
+
+df %>% 
+  ggplot(aes(date_time, flux, col=k_para))+
+  geom_line()+
+  labs(y="F (mol m-2 d-1)")+
+  facet_wrap(~freq)
+
 df %>% 
   ggplot(aes(date_time, flux_cum, col=k_para))+
   geom_line()+
   labs(y="F (mol m-2)")+
   facet_wrap(~freq)
-
 ```
-
 
 
 # Open tasks / questions
