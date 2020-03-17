@@ -423,7 +423,7 @@ div.section {
 
 <h1 class="title toc-ignore">CT dynamics</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">16 March, 2020</h4>
+<h4 class="date">17 March, 2020</h4>
 
 </div>
 
@@ -448,7 +448,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-03-16
+<strong>Last updated:</strong> 2020-03-17
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -539,10 +539,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreecab4241d84d9e7120cbe18704f6edd200c009d86targetblankcab4241a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/cab4241d84d9e7120cbe18704f6edd200c009d86" target="_blank">cab4241</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree7c1033668ce8f47beb2e66f616b27e27b660a9d5targetblank7c10336a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/7c1033668ce8f47beb2e66f616b27e27b660a9d5" target="_blank">7c10336</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreecab4241d84d9e7120cbe18704f6edd200c009d86targetblankcab4241a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree7c1033668ce8f47beb2e66f616b27e27b660a9d5targetblank7c10336a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -592,6 +592,8 @@ library(scico)
 <li>Selecting only continous downcast periods</li>
 <li>Gridding profiles to 1m depth intervals</li>
 <li>Discarding profiles with 3 or more observation missing within upper 20m (except shallow coastal station at Ostergarnsholm “P14”)</li>
+<li>assigning mean date_time value to all profiles belonging to one cruise</li>
+<li>discarding second (repeated) visit of coastal station P14 during each cruise</li>
 </ul>
 <div id="pco2-profile-overview" class="section level2">
 <h2><span class="header-section-number">1.1</span> pCO<sub>2</sub> profile overview</h2>
@@ -659,7 +661,9 @@ df &lt;- df %&gt;%
   filter(phase == &quot;down&quot;) %&gt;% 
   select(-phase)
 
-df_highres &lt;- df
+
+
+#df_highres &lt;- df
 
 # grid observation to 1m depth intervals
 df &lt;- df %&gt;% 
@@ -700,7 +704,19 @@ Overview pCO2 profiles at stations (P01-P14) and cruise dates (ID)
 </div>
 <pre class="r"><code>df &lt;- df %&gt;%
   filter(select == &quot;in&quot;) %&gt;%
-  select(-select)</code></pre>
+  select(-select)
+
+# assign mean date_time stamp
+
+cruise_dates &lt;- df %&gt;% 
+  filter(station != &quot;P14&quot;) %&gt;% 
+  group_by(ID) %&gt;% 
+  summarise(date_time_ID = mean(date_time)) %&gt;% 
+  ungroup()
+
+
+# inner_join remove P14 observations lacking date_time_ID 
+df &lt;- inner_join(cruise_dates, df)</code></pre>
 </div>
 <div id="station-map" class="section level2">
 <h2><span class="header-section-number">1.2</span> Station map</h2>
@@ -726,12 +742,15 @@ Location of stations sampled between the east coast of Gotland and Gotland deep.
 <h2><span class="header-section-number">1.3</span> Data coverage</h2>
 <pre class="r"><code>cover &lt;- df %&gt;% 
   group_by(ID, station) %&gt;% 
-  summarise(date = mean(date_time)) %&gt;% 
+  summarise(date = mean(date_time),
+            date_time_ID = mean(date_time_ID)) %&gt;% 
   ungroup()
 
 cover %&gt;% 
   ggplot(aes(date, station, fill=ID))+
+  geom_vline(aes(xintercept = date_time_ID, col=ID))+
   geom_point(shape=21)+
+  scale_color_viridis_d()+
   scale_fill_viridis_d()</code></pre>
 <div class="figure" style="text-align: center">
 <img src="figure/CT_dynamics.Rmd/data_coverage-1.png" alt="Spatio-temporal data coverage, indicated as station visits over time. ID (color) refers to the starting date of the cruise, except for P14, which was visited twice during each cruise." width="672" />
@@ -752,7 +771,9 @@ Spatio-temporal data coverage, indicated as station visits over time. ID (color)
 CO2 &lt;- CO2 %&gt;% 
   filter(station %in% c(&quot;P07&quot;, &quot;P10&quot;)) %&gt;% 
   select(-pH_Mosley) %&gt;% 
-  mutate(CT_AT_ratio = CT/AT)</code></pre>
+  mutate(CT_AT_ratio = CT/AT)
+
+CO2 &lt;- inner_join(CO2, cruise_dates)</code></pre>
 <div id="vertical-profiles" class="section level2">
 <h2><span class="header-section-number">2.1</span> Vertical profiles</h2>
 <pre class="r"><code>CO2_long &lt;- CO2 %&gt;% 
@@ -773,20 +794,21 @@ CO2_long %&gt;%
 <h2><span class="header-section-number">2.2</span> Surface time series</h2>
 <pre class="r"><code>CO2_ts &lt;- CO2_long %&gt;% 
   filter(dep&lt;10) %&gt;% 
-  group_by(ID, parameter, station) %&gt;% 
+  group_by(ID, date_time_ID, parameter, station) %&gt;% 
   summarise(value = mean(value, na.rm = TRUE)) %&gt;% 
   ungroup()
 
 rm(CO2_long)
 
 CO2_ts %&gt;% 
-  ggplot(aes(lubridate::ymd(ID), value, col=station))+
+  ggplot(aes(date_time_ID, value, col=station))+
+  #geom_point(aes(lubridate::ymd(ID), value, col=station))+
   geom_point()+
   geom_path()+
   scale_fill_viridis_d()+
   scale_color_brewer(palette = &quot;Set1&quot;)+
   facet_grid(parameter~., scales = &quot;free_y&quot;)+
-  labs(x=&quot;Transect starting date (from ID)&quot;)</code></pre>
+  labs(x=&quot;Mean transect date&quot;)</code></pre>
 <div class="figure" style="text-align: center">
 <img src="figure/CT_dynamics.Rmd/plot_bottle_CO2_surface_timeseries-1.png" alt="Time series of bottle data. Shown are mean values of samples collected at water depths &lt; 10m (usually at 0 and 5 m)." width="672" />
 <p class="caption">
@@ -805,7 +827,7 @@ CO2_ts %&gt;%
   geom_path()+
   scale_fill_viridis_d()+
   scale_color_brewer(palette = &quot;Set1&quot;)+
-  labs(x=&quot;Transect starting date (from ID)&quot;, y=&quot;CT-AT-ratio * mean AT&quot;)</code></pre>
+  labs(x=&quot;Mean transect date&quot;, y=&quot;CT-AT-ratio * mean AT&quot;)</code></pre>
 <div class="figure" style="text-align: center">
 <img src="figure/CT_dynamics.Rmd/plot_bottle_CT_surface_timeseries-1.png" alt="CT timeseries, derived by multiplying the CT-AT-ratio with mean AT" width="672" />
 <p class="caption">
@@ -822,7 +844,7 @@ CT timeseries, derived by multiplying the CT-AT-ratio with mean AT
   pull()
 
 AT_mean</code></pre>
-<pre><code>[1] 1716.205</code></pre>
+<pre><code>[1] 1717.08</code></pre>
 <p>Likewise, the mean salinity amounts to:</p>
 <pre class="r"><code>sal_mean &lt;- CO2 %&gt;% 
   filter(dep &lt;= 20) %&gt;% 
@@ -830,7 +852,7 @@ AT_mean</code></pre>
   pull()
 
 sal_mean</code></pre>
-<pre><code>[1] 6.920357</code></pre>
+<pre><code>[1] 6.894127</code></pre>
 </div>
 </div>
 <div id="ct-profiles" class="section level1">
@@ -872,14 +894,14 @@ df %&gt;%
 #   facet_grid(station~ID)
 
 mean_profiles &lt;- df %&gt;% 
-  filter(station != &quot;P14&quot;, dep &lt; 25) %&gt;% 
+  filter(dep &lt; 25) %&gt;% 
   select(-c(station,lat, lon, pCO2_raw)) %&gt;% 
-  group_by(ID, dep) %&gt;% 
+  group_by(ID, date_time_ID, dep) %&gt;% 
   summarise_all(list(mean), na.rm=TRUE) %&gt;% 
   ungroup()
 
 mean_profiles_long &lt;- mean_profiles %&gt;% 
-  pivot_longer(4:7, names_to = &quot;parameter&quot;, values_to = &quot;value&quot;)
+  pivot_longer(5:8, names_to = &quot;parameter&quot;, values_to = &quot;value&quot;)
   
 mean_profiles_long %&gt;% 
   ggplot(aes(value, dep, col=ID))+
@@ -1032,6 +1054,7 @@ rm(i_ID, df_long)</code></pre>
            cum_value = cumsum(diff_value)) %&gt;% 
   ungroup()
 
+
 mean_profiles_long %&gt;% 
   arrange(dep) %&gt;% 
   ggplot(aes(diff_value_daily, dep, col=ID))+
@@ -1087,80 +1110,77 @@ mean_profiles_long %&gt;%
 <p>Timeseries of changes in seawater parameters were calculated for 5m depth intervals.</p>
 <pre class="r"><code>timeseries &lt;- mean_profiles_long %&gt;% 
   mutate(dep = cut(dep, seq(0,30,5))) %&gt;% 
-  group_by(ID, dep, parameter)  %&gt;% 
+  group_by(ID, date_time_ID, dep, parameter)  %&gt;% 
   summarise_all(list(mean), na.rm=TRUE) 
 
 timeseries %&gt;% 
-  ggplot(aes(date_time, value, col=as.factor(dep)))+
+  ggplot(aes(date_time_ID, value, col=as.factor(dep)))+
   geom_path()+
   geom_point()+
   scale_color_viridis_d(name=&quot;Depth [m]&quot;)+
   facet_wrap(~parameter, scales = &quot;free_y&quot;, ncol=1)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/observed_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="incremental-changes" class="section level2">
-<h2><span class="header-section-number">4.2</span> Incremental changes</h2>
-<p>Total incremental C<sub>T</sub> changes inbetween cruise dates were calculated for 5m depth intervals.</p>
+<div id="incremental-and-cumulative" class="section level2">
+<h2><span class="header-section-number">4.2</span> Incremental and cumulative</h2>
+<p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated for 5m depth intervals.</p>
 <pre class="r"><code>NCP &lt;- mean_profiles_long %&gt;% 
   filter(parameter == &quot;CT&quot;) %&gt;% 
   mutate(dep = cut(dep, seq(0,30,5))) %&gt;% 
-  group_by(ID, dep, sign) %&gt;% 
-  summarise(date_time = mean(date_time),
-            dCT = sum(cum_value_sign)/1000) %&gt;% 
+  group_by(ID, date_time_ID, dep, sign) %&gt;% 
+  summarise(dCT = sum(diff_value)/1000) %&gt;% 
   ungroup()
 
 NCP &lt;- NCP %&gt;% 
   group_by(sign, dep) %&gt;% 
-  arrange(date_time) %&gt;%
+  arrange(date_time_ID) %&gt;%
   mutate(dCT_cum = cumsum(dCT)) %&gt;% 
   ungroup()
 
 
 NCP_grid &lt;- expand_grid(
-  unique(NCP$ID),
+  unique(NCP$date_time_ID),
   unique(NCP$dep),
   unique(NCP$sign)
 )
 
 NCP_grid &lt;- NCP_grid %&gt;% 
-  set_names(c(&quot;ID&quot;, &quot;dep&quot;, &quot;sign&quot;))
+  set_names(c(&quot;date_time_ID&quot;,&quot;dep&quot;, &quot;sign&quot;))
 
 NCP &lt;- full_join(NCP, NCP_grid)
 
 NCP &lt;- NCP %&gt;% 
-  arrange(sign, dep, ID) %&gt;% 
+  arrange(sign, dep, date_time_ID) %&gt;% 
   group_by(sign, dep) %&gt;% 
   fill(dCT_cum) %&gt;% 
   ungroup() %&gt;% 
   mutate(dCT_cum = if_else(is.na(dCT_cum), 0, dCT_cum))</code></pre>
-<pre class="r"><code>NCP %&gt;% 
-  ggplot(aes(lubridate::ymd(ID), dCT, fill=dep))+
+<pre class="r"><code>p_iNCP &lt;- NCP %&gt;% 
+  ggplot(aes(date_time_ID, dCT, fill=dep))+
   geom_hline(yintercept = 0)+
-  geom_bar(stat=&quot;identity&quot;)+
+  geom_bar(stat=&quot;identity&quot;, col=&quot;black&quot;)+
   scale_fill_viridis_d()+
-  scale_color_viridis_d()+
-  scale_y_continuous(breaks = seq(-100, 100, 1))+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
   facet_grid(rev(sign)~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
   theme(strip.background = element_blank(),
         strip.text = element_blank())+
-  labs(y=&quot;integrated, directional CT changes [mol/m2]&quot;, x=&quot;date&quot;)</code></pre>
+  labs(y=&quot;integrated, directional CT changes [mol/m2]&quot;, x=&quot;date&quot;)
+
+p_iNCPcum &lt;- NCP %&gt;% 
+  ggplot(aes(date_time_ID,  dCT_cum, fill=dep))+
+  geom_hline(yintercept = 0)+
+  geom_area(col=&quot;black&quot;)+
+  scale_fill_viridis_d()+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  facet_grid(rev(sign)~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
+  theme(strip.background = element_blank(),
+        strip.text = element_blank())+
+  labs(y=&quot;integrated, cumulative, directional CT changes [mol/m2]&quot;, x=&quot;date&quot;)
+
+
+(p_iNCP / p_iNCPcum)+
+  plot_layout(guides = &#39;collect&#39;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/plot_integrated_NCP_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="cumulative-changes" class="section level2">
-<h2><span class="header-section-number">4.3</span> Cumulative changes</h2>
-<p>Cumulative C<sub>T</sub> changes were calculated for 5m depth intervals.</p>
-<pre class="r"><code>NCP %&gt;% 
-  ggplot(aes(lubridate::ymd(ID), dCT_cum, fill=dep))+
-  geom_hline(yintercept = 0)+
-  geom_area(alpha = 0.8, col=&quot;white&quot;)+
-  scale_fill_viridis_d()+
-  scale_color_viridis_d()+
-  scale_y_continuous(breaks = seq(-100, 100, 1))+
-  facet_grid(rev(sign)~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
-  theme(strip.background = element_blank(),
-        strip.text = element_blank())+
-  labs(y=&quot;integrated, cumulative, directional CT changes [mol/m2]&quot;, x=&quot;date&quot;)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/plot_integrated_NCP_timeseries_cumulative-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>mean_profiles %&gt;% 
   ggplot(aes(date_time, dep, col=CT))+
   geom_point()+
@@ -1188,7 +1208,8 @@ mean_profiles_long %&gt;%
 <ul>
 <li>Significance of changes in AT for calculated CT changes</li>
 <li>Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)</li>
-<li>Use exact mean date instead of ID throughout</li>
+<li>Include errorbars in timerseries and profile plots</li>
+<li>refer to mean date between cruises for incremental and cumulative changes?</li>
 </ul>
 <br>
 <p>
