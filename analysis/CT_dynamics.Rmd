@@ -245,7 +245,7 @@ CO2_long %>%
 
 ## Surface time series
 
-```{r plot_bottle_CO2_surface_timeseries, fig.cap="Time series of bottle data. Shown are mean values of samples collected at water depths < 10m (usually at 0 and 5 m).", fig.asp=1.2}
+```{r plot_bottle_CO2_surface_timeseries, fig.cap="Time series of bottle data. Shown are mean values of samples collected at water depths < 10m (usually collected at 0 and 5 m).", fig.asp=1.2}
 
 CO2_ts <- CO2_long %>% 
   filter(dep<10) %>% 
@@ -690,7 +690,7 @@ p_iNCPcum <- NCP %>%
 (p_iNCP / p_iNCPcum)+
   plot_layout(guides = 'collect')
 
-
+rm(p_iNCP, p_iNCPcum)
 ```
 
 

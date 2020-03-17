@@ -161,7 +161,7 @@ Units used here are:
 - wind speed U: m s-1
 
 - gas transfer velocities k: cm hr-1 (= 60*60*100 m s-1)
-- air sea CO~2~ flux F: mol m–2 yr–1 (= 365 * mol m–2 d–1)
+- air sea CO~2~ flux F: mol m–2 d–1
 
 - coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2 
 
@@ -188,17 +188,9 @@ df <- df %>%
 # calculate flux F [mol m–2 d–1]
 
 df <- df %>% 
-  mutate(flux = k_value*dCO2/365) 
+  mutate(flux_daily = k_value*dCO2*1e-5*24) 
 
-# scale flux to time interval
 
-df <- df %>% 
-  mutate(scale = if_else(freq == "daily", 1, 24*2)) %>% 
-  mutate(flux = flux / scale) %>% 
-  group_by(freq, k_para) %>% 
-  arrange(date_time) %>% 
-  mutate(flux_cum = cumsum(flux)) %>% 
-  ungroup()
 
 
 ```
@@ -208,10 +200,20 @@ Timeseries
 ```{r plot_daily_fluxes}
 
 df %>% 
-  ggplot(aes(date_time, flux, col=k_para))+
+  ggplot(aes(date_time, flux_daily, col=k_para))+
   geom_line()+
   labs(y="F (mol m-2 d-1)")+
   facet_wrap(~freq)
+
+# scale flux to time interval
+
+df <- df %>% 
+  mutate(scale = if_else(freq == "daily", 1, 24*2)) %>% 
+  mutate(flux_scale = flux_daily / scale) %>% 
+  group_by(freq, k_para) %>% 
+  arrange(date_time) %>% 
+  mutate(flux_cum = cumsum(flux_scale)) %>% 
+  ungroup()
 
 df %>% 
   ggplot(aes(date_time, flux_cum, col=k_para))+
