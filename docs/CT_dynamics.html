@@ -539,10 +539,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree7be14e4602989f5ef3a242398c3095758f7c5986targetblank7be14e4a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/7be14e4602989f5ef3a242398c3095758f7c5986" target="_blank">7be14e4</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree859c4a4613eb27eb92eac182cf99feaf23395f66targetblank859c4a4a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/859c4a4613eb27eb92eac182cf99feaf23395f66" target="_blank">859c4a4</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree7be14e4602989f5ef3a242398c3095758f7c5986targetblank7be14e4a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree859c4a4613eb27eb92eac182cf99feaf23395f66targetblank859c4a4a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -551,6 +551,7 @@ Great! You are using Git for version control. Tracking code development and conn
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
     Ignored:    data/Maps/
     Ignored:    data/Ostergarnsholm/
     Ignored:    data/TinaV/
@@ -810,9 +811,9 @@ CO2_ts %&gt;%
   facet_grid(parameter~., scales = &quot;free_y&quot;)+
   labs(x=&quot;Mean transect date&quot;)</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/CT_dynamics.Rmd/plot_bottle_CO2_surface_timeseries-1.png" alt="Time series of bottle data. Shown are mean values of samples collected at water depths &lt; 10m (usually at 0 and 5 m)." width="672" />
+<img src="figure/CT_dynamics.Rmd/plot_bottle_CO2_surface_timeseries-1.png" alt="Time series of bottle data. Shown are mean values of samples collected at water depths &lt; 10m (usually collected at 0 and 5 m)." width="672" />
 <p class="caption">
-Time series of bottle data. Shown are mean values of samples collected at water depths &lt; 10m (usually at 0 and 5 m).
+Time series of bottle data. Shown are mean values of samples collected at water depths &lt; 10m (usually collected at 0 and 5 m).
 </p>
 </div>
 <pre class="r"><code>AT_mean &lt;- CO2_ts %&gt;% 
@@ -1181,6 +1182,7 @@ p_iNCPcum &lt;- NCP %&gt;%
 (p_iNCP / p_iNCPcum)+
   plot_layout(guides = &#39;collect&#39;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/plot_integrated_NCP_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(p_iNCP, p_iNCPcum)</code></pre>
 <pre class="r"><code>mean_profiles %&gt;% 
   ggplot(aes(date_time, dep, col=CT))+
   geom_point()+
