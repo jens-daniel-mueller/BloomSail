@@ -662,7 +662,7 @@ NCP <- NCP %>%
 
 ```
 
-```{r plot_integrated_NCP_timeseries}
+```{r plot_integrated_NCP_timeseries, fig.asp=1.5}
 
 p_iNCP <- NCP %>% 
   ggplot(aes(date_time_ID, dCT, fill=dep))+
