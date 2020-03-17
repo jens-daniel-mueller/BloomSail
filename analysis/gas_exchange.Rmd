@@ -152,6 +152,7 @@ dCO2 = K0 * dpCO2 and
 
 k = coeff * U^2 * (660/Sc)^0.5
 
+
 Units used here are:
 
 - dpCO~2~: µatm
@@ -160,13 +161,12 @@ Units used here are:
 
 - wind speed U: m s-1
 
+- coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2 
 - gas transfer velocities k: cm hr-1 (= 60*60*100 m s-1)
+
 - air sea CO~2~ flux F: mol m–2 d–1
 
-- coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2 
-
-W14_simplyfied: F = 7.7 * 10–4 * U2 * dpCO2
-
+- conversion between the unit of k * dCO2 and F requires a factor of 10-5 * 24
 
 ```{r gas_exchange_calc}
 
@@ -226,4 +226,4 @@ df %>%
 # Open tasks / questions
 
 - Calculate mean wind direction correctly for northerly winds
-- Conversion of CO2 concentration from mol kg-1 to mol m-3 required?
+- Correct conversion of CO2 concentration from mol kg-1 to mol m-3 required?
