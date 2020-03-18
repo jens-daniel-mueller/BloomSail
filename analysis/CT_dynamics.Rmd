@@ -701,6 +701,43 @@ p_iNCPcum <- NCP %>%
 rm(p_iNCP, p_iNCPcum)
 ```
 
+# C~T~ vs temperature
+
+As primary production (negative changes in C~T~) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated.
+
+
+```{r CT_vs_temperature}
+
+CT_tem <- mean_profiles %>%
+  group_by(dep) %>%
+  arrange(date_time) %>%
+  mutate(dCT = CT - lag(CT),
+         dtem = tem - lag(tem),
+         sign = if_else(dCT < 0, "neg", "pos")) %>% 
+  ungroup() %>% 
+  drop_na()
+
+CT_tem %>% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_vline(xintercept = 0)+
+  geom_smooth(aes(dtem, dCT), method = "lm", se=FALSE)+
+  geom_point(aes(dtem, dCT, fill=ID), shape=21)+
+  scale_fill_viridis_d()+
+  guides(fill = guide_legend(override.aes=list(shape=21)))
+
+CT_tem %>% 
+  ggplot(aes(dtem, dCT))+
+  geom_hline(yintercept = 0)+
+  geom_vline(xintercept = 0)+
+  geom_smooth(method = "lm", se=FALSE)+
+  geom_point(aes(fill=ID), shape = 21)+
+  scale_fill_viridis_d()+
+  guides(fill = guide_legend(override.aes=list(shape=21)))+
+  facet_wrap(~ID)
+
+```
+
 
 
 
