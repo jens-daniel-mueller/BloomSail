@@ -87,7 +87,7 @@ df %>%
   geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
   geom_path()+
   scale_y_reverse()+
-  #scale_color_brewer(name="Rho lim")+
+  scale_color_discrete(name="Rho lim")+
   facet_grid(ID~station)
 
 ```
@@ -128,26 +128,21 @@ for(i_ID in unique(df_long$ID)){
   for(i_station in unique(df_long$station)){
  
       
-      #i_ID      <-      unique(df_long$ID)[1]
-      #i_station <- unique(df_long$station)[1]
+      # i_ID      <-      unique(df_long$ID)[1]
+      # i_station <- unique(df_long$station)[1]
 
       if (nrow(df_long %>% filter(ID == i_ID, station == i_station)) > 0){
       
-    
-    
       print(
-    
-        
         df_long %>%
           arrange(date_time) %>% 
           filter(ID == i_ID,
-                 station == i_station,
-                 dep<20) %>%
+                 station == i_station) %>%
           ggplot(aes(value,dep))+
-          geom_hline(aes(yintercept = MLD))+
+          geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
           geom_path()+
-          scale_y_reverse()+
-          scale_color_brewer(palette = "Set1")+
+          scale_y_reverse(limits = c(30,0))+
+          scale_color_discrete(name="Rho lim")+
           labs(y="Depth [m]", title = str_c(i_ID," | ",i_station))+
           facet_wrap(~parameter, scales = "free_x")+
           theme_bw()
@@ -193,7 +188,7 @@ NCP_integ <- CT_ts %>%
 CT <- full_join(CT_conc_surf, NCP_integ)
 
 CT <- CT %>% 
-  mutate(zeff = -(dNCPi/dCT)*1e3)
+  mutate(zeff = (dNCPi/dCT)*1e3)
 
 CT_long <- CT %>% 
   pivot_longer(3:4, names_to = "parameter", values_to = "values")
@@ -207,7 +202,8 @@ CT_long %>%
 CT %>% 
   ggplot(aes(date_time_ID, zeff))+
   geom_path()+
-  geom_point()
+  geom_point()+
+  scale_y_reverse()
 
 ```
 
