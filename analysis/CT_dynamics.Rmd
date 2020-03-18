@@ -584,6 +584,9 @@ mean_profiles_long <- mean_profiles_long %>%
   mutate(cum_value_sign = cumsum(diff_value)) %>% 
   ungroup()
 
+mean_profiles_long %>%
+  write_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_CT_cumulative_profiles.csv"))
+
 mean_profiles_long %>% 
   arrange(dep) %>% 
   ggplot(aes(cum_value_sign, dep, col=ID))+
@@ -640,6 +643,9 @@ NCP <- NCP %>%
   mutate(dCT_cum = cumsum(dCT)) %>% 
   ungroup()
 
+NCP %>%
+  write_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_CT_cumulative_timeseries.csv"))
+
 
 NCP_grid <- expand_grid(
   unique(NCP$date_time_ID),
@@ -651,6 +657,8 @@ NCP_grid <- NCP_grid %>%
   set_names(c("date_time_ID","dep", "sign"))
 
 NCP <- full_join(NCP, NCP_grid)
+
+rm(NCP_grid)
 
 NCP <- NCP %>% 
   arrange(sign, dep, date_time_ID) %>% 
