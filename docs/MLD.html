@@ -539,10 +539,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree25013f8f797829fff726f746a0971e8c993aed89targetblank25013f8a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/25013f8f797829fff726f746a0971e8c993aed89" target="_blank">25013f8</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea557413b305bd48fd472fe5b11b389349377fefetargetblanka557413a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a557413b305bd48fd472fe5b11b389349377fefe" target="_blank">a557413</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree25013f8f797829fff726f746a0971e8c993aed89targetblank25013f8a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea557413b305bd48fd472fe5b11b389349377fefetargetblanka557413a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -699,6 +699,7 @@ rm(i_ID, i_station)</code></pre>
 </div>
 <div id="ncp-penetration-depth" class="section level1">
 <h1><span class="header-section-number">3</span> NCP penetration depth</h1>
+<p>The effective NCP penetration depth, z<sub>eff</sub>, was calculated as the ratio of the observed inremental change of the depth integrated NCP, divided by the change in surface C<sub>T</sub>.</p>
 <pre class="r"><code>CT_ts &lt;-
   read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_CT_cumulative_timeseries.csv&quot;))
 
@@ -721,7 +722,7 @@ NCP_integ &lt;- CT_ts %&gt;%
 CT &lt;- full_join(CT_conc_surf, NCP_integ)
 
 CT &lt;- CT %&gt;% 
-  mutate(dep_NCP = -(dNCPi/dCT)*1e3)
+  mutate(zeff = -(dNCPi/dCT)*1e3)
 
 CT_long &lt;- CT %&gt;% 
   pivot_longer(3:4, names_to = &quot;parameter&quot;, values_to = &quot;values&quot;)
@@ -733,7 +734,7 @@ CT_long %&gt;%
   facet_grid(parameter~., scales = &quot;free_y&quot;)</code></pre>
 <p><img src="figure/MLD.Rmd/NCP_penetration_depth-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>CT %&gt;% 
-  ggplot(aes(date_time_ID, dep_NCP))+
+  ggplot(aes(date_time_ID, zeff))+
   geom_path()+
   geom_point()</code></pre>
 <p><img src="figure/MLD.Rmd/NCP_penetration_depth-2.png" width="672" style="display: block; margin: auto;" /></p>
