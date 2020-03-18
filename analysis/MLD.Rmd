@@ -78,17 +78,16 @@ df <- full_join(df, MLD)
 
 ## Density profiles
 
-```{r plot_density_profiles, fig.cap="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD", fig.asp = 1.5}
+```{r plot_density_profiles, fig.cap="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD", fig.asp = 1.4}
 
 df %>% 
   filter(dep < 30) %>% 
   arrange(dep) %>% 
   ggplot(aes(rho, dep))+
-  geom_hline(aes(yintercept = MLD))+
+  geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
   geom_path()+
-  geom_point(aes(col=layer))+
   scale_y_reverse()+
-  scale_color_brewer(palette = "Set1", direction = -1)+
+  #scale_color_brewer(name="Rho lim")+
   facet_grid(ID~station)
 
 ```
@@ -110,7 +109,7 @@ MLD_sum %>%
   geom_point(aes(date_time_ID, mean))+
   labs(x="Mean transect date", y="Mixed layer depth [m]")+
   ylim(0,30)+
-  facet_grid(rho_lim~.)
+  facet_grid(rho_lim~., labeller = label_both)
 
 ```
 
@@ -195,13 +194,18 @@ CT <- CT %>%
   mutate(dep_NCP = -(dNCPi/dCT)*1e3)
 
 CT_long <- CT %>% 
-  pivot_longer(3:5, names_to = "parameter", values_to = "values")
+  pivot_longer(3:4, names_to = "parameter", values_to = "values")
 
 CT_long %>% 
   ggplot(aes(date_time_ID, values))+
   geom_path()+
   geom_point()+
   facet_grid(parameter~., scales = "free_y")
+
+CT %>% 
+  ggplot(aes(date_time_ID, dep_NCP))+
+  geom_path()+
+  geom_point()
 
 ```
 
