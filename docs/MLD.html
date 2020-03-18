@@ -539,10 +539,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea557413b305bd48fd472fe5b11b389349377fefetargetblanka557413a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a557413b305bd48fd472fe5b11b389349377fefe" target="_blank">a557413</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree583c398c1724969100ddca0c0ed3c1c37d6a9b6ftargetblank583c398a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/583c398c1724969100ddca0c0ed3c1c37d6a9b6f" target="_blank">583c398</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea557413b305bd48fd472fe5b11b389349377fefetargetblanka557413a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree583c398c1724969100ddca0c0ed3c1c37d6a9b6ftargetblank583c398a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -551,6 +551,7 @@ Great! You are using Git for version control. Tracking code development and conn
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
     Ignored:    data/Maps/
     Ignored:    data/Ostergarnsholm/
     Ignored:    data/TinaV/
@@ -627,7 +628,7 @@ df &lt;- full_join(df, MLD)</code></pre>
   geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
   geom_path()+
   scale_y_reverse()+
-  #scale_color_brewer(name=&quot;Rho lim&quot;)+
+  scale_color_discrete(name=&quot;Rho lim&quot;)+
   facet_grid(ID~station)</code></pre>
 <div class="figure" style="text-align: center">
 <img src="figure/MLD.Rmd/plot_density_profiles-1.png" alt="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD" width="672" />
@@ -664,26 +665,21 @@ for(i_ID in unique(df_long$ID)){
   for(i_station in unique(df_long$station)){
  
       
-      #i_ID      &lt;-      unique(df_long$ID)[1]
-      #i_station &lt;- unique(df_long$station)[1]
+      # i_ID      &lt;-      unique(df_long$ID)[1]
+      # i_station &lt;- unique(df_long$station)[1]
 
       if (nrow(df_long %&gt;% filter(ID == i_ID, station == i_station)) &gt; 0){
       
-    
-    
       print(
-    
-        
         df_long %&gt;%
           arrange(date_time) %&gt;% 
           filter(ID == i_ID,
-                 station == i_station,
-                 dep&lt;20) %&gt;%
+                 station == i_station) %&gt;%
           ggplot(aes(value,dep))+
-          geom_hline(aes(yintercept = MLD))+
+          geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
           geom_path()+
-          scale_y_reverse()+
-          scale_color_brewer(palette = &quot;Set1&quot;)+
+          scale_y_reverse(limits = c(30,0))+
+          scale_color_discrete(name=&quot;Rho lim&quot;)+
           labs(y=&quot;Depth [m]&quot;, title = str_c(i_ID,&quot; | &quot;,i_station))+
           facet_wrap(~parameter, scales = &quot;free_x&quot;)+
           theme_bw()
@@ -722,7 +718,7 @@ NCP_integ &lt;- CT_ts %&gt;%
 CT &lt;- full_join(CT_conc_surf, NCP_integ)
 
 CT &lt;- CT %&gt;% 
-  mutate(zeff = -(dNCPi/dCT)*1e3)
+  mutate(zeff = (dNCPi/dCT)*1e3)
 
 CT_long &lt;- CT %&gt;% 
   pivot_longer(3:4, names_to = &quot;parameter&quot;, values_to = &quot;values&quot;)
@@ -736,7 +732,8 @@ CT_long %&gt;%
 <pre class="r"><code>CT %&gt;% 
   ggplot(aes(date_time_ID, zeff))+
   geom_path()+
-  geom_point()</code></pre>
+  geom_point()+
+  scale_y_reverse()</code></pre>
 <p><img src="figure/MLD.Rmd/NCP_penetration_depth-2.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
