@@ -539,10 +539,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree905eb1f969d2908f7f1e73b790429d529717ab47targetblank905eb1fa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/905eb1f969d2908f7f1e73b790429d529717ab47" target="_blank">905eb1f</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb839b18eba6c6ad74e6b2279bf2e82c08b1fc3e9targetblankb839b18a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b839b18eba6c6ad74e6b2279bf2e82c08b1fc3e9" target="_blank">b839b18</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree905eb1f969d2908f7f1e73b790429d529717ab47targetblank905eb1fa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb839b18eba6c6ad74e6b2279bf2e82c08b1fc3e9targetblankb839b18a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -556,12 +556,6 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
-
-Untracked files:
-    Untracked:  output/Plots/MLD/
-
-Unstaged changes:
-    Modified:   analysis/_site.yml
 
 </code></pre>
 <p>
@@ -1196,6 +1190,39 @@ p_iNCPcum &lt;- NCP %&gt;%
   plot_layout(guides = &#39;collect&#39;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/plot_integrated_NCP_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(p_iNCP, p_iNCPcum)</code></pre>
+</div>
+</div>
+<div id="ct-vs-temperature" class="section level1">
+<h1><span class="header-section-number">5</span> C<sub>T</sub> vs temperature</h1>
+<p>As primary production (negative changes in C<sub>T</sub>) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated.</p>
+<pre class="r"><code>CT_tem &lt;- mean_profiles %&gt;%
+  group_by(dep) %&gt;%
+  arrange(date_time) %&gt;%
+  mutate(dCT = CT - lag(CT),
+         dtem = tem - lag(tem),
+         sign = if_else(dCT &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;% 
+  ungroup() %&gt;% 
+  drop_na()
+
+CT_tem %&gt;% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_vline(xintercept = 0)+
+  geom_smooth(aes(dtem, dCT), method = &quot;lm&quot;, se=FALSE)+
+  geom_point(aes(dtem, dCT, fill=ID), shape=21)+
+  scale_fill_viridis_d()+
+  guides(fill = guide_legend(override.aes=list(shape=21)))</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/CT_vs_temperature-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>CT_tem %&gt;% 
+  ggplot(aes(dtem, dCT))+
+  geom_hline(yintercept = 0)+
+  geom_vline(xintercept = 0)+
+  geom_smooth(method = &quot;lm&quot;, se=FALSE)+
+  geom_point(aes(fill=ID), shape = 21)+
+  scale_fill_viridis_d()+
+  guides(fill = guide_legend(override.aes=list(shape=21)))+
+  facet_wrap(~ID)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/CT_vs_temperature-2.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>mean_profiles %&gt;% 
   ggplot(aes(date_time, dep, col=CT))+
   geom_point()+
@@ -1217,9 +1244,8 @@ mean_profiles_long %&gt;%
   scale_color_divergent()+
   scale_y_reverse()</code></pre>
 </div>
-</div>
 <div id="open-tasks-questions" class="section level1">
-<h1><span class="header-section-number">5</span> Open tasks / questions</h1>
+<h1><span class="header-section-number">6</span> Open tasks / questions</h1>
 <ul>
 <li>Significance of changes in AT for calculated CT changes</li>
 <li>Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)</li>
@@ -1260,30 +1286,30 @@ loaded via a namespace (and not attached):
  [1] nlme_3.1-137         bitops_1.0-6         fs_1.3.1            
  [4] lubridate_1.7.4      RColorBrewer_1.1-2   httr_1.4.1          
  [7] rprojroot_1.3-2      tools_3.5.0          backports_1.1.5     
-[10] R6_2.4.0             DBI_1.0.0            colorspace_1.4-1    
-[13] withr_2.1.2          sp_1.3-2             tidyselect_0.2.5    
-[16] gridExtra_2.3        compiler_3.5.0       git2r_0.26.1        
-[19] cli_1.1.0            rvest_0.3.5          xml2_1.2.2          
-[22] labeling_0.3         scales_1.0.0         checkmate_1.9.4     
-[25] digest_0.6.22        foreign_0.8-70       rmarkdown_2.0       
-[28] pkgconfig_2.0.3      htmltools_0.4.0      dbplyr_1.4.2        
-[31] highr_0.8            maps_3.3.0           rlang_0.4.5         
-[34] readxl_1.3.1         rstudioapi_0.10      generics_0.0.2      
-[37] jsonlite_1.6         RCurl_1.95-4.12      magrittr_1.5        
-[40] Formula_1.2-3        dotCall64_1.0-0      Matrix_1.2-14       
-[43] Rcpp_1.0.2           munsell_0.5.0        lifecycle_0.1.0     
-[46] stringi_1.4.3        yaml_2.2.0           plyr_1.8.4          
-[49] grid_3.5.0           maptools_0.9-8       formula.tools_1.7.1 
-[52] promises_1.1.0       crayon_1.3.4         lattice_0.20-35     
-[55] haven_2.2.0          hms_0.5.2            zeallot_0.1.0       
-[58] knitr_1.26           pillar_1.4.2         reprex_0.3.0        
-[61] glue_1.3.1           evaluate_0.14        data.table_1.12.6   
-[64] modelr_0.1.5         operator.tools_1.6.3 vctrs_0.2.0         
-[67] spam_2.3-0.2         httpuv_1.5.2         cellranger_1.1.0    
-[70] gtable_0.3.0         assertthat_0.2.1     xfun_0.10           
-[73] broom_0.5.3          later_1.0.0          viridisLite_0.3.0   
-[76] memoise_1.1.0        fields_9.9           workflowr_1.6.0     
-[79] ellipsis_0.3.0       here_0.1            </code></pre>
+[10] R6_2.4.0             mgcv_1.8-23          DBI_1.0.0           
+[13] colorspace_1.4-1     withr_2.1.2          sp_1.3-2            
+[16] tidyselect_0.2.5     gridExtra_2.3        compiler_3.5.0      
+[19] git2r_0.26.1         cli_1.1.0            rvest_0.3.5         
+[22] xml2_1.2.2           labeling_0.3         scales_1.0.0        
+[25] checkmate_1.9.4      digest_0.6.22        foreign_0.8-70      
+[28] rmarkdown_2.0        pkgconfig_2.0.3      htmltools_0.4.0     
+[31] dbplyr_1.4.2         highr_0.8            maps_3.3.0          
+[34] rlang_0.4.5          readxl_1.3.1         rstudioapi_0.10     
+[37] generics_0.0.2       jsonlite_1.6         RCurl_1.95-4.12     
+[40] magrittr_1.5         Formula_1.2-3        dotCall64_1.0-0     
+[43] Matrix_1.2-14        Rcpp_1.0.2           munsell_0.5.0       
+[46] lifecycle_0.1.0      stringi_1.4.3        yaml_2.2.0          
+[49] plyr_1.8.4           grid_3.5.0           maptools_0.9-8      
+[52] formula.tools_1.7.1  promises_1.1.0       crayon_1.3.4        
+[55] lattice_0.20-35      haven_2.2.0          hms_0.5.2           
+[58] zeallot_0.1.0        knitr_1.26           pillar_1.4.2        
+[61] reprex_0.3.0         glue_1.3.1           evaluate_0.14       
+[64] data.table_1.12.6    modelr_0.1.5         operator.tools_1.6.3
+[67] vctrs_0.2.0          spam_2.3-0.2         httpuv_1.5.2        
+[70] cellranger_1.1.0     gtable_0.3.0         assertthat_0.2.1    
+[73] xfun_0.10            broom_0.5.3          later_1.0.0         
+[76] viridisLite_0.3.0    memoise_1.1.0        fields_9.9          
+[79] workflowr_1.6.0      ellipsis_0.3.0       here_0.1            </code></pre>
 </div>
 </div>
 
