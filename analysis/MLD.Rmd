@@ -38,6 +38,10 @@ df <-
 
 # Mixed layer depth
 
+## Calculation
+
+Seawater density Rho was determined from S, T, and p according to TEOS-10.
+
 ```{r calulcate_seawater_density}
 
 df <- df %>% 
@@ -48,6 +52,8 @@ df <- df %>%
 
 ```
 
+Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria
+
 ```{r calculate_MLD}
 # density criterion
 
@@ -55,7 +61,8 @@ df <- expand_grid(df, rho_lim = c(0.1,0.2,0.5))
 
 df <- df %>% 
   group_by(ID, date_time_ID, station, rho_lim) %>% 
-  mutate(d_rho = rho - min(rho)) %>% 
+  arrange(dep) %>% 
+  mutate(d_rho = rho - first(rho)) %>% 
   mutate(layer = if_else(d_rho > rho_lim, "deep", "surface")) %>% 
   ungroup()
   
@@ -69,8 +76,9 @@ df <- full_join(df, MLD)
 
 ```
 
+## Density profiles
 
-```{r plot_density_profiles, fig.cap="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD", fig.asp = 1.5, eval=FALSE}
+```{r plot_density_profiles, fig.cap="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD", fig.asp = 1.5}
 
 df %>% 
   filter(dep < 30) %>% 
@@ -85,9 +93,9 @@ df %>%
 
 ```
 
+## Timeseries plot
 
-
-```{r plot_MLD_timeseries}
+```{r plot_MLD_timeseries, fig.asp=1.5}
 
 MLD_sum <- MLD %>% 
   select(-station) %>% 
@@ -102,7 +110,7 @@ MLD_sum %>%
   geom_point(aes(date_time_ID, mean))+
   labs(x="Mean transect date", y="Mixed layer depth [m]")+
   ylim(0,30)+
-  facet_wrap(~rho_lim)
+  facet_grid(rho_lim~.)
 
 ```
 
@@ -176,18 +184,10 @@ CT_conc_surf <-
   group_by(ID, date_time_ID) %>% 
   summarise(dCT = mean(diff_value))
 
-CT_conc_surf %>% 
-  ggplot(aes(date_time_ID, dCT))+
-  geom_path()
-
 NCP_integ <- CT_ts %>% 
   filter(sign == "neg") %>% 
   group_by(ID, date_time_ID) %>% 
   summarise(dNCPi = sum(dCT))
-
-NCP_integ %>% 
-  ggplot(aes(date_time_ID, dNCPi))+
-  geom_path()
 
 CT <- full_join(CT_conc_surf, NCP_integ)
 
