@@ -1,0 +1,110 @@
+---
+title: "Reconstruction of NCP based on surface pCO2 and CTD data"
+author: "Jens Daniel Müller"
+date:  "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  workflowr::wflow_html:
+    number_sections: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+editor_options:
+  chunk_output_type: console
+---
+
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
+
+```{r packages}
+library(tidyverse)
+library(seacarb)
+```
+
+# Sensor data
+
+1m gridded, downcast profiles were used.
+
+```{r read_Tina-V_Sensor_data}
+
+df <-
+  read_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_CT_cumulative_profiles.csv"))
+
+df <- df %>% 
+  select(1:5) %>% 
+  pivot_wider(names_from = "parameter", values_from = "value") %>% 
+  mutate(CT = if_else(dep==3.5, CT, NaN))
+
+```
+
+# C~T~ vs temperature
+
+As primary production (negative changes in C~T~) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated.
+
+```{r CT_vs_temperature}
+
+df_CT <- df %>%
+  drop_na() %>% 
+  arrange(date_time_ID) %>%
+  mutate(dCT = CT - lag(CT))
+
+df <- df %>%
+  arrange(date_time_ID) %>%
+  mutate(dtem = tem - lag(tem))
+
+df <- full_join(df, df_CT)
+rm(df_CT)
+
+df %>% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_vline(xintercept = 0)+
+  geom_smooth(aes(dtem, dCT), method = "lm", se=FALSE)+
+  geom_point(aes(dtem, dCT), shape=21)+
+  scale_fill_viridis_d()+
+  guides(fill = guide_legend(override.aes=list(shape=21)))
+
+CT_tem %>% 
+  ggplot(aes(dtem, dCT))+
+  geom_hline(yintercept = 0)+
+  geom_vline(xintercept = 0)+
+  geom_smooth(method = "lm", se=FALSE)+
+  geom_point(aes(fill=ID), shape = 21)+
+  scale_fill_viridis_d()+
+  guides(fill = guide_legend(override.aes=list(shape=21)))+
+  facet_wrap(~ID)
+
+```
+
+
+
+
+## Profiles of incremental changes
+
+Changes of seawater parameters at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.
+
+```{r incremental_changes_profiles}
+
+mean_profiles_long <- mean_profiles_long %>%
+    group_by(parameter, dep) %>%
+    arrange(date_time_ID) %>%
+    mutate(diff_value = value     - lag(value, default = first(value)),
+           diff_time  = as.numeric(date_time_ID - lag(date_time_ID)),
+           diff_value_daily = diff_value / diff_time,
+           cum_value = cumsum(diff_value)) %>% 
+  ungroup()
+
+
+mean_profiles_long %>% 
+  arrange(dep) %>% 
+  ggplot(aes(diff_value_daily, dep, col=ID))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  facet_wrap(~parameter, scales = "free_x")+
+  labs(x="Change of value inbetween cruises per day")
+  
+```
