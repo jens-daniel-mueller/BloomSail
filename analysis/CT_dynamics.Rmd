@@ -784,7 +784,9 @@ CT_tem %>%
 ```
 
 
+# Hovmoeller plots
 
+## Absolute values
 
 ```{r plot_hovmoeller_absolut, fig.cap="Hovmoeller plots of absolute changes in C~T~ and temperature."}
 
@@ -827,12 +829,59 @@ Tem_hov <- mean_profiles_long %>%
 
 CT_hov / Tem_hov
 
+rm(CT_hov, bin_CT, Tem_hov, bin_Tem)
+
 ```
 
+
+## Daily changes
+
+```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily changes in C~T~ and temperature. Note: Daily changes are currently plotted against the day when they were observed compared to the previous transect, although plotting against the mean date would be more plausible."}
+
+bin_CT <- 2.5
+
+CT_hov <- mean_profiles_long %>% 
+  filter(parameter == "CT") %>% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=diff_value_daily),
+                    breaks = MakeBreaks(bin_CT),
+                    col="black")+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill="white")+
+  scale_fill_divergent(breaks = MakeBreaks(bin_CT),
+                       guide = "colorstrip",
+                       name="CT (µmol/kg)")+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y="Depth (m)")+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+bin_Tem <- 0.1
+
+Tem_hov <- mean_profiles_long %>% 
+  filter(parameter == "tem") %>% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=diff_value_daily),
+                    breaks = MakeBreaks(bin_Tem),
+                    col="black")+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill="white")+
+  scale_fill_divergent(breaks = MakeBreaks(bin_Tem),
+                       guide = "colorstrip",
+                       name="Tem (°C)")+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(x="",y="Depth (m)")+
+  coord_cartesian(expand = 0)
+
+CT_hov / Tem_hov
+
+rm(CT_hov, bin_CT, Tem_hov, bin_Tem)
+
+```
 
 # Open tasks / questions
 
 - Significance of changes in AT for calculated CT changes
 - Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)
-- Include errorbars in timerseries and profile plots
 - refer to mean date between cruises for incremental and cumulative changes?
