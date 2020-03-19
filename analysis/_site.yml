@@ -3,19 +3,19 @@ output_dir: ../docs
 navbar:
   title: BloomSail
   left:
-  - text: Data base
+  - text: Data
     href: data_base.html
-  - text: Data handling
+  - text: Handling
     href: merging_interpolation.html
   - text: Response time
     href: response_time.html
   - text: CT dynamics
     href: CT_dynamics.html
-  - text: Gas exchange
+  - text: Gas flux
     href: gas_exchange.html
   - text: MLD
     href: MLD.html
-  - text: Finnmaid+GETM
+  - text: FM+GETM
     href: Finnmaid+GETM.html
   right:
   - icon: fa-github
