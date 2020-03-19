@@ -23,6 +23,7 @@ library(patchwork)
 library(seacarb)
 library(metR)
 library(scico)
+library(cmocean)
 # library(broom)
 # library(lubridate)
 # library(tibbletime)
@@ -37,9 +38,9 @@ Profile data are prepared by:
 - Removing HydroC Flush and Zeroing periods
 - Selecting only continous downcast periods
 - Gridding profiles to 1m depth intervals
-- Discarding profiles with 3 or more observation missing within upper 20m (except shallow coastal station at Ostergarnsholm "P14")
+- Discarding profiles with 3 or more observation missing within upper 20m
 - assigning mean date_time value to all profiles belonging to one cruise
-- discarding second (repeated) visit of coastal station P14 during each cruise 
+- discarding "coastal" station P01, P13, P14
 
 ## pCO~2~ profile overview
 
@@ -67,8 +68,8 @@ df <- df %>%
   filter(type == "P",
          Flush == "0",
          Zero == "0",
-         ID != "180616",
-         !(station %in% c("PX1", "PX2"))) %>% 
+         !ID %in% c("180616","180820"),
+         !(station %in% c("PX1", "PX2", "P14", "P13", "P01"))) %>% 
   select(date_time, ID, type, station, lat, lon, dep, sal, tem, pCO2_raw = pCO2, pCO2 = pCO2_RT_mean, duration)
 
 
@@ -85,8 +86,8 @@ meta <- read_csv(here::here("Data/_summarized_data_files",
                  col_types = cols(ID = col_character()))
 
 meta <- meta %>% 
-    filter(ID != "180616",
-           !(station %in% c("PX1", "PX2")))
+    filter(!ID %in% c("180616","180820"),
+           !(station %in% c("PX1", "PX2", "P14", "P13", "P01")))
 
 df <- full_join(df, meta)
 rm(meta)
@@ -111,7 +112,7 @@ df <- df %>%
 
 
 
-#df_highres <- df
+df_highres <- df
 
 # grid observation to 1m depth intervals
 df <- df %>% 
@@ -171,14 +172,24 @@ df <- inner_join(cruise_dates, df)
 
 map <- read_csv(here::here("data/Maps","Bathymetry_Gotland_east_small.csv"))
 
+# ggplot()+
+#   geom_contour_fill(data=map, aes(x=lon, y=lat, z=-elev), na.fill = TRUE)+
+#   coord_quickmap(expand = 0, xlim = c(18.7, 19.9), ylim = c(57.25,57.6))+
+#   theme_bw()+
+#   theme(legend.position="bottom")
+
 df %>% 
+  group_by(station) %>% 
+  summarise(lat = mean(lat),
+            lon = mean(lon)) %>% 
+  ungroup() %>% 
   ggplot()+
   geom_raster(data=map, aes(lon, lat, fill=-elev))+
-  scale_fill_scico(palette = "grayC", na.value = "grey", name="Depth [m]")+
-  geom_point(aes(lon, lat, col=station))+
+  scale_fill_scico(palette = "oslo", na.value = "grey", 
+                   name="Depth [m]", direction = -1)+
+  geom_label(aes(lon, lat, label=station))+
   coord_quickmap(expand = 0, xlim = c(18.7, 19.9), ylim = c(57.25,57.6))+
-  theme_bw()+
-  theme(legend.position="bottom")
+  theme_bw()
 
 rm(map)
 
@@ -349,7 +360,7 @@ Mean vertical profiles were calculated for each cruise day (ID). Note that:
 - ID represents the start date of the cruise, not the exact mean sampling date
 - Coastal station P14 was excluded so far from the analysis
 
-```{r plot_CT_profiles, fig.cap="Mean vertical profiles per cruise day across all stations, except P14."}
+```{r plot_CT_profiles_all, fig.cap="Mean vertical profiles per cruise day across all stations."}
 
 # df %>% 
 #   filter(dep < 20) %>% 
@@ -363,14 +374,28 @@ Mean vertical profiles were calculated for each cruise day (ID). Note that:
 
 mean_profiles <- df %>% 
   filter(dep < 25) %>% 
-  select(-c(station,lat, lon, pCO2_raw)) %>% 
+  select(-c(station,lat, lon, pCO2_raw, date_time)) %>% 
   group_by(ID, date_time_ID, dep) %>% 
   summarise_all(list(mean), na.rm=TRUE) %>% 
   ungroup()
 
-mean_profiles_long <- mean_profiles %>% 
-  pivot_longer(5:8, names_to = "parameter", values_to = "value")
+sd_profiles <- df %>% 
+  filter(dep < 25) %>% 
+  select(-c(station,lat, lon, pCO2_raw, date_time)) %>% 
+  group_by(ID, date_time_ID, dep) %>% 
+  summarise_all(list(sd), na.rm=TRUE) %>% 
+  ungroup()
+
+sd_profiles_long <- sd_profiles %>% 
+  pivot_longer(4:7, names_to = "parameter", values_to = "sd")
   
+mean_profiles_long <- mean_profiles %>% 
+  pivot_longer(4:7, names_to = "parameter", values_to = "value")
+  
+mean_profiles_long <- inner_join(mean_profiles_long, sd_profiles_long)
+
+rm(sd_profiles, sd_profiles_long)
+
 mean_profiles_long %>% 
   ggplot(aes(value, dep, col=ID))+
   geom_point()+
@@ -379,8 +404,27 @@ mean_profiles_long %>%
   scale_color_viridis_d()+
   facet_wrap(~parameter, scales = "free_x")
   
+```
+
+```{r plot_CT_profiles_individual, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually", fig.asp=1.5}
+
+all <- mean_profiles_long %>% 
+  filter(parameter %in% c("CT", "tem")) %>% 
+  rename(group = ID)
+
+mean_profiles_long %>% 
+  filter(parameter %in% c("CT", "tem")) %>% 
+  ggplot()+
+  geom_path(data=all, aes(value, dep, group=group))+
+  geom_ribbon(aes(xmin = value-sd, xmax=value+sd, y=dep, fill=ID), alpha=0.5)+
+  geom_path(aes(value, dep, col=ID))+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  scale_fill_viridis_d()+
+  facet_grid(ID~parameter, scales = "free_x")
 
 ```
+
 
 ## Individual profiles
 
@@ -488,7 +532,7 @@ rm(i_ID, i_station)
 df_long <- df %>%
   select(-c(lat, lon, pCO2_raw)) %>% 
   filter(dep < 25) %>% 
-  pivot_longer(5:8, values_to = "value", names_to = "parameter")
+  pivot_longer(6:9, values_to = "value", names_to = "parameter")
 
 
 pdf(file=here::here("output/Plots/CT_dynamics",
@@ -533,9 +577,9 @@ Changes of seawater parameters at each depth are calculated from one cruise day 
 
 mean_profiles_long <- mean_profiles_long %>%
     group_by(parameter, dep) %>%
-    arrange(date_time) %>%
+    arrange(date_time_ID) %>%
     mutate(diff_value = value     - lag(value, default = first(value)),
-           diff_time  = as.numeric(date_time - lag(date_time)),
+           diff_time  = as.numeric(date_time_ID - lag(date_time_ID)),
            diff_value_daily = diff_value / diff_time,
            cum_value = cumsum(diff_value)) %>% 
   ungroup()
@@ -580,7 +624,7 @@ Cumulative positive and negative changes of seawater parameters were calculated 
 mean_profiles_long <- mean_profiles_long %>% 
   mutate(sign = if_else(diff_value < 0, "neg", "pos")) %>% 
   group_by(parameter, dep, sign) %>%
-  arrange(date_time) %>%
+  arrange(date_time_ID) %>%
   mutate(cum_value_sign = cumsum(diff_value)) %>% 
   ungroup()
 
@@ -618,6 +662,7 @@ timeseries <- mean_profiles_long %>%
 timeseries %>% 
   ggplot(aes(date_time_ID, value, col=as.factor(dep)))+
   geom_path()+
+  geom_errorbar(aes(date_time_ID, ymax=value+sd, ymin=value-sd, col=as.factor(dep)))+
   geom_point()+
   scale_color_viridis_d(name="Depth [m]")+
   facet_wrap(~parameter, scales = "free_y", ncol=1)
@@ -710,7 +755,7 @@ As primary production (negative changes in C~T~) and increase in seawater temper
 
 CT_tem <- mean_profiles %>%
   group_by(dep) %>%
-  arrange(date_time) %>%
+  arrange(date_time_ID) %>%
   mutate(dCT = CT - lag(CT),
          dtem = tem - lag(tem),
          sign = if_else(dCT < 0, "neg", "pos")) %>% 
@@ -741,29 +786,46 @@ CT_tem %>%
 
 
 
-```{r plot_hovmoeller, eval=FALSE}
+```{r plot_hovmoeller_absolut, fig.cap="Hovmoeller plots of absolute changes in C~T~ and temperature."}
 
-mean_profiles %>% 
-  ggplot(aes(date_time, dep, col=CT))+
-  geom_point()+
-  scale_color_viridis_c(direction = -1)+
-  scale_y_reverse()
+bin_CT <- 20
 
-
-mean_profiles_long %>%
+CT_hov <- mean_profiles_long %>% 
   filter(parameter == "CT") %>% 
-  ggplot(aes(date_time, dep, col=diff))+
-  geom_point()+
-  scale_color_divergent()+
-  scale_y_reverse()
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=value),
+                    breaks = MakeBreaks(bin_CT),
+                    col="black")+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill="white")+
+  scale_fill_viridis_c(breaks = MakeBreaks(bin_CT),
+                       guide = "colorstrip",
+                       name="CT (µmol/kg)")+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y="Depth (m)")+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
 
-mean_profiles_long %>%
+bin_Tem <- 2
+
+Tem_hov <- mean_profiles_long %>% 
   filter(parameter == "tem") %>% 
-  ggplot(aes(date_time, dep, col=diff))+
-  geom_point()+
-  scale_color_divergent()+
-  scale_y_reverse()
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=value),
+                    breaks = MakeBreaks(bin_Tem),
+                    col="black")+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill="white")+
+  scale_fill_viridis_c(breaks = MakeBreaks(bin_Tem),
+                       guide = "colorstrip",
+                       name="Tem (°C)",
+                       option = "inferno")+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(x="",y="Depth (m)")+
+  coord_cartesian(expand = 0)
 
+CT_hov / Tem_hov
 
 ```
 
