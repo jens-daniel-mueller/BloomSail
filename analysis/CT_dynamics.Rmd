@@ -406,7 +406,7 @@ mean_profiles_long %>%
   
 ```
 
-```{r plot_CT_profiles_individual, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually", fig.asp=1.5}
+```{r plot_CT_profiles_individual, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
 
 all <- mean_profiles_long %>% 
   filter(parameter %in% c("CT", "tem")) %>% 
@@ -662,7 +662,7 @@ timeseries <- mean_profiles_long %>%
 timeseries %>% 
   ggplot(aes(date_time_ID, value, col=as.factor(dep)))+
   geom_path()+
-  geom_errorbar(aes(date_time_ID, ymax=value+sd, ymin=value-sd, col=as.factor(dep)))+
+  #geom_errorbar(aes(date_time_ID, ymax=value+sd, ymin=value-sd, col=as.factor(dep)))+
   geom_point()+
   scale_color_viridis_d(name="Depth [m]")+
   facet_wrap(~parameter, scales = "free_y", ncol=1)
