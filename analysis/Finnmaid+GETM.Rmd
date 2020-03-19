@@ -22,9 +22,9 @@ library(tidyverse)
 library(seacarb)
 ```
 
-# Sensor data
+# Finnmaid data
 
-1m gridded, downcast profiles were used.
+Finnmaid data, including reconstructed data during LICOS operation failure.
 
 ```{r read_Tina-V_Sensor_data}
 
