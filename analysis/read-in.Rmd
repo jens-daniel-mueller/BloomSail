@@ -1,0 +1,913 @@
+---
+title: "Data base"
+author: "Jens Daniel Müller"
+date:  "`r format(Sys.time(), '%d %B, %Y')`"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
+
+
+```{r packages}
+library(tidyverse)
+library(data.table)
+library(lubridate)
+library(DataExplorer)
+library(leaflet)
+library(readxl)
+library(gsubfn)
+
+```
+
+
+# CTD Sensor data
+
+## Regular profiles and transects
+
+CTD sensor data including recordings from auxiliary pH, O~2~, Chla and pCO~2~ sensors were recorded with a measurement frequency of 15 sec. (In addition, pCO~2~ data were also internally recorded on the Contros HydroC instrument with higher temporal resolution and will later be used for further analysis after merging with CTD data.)
+
+```{r read_profile_transect_CTD_data, eval=FALSE}
+
+setwd("C:/Mueller_Jens_Data/Research/Projects/BloomSail/data/TinaV/Sensor/Profiles_Transects")
+files <- list.files(pattern = "[.]cnv$")
+#file <- files[1]
+
+for (file in files){
+  
+  start.date <- data.table(read.delim(file, sep="#", nrows = 160))[[78,1]]
+  start.date <- substr(start.date, 15, 34)
+  start.date <- mdy_hms(start.date, tz="UTC")
+  
+  tempo <- read.delim(file, sep="", skip = 160, header = FALSE)
+  tempo <- data.table(tempo[,c(2,3,4,5,6,7,9,11,13)])
+  names(tempo) <- c("date", "Dep.S", "Tem.S", "Sal.S", "V_pH", "pH", "Chl", "O2", "pCO2")
+  tempo$start.date <- start.date
+  tempo$date <- tempo$date + tempo$start.date
+  
+  tempo$transect.ID <- substr(file, 1, 6)
+  tempo$type <- substr(file, 8,8)
+  tempo$label <- substr(file, 8,10)
+  
+  tempo$cast <- "up"
+  tempo[date < mean(tempo[Dep.S == max(tempo$Dep.S)]$date)]$cast <- "down"
+  
+  if (exists("dataset")){
+    dataset <- rbind(dataset, tempo)
+  }
+  
+  if (!exists("dataset")){
+    dataset <- tempo
+  }
+  
+  rm(start.date)
+  rm(tempo)
+}
+
+
+CTD <- dataset
+rm(dataset, file, files)
+
+
+setwd("C:/Mueller_Jens_Data/Research/Projects/BloomSail/")
+
+```
+
+```{r read_profile_transect_CTD_data_Ostergarnsholm, eval=FALSE}
+
+setwd("C:/Mueller_Jens_Data/Research/Projects/BloomSail/data/TinaV/Sensor/Ostergarnsholm")
+files <- list.files(pattern = "[.]cnv$")
+#file <- files[1]
+
+for (file in files){
+  
+  start.date <- data.table(read.delim(file, sep="#", nrows = 160))[[78,1]]
+  start.date <- substr(start.date, 15, 34)
+  start.date <- mdy_hms(start.date, tz="UTC")
+  
+  tempo <- read.delim(file, sep="", skip = 160, header = FALSE)
+  tempo <- data.table(tempo[,c(2,3,4,5,6,7,9,11,13)])
+  names(tempo) <- c("date", "Dep.S", "Tem.S", "Sal.S", "V_pH", "pH", "Chl", "O2", "pCO2")
+  tempo$start.date <- start.date
+  tempo$date <- tempo$date + tempo$start.date
+  
+  tempo$transect.ID <- substr(file, 1, 6)
+  tempo$type <- substr(file, 8,8)
+  tempo$label <- substr(file, 11,12)
+    
+  tempo$cast <- "up"
+  tempo[date < mean(tempo[Dep.S == max(tempo$Dep.S)]$date)]$cast <- "down"
+  
+  if (exists("dataset")){
+    dataset <- rbind(dataset, tempo)
+  }
+  
+  if (!exists("dataset")){
+    dataset <- tempo
+  }
+  
+  rm(start.date)
+  rm(tempo)
+}
+
+
+OGB <- dataset
+rm(dataset, file, files)
+
+OGB <- OGB %>% 
+  mutate(type = if_else(label=="bo", "P", "T"),
+         label = if_else(label == "bo", "P14", label),
+         label = if_else(label == "in", "T14", label),
+         label = if_else(label == "ou", "T15", label))
+
+setwd("C:/Mueller_Jens_Data/Research/Projects/BloomSail/")
+
+```
+
+```{r merge_regular_CTD_and_Ostergarnsholm, eval=FALSE}
+CTD <- bind_rows(CTD, OGB) %>% 
+  arrange(date)
+
+rm(OGB)
+```
+
+
+```{r CTD_EDA_raw, eval=FALSE}
+
+source("code/eda.R")
+eda(CTD, "CTD-raw")
+rm(eda)
+
+```
+
+The output of an automated Exploratory Data Analysis (EDA) performed with the package `DataExplorer` can be accessed here:
+
+[Link to EDA report of CTD raw data](https://jens-daniel-mueller.github.io/BloomSail/EDA_report_CTD-raw.html){target="_blank}
+
+CTD recordings were cleaned from obviously erroneous readings, by setting values to NA. 
+
+```{r clean_CTD_data, eval=FALSE}
+
+class(CTD)
+CTD <- data.table(CTD)
+
+# Profiling data
+
+# Temperature
+
+# CTD %>%
+#   filter(type == "P") %>%
+#   ggplot(aes(Tem.S, Dep.S, col=label, linetype = cast))+
+#   geom_line()+
+#   scale_y_reverse()+
+#   geom_vline(xintercept = c(10, 20))+
+#   facet_wrap(~transect.ID)
+
+CTD[transect.ID == "180723" & label == "P07" & Dep.S < 2 & cast == "up"]$Tem.S <- NA
+
+# Salinity
+
+# CTD %>%
+#   filter(type == "P") %>%
+#   ggplot(aes(Sal.S, Dep.S, col=label, linetype = cast))+
+#   geom_path()+
+#   scale_y_reverse()+
+#   facet_wrap(~transect.ID)
+
+CTD[Sal.S < 6]$Sal.S <- NA
+
+# pH
+
+# CTD %>%
+#   filter(type == "P") %>%
+#   ggplot(aes(pH, Dep.S, col=label, linetype=cast))+
+#   geom_path()+
+#   scale_y_reverse()+
+#   facet_wrap(~transect.ID)
+# 
+# CTD %>%
+#   filter(type == "P") %>%
+#   ggplot(aes(V_pH, Dep.S, col=label, linetype=cast))+
+#   geom_path()+
+#   scale_y_reverse()+
+#   facet_wrap(~transect.ID)
+
+CTD[pH < 7.5]$V_pH <- NA
+CTD[pH < 7.5]$pH <- NA
+
+CTD[transect.ID == "180709" & label == "P03" & Dep.S < 5 & cast == "down"]$pH <- NA
+CTD[transect.ID == "180709" & label == "P05" & Dep.S < 10 & cast == "down"]$pH <- NA
+CTD[transect.ID == "180718" & label == "P10" & Dep.S < 3 & cast == "down"]$pH <- NA
+CTD[transect.ID == "180815" & label == "P03" & Dep.S < 2 & cast == "down"]$pH <- NA
+CTD[transect.ID == "180820" & label == "P11" & Dep.S < 15 & cast == "down"]$pH <- NA
+
+CTD[transect.ID == "180709" & label == "P03" & Dep.S < 5 & cast == "down"]$V_pH <- NA
+CTD[transect.ID == "180709" & label == "P05" & Dep.S < 10 & cast == "down"]$V_pH <- NA
+CTD[transect.ID == "180718" & label == "P10" & Dep.S < 3 & cast == "down"]$V_pH <- NA
+CTD[transect.ID == "180815" & label == "P03" & Dep.S < 2 & cast == "down"]$V_pH <- NA
+CTD[transect.ID == "180820" & label == "P11" & Dep.S < 15 & cast == "down"]$V_pH <- NA
+
+
+# pCO2
+
+# CTD %>%
+#   filter(type == "P") %>%
+#   ggplot(aes(pCO2, Dep.S, col=label, linetype = cast))+
+#   geom_path()+
+#   scale_y_reverse()+
+#   facet_wrap(~transect.ID)
+
+CTD[transect.ID == "180616"]$pCO2 <- NA
+
+# O2
+
+# CTD %>% 
+#   filter(type == "P") %>% 
+#   ggplot(aes(O2, Dep.S, col=label, linetype = cast))+
+#   geom_path()+
+#   scale_y_reverse()+
+#   facet_wrap(~transect.ID)
+
+# Chlorophyll
+
+# CTD %>%
+#   filter(type == "P") %>%
+#   ggplot(aes(Chl, Dep.S, col=label, linetype = cast))+
+#   geom_path()+
+#   scale_y_reverse()+
+#   facet_wrap(~transect.ID)
+
+CTD[Chl > 100]$Chl <- NA
+
+
+#### Surface transect data
+
+# CTD %>%
+#   filter(type == "T") %>%
+#   ggplot(aes(date, Dep.S, col=label))+
+#   geom_point()+
+#   scale_y_reverse()+
+#   facet_wrap(~transect.ID, scales = "free_x")
+# 
+# CTD %>%
+#   filter(type == "T") %>%
+#   ggplot(aes(date, Tem.S, col=label))+
+#   geom_point()+
+#   facet_wrap(~transect.ID, scales = "free_x")
+# 
+# CTD %>%
+#   filter(type == "T") %>%
+#   ggplot(aes(date, Sal.S, col=label))+
+#   geom_point()+
+#   facet_wrap(~transect.ID, scales = "free_x")
+# 
+# CTD %>%
+#   filter(type == "T") %>%
+#   ggplot(aes(date, pCO2, col=label))+
+#   geom_point()+
+#   facet_wrap(~transect.ID, scales = "free_x")
+# 
+# CTD %>%
+#   filter(type == "T") %>%
+#   ggplot(aes(date, pH, col=label))+
+#   geom_point()+
+#   facet_wrap(~transect.ID, scales = "free_x")
+# 
+# CTD %>%
+#   filter(type == "T") %>%
+#   ggplot(aes(date, Chl, col=label))+
+#   geom_point()+
+#   facet_wrap(~transect.ID, scales = "free_x")
+
+CTD[type == "T" & Chl > 10]$Chl <- NA
+
+
+# CTD %>% 
+#   filter(type == "T") %>% 
+#   ggplot(aes(date, O2, col=label))+
+#   geom_point()+
+#   facet_wrap(~transect.ID, scales = "free_x")
+
+```
+
+Relevant columns were selected and renamed, only observations from regular stations (P01-P13) and transects (T01-T13) were selected and summarized data were written to file.
+
+```{r subsetting_writing_summary_file, eval=FALSE}
+
+CTD <-
+  CTD %>% 
+  select(date_time=date,
+         ID=transect.ID,
+         type,
+         station=label,
+         dep=Dep.S,
+         sal=Sal.S,
+         tem=Tem.S,
+         pCO2,pH,V_pH,O2,Chl)
+
+# CTD <- CTD %>% 
+#   filter( !(station %in% c("PX1", "PX2", "TX1", "TX2") ))
+
+CTD %>% 
+  write_csv(here::here("data/_summarized_data_files", "Tina_V_Sensor_Profiles_Transects.csv"))
+
+rm(CTD)
+```
+
+```{r reopen_CTD_data}
+CTD <- 
+  read_csv(here::here("data/_summarized_data_files", "Tina_V_Sensor_Profiles_Transects.csv"),
+           col_types = cols(pCO2 = col_double()))
+```
+
+
+```{r CTD_EDA, eval=FALSE}
+
+source("code/eda.R")
+eda(CTD, "CTD")
+
+rm(eda)
+```
+
+
+The output of an automated Exploratory Data Analysis (EDA) performed with the package `DataExplorer` can be accessed here:
+
+[Link to EDA report of CTD clean data](https://jens-daniel-mueller.github.io/BloomSail/EDA_report_CTD.html){target="_blank}
+
+
+```{r Overview_temperature_profiles, fig.cap="Temperature profiles recorded on regular stations P01-P13. ID refers to the starting date of each cruise.", fig.asp = 1.3}
+
+CTD %>%
+  arrange(date_time) %>% 
+  filter(type == "P", !(station %in% c("PX1", "PX2"))) %>%
+  ggplot(aes(tem, dep, col=station))+
+  geom_path()+
+  scale_y_reverse()+
+  labs(x="Temperature (°C)", y="Depth (m)")+
+  facet_wrap(~ID, labeller = label_both)
+
+```
+
+```{r Overview_pCO2_analog_profiles, fig.cap="pCO~2~ profiles (analog output from HydroC) recorded on regular stations P01-P13. ID refers to the starting date of each cruise. Please note that pCO~2~ measurement range is restricted to 100-500  µatm here due to the settings of the analog voltage output of the sensor. Zeroing periods are included.", fig.asp = 1.3}
+
+CTD %>%
+  arrange(date_time) %>% 
+  filter(type == "P", !(station %in% c("PX1", "PX2"))) %>%
+  ggplot(aes(pCO2, dep, col=station))+
+  geom_path()+
+  scale_y_reverse()+
+  labs(x=expression(pCO[2]~(µatm)), y="Depth (m)")+
+  facet_wrap(~ID, labeller = label_both)
+
+```
+
+
+
+# pCO~2~ data
+
+HydroC pCO~2~ data  were provided by KM Contros after applying a drift correction to the raw data, which was based on pre- and post-deployment calibration results. 
+
+```{r read_HydroC_raw_data, eval=FALSE}
+
+# Read Contros corrected data file
+
+HC <-
+  read_csv2(here::here("Data/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
+                       "parameter&pCO2s(method 43).txt"),
+            col_names = c("date_time", "Zero", "Flush", "p_NDIR",
+                          "p_in", "T_control", "T_gas", "%rH_gas",
+                          "Signal_raw", "Signal_ref", "T_sensor",
+                          "pCO2", "Runtime", "nr.ave")) %>% 
+  mutate(date_time = dmy_hms(date_time),
+         Flush = as.factor(as.character(Flush)),
+         Zero = as.factor(as.character(Zero)))
+
+```
+
+Individual deployments (periods of observations with less than 30 sec between recordings) were identified and relevant deployment periods were subsetted.
+
+```{r HydroC_deployment_identification_selection, eval=FALSE}
+
+HC <- HC %>% 
+  arrange(date_time) %>% 
+  mutate(deployment = cumsum(c(TRUE,diff(date_time)>=30)))
+
+HC <- HC %>% 
+  filter(deployment %in% c(2,6,9,14,17,21,23,27,31,33,34,35,37))
+
+```
+
+```{r duplicated_timestamp_correction, eval=FALSE}
+
+
+# add counter for date_time observations
+
+HC <- HC %>% 
+  add_count(date_time)
+
+# find triplicated time stamp and select only first observation, and merge
+
+HC_no_triple <- HC %>% 
+  filter(n <= 2)
+
+HC_triple_clean <- HC %>% 
+  filter(n > 2) %>% 
+  slice(1)
+
+HC <- full_join(HC_no_triple, HC_triple_clean)
+
+rm(list=setdiff(ls(), "HC"))
+
+
+# find duplicated time stamps and shift first by one second backward, and merge
+
+HC %>% 
+  distinct(date_time)
+
+HC <- HC %>% 
+  select(-n) %>% 
+  add_count(date_time)
+
+unique(HC$n)
+
+HC_no_duplicated <- HC %>%
+  filter(n == 1)
+
+HC_duplicated <- HC %>% 
+  filter(n == 2)
+
+HC_duplicated_first <- HC_duplicated %>% 
+  group_by(date_time) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  mutate(date_time = date_time - 1)
+
+HC_duplicated_second <- HC_duplicated %>% 
+  group_by(date_time) %>% 
+  slice(2) %>% 
+  ungroup()
+
+HC_duplicated_clean <- full_join(HC_duplicated_first, HC_duplicated_second) %>% 
+  arrange(date_time)
+
+HC <- full_join(HC_no_duplicated, HC_duplicated_clean)
+
+HC %>% 
+  distinct(date_time)
+
+rm(list=setdiff(ls(), "HC"))
+
+
+
+# find duplicated time stamps and shift first by two seconds forward, and merge
+
+HC %>% 
+  distinct(date_time)
+
+HC <- HC %>% 
+  select(-n) %>% 
+  add_count(date_time)
+
+unique(HC$n)
+
+HC_no_duplicated <- HC %>%
+  filter(n == 1)
+
+HC_duplicated <- HC %>% 
+  filter(n == 2)
+
+HC_duplicated_first <- HC_duplicated %>% 
+  group_by(date_time) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  mutate(date_time = date_time + 2)
+
+HC_duplicated_second <- HC_duplicated %>% 
+  group_by(date_time) %>% 
+  slice(2) %>% 
+  ungroup()
+
+HC_duplicated_clean <- full_join(HC_duplicated_first, HC_duplicated_second) %>% 
+  arrange(date_time)
+
+HC <- full_join(HC_no_duplicated, HC_duplicated_clean)
+
+HC %>% 
+  distinct(date_time)
+
+rm(list=setdiff(ls(), "HC"))
+
+# remaining duplicates are observations where other observations with a +/- 1 sec timestamp exist
+# for those cases, only the first duplicated observation is selected (similar to triplicate treatment)
+
+
+HC %>% 
+  distinct(date_time)
+
+HC <- HC %>% 
+  select(-n) %>% 
+  add_count(date_time)
+
+unique(HC$n)
+
+
+HC_still_no_duplicated <- HC %>% 
+  filter(n == 1)
+
+HC_still_duplicated_first <- HC %>% 
+  filter(n == 2) %>% 
+  group_by(date_time) %>% 
+  slice(1)
+
+HC <- full_join(HC_still_no_duplicated, HC_still_duplicated_first)
+
+HC %>% 
+  distinct(date_time)
+
+rm(list=setdiff(ls(), "HC"))
+
+HC <- HC %>% 
+  select(-n)
+
+```
+
+
+```{r HC_Zeroing_Flush_Identification, eval=FALSE}
+
+# Zeroing ID labelling
+
+HC <- HC %>% 
+  arrange(date_time) %>% 
+  group_by(Zero) %>% 
+  mutate(Zero_ID = as.factor(cumsum(c(TRUE,diff(date_time)>=30)))) %>% 
+  ungroup()
+
+unique(HC$Zero_ID)
+
+# Flush: Identification
+
+HC <- HC %>% 
+  mutate(Flush = 0) %>% 
+  group_by(Zero, Zero_ID) %>% 
+  mutate(start = min(date_time),
+         duration = date_time - start,
+         Flush = if_else(Zero == 0 & duration < 600, "1", "0")) %>% 
+  ungroup()
+
+
+#  Flush: Identify equilibration and internal gas mixing periods
+
+HC <- HC %>% 
+  mutate(mixing = if_else(duration < 20, "mixing", "equilibration"))
+
+
+
+```
+
+A pdf with plots of all Flush periods (mixing and equilibration identified) can be found here:
+
+[Link to Flush period plots](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/data_base/Flush_periods_all.pdf){target="_blank"}
+
+```{r HydroC_deployment_plots, eval=FALSE, eval=FALSE}
+
+pdf(file=here::here("output/Plots/data_base",
+    "HydroC_pCO2_deployments.pdf"), onefile = TRUE, width = 7, height = 4)
+
+for (i in unique(HC$deployment)) {
+  
+  #i <- unique(HC$deployment)[3]
+  
+  sub <-  HC %>%
+      filter(deployment == i)
+  start_date <- min(sub$date_time)
+  
+  print(
+    sub %>% 
+      ggplot(aes(date_time, pCO2, col=Zero_ID))+
+      geom_line()+
+      labs(title = paste("Deployment: ",i, "| Start time: ", start_date))
+)
+  
+}
+
+dev.off()
+
+rm(sub, start_date, i)
+
+```
+
+A pdf with pCO2 timeseries plots of all deployments can be found here:
+
+[Link to pCO~2~ timeseries plots](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/data_base/HydroC_pCO2_deployments.pdf){target="_blank"}
+
+
+```{r HydroC_EDA, eval=FALSE}
+
+source("code/eda.R")
+eda(HC, "HydroC-pCO2")
+rm(eda)
+
+```
+
+The output of an automated Exploratory Data Analysis (EDA) performed with the package `DataExplorer` can be accessed here:
+
+[Link to EDA report of HydroC pCO~2~ data data](https://jens-daniel-mueller.github.io/BloomSail/EDA_report_HydroC-pCO2.html){target="_blank}
+
+Individual zeroings were labeled with a counter and a period of 10 min after the zeroing was labelled as Flush period (overriding the internal Flush flag). A mixing flag was introduced, flagging the initial 20 sec of each Flush period as "mixing" and the rest as "equilibration".
+
+```{r Plot_all_Flush_periods, eval=FALSE}
+
+
+Flush <- HC %>% 
+ filter(Flush == 1)
+
+# Flush: Plot individual periods
+
+pdf(file=here::here("output/Plots/data_base",
+    "Flush_periods_all.pdf"), onefile = TRUE, width = 7, height = 4)
+
+for (i in unique(Flush$Zero_ID)) {
+  
+  #i <- unique(Flush$Zero_ID)[5]
+print(
+  Flush %>%
+    filter(Zero_ID == i) %>%
+    ggplot(aes(duration, pCO2, col=mixing))+
+    geom_point() +
+    scale_color_brewer(palette = "Set1")+
+    labs(y=expression(pCO[2]~(µatm)), x="Duration of Flush period (s)",
+             title = paste("Zero_ID: ", i))
+)
+
+}
+
+dev.off()
+
+rm(Flush,i)
+
+```
+
+
+
+
+
+Summarized pCO~2~ date were written to file.
+
+```{r writing_summary_file, eval=FALSE}
+
+HC %>% 
+  write_csv(here::here("Data/_summarized_data_files",
+                       "Tina_V_HydroC_full.csv"))
+
+HC %>% 
+  select(date_time, Zero, Flush, pCO2, deployment, Zero_ID, duration, mixing) %>% 
+  write_csv(here::here("Data/_summarized_data_files",
+                       "Tina_V_HydroC.csv"))
+
+```
+
+
+# Bottle data
+
+## CO~2~
+
+```{r read_bottle_CO2, eval=FALSE}
+
+
+Bottle <- read_csv(here::here("Data/TinaV/Bottle/Tracegases", "BloomSail_bottle_CO2_all.csv"),
+                   col_types = list("c","c","n","n","n","n","n"))
+
+Bottle <- Bottle %>% 
+  select(ID=transect.ID,
+         station=label,
+         dep=Dep,
+         sal=Sal,
+         CT, AT,
+         pH_Mosley = pH.Mosley)
+
+Bottle %>% 
+  write_csv(here::here("Data/_summarized_data_files", "Tina_V_Bottle_CO2_lab.csv"))
+
+```
+
+
+
+# GPS Track
+
+First, we read the GPS track data.
+
+```{r read_GPS, eval=FALSE}
+
+setwd("C:/Mueller_Jens_Data/Research/Projects/BloomSail/data/TinaV/Track/GPS_Logger_Track")
+files <- list.files(pattern = "[.]txt$")
+
+
+for (file in files){
+  
+  # if the merged dataset does exist, append to it
+  if (exists("dataset")){
+    
+    tempo<-data.table ( read.delim(file, sep=",")[,c(2,3,4)])
+    names(tempo) <- c("date_time", "lat", "lon")
+    tempo$date_time<- ymd_hms(tempo$date, tz="UTC")
+    
+    dataset<-rbind(dataset, tempo)
+    rm(tempo)
+  }
+  
+  # if the merged dataset doesn't exist, create it
+  if (!exists("dataset")){
+    dataset<-data.table ( read.delim(file, sep=",")[,c(2,3,4)])
+    names(dataset) <- c("date_time", "lat", "lon")
+    dataset$date_time<- ymd_hms(dataset$date_time, tz="UTC")
+    
+  }
+}
+
+track <- dataset
+rm(dataset, file, files)
+
+setwd("C:/Mueller_Jens_Data/Research/Projects/BloomSail")
+
+track %>% 
+  write_csv(here::here("Data/_summarized_data_files",
+                       "TinaV_Track.csv"))
+
+# track_sub <- track %>%
+#  slice(which(row_number() %% 20 == 1))
+# 
+# bathy <- read_csv(here::here("data/Maps","Bathymetry_Gotland_east.csv"))
+# 
+# track_sub %>% 
+#   ggplot()+
+#   geom_raster(data=bathy, aes(lon, lat, fill=elev))+
+#   scale_fill_continuous(na.value = "black", name="Tiefe [m]")+
+#   geom_path(aes(lon, lat), col="grey80")+
+#   labs(x="Längengrad (°E)", y="Breitengrad (°N)")+
+#   coord_quickmap(expand = 0, ylim = c(57.25,57.6), xlim = c(18.6, 19.8))+
+#   theme_bw()+
+#   guides(col = guide_legend(nrow = 5))
+
+```
+
+And than create an interactive map.
+
+```{r map}
+
+track <- 
+  read_csv(here::here("Data/_summarized_data_files",
+                       "TinaV_Track.csv"))
+
+track_sub <- track %>%
+  slice(which(row_number() %% 20 == 1))
+
+rm(track)
+
+leaflet() %>% 
+  setView(lng = 20, lat = 57.3, zoom = 8) %>%
+  addLayersControl(baseGroups = c("Ocean Basemap",
+                                  "Satellite"),
+                   overlayGroups = c("Track"),
+                   options = layersControlOptions(collapsed = FALSE),
+                   position = 'topright') %>% 
+  addProviderTiles("Esri.WorldImagery", group = "Satellite") %>%
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Ocean Basemap") %>%
+  addScaleBar(position = 'topright') %>%
+  addMeasure(
+    primaryLengthUnit = "kilometers",
+    secondaryLengthUnit = 'miles', 
+    primaryAreaUnit = "sqmeters",
+    secondaryAreaUnit="acres", 
+    position = 'topleft') %>% 
+  addPolylines(data = track_sub, ~lon, ~lat,
+               color = "red",
+               group = "Track") 
+
+```
+
+
+# Finnmaid
+
+pCO~2~ data were recorded on VOS Finnmaid in summer 2018.
+
+```{r read_Finnmaid_data, eval=FALSE}
+
+
+### June - August 2018
+
+setwd("C:/Mueller_Jens_Data/Research/Projects/BloomSail/data/Finnmaid_2018")
+files <- list.files(pattern = "[.]xls$")
+#file <-files[1]
+
+for (file in files){
+  
+  
+  df <- read_excel(file)
+  df <- df[c(1,2,3,12,7,4,15,8,5,17)]
+  names(df) <- c("date","Lon","Lat","pCO2","Sal","Tem","cO2","patm", "Teq","xCO2")
+  df <- df[-c(1),]
+  df$date <- as.POSIXct(as.numeric(df$date)*60*60*24, origin="1899-12-30", tz="GMT")
+  df$Lon <- as.numeric(as.character(df$Lon))
+  df$Lat <- as.numeric(as.character(df$Lat))
+  df$pCO2 <- as.numeric(as.character(df$pCO2))
+  df$Sal <- as.numeric(as.character(df$Sal))
+  df$Tem <- as.numeric(as.character(df$Tem))
+  df$cO2 <- as.numeric(as.character(df$cO2))
+  df$patm <- as.numeric(as.character(df$patm))
+  df$Teq <- as.numeric(as.character(df$Teq))
+  df$xCO2 <- as.numeric(as.character(df$xCO2))
+  df <- data.table(df)
+  
+  df$route <- strapplyc(as.character(file), ".*(.).xls*", simplify = TRUE)
+  df$ID <- substr(as.character(file), 3, 10)
+  
+  if (exists("temp")){
+    temp <- rbind (temp, df)
+  } else{temp <- df}
+  
+}
+
+
+rm(df, files, file)
+temp <- temp[pCO2 != 0]
+
+
+#### Los Gatos data
+
+setwd("C:/Mueller_Jens_Data/Research/Projects/BloomSail/data/Finnmaid_2018/LGR")
+files <- list.files(pattern = "[.]xls$")
+#file <-files[1]
+
+for (file in files){
+  
+  
+  df <- read_excel(file)
+  df <- df[c(2,3,4,8,6,5,14,7,15,9)]
+  names(df) <- c("date","Lon","Lat","pCO2","Sal","Tem","cO2","patm", "Teq","xCO2")
+  df <- df[-c(1),]
+  df$date <- dmy_hms(df$date)
+  df <- data.table(df)
+  
+  df$route <- substr(as.character(file), 12, 12)
+  df$ID <- substr(as.character(file), 3, 10)
+  
+  if (exists("temp.LGR")){
+    temp.LGR <- rbind (temp.LGR, df)
+  } else{temp.LGR <- df}
+  
+}
+
+
+#Convert O2 sat to O2 concentration #
+
+source(here::here("code", "O2stoO2c.R"))
+
+temp.LGR <- temp.LGR %>%
+  filter() %>% 
+  mutate(cO2 = O2stoO2c(O2sat = cO2, T=Tem, S=Sal, P=3/10, p_atm = 1013.5))
+
+
+#### Merge Los Gator and LICOR data files ####
+
+temp$sensor <- "LICOR"
+temp.LGR$sensor <- "LosGatos"
+
+temp <- rbind(temp, temp.LGR)
+
+rm(temp.LGR, df, file, files)
+
+
+#### Assign subareas according to Schneider and Mueller (2018) ####
+
+temp$Area <- with(temp,
+                  ifelse(Lon>12 & Lon<12.6, "1.MEB",
+                  ifelse(Lon>13.1 & Lon<14.3, "2.ARK",
+                  ifelse(Lat>57.5 & Lat<58.5 & route %in% c("E", "G"), "4.EGS",
+                  ifelse(Lat>57.33 & Lat<57.5 & route %in% c("E"), "BS",
+                  ifelse(Lat>56.8 & Lat<57.5 & route=="W", "3.WGS",
+                  ifelse(Lat>58.5 & Lat<59 & Lon>20, "5.NGS",
+                  ifelse(Lon>22 & Lon<24, "6.WGF",
+                  ifelse(Lon>24 & Lon<24.5, "7.HGF", "NaN")))))))))
+
+
+temp <-temp[complete.cases(temp[,pCO2]),]
+
+temp %>% 
+  write_csv(here::here("Data/_summarized_data_files",
+                       "Finnmaid.csv"))
+
+
+
+```
+
+
+
+# Tasks / open questions
+
+- Include data from crossing large vessels 
+
+- Include information about HydroC calibration results and raw data correction by Contros
+
+- Check results from field response time experiment (high zeroing frequency)

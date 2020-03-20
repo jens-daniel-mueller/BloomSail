@@ -3,22 +3,24 @@ output_dir: ../docs
 navbar:
   title: BloomSail
   left:
-  - text: Data
-    href: data_base.html
-  - text: Handling
-    href: merging_interpolation.html
+  - text: Data base
+    menu:
+    - text: Read-in
+      href: read-in.html
+    - text: Mergind and interpolation
+      href: merging_interpolation.html
   - text: Response time
     href: response_time.html
   - text: CT dynamics
     href: CT_dynamics.html
   - text: Gas flux
-    href: gas_exchange.html
-  - text: MLD
-    href: MLD.html
+    href: gas_flux.html
   - text: NCP reconstruction
     menu:
-    - text: BloomSail surface data
-      href: BloomSail_surface.html
+    - text: BloomSail delta T approach
+      href: BloomSail_dT.html
+    - text: BloomSail MLD approach
+      href: BloomSail_MLD.html
     - text: Finnmaid + GETM
       href: Finnmaid+GETM.html
   right:
