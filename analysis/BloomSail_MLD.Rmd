@@ -74,11 +74,17 @@ MLD <- df  %>%
 
 df <- full_join(df, MLD)
 
+MLD_sum <- MLD %>% 
+  select(-station) %>% 
+  group_by(ID, date_time_ID, rho_lim)%>%
+  summarise_all(list(~mean(.),~sd(.),~min(.), ~max(.))) %>% 
+  ungroup()
+
 ```
 
 ## Density profiles
 
-```{r plot_density_profiles, fig.cap="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD", fig.asp = 1.4}
+```{r plot_density_profiles, fig.cap="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD"}
 
 df %>% 
   filter(dep < 30) %>% 
@@ -89,28 +95,6 @@ df %>%
   scale_y_reverse()+
   scale_color_discrete(name="Rho lim")+
   facet_grid(ID~station)
-
-```
-
-## Timeseries plot
-
-```{r plot_MLD_timeseries, fig.asp=1.5}
-
-MLD_sum <- MLD %>% 
-  select(-station) %>% 
-  group_by(ID, date_time_ID, rho_lim)%>%
-  summarise_all(list(~mean(.),~sd(.),~min(.), ~max(.))) %>% 
-  ungroup()
-
-MLD_sum %>% 
-  ggplot()+
-  geom_ribbon(aes(date_time_ID, ymin = min, ymax = max), alpha = 0.5)+
-  geom_path(aes(date_time_ID, mean))+
-  geom_errorbar(aes(date_time_ID, ymin = mean-sd, ymax = mean+sd))+
-  geom_point(aes(date_time_ID, mean))+
-  labs(x="Mean transect date", y="Mixed layer depth [m]")+
-  ylim(0,30)+
-  facet_grid(rho_lim~., labeller = label_both)
 
 ```
 
@@ -165,6 +149,8 @@ rm(i_ID, i_station)
 
 The effective NCP penetration depth, z~eff~, was calculated as the ratio of the observed inremental change of the depth integrated NCP, divided by the change in surface C~T~. 
 
+## C~T~ and NCP changes
+
 ```{r NCP_penetration_depth_calculation}
 
 CT_ts <-
@@ -205,6 +191,8 @@ CT_long %>%
   facet_grid(parameter~., scales = "free_y")
 
 ```
+
+## Time series MLD and zeff
 
 ```{r plot_NCP_penetration_depth_and_MLD}
 
