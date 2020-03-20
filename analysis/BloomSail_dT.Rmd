@@ -67,11 +67,15 @@ df %>%
   geom_hline(yintercept = 0)+
   geom_vline(xintercept = 0)+
   geom_path()+
-  geom_point(aes(fill=as.factor(ID)), shape=21)+
+  geom_point(aes(fill=ID), shape=21)+
   scale_fill_viridis_d()
 
 
 ```
+
+# Reconstruction of C~T~ dynamics at depth
+
+The ratio of the incremental change of C~T~ with temperature at the seasurface was applied to calculate the C~T~ in other water depth based on the known change in temperature.
 
 ```{r reconctruction_CT_incremental_changes_profiles}
 
@@ -92,6 +96,7 @@ df <- df %>%
 
 ```
 
+The reconstructed incremental changes are added up to derive cummulative C~T~ changes throughout the water column.
 
 ```{r reconctruction_CT_cumulative_changes_profiles}
 
@@ -106,7 +111,7 @@ df <- df %>%
 
 ## Profiles of incremental changes
 
-Changes of seawater parameters at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.
+Changes of seawater parameters at each depth were reconstructed from one cruise day to the next and divided by the number of days inbetween.
 
 ```{r incremental_changes_profiles}
 
@@ -123,7 +128,6 @@ df %>%
 
 
 ```
-
 
 
 ## Profiles of cumulative changes
@@ -144,7 +148,7 @@ df %>%
 
 ```
 
-Cumulative positive and negative changes of seawater parameters were calculated separately at each depth relative to the first cruise day on July 5.
+Reconstructed cumulative positive and negative changes of seawater parameters were calculated separately at each depth relative to the first cruise day on July 5.
 
 ```{r cumulative_directional_changes_profiles}
 
