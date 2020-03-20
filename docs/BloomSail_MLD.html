@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1ebd01a942fe9692198b910ad2d6bb940cded9bftargetblank1ebd01aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/1ebd01a942fe9692198b910ad2d6bb940cded9bf" target="_blank">1ebd01a</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3099bfcef53fc3fba121f61cab128c3d26f4a64dtargetblank3099bfca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/3099bfcef53fc3fba121f61cab128c3d26f4a64d" target="_blank">3099bfc</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1ebd01a942fe9692198b910ad2d6bb940cded9bftargetblank1ebd01aa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3099bfcef53fc3fba121f61cab128c3d26f4a64dtargetblank3099bfca" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -578,12 +578,6 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
-
-Unstaged changes:
-    Deleted:    analysis/BloomSail_surface.Rmd
-    Deleted:    analysis/MLD.Rmd
-    Deleted:    analysis/data_base.Rmd
-    Deleted:    analysis/gas_exchange.Rmd
 
 </code></pre>
 <p>
@@ -666,7 +660,8 @@ Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizonta
 <pre class="r"><code>MLD_sum &lt;- MLD %&gt;% 
   select(-station) %&gt;% 
   group_by(ID, date_time_ID, rho_lim)%&gt;%
-  summarise_all(list(~mean(.),~sd(.),~min(.), ~max(.)))
+  summarise_all(list(~mean(.),~sd(.),~min(.), ~max(.))) %&gt;% 
+  ungroup()
 
 MLD_sum %&gt;% 
   ggplot()+
@@ -728,37 +723,62 @@ CT_profiles &lt;-
 
 CT_conc_surf &lt;-
   CT_profiles %&gt;% 
-  filter(dep &lt; 3,
+  filter(dep == 3.5,
          parameter == &quot;CT&quot;,
          sign == &quot;neg&quot;) %&gt;% 
-  group_by(ID, date_time_ID) %&gt;% 
-  summarise(dCT = mean(diff_value))
+  group_by(date_time_ID) %&gt;% 
+  summarise(dCT = mean(diff_value)) %&gt;% 
+  ungroup()
 
 NCP_integ &lt;- CT_ts %&gt;% 
   filter(sign == &quot;neg&quot;) %&gt;% 
   group_by(ID, date_time_ID) %&gt;% 
-  summarise(dNCPi = sum(dCT))
+  summarise(dNCPi = sum(dCT)) %&gt;% 
+  ungroup()
 
 CT &lt;- full_join(CT_conc_surf, NCP_integ)
+
+rm(CT_conc_surf, NCP_integ, CT_ts, CT_profiles)
 
 CT &lt;- CT %&gt;% 
   mutate(zeff = (dNCPi/dCT)*1e3)
 
 CT_long &lt;- CT %&gt;% 
-  pivot_longer(3:4, names_to = &quot;parameter&quot;, values_to = &quot;values&quot;)
+  pivot_longer(c(dCT, dNCPi), names_to = &quot;parameter&quot;, values_to = &quot;values&quot;)
 
 CT_long %&gt;% 
   ggplot(aes(date_time_ID, values))+
   geom_path()+
   geom_point()+
   facet_grid(parameter~., scales = &quot;free_y&quot;)</code></pre>
-<p><img src="figure/BloomSail_MLD.Rmd/NCP_penetration_depth-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>CT %&gt;% 
-  ggplot(aes(date_time_ID, zeff))+
-  geom_path()+
-  geom_point()+
-  scale_y_reverse()</code></pre>
-<p><img src="figure/BloomSail_MLD.Rmd/NCP_penetration_depth-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/BloomSail_MLD.Rmd/NCP_penetration_depth_calculation-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>df &lt;- full_join(MLD_sum, CT)
+
+date_grid &lt;- df %&gt;% 
+  select(ID, date_time_ID) %&gt;% 
+  unique() %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  mutate(diff_date = difftime(date_time_ID, lag(date_time_ID))/2,
+         mean_date = date_time_ID - diff_date) %&gt;% 
+  select(ID, mean_date)
+
+df &lt;- full_join(df, date_grid)
+rm(date_grid)
+
+df %&gt;% 
+  ggplot()+
+  geom_ribbon(aes(date_time_ID, ymin = min, ymax = max, fill=&quot;MLD&quot;), alpha = 0.2)+
+  geom_path(aes(date_time_ID, mean, col=&quot;MLD&quot;))+
+  geom_errorbar(aes(date_time_ID, ymin = mean-sd, ymax = mean+sd, col=&quot;MLD&quot;))+
+  geom_point(aes(date_time_ID, mean, col=&quot;MLD&quot;))+
+  geom_point(aes(mean_date, zeff, col=&quot;zeff&quot;))+
+  geom_line(aes(mean_date, zeff, col=&quot;zeff&quot;))+
+  labs(x=&quot;Mean transect date&quot;, y=&quot;Depth [m]&quot;)+
+  scale_y_reverse()+
+  scale_color_brewer(palette = &quot;Set1&quot;, direction = -1, name=&quot;&quot;)+
+  scale_fill_brewer(palette = &quot;Set1&quot;, direction = -1, guide=FALSE)+
+  facet_grid(rho_lim~., labeller = label_both)</code></pre>
+<p><img src="figure/BloomSail_MLD.Rmd/plot_NCP_penetration_depth_and_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -790,21 +810,21 @@ other attached packages:
 [13] tibble_2.1.3    ggplot2_3.3.0   tidyverse_1.3.0
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.2       lubridate_1.7.4  here_0.1         lattice_0.20-35 
- [5] assertthat_0.2.1 zeallot_0.1.0    rprojroot_1.3-2  digest_0.6.22   
- [9] R6_2.4.0         cellranger_1.1.0 backports_1.1.5  reprex_0.3.0    
-[13] evaluate_0.14    httr_1.4.1       highr_0.8        pillar_1.4.2    
-[17] rlang_0.4.5      readxl_1.3.1     rstudioapi_0.10  rmarkdown_2.0   
-[21] labeling_0.3     munsell_0.5.0    broom_0.5.3      compiler_3.5.0  
-[25] httpuv_1.5.2     modelr_0.1.5     xfun_0.10        pkgconfig_2.0.3 
-[29] htmltools_0.4.0  tidyselect_0.2.5 workflowr_1.6.0  crayon_1.3.4    
-[33] dbplyr_1.4.2     withr_2.1.2      later_1.0.0      grid_3.5.0      
-[37] nlme_3.1-137     jsonlite_1.6     gtable_0.3.0     lifecycle_0.1.0 
-[41] DBI_1.0.0        git2r_0.26.1     magrittr_1.5     scales_1.0.0    
-[45] cli_1.1.0        stringi_1.4.3    fs_1.3.1         promises_1.1.0  
-[49] xml2_1.2.2       generics_0.0.2   vctrs_0.2.0      tools_3.5.0     
-[53] glue_1.3.1       hms_0.5.2        yaml_2.2.0       colorspace_1.4-1
-[57] rvest_0.3.5      knitr_1.26       haven_2.2.0     </code></pre>
+ [1] Rcpp_1.0.2         lubridate_1.7.4    here_0.1           lattice_0.20-35   
+ [5] assertthat_0.2.1   zeallot_0.1.0      rprojroot_1.3-2    digest_0.6.22     
+ [9] R6_2.4.0           cellranger_1.1.0   backports_1.1.5    reprex_0.3.0      
+[13] evaluate_0.14      httr_1.4.1         highr_0.8          pillar_1.4.2      
+[17] rlang_0.4.5        readxl_1.3.1       rstudioapi_0.10    rmarkdown_2.0     
+[21] labeling_0.3       munsell_0.5.0      broom_0.5.3        compiler_3.5.0    
+[25] httpuv_1.5.2       modelr_0.1.5       xfun_0.10          pkgconfig_2.0.3   
+[29] htmltools_0.4.0    tidyselect_0.2.5   workflowr_1.6.0    crayon_1.3.4      
+[33] dbplyr_1.4.2       withr_2.1.2        later_1.0.0        grid_3.5.0        
+[37] nlme_3.1-137       jsonlite_1.6       gtable_0.3.0       lifecycle_0.1.0   
+[41] DBI_1.0.0          git2r_0.26.1       magrittr_1.5       scales_1.0.0      
+[45] cli_1.1.0          stringi_1.4.3      fs_1.3.1           promises_1.1.0    
+[49] xml2_1.2.2         generics_0.0.2     vctrs_0.2.0        RColorBrewer_1.1-2
+[53] tools_3.5.0        glue_1.3.1         hms_0.5.2          yaml_2.2.0        
+[57] colorspace_1.4-1   rvest_0.3.5        knitr_1.26         haven_2.2.0       </code></pre>
 </div>
 </div>
 
