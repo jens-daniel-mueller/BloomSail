@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1ebd01a942fe9692198b910ad2d6bb940cded9bftargetblank1ebd01aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/1ebd01a942fe9692198b910ad2d6bb940cded9bf" target="_blank">1ebd01a</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee50dee66c90dc512f8c20fbefe11099cab513fc9targetblanke50dee6a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/e50dee66c90dc512f8c20fbefe11099cab513fc9" target="_blank">e50dee6</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1ebd01a942fe9692198b910ad2d6bb940cded9bftargetblank1ebd01aa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee50dee66c90dc512f8c20fbefe11099cab513fc9targetblanke50dee6a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -578,12 +578,6 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
-
-Unstaged changes:
-    Deleted:    analysis/BloomSail_surface.Rmd
-    Deleted:    analysis/MLD.Rmd
-    Deleted:    analysis/data_base.Rmd
-    Deleted:    analysis/gas_exchange.Rmd
 
 </code></pre>
 <p>
@@ -642,9 +636,13 @@ df %&gt;%
   geom_hline(yintercept = 0)+
   geom_vline(xintercept = 0)+
   geom_path()+
-  geom_point(aes(fill=as.factor(ID)), shape=21)+
+  geom_point(aes(fill=ID), shape=21)+
   scale_fill_viridis_d()</code></pre>
 <p><img src="figure/BloomSail_dT.Rmd/CT_and_temperature_changes_in_surface-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="reconstruction-of-ct-dynamics-at-depth" class="section level1">
+<h1><span class="header-section-number">3</span> Reconstruction of C<sub>T</sub> dynamics at depth</h1>
+<p>The ratio of the incremental change of C<sub>T</sub> with temperature at the seasurface was applied to calculate the C<sub>T</sub> in other water depth based on the known change in temperature.</p>
 <pre class="r"><code>df_factor &lt;- df %&gt;% 
   drop_na() %&gt;% 
   mutate(factor = dCT/dtem,
@@ -659,6 +657,7 @@ df &lt;- df %&gt;%
   mutate(diff_value = dtem * factor) %&gt;% 
   ungroup() %&gt;% 
   select(-factor)</code></pre>
+<p>The reconstructed incremental changes are added up to derive cummulative C<sub>T</sub> changes throughout the water column.</p>
 <pre class="r"><code>df &lt;- df %&gt;% 
   group_by(dep) %&gt;% 
   arrange(date_time_ID) %&gt;% 
@@ -666,8 +665,8 @@ df &lt;- df %&gt;%
          diff_value_daily = diff_value / diff_time,
          cum_value = cumsum(diff_value))</code></pre>
 <div id="profiles-of-incremental-changes" class="section level2">
-<h2><span class="header-section-number">2.1</span> Profiles of incremental changes</h2>
-<p>Changes of seawater parameters at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.</p>
+<h2><span class="header-section-number">3.1</span> Profiles of incremental changes</h2>
+<p>Changes of seawater parameters at each depth were reconstructed from one cruise day to the next and divided by the number of days inbetween.</p>
 <pre class="r"><code>df %&gt;% 
   arrange(dep) %&gt;% 
   ggplot(aes(diff_value_daily, dep, col=ID))+
@@ -681,7 +680,7 @@ df &lt;- df %&gt;%
 <p><img src="figure/BloomSail_dT.Rmd/incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="profiles-of-cumulative-changes" class="section level2">
-<h2><span class="header-section-number">2.2</span> Profiles of cumulative changes</h2>
+<h2><span class="header-section-number">3.2</span> Profiles of cumulative changes</h2>
 <p>Cumulative changes of seawater parameters were calculated at each depth relative to the first cruise day on July 5.</p>
 <pre class="r"><code>df %&gt;% 
   arrange(dep) %&gt;% 
@@ -693,7 +692,7 @@ df &lt;- df %&gt;%
   scale_color_viridis_d()+
   labs(x=&quot;Cumulative change of value&quot;)</code></pre>
 <p><img src="figure/BloomSail_dT.Rmd/cumulative_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>Cumulative positive and negative changes of seawater parameters were calculated separately at each depth relative to the first cruise day on July 5.</p>
+<p>Reconstructed cumulative positive and negative changes of seawater parameters were calculated separately at each depth relative to the first cruise day on July 5.</p>
 <pre class="r"><code>df &lt;- df %&gt;% 
   mutate(sign = if_else(diff_value &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;% 
   group_by(dep, sign) %&gt;%
@@ -716,9 +715,9 @@ df %&gt;%
 </div>
 </div>
 <div id="timeseries" class="section level1">
-<h1><span class="header-section-number">3</span> Timeseries</h1>
+<h1><span class="header-section-number">4</span> Timeseries</h1>
 <div id="incremental-and-cumulative" class="section level2">
-<h2><span class="header-section-number">3.1</span> Incremental and cumulative</h2>
+<h2><span class="header-section-number">4.1</span> Incremental and cumulative</h2>
 <p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated for 5m depth intervals.</p>
 <pre class="r"><code>NCP &lt;- df %&gt;% 
   mutate(dep = cut(dep, seq(0,30,5))) %&gt;% 
@@ -781,9 +780,9 @@ p_iNCPcum &lt;- NCP %&gt;%
 </div>
 </div>
 <div id="hovmoeller-plots" class="section level1">
-<h1><span class="header-section-number">4</span> Hovmoeller plots</h1>
+<h1><span class="header-section-number">5</span> Hovmoeller plots</h1>
 <div id="daily-changes" class="section level2">
-<h2><span class="header-section-number">4.1</span> Daily changes</h2>
+<h2><span class="header-section-number">5.1</span> Daily changes</h2>
 <pre class="r"><code>bin_CT &lt;- 2.5
 
 df %&gt;% 
