@@ -99,7 +99,8 @@ df %>%
 MLD_sum <- MLD %>% 
   select(-station) %>% 
   group_by(ID, date_time_ID, rho_lim)%>%
-  summarise_all(list(~mean(.),~sd(.),~min(.), ~max(.)))
+  summarise_all(list(~mean(.),~sd(.),~min(.), ~max(.))) %>% 
+  ungroup()
 
 MLD_sum %>% 
   ggplot()+
@@ -164,7 +165,7 @@ rm(i_ID, i_station)
 
 The effective NCP penetration depth, z~eff~, was calculated as the ratio of the observed inremental change of the depth integrated NCP, divided by the change in surface C~T~. 
 
-```{r NCP_penetration_depth}
+```{r NCP_penetration_depth_calculation}
 
 CT_ts <-
   read_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_CT_cumulative_timeseries.csv"))
@@ -174,24 +175,28 @@ CT_profiles <-
 
 CT_conc_surf <-
   CT_profiles %>% 
-  filter(dep < 3,
+  filter(dep == 3.5,
          parameter == "CT",
          sign == "neg") %>% 
-  group_by(ID, date_time_ID) %>% 
-  summarise(dCT = mean(diff_value))
+  group_by(date_time_ID) %>% 
+  summarise(dCT = mean(diff_value)) %>% 
+  ungroup()
 
 NCP_integ <- CT_ts %>% 
   filter(sign == "neg") %>% 
   group_by(ID, date_time_ID) %>% 
-  summarise(dNCPi = sum(dCT))
+  summarise(dNCPi = sum(dCT)) %>% 
+  ungroup()
 
 CT <- full_join(CT_conc_surf, NCP_integ)
+
+rm(CT_conc_surf, NCP_integ, CT_ts, CT_profiles)
 
 CT <- CT %>% 
   mutate(zeff = (dNCPi/dCT)*1e3)
 
 CT_long <- CT %>% 
-  pivot_longer(3:4, names_to = "parameter", values_to = "values")
+  pivot_longer(c(dCT, dNCPi), names_to = "parameter", values_to = "values")
 
 CT_long %>% 
   ggplot(aes(date_time_ID, values))+
@@ -199,11 +204,37 @@ CT_long %>%
   geom_point()+
   facet_grid(parameter~., scales = "free_y")
 
-CT %>% 
-  ggplot(aes(date_time_ID, zeff))+
-  geom_path()+
-  geom_point()+
-  scale_y_reverse()
+```
+
+```{r plot_NCP_penetration_depth_and_MLD}
+
+df <- full_join(MLD_sum, CT)
+
+date_grid <- df %>% 
+  select(ID, date_time_ID) %>% 
+  unique() %>% 
+  arrange(date_time_ID) %>% 
+  mutate(diff_date = difftime(date_time_ID, lag(date_time_ID))/2,
+         mean_date = date_time_ID - diff_date) %>% 
+  select(ID, mean_date)
+
+df <- full_join(df, date_grid)
+rm(date_grid)
+
+df %>% 
+  ggplot()+
+  geom_ribbon(aes(date_time_ID, ymin = min, ymax = max, fill="MLD"), alpha = 0.2)+
+  geom_path(aes(date_time_ID, mean, col="MLD"))+
+  geom_errorbar(aes(date_time_ID, ymin = mean-sd, ymax = mean+sd, col="MLD"))+
+  geom_point(aes(date_time_ID, mean, col="MLD"))+
+  geom_point(aes(mean_date, zeff, col="zeff"))+
+  geom_line(aes(mean_date, zeff, col="zeff"))+
+  labs(x="Mean transect date", y="Depth [m]")+
+  scale_y_reverse()+
+  scale_color_brewer(palette = "Set1", direction = -1, name="")+
+  scale_fill_brewer(palette = "Set1", direction = -1, guide=FALSE)+
+  facet_grid(rho_lim~., labeller = label_both)
+
 
 ```
 

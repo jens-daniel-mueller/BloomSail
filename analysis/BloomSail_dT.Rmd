@@ -1,5 +1,5 @@
 ---
-title: "Reconstruction of NCP based on surface pCO2 and CTD data"
+title: "Reconstruction of NCP based on surface CO2 and CTD data"
 author: "Jens Daniel Müller"
 date:  "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
