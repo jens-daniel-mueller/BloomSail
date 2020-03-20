@@ -360,11 +360,20 @@ div.tocify {
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <li>
-  <a href="data_base.html">Data</a>
-</li>
-<li>
-  <a href="merging_interpolation.html">Handling</a>
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Data base
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="read-in.html">Read-in</a>
+    </li>
+    <li>
+      <a href="merging_interpolation.html">Mergind and interpolation</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="response_time.html">Response time</a>
@@ -373,10 +382,7 @@ div.tocify {
   <a href="CT_dynamics.html">CT dynamics</a>
 </li>
 <li>
-  <a href="gas_exchange.html">Gas flux</a>
-</li>
-<li>
-  <a href="MLD.html">MLD</a>
+  <a href="gas_flux.html">Gas flux</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -386,7 +392,10 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="BloomSail_surface.html">BloomSail surface data</a>
+      <a href="BloomSail_dT.html">BloomSail delta T approach</a>
+    </li>
+    <li>
+      <a href="BloomSail_MLD.html">BloomSail MLD approach</a>
     </li>
     <li>
       <a href="Finnmaid+GETM.html">Finnmaid + GETM</a>
@@ -551,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee9938a9886db313b94fa0b4319640332a4ff8ed7targetblanke9938a9a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/e9938a9886db313b94fa0b4319640332a4ff8ed7" target="_blank">e9938a9</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1ebd01a942fe9692198b910ad2d6bb940cded9bftargetblank1ebd01aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/1ebd01a942fe9692198b910ad2d6bb940cded9bf" target="_blank">1ebd01a</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee9938a9886db313b94fa0b4319640332a4ff8ed7targetblanke9938a9a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1ebd01a942fe9692198b910ad2d6bb940cded9bftargetblank1ebd01aa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -570,12 +579,11 @@ Ignored files:
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
 
-Untracked files:
-    Untracked:  analysis/BloomSail_surface.Rmd
-
 Unstaged changes:
-    Deleted:    analysis/Reconstruction.Rmd
-    Modified:   analysis/_site.yml
+    Deleted:    analysis/BloomSail_surface.Rmd
+    Deleted:    analysis/MLD.Rmd
+    Deleted:    analysis/data_base.Rmd
+    Deleted:    analysis/gas_exchange.Rmd
 
 </code></pre>
 <p>

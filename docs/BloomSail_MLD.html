@@ -12,7 +12,7 @@
 <meta name="author" content="Jens Daniel Müller" />
 
 
-<title>Merging and interpolation of observations</title>
+<title>MLD</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -442,7 +442,7 @@ div.section {
 
 
 
-<h1 class="title toc-ignore">Merging and interpolation of observations</h1>
+<h1 class="title toc-ignore">MLD</h1>
 <h4 class="author">Jens Daniel Müller</h4>
 <h4 class="date">20 March, 2020</h4>
 
@@ -604,204 +604,161 @@ There are no past versions. Publish this analysis with <code>wflow_publish()</co
 </div>
 </div>
 <pre class="r"><code>library(tidyverse)
-library(lubridate)
-library(zoo)
-# library(dygraphs)
-# library(xts)</code></pre>
-<div id="ctd-and-pco2-data" class="section level1">
-<h1>CTD and pCO<sub>2</sub> data</h1>
-<div id="merging-summarized-data-sets" class="section level2">
-<h2>Merging summarized data sets</h2>
-<pre class="r"><code># Load Sensor and HydroC data ---------------------------------------------
-
-CTD &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
-                              &quot;Tina_V_Sensor_Profiles_Transects.csv&quot;),
-                   col_types = list(&quot;pCO2&quot; = col_double())) %&gt;% 
-  rename(pCO2_analog = pCO2)
-
-HC &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;Tina_V_HydroC.csv&quot;))
-HC_full &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;Tina_V_HydroC_full.csv&quot;))
-
-# Time offset correction ----------------------------------------------
-
-# Time offset was determined by comparing zeroing reads from Sensor and HC
-# in the plots produced in the section Time stamp synchronzity below
-# before applying this correction
-
-CTD &lt;- CTD %&gt;% 
-  mutate(day = yday(date_time),
-         date_time = if_else(day &gt;= 206 &amp; day &lt;= 220,
-                             date_time - 80, date_time - 10)) %&gt;% 
-  select(-day)
-
-# Merge Sensor and HydroC data --------------------------------------------
-
-df &lt;- full_join(CTD, HC) %&gt;% 
-  arrange(date_time)
-
-df_full &lt;- full_join(CTD, HC_full) %&gt;% 
-  arrange(date_time)
-
-rm(HC, HC_full, CTD)</code></pre>
+library(seacarb)
+library(oce)
+library(marelac)</code></pre>
+<div id="sensor-data" class="section level1">
+<h1><span class="header-section-number">1</span> Sensor data</h1>
+<p>1m gridded, downcast profiles were used.</p>
+<pre class="r"><code>df &lt;-
+  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_CT.csv&quot;))</code></pre>
 </div>
-<div id="interpolation-to-common-time-stamp" class="section level2">
-<h2>Interpolation to common time stamp</h2>
-<p>CTD and auxillary recordings (15 sec measurment interval) are interpolated to HydroC time stamps (first 10 sec, than 1 sec measurement interval) when gaps between observations are not larger than 20. Thereafter, HydroC readings not falling in regular transects/profilings are removed, by removing rows with NA depth values. Furthermore, CTD readings without corresponding HydroC reading are removed, except during periods when HydroC was not operating.</p>
-<pre class="r"><code># Interpolate Sensor data to HydroC timestamp
+<div id="mixed-layer-depth" class="section level1">
+<h1><span class="header-section-number">2</span> Mixed layer depth</h1>
+<div id="calculation" class="section level2">
+<h2><span class="header-section-number">2.1</span> Calculation</h2>
+<p>Seawater density Rho was determined from S, T, and p according to TEOS-10.</p>
+<pre class="r"><code>df &lt;- df %&gt;% 
+  mutate(rho = swSigma(salinity = sal, temperature = tem, pressure = dep/10))
 
-df &lt;-
-  df %&gt;%
-  mutate(dep = na.approx(dep, na.rm = FALSE, maxgap = 20),
-         sal = na.approx(sal, na.rm = FALSE, maxgap = 20),
-         tem = na.approx(tem, na.rm = FALSE, maxgap = 20),
-         pCO2_analog = na.approx(pCO2_analog, na.rm = FALSE, maxgap = 20),
-         pH = na.approx(pH, na.rm = FALSE, maxgap = 20),
-         V_pH = na.approx(V_pH, na.rm = FALSE, maxgap = 20),
-         O2 = na.approx(O2, na.rm = FALSE, maxgap = 20),
-         Chl = na.approx(Chl, na.rm = FALSE, maxgap = 20)) %&gt;% 
-  filter(!is.na(dep)) %&gt;% #remove HC readings not falling in regular transects/profilings
-  fill(ID, type, station) %&gt;% 
-  filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
+ # seacarb = rho(S = sal, T = tem, P = pres),
+ # marelac = sw_dens(S = sal, t = tem, p = pres + 1, method = &quot;Gibbs&quot;)</code></pre>
+<p>Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria</p>
+<pre class="r"><code># density criterion
 
-df_full &lt;-
-  df_full %&gt;%
-  mutate(dep = na.approx(dep, na.rm = FALSE, maxgap = 20),
-         sal = na.approx(sal, na.rm = FALSE, maxgap = 20),
-         tem = na.approx(tem, na.rm = FALSE, maxgap = 20),
-         pCO2_analog = na.approx(pCO2_analog, na.rm = FALSE, maxgap = 20),
-         pH = na.approx(pH, na.rm = FALSE, maxgap = 20),
-         V_pH = na.approx(V_pH, na.rm = FALSE, maxgap = 20),
-         O2 = na.approx(O2, na.rm = FALSE, maxgap = 20),
-         Chl = na.approx(Chl, na.rm = FALSE, maxgap = 20)) %&gt;% 
-  filter(!is.na(dep)) %&gt;% #remove HC readings not falling in regular transects/profilings
-  fill(ID, type, station) %&gt;% 
-  filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
+df &lt;- expand_grid(df, rho_lim = c(0.1,0.2,0.5))
 
-# Time stamp synchronzity -------------------------------------------------
-# 
-# df &lt;- df %&gt;% 
-#   mutate(day = yday(date_time))
-# 
-# for (dayID in unique(df$day)) {
-#   
-#   df %&gt;%
-#     filter(day == dayID) %&gt;% 
-#       ggplot()+
-#       geom_point(aes(date_time, pCO2, col=&quot;HC&quot;))+
-#       geom_point(aes(date_time, dep, col=&quot;dep&quot;))+
-#       geom_point(aes(date_time, pH, col=&quot;pH&quot;))+
-#       geom_point(aes(date_time, pCO2_analog, col=&quot;Sensor_int&quot;))
-#       
-#     ggsave(here::here(&quot;/Plots/TinaV/Sensor/HydroC_diagnostics/Timing/day&quot;,
-#                       paste(dayID,&quot;_day_HydroC_merged.jpg&quot;, sep=&quot;&quot;)),
-#            width = 10, height = 4)
-# }
-# 
-# 
-# for (depID in unique(df$deployment)) {
-#   
-#   df_dep &lt;- df %&gt;%
-#     filter(deployment == depID, Zero == 1)
-#   
-#   for (zerID in unique(df_dep$Zero_ID)) {
-#     
-#     df_dep %&gt;%
-#       filter(Zero_ID == zerID) %&gt;% 
-#       ggplot()+
-#       geom_point(aes(date_time, pCO2, col=&quot;HC&quot;))+
-#       geom_point(aes(date_time, pCO2_analog, col=&quot;Sensor_int&quot;))
-#     
-#     ggsave(here::here(&quot;/Plots/TinaV/Sensor/HydroC_diagnostics/Timing/Zeroing&quot;,
-#                       paste(depID,&quot;_deployment_&quot;,zerID,&quot;_Zero_ID_HydroC.jpg&quot;, sep=&quot;&quot;)),
-#            width = 10, height = 4)
-#     
-#   }
-# }</code></pre>
-<pre class="r"><code>write_csv(df, here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC.csv&quot;))
-write_csv(df_full, here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_full.csv&quot;))
+df &lt;- df %&gt;% 
+  group_by(ID, date_time_ID, station, rho_lim) %&gt;% 
+  arrange(dep) %&gt;% 
+  mutate(d_rho = rho - first(rho)) %&gt;% 
+  mutate(layer = if_else(d_rho &gt; rho_lim, &quot;deep&quot;, &quot;surface&quot;)) %&gt;% 
+  ungroup()
+  
+MLD &lt;- df  %&gt;% 
+  group_by(ID, date_time_ID, station, rho_lim) %&gt;% 
+  filter(d_rho &gt; rho_lim) %&gt;% 
+  summarise(MLD = min(dep)) %&gt;% 
+  ungroup()
 
-rm(df, df_full)</code></pre>
-<pre class="r"><code>df &lt;- read_csv(here::here(&quot;data/_merged_data_files&quot;,
-                          &quot;BloomSail_CTD_HydroC.csv&quot;),
-               col_types = cols(ID = col_character(),
-                                pCO2_analog = col_double(),
-                                pCO2 = col_double(),
-                                Zero = col_factor(),
-                                Flush = col_factor(),
-                                Zero_ID = col_integer(),
-                                deployment = col_integer(),
-                                duration = col_double(),
-                                mixing = col_character()))
-
-
-df %&gt;% 
-  filter(!is.na(pCO2)) %&gt;% 
-  ggplot()+
-  geom_path(aes(date_time, pCO2, col = &quot;HydroC, drift corrected&quot;))+
-  geom_path(aes(date_time, pCO2_analog, col = &quot;analog CTD&quot;))+
-  scale_color_brewer(palette = &quot;Set1&quot;, name = &quot;pCO2 record&quot;)+
-  labs(y=expression(pCO[2]~(µatm)), x=&quot;&quot;)+
-  facet_wrap(~ID, scales = &quot;free_x&quot;, ncol = 1)</code></pre>
+df &lt;- full_join(df, MLD)</code></pre>
+</div>
+<div id="density-profiles" class="section level2">
+<h2><span class="header-section-number">2.2</span> Density profiles</h2>
+<pre class="r"><code>df %&gt;% 
+  filter(dep &lt; 30) %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(rho, dep))+
+  geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_discrete(name=&quot;Rho lim&quot;)+
+  facet_grid(ID~station)</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/merging_interpolation.Rmd/timeseries_pCO2-1.png" alt="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO~2~ measurement range is restricted to 100-500  µatm here due to the settings of the analog voltage output of the sensor. Zeroing periods are included." width="672" />
+<img src="figure/BloomSail_MLD.Rmd/plot_density_profiles-1.png" alt="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD" width="672" />
 <p class="caption">
-pCO<sub>2</sub> record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO<sub>2</sub> measurement range is restricted to 100-500 µatm here due to the settings of the analog voltage output of the sensor. Zeroing periods are included.
+Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD
 </p>
 </div>
-<pre class="r"><code># ts &lt;- xts(cbind(df$pCO2, df$dep), order.by = df$date_time)
-# names(ts) &lt;- c(&quot;pCO2&quot;, &quot;Depth&quot;)
-# 
-# ts %&gt;% 
-#   dygraph() %&gt;% 
-#   dyRangeSelector() %&gt;% #dateWindow = c(&quot;2012-01-01&quot;, &quot;2016-12-31&quot;)
-#   dySeries(&quot;pCO2&quot;, label = &quot;pCO2&quot;) %&gt;% 
-#   dySeries(&quot;Depth&quot;, axis = &#39;y2&#39;, label = &quot;Depth&quot;) %&gt;% 
-#   dyAxis(&quot;y&quot;, label = &quot;pCO2 [µatm]&quot;) %&gt;% 
-#   dyAxis(&quot;y2&quot;, label = &quot;Depth [m]&quot;) %&gt;% 
-#   dyOptions(drawPoints = TRUE, pointSize = 1)</code></pre>
+</div>
+<div id="timeseries-plot" class="section level2">
+<h2><span class="header-section-number">2.3</span> Timeseries plot</h2>
+<pre class="r"><code>MLD_sum &lt;- MLD %&gt;% 
+  select(-station) %&gt;% 
+  group_by(ID, date_time_ID, rho_lim)%&gt;%
+  summarise_all(list(~mean(.),~sd(.),~min(.), ~max(.)))
+
+MLD_sum %&gt;% 
+  ggplot()+
+  geom_ribbon(aes(date_time_ID, ymin = min, ymax = max), alpha = 0.5)+
+  geom_path(aes(date_time_ID, mean))+
+  geom_errorbar(aes(date_time_ID, ymin = mean-sd, ymax = mean+sd))+
+  geom_point(aes(date_time_ID, mean))+
+  labs(x=&quot;Mean transect date&quot;, y=&quot;Mixed layer depth [m]&quot;)+
+  ylim(0,30)+
+  facet_grid(rho_lim~., labeller = label_both)</code></pre>
+<p><img src="figure/BloomSail_MLD.Rmd/plot_MLD_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Rho, S, and T profiles were plotted individually <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/MLD/profiles_MLD_individual.pdf" target="_blank">pdf here</a>.</p>
+<pre class="r"><code>df_long &lt;- df %&gt;% 
+  pivot_longer(cols = c(&quot;sal&quot;, &quot;tem&quot;, &quot;rho&quot;), names_to = &quot;parameter&quot;, values_to = &quot;value&quot;)
+
+pdf(file=here::here(&quot;output/Plots/MLD&quot;,
+    &quot;profiles_MLD_individual.pdf&quot;), onefile = TRUE, width = 9, height = 5)
+
+for(i_ID in unique(df_long$ID)){
+  for(i_station in unique(df_long$station)){
+ 
+      
+      # i_ID      &lt;-      unique(df_long$ID)[1]
+      # i_station &lt;- unique(df_long$station)[1]
+
+      if (nrow(df_long %&gt;% filter(ID == i_ID, station == i_station)) &gt; 0){
+      
+      print(
+        df_long %&gt;%
+          arrange(date_time) %&gt;% 
+          filter(ID == i_ID,
+                 station == i_station) %&gt;%
+          ggplot(aes(value,dep))+
+          geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
+          geom_path()+
+          scale_y_reverse(limits = c(30,0))+
+          scale_color_discrete(name=&quot;Rho lim&quot;)+
+          labs(y=&quot;Depth [m]&quot;, title = str_c(i_ID,&quot; | &quot;,i_station))+
+          facet_wrap(~parameter, scales = &quot;free_x&quot;)+
+          theme_bw()
+      )
+    }
+  }
+}
+
+dev.off()
+
+rm(i_ID, i_station)</code></pre>
 </div>
 </div>
-<div id="sensor-and-track-data" class="section level1">
-<h1>Sensor and track data</h1>
-<pre class="r"><code>Sensor &lt;- read_csv(here::here(&quot;data/_merged_data_files&quot;,
-                          &quot;BloomSail_CTD_HydroC.csv&quot;),
-               col_types = cols(ID = col_character(),
-                                pCO2_analog = col_double(),
-                                pCO2 = col_double(),
-                                Zero = col_factor(),
-                                Flush = col_factor(),
-                                Zero_ID = col_integer(),
-                                deployment = col_integer(),
-                                duration = col_double(),
-                                mixing = col_character()))
+<div id="ncp-penetration-depth" class="section level1">
+<h1><span class="header-section-number">3</span> NCP penetration depth</h1>
+<p>The effective NCP penetration depth, z<sub>eff</sub>, was calculated as the ratio of the observed inremental change of the depth integrated NCP, divided by the change in surface C<sub>T</sub>.</p>
+<pre class="r"><code>CT_ts &lt;-
+  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_CT_cumulative_timeseries.csv&quot;))
 
+CT_profiles &lt;-
+  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_CT_cumulative_profiles.csv&quot;))
 
-track &lt;- 
-  read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
-                       &quot;TinaV_Track.csv&quot;))
+CT_conc_surf &lt;-
+  CT_profiles %&gt;% 
+  filter(dep &lt; 3,
+         parameter == &quot;CT&quot;,
+         sign == &quot;neg&quot;) %&gt;% 
+  group_by(ID, date_time_ID) %&gt;% 
+  summarise(dCT = mean(diff_value))
 
+NCP_integ &lt;- CT_ts %&gt;% 
+  filter(sign == &quot;neg&quot;) %&gt;% 
+  group_by(ID, date_time_ID) %&gt;% 
+  summarise(dNCPi = sum(dCT))
 
-df &lt;- full_join(Sensor, track) %&gt;% 
-  arrange(date_time)
+CT &lt;- full_join(CT_conc_surf, NCP_integ)
 
-# interpolate track data and than remove columns that originate from track time stamp
-df &lt;-
-  df %&gt;%
-  mutate(lat = na.approx(lat, na.rm = FALSE, maxgap = 20),
-         lon = na.approx(lon, na.rm = FALSE, maxgap = 20)) %&gt;% 
-  filter(!is.na(dep))
+CT &lt;- CT %&gt;% 
+  mutate(zeff = (dNCPi/dCT)*1e3)
 
-df %&gt;% 
-  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_track.csv&quot;))
+CT_long &lt;- CT %&gt;% 
+  pivot_longer(3:4, names_to = &quot;parameter&quot;, values_to = &quot;values&quot;)
 
-rm(df)</code></pre>
-<p>```</p>
-</div>
-<div id="tasks-open-questions" class="section level1">
-<h1>Tasks / open questions</h1>
-<ul>
-<li>Check interpolation to CTD Sensor timestamp as alternative option</li>
-</ul>
+CT_long %&gt;% 
+  ggplot(aes(date_time_ID, values))+
+  geom_path()+
+  geom_point()+
+  facet_grid(parameter~., scales = &quot;free_y&quot;)</code></pre>
+<p><img src="figure/BloomSail_MLD.Rmd/NCP_penetration_depth-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>CT %&gt;% 
+  ggplot(aes(date_time_ID, zeff))+
+  geom_path()+
+  geom_point()+
+  scale_y_reverse()</code></pre>
+<p><img src="figure/BloomSail_MLD.Rmd/NCP_penetration_depth-2.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -827,26 +784,27 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] zoo_1.8-6       lubridate_1.7.4 forcats_0.4.0   stringr_1.4.0  
- [5] dplyr_0.8.3     purrr_0.3.3     readr_1.3.1     tidyr_1.0.0    
- [9] tibble_2.1.3    ggplot2_3.3.0   tidyverse_1.3.0
+ [1] marelac_2.1.9   shape_1.4.4     seacarb_3.2.12  oce_1.2-0      
+ [5] gsw_1.0-5       testthat_2.3.1  forcats_0.4.0   stringr_1.4.0  
+ [9] dplyr_0.8.3     purrr_0.3.3     readr_1.3.1     tidyr_1.0.0    
+[13] tibble_2.1.3    ggplot2_3.3.0   tidyverse_1.3.0
 
 loaded via a namespace (and not attached):
- [1] tidyselect_0.2.5   xfun_0.10          haven_2.2.0        lattice_0.20-35   
- [5] colorspace_1.4-1   vctrs_0.2.0        generics_0.0.2     htmltools_0.4.0   
- [9] yaml_2.2.0         rlang_0.4.5        later_1.0.0        pillar_1.4.2      
-[13] withr_2.1.2        glue_1.3.1         DBI_1.0.0          RColorBrewer_1.1-2
-[17] dbplyr_1.4.2       modelr_0.1.5       readxl_1.3.1       lifecycle_0.1.0   
-[21] munsell_0.5.0      gtable_0.3.0       workflowr_1.6.0    cellranger_1.1.0  
-[25] rvest_0.3.5        evaluate_0.14      labeling_0.3       knitr_1.26        
-[29] httpuv_1.5.2       highr_0.8          broom_0.5.3        Rcpp_1.0.2        
-[33] promises_1.1.0     backports_1.1.5    scales_1.0.0       jsonlite_1.6      
-[37] fs_1.3.1           hms_0.5.2          digest_0.6.22      stringi_1.4.3     
-[41] grid_3.5.0         rprojroot_1.3-2    here_0.1           cli_1.1.0         
-[45] tools_3.5.0        magrittr_1.5       crayon_1.3.4       pkgconfig_2.0.3   
-[49] zeallot_0.1.0      xml2_1.2.2         reprex_0.3.0       rstudioapi_0.10   
-[53] assertthat_0.2.1   rmarkdown_2.0      httr_1.4.1         R6_2.4.0          
-[57] nlme_3.1-137       git2r_0.26.1       compiler_3.5.0    </code></pre>
+ [1] Rcpp_1.0.2       lubridate_1.7.4  here_0.1         lattice_0.20-35 
+ [5] assertthat_0.2.1 zeallot_0.1.0    rprojroot_1.3-2  digest_0.6.22   
+ [9] R6_2.4.0         cellranger_1.1.0 backports_1.1.5  reprex_0.3.0    
+[13] evaluate_0.14    httr_1.4.1       highr_0.8        pillar_1.4.2    
+[17] rlang_0.4.5      readxl_1.3.1     rstudioapi_0.10  rmarkdown_2.0   
+[21] labeling_0.3     munsell_0.5.0    broom_0.5.3      compiler_3.5.0  
+[25] httpuv_1.5.2     modelr_0.1.5     xfun_0.10        pkgconfig_2.0.3 
+[29] htmltools_0.4.0  tidyselect_0.2.5 workflowr_1.6.0  crayon_1.3.4    
+[33] dbplyr_1.4.2     withr_2.1.2      later_1.0.0      grid_3.5.0      
+[37] nlme_3.1-137     jsonlite_1.6     gtable_0.3.0     lifecycle_0.1.0 
+[41] DBI_1.0.0        git2r_0.26.1     magrittr_1.5     scales_1.0.0    
+[45] cli_1.1.0        stringi_1.4.3    fs_1.3.1         promises_1.1.0  
+[49] xml2_1.2.2       generics_0.0.2   vctrs_0.2.0      tools_3.5.0     
+[53] glue_1.3.1       hms_0.5.2        yaml_2.2.0       colorspace_1.4-1
+[57] rvest_0.3.5      knitr_1.26       haven_2.2.0     </code></pre>
 </div>
 </div>
 
