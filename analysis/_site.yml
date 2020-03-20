@@ -16,9 +16,11 @@ navbar:
   - text: MLD
     href: MLD.html
   - text: NCP reconstruction
-    href: reconstruction.html
-  - text: FM+GETM
-    href: Finnmaid+GETM.html
+    menu:
+    - text: BloomSail surface data
+      href: BloomSail_surface.html
+    - text: Finnmaid + GETM
+      href: Finnmaid+GETM.html
   right:
   - icon: fa-github
     text: Source code
