@@ -12,7 +12,7 @@
 <meta name="author" content="Jens Daniel Müller" />
 
 
-<title>MLD</title>
+<title>Gas exchange</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -360,11 +360,20 @@ div.tocify {
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <li>
-  <a href="data_base.html">Data</a>
-</li>
-<li>
-  <a href="merging_interpolation.html">Handling</a>
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Data base
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="read-in.html">Read-in</a>
+    </li>
+    <li>
+      <a href="merging_interpolation.html">Mergind and interpolation</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="response_time.html">Response time</a>
@@ -373,10 +382,7 @@ div.tocify {
   <a href="CT_dynamics.html">CT dynamics</a>
 </li>
 <li>
-  <a href="gas_exchange.html">Gas flux</a>
-</li>
-<li>
-  <a href="MLD.html">MLD</a>
+  <a href="gas_flux.html">Gas flux</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -386,7 +392,10 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="BloomSail_surface.html">BloomSail surface data</a>
+      <a href="BloomSail_dT.html">BloomSail delta T approach</a>
+    </li>
+    <li>
+      <a href="BloomSail_MLD.html">BloomSail MLD approach</a>
     </li>
     <li>
       <a href="Finnmaid+GETM.html">Finnmaid + GETM</a>
@@ -433,7 +442,7 @@ div.section {
 
 
 
-<h1 class="title toc-ignore">MLD</h1>
+<h1 class="title toc-ignore">Gas exchange</h1>
 <h4 class="author">Jens Daniel Müller</h4>
 <h4 class="date">20 March, 2020</h4>
 
@@ -551,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee9938a9886db313b94fa0b4319640332a4ff8ed7targetblanke9938a9a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/e9938a9886db313b94fa0b4319640332a4ff8ed7" target="_blank">e9938a9</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1ebd01a942fe9692198b910ad2d6bb940cded9bftargetblank1ebd01aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/1ebd01a942fe9692198b910ad2d6bb940cded9bf" target="_blank">1ebd01a</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee9938a9886db313b94fa0b4319640332a4ff8ed7targetblanke9938a9a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1ebd01a942fe9692198b910ad2d6bb940cded9bftargetblank1ebd01aa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -570,12 +579,11 @@ Ignored files:
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
 
-Untracked files:
-    Untracked:  analysis/BloomSail_surface.Rmd
-
 Unstaged changes:
-    Deleted:    analysis/Reconstruction.Rmd
-    Modified:   analysis/_site.yml
+    Deleted:    analysis/BloomSail_surface.Rmd
+    Deleted:    analysis/MLD.Rmd
+    Deleted:    analysis/data_base.Rmd
+    Deleted:    analysis/gas_exchange.Rmd
 
 </code></pre>
 <p>
@@ -596,161 +604,170 @@ There are no past versions. Publish this analysis with <code>wflow_publish()</co
 </div>
 </div>
 <pre class="r"><code>library(tidyverse)
+#library(patchwork)
 library(seacarb)
-library(oce)
-library(marelac)</code></pre>
+library(zoo)
+#library(metR)
+#library(scico)
+# library(broom)
+library(lubridate)
+# library(tibbletime)
+library(marelac)
+library(seacarb)</code></pre>
 <div id="sensor-data" class="section level1">
 <h1><span class="header-section-number">1</span> Sensor data</h1>
-<p>1m gridded, downcast profiles were used.</p>
-<pre class="r"><code>df &lt;-
-  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_CT.csv&quot;))</code></pre>
+<p>The cruise mean pCO<sub>2</sub> recorded in profiling-mode (stations only) and depths &lt; 3m was used for gas exchange calcualtions.</p>
+<pre class="r"><code>water &lt;-
+  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_CT.csv&quot;))
+
+water &lt;- water %&gt;% 
+  filter(dep &lt; 3) %&gt;% 
+  select(date_time, ID, tem, pCO2_water = pCO2)
+
+water_ID &lt;- water %&gt;% 
+  group_by(ID) %&gt;% 
+  summarise_all(mean) %&gt;% 
+  ungroup() %&gt;% 
+  select(-ID)
+
+water_ID %&gt;% 
+  ggplot(aes(date_time, pCO2_water))+
+  geom_point(data=water, aes(date_time, pCO2_water), col=&quot;grey&quot;)+
+  geom_path()+
+  geom_point()</code></pre>
+<p><img src="figure/gas_flux.Rmd/read_Tina-V_Sensor_data-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>start &lt;- min(water$date_time)
+end   &lt;- max(water$date_time)</code></pre>
 </div>
-<div id="mixed-layer-depth" class="section level1">
-<h1><span class="header-section-number">2</span> Mixed layer depth</h1>
-<div id="calculation" class="section level2">
-<h2><span class="header-section-number">2.1</span> Calculation</h2>
-<p>Seawater density Rho was determined from S, T, and p according to TEOS-10.</p>
-<pre class="r"><code>df &lt;- df %&gt;% 
-  mutate(rho = swSigma(salinity = sal, temperature = tem, pressure = dep/10))
+<div id="wind-data" class="section level1">
+<h1><span class="header-section-number">2</span> Wind data</h1>
+<p>Metrological data were recorded on the flux tower located on Ostergarnsholm island.</p>
+<pre class="r"><code>air &lt;- read_delim(here::here(&quot;Data/Ostergarnsholm/Tower&quot;, &quot;Oes_Jens_atm_water_June_to_August_2018.csv&quot;),
+                 delim = &quot;;&quot;               )
 
- # seacarb = rho(S = sal, T = tem, P = pres),
- # marelac = sw_dens(S = sal, t = tem, p = pres + 1, method = &quot;Gibbs&quot;)</code></pre>
-<p>Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria</p>
-<pre class="r"><code># density criterion
+air &lt;- air %&gt;%
+  mutate(date_time = ymd_hms( paste(paste(year, month, day, sep = &quot;/&quot;),
+                                          paste(hour, min, sec, sep = &quot;:&quot;)))) %&gt;% 
+  select(&quot;date_time&quot;,
+         &quot;CO2 12m [ppm]&quot;,
+         &quot;w_c [ppm m/s]&quot;,
+         &quot;WS 12m [m/s]&quot;,
+         &quot;WD 12m [degrees]&quot;,
+         &quot;T 12m [degrees C]&quot;,
+         &quot;RIS [W/m^2]&quot;
+         ) %&gt;% 
+  filter(date_time &gt; start,
+         date_time &lt; end)
 
-df &lt;- expand_grid(df, rho_lim = c(0.1,0.2,0.5))
+rm(end, start)
+
+air &lt;- air %&gt;% 
+  mutate(freq = &quot;30 min&quot;) %&gt;% 
+  select(date_time, freq, pCO2_air = &quot;CO2 12m [ppm]&quot;, wind = &quot;WS 12m [m/s]&quot;)</code></pre>
+<pre class="r"><code>df &lt;- full_join(air, water_ID) %&gt;% 
+  arrange(date_time)
 
 df &lt;- df %&gt;% 
-  group_by(ID, date_time_ID, station, rho_lim) %&gt;% 
-  arrange(dep) %&gt;% 
-  mutate(d_rho = rho - first(rho)) %&gt;% 
-  mutate(layer = if_else(d_rho &gt; rho_lim, &quot;deep&quot;, &quot;surface&quot;)) %&gt;% 
-  ungroup()
-  
-MLD &lt;- df  %&gt;% 
-  group_by(ID, date_time_ID, station, rho_lim) %&gt;% 
-  filter(d_rho &gt; rho_lim) %&gt;% 
-  summarise(MLD = min(dep)) %&gt;% 
-  ungroup()
+  mutate(pCO2_water = na.approx(pCO2_water, rule = 2),
+         tem = na.approx(tem, rule = 2),
+         wind = na.approx(wind, rule = 2)) %&gt;% 
+  filter(!is.na(pCO2_air))
 
-df &lt;- full_join(df, MLD)</code></pre>
-</div>
-<div id="density-profiles" class="section level2">
-<h2><span class="header-section-number">2.2</span> Density profiles</h2>
-<pre class="r"><code>df %&gt;% 
-  filter(dep &lt; 30) %&gt;% 
-  arrange(dep) %&gt;% 
-  ggplot(aes(rho, dep))+
-  geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
-  geom_path()+
-  scale_y_reverse()+
-  scale_color_discrete(name=&quot;Rho lim&quot;)+
-  facet_grid(ID~station)</code></pre>
-<div class="figure" style="text-align: center">
-<img src="figure/MLD.Rmd/plot_density_profiles-1.png" alt="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD" width="672" />
-<p class="caption">
-Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD
-</p>
-</div>
-</div>
-<div id="timeseries-plot" class="section level2">
-<h2><span class="header-section-number">2.3</span> Timeseries plot</h2>
-<pre class="r"><code>MLD_sum &lt;- MLD %&gt;% 
-  select(-station) %&gt;% 
-  group_by(ID, date_time_ID, rho_lim)%&gt;%
-  summarise_all(list(~mean(.),~sd(.),~min(.), ~max(.)))
+df_daily &lt;- df %&gt;% 
+  mutate(day = yday(date_time)) %&gt;% 
+  group_by(day) %&gt;% 
+  summarise_all(mean, na.rm = TRUE) %&gt;% 
+  ungroup() %&gt;% 
+  select(-day) %&gt;% 
+  mutate(freq = &quot;daily&quot;)
 
-MLD_sum %&gt;% 
-  ggplot()+
-  geom_ribbon(aes(date_time_ID, ymin = min, ymax = max), alpha = 0.5)+
-  geom_path(aes(date_time_ID, mean))+
-  geom_errorbar(aes(date_time_ID, ymin = mean-sd, ymax = mean+sd))+
-  geom_point(aes(date_time_ID, mean))+
-  labs(x=&quot;Mean transect date&quot;, y=&quot;Mixed layer depth [m]&quot;)+
-  ylim(0,30)+
-  facet_grid(rho_lim~., labeller = label_both)</code></pre>
-<p><img src="figure/MLD.Rmd/plot_MLD_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>Rho, S, and T profiles were plotted individually <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/MLD/profiles_MLD_individual.pdf" target="_blank">pdf here</a>.</p>
+df &lt;- bind_rows(df, df_daily)
+
+
+rm(air, water_ID, water, df_daily)</code></pre>
+<div id="time-series-plot" class="section level2">
+<h2><span class="header-section-number">2.1</span> Time series plot</h2>
 <pre class="r"><code>df_long &lt;- df %&gt;% 
-  pivot_longer(cols = c(&quot;sal&quot;, &quot;tem&quot;, &quot;rho&quot;), names_to = &quot;parameter&quot;, values_to = &quot;value&quot;)
+  gather(&quot;parameter&quot;, &quot;value&quot;, 3:6)
 
-pdf(file=here::here(&quot;output/Plots/MLD&quot;,
-    &quot;profiles_MLD_individual.pdf&quot;), onefile = TRUE, width = 9, height = 5)
-
-for(i_ID in unique(df_long$ID)){
-  for(i_station in unique(df_long$station)){
- 
-      
-      # i_ID      &lt;-      unique(df_long$ID)[1]
-      # i_station &lt;- unique(df_long$station)[1]
-
-      if (nrow(df_long %&gt;% filter(ID == i_ID, station == i_station)) &gt; 0){
-      
-      print(
-        df_long %&gt;%
-          arrange(date_time) %&gt;% 
-          filter(ID == i_ID,
-                 station == i_station) %&gt;%
-          ggplot(aes(value,dep))+
-          geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
-          geom_path()+
-          scale_y_reverse(limits = c(30,0))+
-          scale_color_discrete(name=&quot;Rho lim&quot;)+
-          labs(y=&quot;Depth [m]&quot;, title = str_c(i_ID,&quot; | &quot;,i_station))+
-          facet_wrap(~parameter, scales = &quot;free_x&quot;)+
-          theme_bw()
-      )
-    }
-  }
+df_long %&gt;% 
+  ggplot(aes(date_time, value, col=freq))+
+  geom_line()+
+  facet_grid(parameter~., scales = &quot;free_y&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;, direction = -1)+
+  theme_bw()</code></pre>
+<p><img src="figure/gas_flux.Rmd/plot_wind_Ostergarn_tower-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="air-sea-co2-flux" class="section level1">
+<h1><span class="header-section-number">3</span> Air-sea CO<sub>2</sub> flux</h1>
+<div id="calculation" class="section level2">
+<h2><span class="header-section-number">3.1</span> Calculation</h2>
+<p>F = k * dCO2</p>
+<p>with</p>
+<p>dCO2 = K0 * dpCO2 and</p>
+<p>k = coeff * U^2 * (660/Sc)^0.5</p>
+<p>Units used here are:</p>
+<ul>
+<li>dpCO<sub>2</sub>: µatm</li>
+<li>K0: mol atm-1 kg-1</li>
+<li><p>dCO<sub>2</sub>: µmol kg-1</p></li>
+<li><p>wind speed U: m s-1</p></li>
+<li>coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2</li>
+<li><p>gas transfer velocities k: cm hr-1 (= 60<em>60</em>100 m s-1)</p></li>
+<li><p>air sea CO<sub>2</sub> flux F: mol m–2 d–1</p></li>
+<li><p>conversion between the unit of k * dCO2 and F requires a factor of 10-5 * 24</p></li>
+</ul>
+<pre class="r"><code>Sc_W14 &lt;- function(tem) {
+  2116.8 - 136.25 * tem + 4.7353 * tem^2 - 0.092307 * tem^3 + 0.0007555 * tem^4
 }
 
-dev.off()
+Sc_W14(20)</code></pre>
+<pre><code>[1] 668.344</code></pre>
+<pre class="r"><code>df &lt;- df %&gt;% 
+  mutate(dpCO2 = pCO2_water - pCO2_air,
+         dCO2  = dpCO2 * K0(S=6.92, T=tem),
+         k_W92 = gas_transfer(t = tem, u10 = wind, species = &quot;CO2&quot;, method = &quot;Wanninkhof1&quot;)* 60^2 * 100,
+         k_W14 = 0.251 * wind^2 * (Sc_W14(tem)/660)^(-0.5),
+         #F_W14_simple = 7.7 * 10^(–4) wind^2,
+         k_SM18 = 0.24 * wind^2 * ((1943-119.6*tem + 3.488*tem^2 - 0.0417*tem^3) / 660)^(-0.5)) %&gt;% 
+  pivot_longer(9:11, names_to = &quot;k_para&quot;, values_to = &quot;k_value&quot;)
 
-rm(i_ID, i_station)</code></pre>
+# calculate flux F [mol m–2 d–1]
+
+df &lt;- df %&gt;% 
+  mutate(flux_daily = k_value*dCO2*1e-5*24) </code></pre>
+<p>Timeseries</p>
+<pre class="r"><code>df %&gt;% 
+  ggplot(aes(date_time, flux_daily, col=k_para))+
+  geom_line()+
+  labs(y=&quot;F (mol m-2 d-1)&quot;)+
+  facet_wrap(~freq)</code></pre>
+<p><img src="figure/gas_flux.Rmd/plot_daily_fluxes-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># scale flux to time interval
+
+df &lt;- df %&gt;% 
+  mutate(scale = if_else(freq == &quot;daily&quot;, 1, 24*2)) %&gt;% 
+  mutate(flux_scale = flux_daily / scale) %&gt;% 
+  group_by(freq, k_para) %&gt;% 
+  arrange(date_time) %&gt;% 
+  mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
+  ungroup()
+
+df %&gt;% 
+  ggplot(aes(date_time, flux_cum, col=k_para))+
+  geom_line()+
+  labs(y=&quot;F (mol m-2)&quot;)+
+  facet_wrap(~freq)</code></pre>
+<p><img src="figure/gas_flux.Rmd/plot_daily_fluxes-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="ncp-penetration-depth" class="section level1">
-<h1><span class="header-section-number">3</span> NCP penetration depth</h1>
-<p>The effective NCP penetration depth, z<sub>eff</sub>, was calculated as the ratio of the observed inremental change of the depth integrated NCP, divided by the change in surface C<sub>T</sub>.</p>
-<pre class="r"><code>CT_ts &lt;-
-  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_CT_cumulative_timeseries.csv&quot;))
-
-CT_profiles &lt;-
-  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_CT_cumulative_profiles.csv&quot;))
-
-CT_conc_surf &lt;-
-  CT_profiles %&gt;% 
-  filter(dep &lt; 3,
-         parameter == &quot;CT&quot;,
-         sign == &quot;neg&quot;) %&gt;% 
-  group_by(ID, date_time_ID) %&gt;% 
-  summarise(dCT = mean(diff_value))
-
-NCP_integ &lt;- CT_ts %&gt;% 
-  filter(sign == &quot;neg&quot;) %&gt;% 
-  group_by(ID, date_time_ID) %&gt;% 
-  summarise(dNCPi = sum(dCT))
-
-CT &lt;- full_join(CT_conc_surf, NCP_integ)
-
-CT &lt;- CT %&gt;% 
-  mutate(zeff = (dNCPi/dCT)*1e3)
-
-CT_long &lt;- CT %&gt;% 
-  pivot_longer(3:4, names_to = &quot;parameter&quot;, values_to = &quot;values&quot;)
-
-CT_long %&gt;% 
-  ggplot(aes(date_time_ID, values))+
-  geom_path()+
-  geom_point()+
-  facet_grid(parameter~., scales = &quot;free_y&quot;)</code></pre>
-<p><img src="figure/MLD.Rmd/NCP_penetration_depth-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>CT %&gt;% 
-  ggplot(aes(date_time_ID, zeff))+
-  geom_path()+
-  geom_point()+
-  scale_y_reverse()</code></pre>
-<p><img src="figure/MLD.Rmd/NCP_penetration_depth-2.png" width="672" style="display: block; margin: auto;" /></p>
+<div id="open-tasks-questions" class="section level1">
+<h1><span class="header-section-number">4</span> Open tasks / questions</h1>
+<ul>
+<li>Calculate mean wind direction correctly for northerly winds</li>
+<li>Correct conversion of CO2 concentration from mol kg-1 to mol m-3 required?</li>
+</ul>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -776,27 +793,28 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] marelac_2.1.9   shape_1.4.4     seacarb_3.2.12  oce_1.2-0      
- [5] gsw_1.0-5       testthat_2.3.1  forcats_0.4.0   stringr_1.4.0  
- [9] dplyr_0.8.3     purrr_0.3.3     readr_1.3.1     tidyr_1.0.0    
-[13] tibble_2.1.3    ggplot2_3.3.0   tidyverse_1.3.0
+ [1] marelac_2.1.9   shape_1.4.4     lubridate_1.7.4 zoo_1.8-6      
+ [5] seacarb_3.2.12  oce_1.2-0       gsw_1.0-5       testthat_2.3.1 
+ [9] forcats_0.4.0   stringr_1.4.0   dplyr_0.8.3     purrr_0.3.3    
+[13] readr_1.3.1     tidyr_1.0.0     tibble_2.1.3    ggplot2_3.3.0  
+[17] tidyverse_1.3.0
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.2       lubridate_1.7.4  here_0.1         lattice_0.20-35 
- [5] assertthat_0.2.1 zeallot_0.1.0    rprojroot_1.3-2  digest_0.6.22   
- [9] R6_2.4.0         cellranger_1.1.0 backports_1.1.5  reprex_0.3.0    
-[13] evaluate_0.14    httr_1.4.1       highr_0.8        pillar_1.4.2    
-[17] rlang_0.4.5      readxl_1.3.1     rstudioapi_0.10  rmarkdown_2.0   
-[21] labeling_0.3     munsell_0.5.0    broom_0.5.3      compiler_3.5.0  
-[25] httpuv_1.5.2     modelr_0.1.5     xfun_0.10        pkgconfig_2.0.3 
-[29] htmltools_0.4.0  tidyselect_0.2.5 workflowr_1.6.0  crayon_1.3.4    
-[33] dbplyr_1.4.2     withr_2.1.2      later_1.0.0      grid_3.5.0      
-[37] nlme_3.1-137     jsonlite_1.6     gtable_0.3.0     lifecycle_0.1.0 
-[41] DBI_1.0.0        git2r_0.26.1     magrittr_1.5     scales_1.0.0    
-[45] cli_1.1.0        stringi_1.4.3    fs_1.3.1         promises_1.1.0  
-[49] xml2_1.2.2       generics_0.0.2   vctrs_0.2.0      tools_3.5.0     
-[53] glue_1.3.1       hms_0.5.2        yaml_2.2.0       colorspace_1.4-1
-[57] rvest_0.3.5      knitr_1.26       haven_2.2.0     </code></pre>
+ [1] Rcpp_1.0.2         here_0.1           lattice_0.20-35    assertthat_0.2.1  
+ [5] zeallot_0.1.0      rprojroot_1.3-2    digest_0.6.22      R6_2.4.0          
+ [9] cellranger_1.1.0   backports_1.1.5    reprex_0.3.0       evaluate_0.14     
+[13] httr_1.4.1         pillar_1.4.2       rlang_0.4.5        readxl_1.3.1      
+[17] rstudioapi_0.10    rmarkdown_2.0      labeling_0.3       munsell_0.5.0     
+[21] broom_0.5.3        compiler_3.5.0     httpuv_1.5.2       modelr_0.1.5      
+[25] xfun_0.10          pkgconfig_2.0.3    htmltools_0.4.0    tidyselect_0.2.5  
+[29] workflowr_1.6.0    crayon_1.3.4       dbplyr_1.4.2       withr_2.1.2       
+[33] later_1.0.0        grid_3.5.0         nlme_3.1-137       jsonlite_1.6      
+[37] gtable_0.3.0       lifecycle_0.1.0    DBI_1.0.0          git2r_0.26.1      
+[41] magrittr_1.5       scales_1.0.0       cli_1.1.0          stringi_1.4.3     
+[45] fs_1.3.1           promises_1.1.0     xml2_1.2.2         ellipsis_0.3.0    
+[49] generics_0.0.2     vctrs_0.2.0        RColorBrewer_1.1-2 tools_3.5.0       
+[53] glue_1.3.1         hms_0.5.2          yaml_2.2.0         colorspace_1.4-1  
+[57] rvest_0.3.5        knitr_1.26         haven_2.2.0       </code></pre>
 </div>
 </div>
 
