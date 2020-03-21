@@ -50,14 +50,14 @@ end_date <- "2018-08-31"
 
 # GETM Data preparation
 
-```{r getm_data_prep}
+```{r getm_data_prep, eval=FALSE}
 
 # data Salinity
 
 var_3d <- "salt"
 
-nc <- nc_open(paste("data/Finnmaid.E.3d.2018.nc", sep = ""))
-nc_2d <- nc_open(paste("data/Finnmaid.E.2d.2018.nc", sep = ""))
+nc <- nc_open(paste("data/GETM/Finnmaid.E.3d.2018.nc", sep = ""))
+nc_2d <- nc_open(paste("data/GETM/Finnmaid.E.2d.2018.nc", sep = ""))
 
 lat <- ncvar_get(nc, "latc")
 
@@ -121,7 +121,7 @@ gt_salt_ngs_3d_jun_aug <- gt_salt_ngs_3d %>%
 # data temperature
 var_3d <- "temp"
 
-nc <- nc_open(paste("data/Finnmaid.E.3d.2018.nc", sep = ""))
+nc <- nc_open(paste("data/GETM/Finnmaid.E.3d.2018.nc", sep = ""))
 
 lat <- ncvar_get(nc, "latc")
 
@@ -185,7 +185,7 @@ gt_temp_ngs_3d_jun_aug <- gt_temp_ngs_3d %>%
 # mld rho data
 var <- "mld_rho"
 
-nc_2d <- nc_open(paste("data/Finnmaid.E.2d.2018.nc", sep = ""))
+nc_2d <- nc_open(paste("data/GETM/Finnmaid.E.2d.2018.nc", sep = ""))
 
 lat <- ncvar_get(nc_2d, "latc")
 
@@ -200,7 +200,7 @@ array <- ncvar_get(nc_2d, var) # store the data in a 3-dimensional array
 #dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
 
 fillvalue <- ncatt_get(nc_2d, var, "_FillValue")
-nc_close(nc_2d)
+#nc_close(nc_2d)
 
 # Working with the data
 array[array == fillvalue$value] <- NA
@@ -229,10 +229,10 @@ rm(nc_2d, time_units, t, array, fillvalue, var)
 gt_temp_salt_ngs_3d_jun_aug <- inner_join(gt_temp_ngs_3d_jun_aug,gt_salt_ngs_3d_jun_aug, by = c("dep", "date_time")) 
 
 gt_temp_salt_ngs_3d_jun_aug %>% 
-  vroom_write((here::here("data", file = "gt_temp_salt_ngs_3d_jun_aug_2018.csv")))
+  vroom_write((here::here("data/_summarized_data_files", file = "gt_temp_salt_ngs_3d_jun_aug_2018.csv")))
 
 gt_mldrho_ngs_2d %>% 
-  vroom_write((here::here("data", file = "gt_mldrho_ngs_2d_jun_aug_2018.csv")))
+  vroom_write((here::here("data/_summarized_data_files", file = "gt_mldrho_ngs_2d_jun_aug_2018.csv")))
 
 rm(gt_salt_ngs_3d, gt_temp_ngs_3d, gt_salt_ngs_3d_jun_aug, gt_temp_ngs_3d_jun_aug, d1_deep, d1_shallow, i, lat)
 
@@ -240,6 +240,14 @@ rm(gt_salt_ngs_3d, gt_temp_ngs_3d, gt_salt_ngs_3d_jun_aug, gt_temp_ngs_3d_jun_au
 #Hovmoeller Plots
 
 ```{r hovmoeller_depth_profil_salt}
+
+gt_temp_salt_ngs_3d_jun_aug <- 
+  vroom((here::here("data/_summarized_data_files", file = "gt_temp_salt_ngs_3d_jun_aug_2018.csv")))
+
+gt_mldrho_ngs_2d <- 
+  vroom((here::here("data/_summarized_data_files", file = "gt_mldrho_ngs_2d_jun_aug_2018.csv")))
+
+
 
 gt_temp_salt_ngs_3d_jun_aug <- gt_temp_salt_ngs_3d_jun_aug %>% 
   mutate(date = ymd(date_time), 
@@ -308,7 +316,7 @@ In the following section, we calculate windspeeds from the parameters v and u. T
 # component u10
 var <- "u10"
 
-nc_2d <- nc_open(paste("data/Finnmaid.E.2d.2018.nc", sep = ""))
+nc_2d <- nc_open(paste("data/GETM/Finnmaid.E.2d.2018.nc", sep = ""))
 
 lat <- ncvar_get(nc_2d, "latc")
 
@@ -354,7 +362,7 @@ array <- as_tibble(array)
 # component v10
 var <- "v10"
 
-nc_2d <- nc_open(paste("data/Finnmaid.E.2d.2018.nc", sep = ""))
+nc_2d <- nc_open(paste("data/GETM/Finnmaid.E.2d.2018.nc", sep = ""))
 
 lat <- ncvar_get(nc_2d, "latc")
 
@@ -412,7 +420,7 @@ gt_v10_u10_ngs_2d %>%
         legend.key.height = unit(0.3, "cm"))
 
 gt_v10_u10_ngs_2d %>% 
-  vroom_write((here::here("data", file = "gt_u10_v10_windspeed_ngs_3d_jun_aug_2018.csv")))
+  vroom_write((here::here("data/_summarized_data_files", file = "gt_u10_v10_windspeed_ngs_3d_jun_aug_2018.csv")))
 
 rm(array, fillvalue, nc_2d, var, t, time_units, lat, gt_u10_ngs_2d, gt_v10_ngs_2d, gt_v10_u10_ngs_2d) 
   
