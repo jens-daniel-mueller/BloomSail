@@ -84,7 +84,7 @@ MLD_sum <- MLD %>%
 
 ## Density profiles
 
-```{r plot_density_profiles, fig.cap="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD"}
+```{r plot_density_profiles, fig.cap="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD", fig.asp=1.2}
 
 df %>% 
   filter(dep < 30) %>% 
@@ -226,3 +226,82 @@ df %>%
 
 ```
 
+# Reconstruct NCP
+
+## Caclulation
+
+```{r NCP_calculation}
+
+df <- df %>% 
+  mutate(NCP_recalc = dCT * mean / 1000) %>% 
+  group_by(rho_lim) %>% 
+  arrange(date_time_ID)
+
+```
+
+
+## Incremental and cumulative timeseries
+
+Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated.
+
+
+```{r plot_integrated_NCP_timeseries, fig.asp=1.5}
+
+p_iNCP <- df %>% 
+  ggplot(aes(date_time_ID, NCP_recalc, fill=rho_lim))+
+  geom_hline(yintercept = 0)+
+  geom_bar(stat="identity", col="black")+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  facet_grid(rho_lim~.)+
+  labs(y="integrated, directional CT changes [mol/m2]", x="date")
+
+p_iNCPcum <- df %>% 
+  ggplot(aes(date_time_ID,  dCT_cum, fill=dep))+
+  geom_hline(yintercept = 0)+
+  geom_area(col="black")+
+  scale_fill_viridis_d()+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  facet_grid(rev(sign)~., scales = "free_y", space = "free_y")+
+  theme(strip.background = element_blank(),
+        strip.text = element_blank())+
+  labs(y="integrated, cumulative, directional CT changes [mol/m2]", x="date")
+
+
+(p_iNCP / p_iNCPcum)+
+  plot_layout(guides = 'collect')
+
+rm(p_iNCP, p_iNCPcum)
+```
+
+
+
+
+```{r integrated_NCP}
+
+NCP <- NCP %>% 
+  group_by(sign, dep) %>% 
+  arrange(date_time_ID) %>%
+  mutate(dCT_cum = cumsum(dCT)) %>% 
+  ungroup()
+
+NCP_grid <- expand_grid(
+  unique(NCP$date_time_ID),
+  unique(NCP$dep),
+  unique(NCP$sign)
+)
+
+NCP_grid <- NCP_grid %>% 
+  set_names(c("date_time_ID","dep", "sign"))
+
+NCP <- full_join(NCP, NCP_grid)
+
+rm(NCP_grid)
+
+NCP <- NCP %>% 
+  arrange(sign, dep, date_time_ID) %>% 
+  group_by(sign, dep) %>% 
+  fill(dCT_cum) %>% 
+  ungroup() %>% 
+  mutate(dCT_cum = if_else(is.na(dCT_cum), 0, dCT_cum))
+
+```
