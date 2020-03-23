@@ -212,6 +212,7 @@ rm(date_grid)
 
 df %>% 
   ggplot()+
+  geom_hline(yintercept = 0)+
   geom_ribbon(aes(date_time_ID, ymin = min, ymax = max, fill="MLD"), alpha = 0.2)+
   geom_path(aes(date_time_ID, mean, col="MLD"))+
   geom_errorbar(aes(date_time_ID, ymin = mean-sd, ymax = mean+sd, col="MLD"))+
@@ -277,7 +278,7 @@ p_iNCPcum <- df_cum %>%
 
 
 (p_iNCP / p_iNCPcum)+
-  plot_layout(guides = 'collect')
+  plot_layout(guides = 'collect', heights = c(1, 2))
 
 rm(p_iNCP, p_iNCPcum)
 ```
