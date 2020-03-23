@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree68cd650bc8eea06e8d32955eac88a01746843abbtargetblank68cd650a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/68cd650bc8eea06e8d32955eac88a01746843abb" target="_blank">68cd650</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeca1591e92bc36f442506b7eaedefd21df23bbbb7targetblankca1591ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ca1591e92bc36f442506b7eaedefd21df23bbbb7" target="_blank">ca1591e</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree68cd650bc8eea06e8d32955eac88a01746843abbtargetblank68cd650a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeca1591e92bc36f442506b7eaedefd21df23bbbb7targetblankca1591ea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -918,6 +918,48 @@ rm(FM_ts_mean, FM_ts_sd)</code></pre>
   scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
   theme_bw()</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/Plot_Finnmaid_crossings-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="ct-vs-temperature" class="section level1">
+<h1><span class="header-section-number">5</span> C<sub>T</sub> vs temperature</h1>
+<p>As primary production (negative changes in C<sub>T</sub>) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated.</p>
+<pre class="r"><code>CT_tem &lt;- FM_ts %&gt;%
+  filter(parameter %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
+  select(date, parameter, mean) %&gt;% 
+  pivot_wider(values_from = mean, names_from = parameter)
+
+CT_tem &lt;- CT_tem %&gt;% 
+  arrange(date) %&gt;%
+  mutate(dCT = CT - lag(CT),
+         dtem = tem - lag(tem),
+         sign = if_else(dCT &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;% 
+  drop_na()
+
+
+lab_dates &lt;- pretty(CT_tem$date)
+
+CT_tem %&gt;% 
+  filter(date &gt; start_date,
+         date &lt; end_date) %&gt;% 
+  arrange(date) %&gt;% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_vline(xintercept = 0)+
+  geom_smooth(aes(dtem, dCT), method = &quot;lm&quot;, se=FALSE)+
+  geom_point(aes(dtem, dCT, fill=as.numeric(date)), shape=21)+
+  scale_fill_viridis_c(breaks = as.numeric(lab_dates),
+                        labels = lab_dates,
+                        name=&quot;Date&quot;)+
+  guides(fill = guide_legend(override.aes=list(shape=21)))</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/CT_vs_temperature-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="ncp" class="section level1">
+<h1><span class="header-section-number">6</span> NCP</h1>
+<div id="mld-approach" class="section level2">
+<h2><span class="header-section-number">6.1</span> MLD approach</h2>
+</div>
+<div id="delta-t-appraoch" class="section level2">
+<h2><span class="header-section-number">6.2</span> delta T appraoch</h2>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -954,17 +996,18 @@ loaded via a namespace (and not attached):
  [5] rprojroot_1.3-2    digest_0.6.22      R6_2.4.0           cellranger_1.1.0  
  [9] backports_1.1.5    reprex_0.3.0       evaluate_0.14      httr_1.4.1        
 [13] pillar_1.4.2       rlang_0.4.5        readxl_1.3.1       rstudioapi_0.10   
-[17] rmarkdown_2.0      labeling_0.3       bit_1.1-14         munsell_0.5.0     
-[21] broom_0.5.3        compiler_3.5.0     httpuv_1.5.2       modelr_0.1.5      
-[25] xfun_0.10          pkgconfig_2.0.3    htmltools_0.4.0    tidyselect_0.2.5  
-[29] workflowr_1.6.0    viridisLite_0.3.0  crayon_1.3.4       dbplyr_1.4.2      
-[33] withr_2.1.2        later_1.0.0        grid_3.5.0         nlme_3.1-137      
-[37] jsonlite_1.6       gtable_0.3.0       lifecycle_0.1.0    DBI_1.0.0         
-[41] git2r_0.26.1       magrittr_1.5       scales_1.0.0       cli_1.1.0         
-[45] stringi_1.4.3      fs_1.3.1           promises_1.1.0     xml2_1.2.2        
-[49] generics_0.0.2     vctrs_0.2.0        RColorBrewer_1.1-2 tools_3.5.0       
-[53] bit64_0.9-7        glue_1.3.1         hms_0.5.2          yaml_2.2.0        
-[57] colorspace_1.4-1   rvest_0.3.5        knitr_1.26         haven_2.2.0       </code></pre>
+[17] Matrix_1.2-14      rmarkdown_2.0      labeling_0.3       bit_1.1-14        
+[21] munsell_0.5.0      broom_0.5.3        compiler_3.5.0     httpuv_1.5.2      
+[25] modelr_0.1.5       xfun_0.10          pkgconfig_2.0.3    mgcv_1.8-23       
+[29] htmltools_0.4.0    tidyselect_0.2.5   workflowr_1.6.0    viridisLite_0.3.0 
+[33] crayon_1.3.4       dbplyr_1.4.2       withr_2.1.2        later_1.0.0       
+[37] grid_3.5.0         nlme_3.1-137       jsonlite_1.6       gtable_0.3.0      
+[41] lifecycle_0.1.0    DBI_1.0.0          git2r_0.26.1       magrittr_1.5      
+[45] scales_1.0.0       cli_1.1.0          stringi_1.4.3      fs_1.3.1          
+[49] promises_1.1.0     xml2_1.2.2         ellipsis_0.3.0     generics_0.0.2    
+[53] vctrs_0.2.0        RColorBrewer_1.1-2 tools_3.5.0        bit64_0.9-7       
+[57] glue_1.3.1         hms_0.5.2          yaml_2.2.0         colorspace_1.4-1  
+[61] rvest_0.3.5        knitr_1.26         haven_2.2.0       </code></pre>
 </div>
 </div>
 </div>
