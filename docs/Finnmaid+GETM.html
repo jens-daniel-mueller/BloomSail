@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree247cf5e6efbf0c85df7779f58742c3fc7d937429targetblank247cf5ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/247cf5e6efbf0c85df7779f58742c3fc7d937429" target="_blank">247cf5e</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree68cd650bc8eea06e8d32955eac88a01746843abbtargetblank68cd650a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/68cd650bc8eea06e8d32955eac88a01746843abb" target="_blank">68cd650</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree247cf5e6efbf0c85df7779f58742c3fc7d937429targetblank247cf5ea" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree68cd650bc8eea06e8d32955eac88a01746843abbtargetblank68cd650a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -826,6 +826,7 @@ p_rho &lt;- gt_3d_jun_aug %&gt;%
 
 p_sal / p_tem / p_rho</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/plot_hovmoeller_gt_salt_temp_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(p_sal, p_tem, p_rho)</code></pre>
 </div>
 <div id="profiles" class="section level2">
 <h2><span class="header-section-number">2.3</span> Profiles</h2>
@@ -864,12 +865,59 @@ gt_3d_jun_aug_long %&gt;%
 <p><img src="figure/Finnmaid+GETM.Rmd/plot_winspeed-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="finnmaid-data" class="section level1">
-<h1><span class="header-section-number">4</span> Finnmaid data</h1>
+<div id="finnmaid" class="section level1">
+<h1><span class="header-section-number">4</span> Finnmaid</h1>
+<div id="read-data" class="section level2">
+<h2><span class="header-section-number">4.1</span> Read data</h2>
 <p>Finnmaid data, including reconstructed data during LICOS operation failure.</p>
-<pre class="r"><code>#df &lt;-
-#  read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
-#                       &quot;Finnmaid.csv&quot;))</code></pre>
+<pre class="r"><code>df &lt;-
+ read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
+                      &quot;Finnmaid.csv&quot;))
+
+df &lt;- df %&gt;% 
+  filter(Area == &quot;BS&quot;) %&gt;% 
+  select(-c(Lon, Lat, patm, Teq, xCO2, route, Area)) %&gt;% 
+  mutate(ID = as.factor(ID)) %&gt;% 
+  rename(tem=Tem,
+         sal=Sal)</code></pre>
+</div>
+<div id="ct-calculation" class="section level2">
+<h2><span class="header-section-number">4.2</span> C<sub>T</sub> calculation</h2>
+<p>Calculate based on fixed A<sub>T</sub> and salinity mean values.</p>
+<pre class="r"><code>df &lt;- df %&gt;% 
+  mutate(CT = carb(24, var1=pCO2, var2=1720*1e-6,
+                   S=6.9, T=tem, k1k2=&quot;m10&quot;, kf=&quot;dg&quot;, ks=&quot;d&quot;,
+                   gas=&quot;insitu&quot;)[,16]*1e6)</code></pre>
+</div>
+<div id="timeseries" class="section level2">
+<h2><span class="header-section-number">4.3</span> Timeseries</h2>
+<pre class="r"><code>FM_ts_mean &lt;- df %&gt;% 
+  arrange(date) %&gt;% 
+  group_by(ID, sensor) %&gt;% 
+  summarise_all(list(~mean(.)), na.rm=TRUE) %&gt;%
+  ungroup() %&gt;% 
+  pivot_longer(4:8, values_to = &quot;mean&quot;, names_to = &quot;parameter&quot;)
+
+FM_ts_sd &lt;- df %&gt;% 
+  arrange(date) %&gt;% 
+  group_by(ID, sensor) %&gt;% 
+  summarise_all(list(~sd(.)), na.rm=TRUE) %&gt;%
+  ungroup() %&gt;% 
+  pivot_longer(4:8, values_to = &quot;sd&quot;, names_to = &quot;parameter&quot;) %&gt;% 
+  select(-date)
+
+FM_ts &lt;- inner_join(FM_ts_mean, FM_ts_sd)
+
+rm(FM_ts_mean, FM_ts_sd)</code></pre>
+<pre class="r"><code>FM_ts %&gt;% 
+  ggplot(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
+  geom_path()+
+  geom_ribbon(alpha=0.5)+
+  geom_point(aes(col=sensor))+
+  facet_grid(parameter~., scales = &quot;free_y&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
+  theme_bw()</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/Plot_Finnmaid_crossings-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -917,6 +965,7 @@ loaded via a namespace (and not attached):
 [49] generics_0.0.2     vctrs_0.2.0        RColorBrewer_1.1-2 tools_3.5.0       
 [53] bit64_0.9-7        glue_1.3.1         hms_0.5.2          yaml_2.2.0        
 [57] colorspace_1.4-1   rvest_0.3.5        knitr_1.26         haven_2.2.0       </code></pre>
+</div>
 </div>
 </div>
 
