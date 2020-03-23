@@ -444,14 +444,14 @@ div.section {
 
 <h1 class="title toc-ignore">Finnmaid and GETM</h1>
 <h4 class="author">Jens Daniel Müller und Lara Sophie Burchardt</h4>
-<h4 class="date">21 March, 2020</h4>
+<h4 class="date">23 March, 2020</h4>
 
 </div>
 
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -460,7 +460,7 @@ div.section {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -469,10 +469,10 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-03-21
+<strong>Last updated:</strong> 2020-03-23
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>BloomSail/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
@@ -488,12 +488,12 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
 </div>
 </div>
 </div>
@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree677a2fd2f594c5c7310e5c4c58b87c27e14072actargetblank677a2fda"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/677a2fd2f594c5c7310e5c4c58b87c27e14072ac" target="_blank">677a2fd</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0c4d34800959442398cdefa1db0321ba2e3039edtargetblank0c4d348a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/0c4d34800959442398cdefa1db0321ba2e3039ed" target="_blank">0c4d348</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree677a2fd2f594c5c7310e5c4c58b87c27e14072actargetblank677a2fda" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0c4d34800959442398cdefa1db0321ba2e3039edtargetblank0c4d348a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -579,6 +579,9 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
+
+Unstaged changes:
+    Modified:   analysis/Finnmaid+GETM.Rmd
 
 </code></pre>
 <p>
@@ -603,12 +606,11 @@ library(ncdf4)
 library(vroom)
 library(lubridate)
 library(here)
-library(seacarb)</code></pre>
+library(seacarb)
+library(oce)
+library(patchwork)</code></pre>
 <pre class="r"><code># route
 select_route &lt;- &quot;E&quot;
-
-# variable names in 2d and 3d GETM files
-#defined later, since more than one needed
 
 # latitude limits
 low_lat &lt;- 57.3
@@ -623,40 +625,40 @@ start_date &lt;- &quot;2018-06-01&quot;
 end_date &lt;- &quot;2018-08-31&quot;</code></pre>
 <div id="getm-data-preparation" class="section level1">
 <h1><span class="header-section-number">1</span> GETM Data preparation</h1>
-<pre class="r"><code># data Salinity
-
-var_3d &lt;- &quot;salt&quot;
-
-nc &lt;- nc_open(paste(&quot;data/GETM/Finnmaid.E.3d.2018.nc&quot;, sep = &quot;&quot;))
-nc_2d &lt;- nc_open(paste(&quot;data/GETM/Finnmaid.E.2d.2018.nc&quot;, sep = &quot;&quot;))
+<div id="salinity-and-temperature-profiles" class="section level2">
+<h2><span class="header-section-number">1.1</span> Salinity and temperature profiles</h2>
+<p>Mean salinity and temperature profiles within the BloomSail area were extracted from daily GETM transects beneath the Finnmaid track.</p>
+<pre class="r"><code>nc &lt;- nc_open(here::here(&quot;data/GETM&quot;, &quot;Finnmaid.E.3d.2018.nc&quot;))
 
 lat &lt;- ncvar_get(nc, &quot;latc&quot;)
 
 time_units &lt;- nc$dim$time$units %&gt;%     #we read the time unit from the netcdf file to calibrate the time 
     substr(start = 15, stop = 33) %&gt;%   #calculation, we take the relevant information from the string
     ymd_hms()                           # and transform it to the right format
-
 t &lt;- time_units + ncvar_get(nc, &quot;time&quot;) # read time vector
+rm(time_units)
+
 d &lt;- ncvar_get(nc, &quot;zax&quot;) # read depths vector
 
+for (var_3d in c(&quot;salt&quot;, &quot;temp&quot;)) {
+  
 array &lt;- ncvar_get(nc, var_3d) # store the data in a 3-dimensional array
 #dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
 
 fillvalue &lt;- ncatt_get(nc, var_3d, &quot;_FillValue&quot;)
-nc_close(nc)
 
 # Working with the data
 array[array == fillvalue$value] &lt;- NA
 
     for (i in seq(1,length(t),1)){
       
-      #i &lt;- 3
+      # i &lt;- 3
       array_slice &lt;- array[, , i] # slices data from one day
       
       array_slice_df &lt;- as.data.frame(t(array_slice))
       array_slice_df &lt;- as_tibble(array_slice_df)
       
-      gt_salt_ngs_3d_part &lt;- array_slice_df %&gt;%
+      gt_3d_part &lt;- array_slice_df %&gt;%
         set_names(as.character(lat)) %&gt;%
         mutate(dep = -d) %&gt;%
         gather(&quot;lat&quot;, &quot;value&quot;, 1:length(lat)) %&gt;%
@@ -668,314 +670,180 @@ array[array == fillvalue$value] &lt;- NA
                date_time=t[i]) %&gt;% 
         dplyr::select(date_time, dep, value, var) #%&gt;% 
         #filter(date_time &gt;= start_date, date_time &lt;= end_date)
+
       
+      if (exists(&quot;gt_3d&quot;)) {
+        gt_3d &lt;- bind_rows(gt_3d, gt_3d_part)
+        } else {gt_3d &lt;- gt_3d_part}
       
-      if (exists(&quot;gt_salt_ngs_3d&quot;)) {
-        gt_salt_ngs_3d &lt;- bind_rows(gt_salt_ngs_3d, gt_salt_ngs_3d_part)
-        } else {gt_salt_ngs_3d &lt;- gt_salt_ngs_3d_part}
-      
-  rm(array_slice, array_slice_df, gt_salt_ngs_3d_part)
+  rm(array_slice, array_slice_df, gt_3d_part)
       
     }
-rm(nc, time_units, t, d, array, fillvalue)
+rm(array, fillvalue)
 
-gt_salt_ngs_3d$date_time %&gt;% 
-  cut.POSIXt(breaks = &quot;days&quot;) %&gt;% 
-  round.POSIXt(units = &quot;days&quot;)
+}
 
-gt_salt_ngs_3d_jun_aug &lt;- gt_salt_ngs_3d %&gt;% 
-  group_by(dep,var,date_time ) %&gt;% 
-  summarise_all(list(value=~mean(.,na.rm=TRUE))) %&gt;%
-  ungroup() %&gt;% 
-  filter(date_time &gt;= start_date &amp; date_time &lt;= end_date)
-
-# data temperature
-var_3d &lt;- &quot;temp&quot;
-
-nc &lt;- nc_open(paste(&quot;data/GETM/Finnmaid.E.3d.2018.nc&quot;, sep = &quot;&quot;))
-
-lat &lt;- ncvar_get(nc, &quot;latc&quot;)
-
-time_units &lt;- nc$dim$time$units %&gt;%     #we read the time unit from the netcdf file to calibrate the time 
-    substr(start = 15, stop = 33) %&gt;%   #calculation, we take the relevant information from the string
-    ymd_hms()                           # and transform it to the right format
-
-t &lt;- time_units + ncvar_get(nc, &quot;time&quot;) # read time vector
-d &lt;- ncvar_get(nc, &quot;zax&quot;) # read depths vector
-
-array &lt;- ncvar_get(nc, var_3d) # store the data in a 3-dimensional array
-#dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
-
-fillvalue &lt;- ncatt_get(nc, var_3d, &quot;_FillValue&quot;)
 nc_close(nc)
+rm(nc)
 
-# Working with the data
-array[array == fillvalue$value] &lt;- NA
-
-    for (i in seq(1,length(t),1)){
-      
-      #i &lt;- 3
-      array_slice &lt;- array[, , i] # slices data from one day
-      
-      array_slice_df &lt;- as.data.frame(t(array_slice))
-      array_slice_df &lt;- as_tibble(array_slice_df)
-      
-      gt_temp_ngs_3d_part &lt;- array_slice_df %&gt;%
-        set_names(as.character(lat)) %&gt;%
-        mutate(dep = -d) %&gt;%
-        gather(&quot;lat&quot;, &quot;value&quot;, 1:length(lat)) %&gt;%
-        mutate(lat = as.numeric(lat)) %&gt;%
-        filter(lat &gt; low_lat, lat &lt; high_lat,
-               dep &gt;= d1_shallow, dep &lt;= d1_deep) %&gt;%
-        #summarise_all(&quot;mean&quot;) %&gt;%
-        mutate(var = var_3d,
-               date_time=t[i]) %&gt;% 
-        dplyr::select(date_time, dep, value, var) #%&gt;% 
-        #filter(date_time &gt;= start_date, date_time &lt;= end_date)
-      
-      
-      if (exists(&quot;gt_temp_ngs_3d&quot;)) {
-        gt_temp_ngs_3d &lt;- bind_rows(gt_temp_ngs_3d, gt_temp_ngs_3d_part)
-        } else {gt_temp_ngs_3d &lt;- gt_temp_ngs_3d_part}
-      
-  rm(array_slice, array_slice_df, gt_temp_ngs_3d_part)
-      
-    }
-rm(nc, time_units, t, d, array, fillvalue, var_3d)
-
-gt_temp_ngs_3d$date_time %&gt;% 
-  cut.POSIXt(breaks = &quot;days&quot;) %&gt;% 
-  round.POSIXt(units = &quot;days&quot;)
-
-gt_temp_ngs_3d_jun_aug &lt;- gt_temp_ngs_3d %&gt;% 
+gt_3d_jun_aug &lt;- gt_3d %&gt;% 
+  filter(date_time &gt;= start_date &amp; date_time &lt;= end_date) %&gt;% 
   group_by(dep,var,date_time ) %&gt;% 
   summarise_all(list(value=~mean(.,na.rm=TRUE))) %&gt;%
-  ungroup() %&gt;% 
-  filter(date_time &gt;= start_date &amp; date_time &lt;= end_date)
+  ungroup()
 
-# mld rho data
-var &lt;- &quot;mld_rho&quot;
+gt_3d_jun_aug %&gt;% 
+  vroom_write((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_3d_jun_aug_2018.csv&quot;)))
 
-nc_2d &lt;- nc_open(paste(&quot;data/GETM/Finnmaid.E.2d.2018.nc&quot;, sep = &quot;&quot;))
+
+rm(gt_3d, gt_3d_jun_aug, d1_deep, d1_shallow, i, lat, d, t, var_3d)</code></pre>
+</div>
+<div id="mixed-layer-depth" class="section level2">
+<h2><span class="header-section-number">1.2</span> Mixed layer depth</h2>
+<p>Regional mean mixed layer depth estimates based on sewater density and windspeed within the BloomSail area were extracted from 3h GETM surface data along the Finnmaid track.</p>
+<pre class="r"><code>nc_2d &lt;- nc_open(here(&quot;data/GETM&quot;, &quot;Finnmaid.E.2d.2018.nc&quot;))
+#print(nc_2d)
 
 lat &lt;- ncvar_get(nc_2d, &quot;latc&quot;)
-
 
 time_units &lt;- nc_2d$dim$time$units %&gt;%     #we read the time unit from the netcdf file to calibrate the time 
     substr(start = 15, stop = 33) %&gt;%   #calculation, we take the relevant information from the string
     ymd_hms()                           # and transform it to the right format
-
 t &lt;- time_units + ncvar_get(nc_2d, &quot;time&quot;) # read time vector
+rm(time_units)
 
-array &lt;- ncvar_get(nc_2d, var) # store the data in a 3-dimensional array
-#dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
-
-fillvalue &lt;- ncatt_get(nc_2d, var, &quot;_FillValue&quot;)
-#nc_close(nc_2d)
-
-# Working with the data
-array[array == fillvalue$value] &lt;- NA
-
-array &lt;- ncvar_get(nc_2d, var) # store the data in a 3-dimensional array
-dim(array) # should be 2d with dimensions: 1575 coordinate, 31d*(24h/d/3h)=248 time steps
-
-array &lt;- as.data.frame(t(array), xy=TRUE)
-array &lt;- as_tibble(array)
-      
-  gt_mldrho_ngs_2d &lt;- array %&gt;%
-  set_names(as.character(lat)) %&gt;%
-  mutate(date_time = t) %&gt;%
-  gather(&quot;lat&quot;, &quot;value&quot;, 1:length(lat)) %&gt;%
-  mutate(lat = as.numeric(lat)) %&gt;%
-  filter(lat &gt; low_lat, lat&lt;high_lat) %&gt;%
-  mutate(var = var) %&gt;% 
-  dplyr::select(date_time, value, var) %&gt;% 
-    filter(date_time &gt;= start_date &amp; date_time &lt;= end_date)
-      
-      
-rm(nc_2d, time_units, t, array, fillvalue, var)
-
-# combine salinity and temperature data
-
-gt_temp_salt_ngs_3d_jun_aug &lt;- inner_join(gt_temp_ngs_3d_jun_aug,gt_salt_ngs_3d_jun_aug, by = c(&quot;dep&quot;, &quot;date_time&quot;)) 
-
-gt_temp_salt_ngs_3d_jun_aug %&gt;% 
-  vroom_write((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_temp_salt_ngs_3d_jun_aug_2018.csv&quot;)))
-
-gt_mldrho_ngs_2d %&gt;% 
-  vroom_write((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_mldrho_ngs_2d_jun_aug_2018.csv&quot;)))
-
-rm(gt_salt_ngs_3d, gt_temp_ngs_3d, gt_salt_ngs_3d_jun_aug, gt_temp_ngs_3d_jun_aug, d1_deep, d1_shallow, i, lat)</code></pre>
-<p>#Hovmoeller Plots</p>
-<pre class="r"><code>gt_temp_salt_ngs_3d_jun_aug &lt;- 
-  vroom((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_temp_salt_ngs_3d_jun_aug_2018.csv&quot;)))
-
-gt_mldrho_ngs_2d &lt;- 
-  vroom((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_mldrho_ngs_2d_jun_aug_2018.csv&quot;)))
-
-
-
-gt_temp_salt_ngs_3d_jun_aug &lt;- gt_temp_salt_ngs_3d_jun_aug %&gt;% 
-  mutate(date = ymd(date_time), 
-         year = year(date_time))
-
-  p1 &lt;- ggplot()+
-    geom_raster(data= gt_temp_salt_ngs_3d_jun_aug ,aes(date, dep, fill=value.y))+
-      #scale_fill_scico(palette = &quot;vik&quot;, name=&quot;mean difference in SST [°C]&quot;)+
-      scale_fill_viridis_c(name=&quot;Salility &quot;, option = &quot;B&quot;)+
-      scale_x_date(expand = c(0,0))+
-      scale_y_continuous(expand = c(0,0))+
-      labs(y=&quot;Depth [m]&quot;)+
-      theme_bw()+
-      theme(
-        axis.title.x = element_blank(),
-        legend.position = &quot;bottom&quot;,
-        legend.key.width = unit(1.3, &quot;cm&quot;),
-        legend.key.height = unit(0.3, &quot;cm&quot;)
-      )
-  # add mld rho as white line
-  p1+ 
-      geom_line(data= gt_mldrho_ngs_2d, aes(x = as.Date(date_time),y = value, color = &quot;white&quot;), color = &quot;white&quot;)+
-      scale_color_discrete(name = &quot;Legend&quot;, labels = c(&quot;MLD Rho&quot;))</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/hovmoeller_depth_profil_salt-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>gt_temp_salt_ngs_3d_jun_aug &lt;- gt_temp_salt_ngs_3d_jun_aug %&gt;% 
-  mutate(date = ymd(date_time), 
-         year = year(date_time))
-
-  p2 &lt;- ggplot()+
-    geom_raster(data= gt_temp_salt_ngs_3d_jun_aug ,aes(date, dep, fill=value.x))+
-      #scale_fill_scico(palette = &quot;vik&quot;, name=&quot;mean difference in SST [°C]&quot;)+
-      scale_fill_viridis_c(name=&quot;Temperature [°C] &quot;, option = &quot;B&quot;)+
-      scale_x_date(expand = c(0,0))+
-      scale_y_continuous(expand = c(0,0))+
-      labs(y=&quot;Depth [m]&quot;)+
-      theme_bw()+
-      theme(
-        axis.title.x = element_blank(),
-        legend.position = &quot;bottom&quot;,
-        legend.key.width = unit(1.3, &quot;cm&quot;),
-        legend.key.height = unit(0.3, &quot;cm&quot;)
-      )
-  # add mld rho as white line
-  p2+ 
-      geom_line(data= gt_mldrho_ngs_2d, aes(x = as.Date(date_time),y = value, color = &quot;white&quot;), color = &quot;white&quot;)+
-      scale_color_discrete(name = &quot;Legend&quot;, labels = c(&quot;MLD Rho&quot;))</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/hovmoeller_depth_profil_temp-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>#Windspeeds</p>
-<p>In the following section, we calculate windspeeds from the parameters v and u. The windspeeds are plotted over time.</p>
-<pre class="r"><code># component u10
-var &lt;- &quot;u10&quot;
-
-nc_2d &lt;- nc_open(paste(&quot;data/GETM/Finnmaid.E.2d.2018.nc&quot;, sep = &quot;&quot;))
-
-lat &lt;- ncvar_get(nc_2d, &quot;latc&quot;)
-
-
-time_units &lt;- nc_2d$dim$time$units %&gt;%     #we read the time unit from the netcdf file to calibrate the time 
-    substr(start = 15, stop = 33) %&gt;%   #calculation, we take the relevant information from the string
-    ymd_hms()                           # and transform it to the right format
-
-t &lt;- time_units + ncvar_get(nc_2d, &quot;time&quot;) # read time vector
-
-array &lt;- ncvar_get(nc_2d, var) # store the data in a 3-dimensional array
-#dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
-
-fillvalue &lt;- ncatt_get(nc_2d, var, &quot;_FillValue&quot;)
-nc_close(nc_2d)
-
-# Working with the data
-array[array == fillvalue$value] &lt;- NA
-
-array &lt;- as.data.frame(t(array), xy=TRUE)
-array &lt;- as_tibble(array)
-      
-  gt_u10_ngs_2d &lt;- array %&gt;%
-  set_names(as.character(lat)) %&gt;%
-  mutate(date_time = t) %&gt;%
-  gather(&quot;lat&quot;, &quot;value&quot;, 1:length(lat)) %&gt;%
-  mutate(lat = as.numeric(lat)) %&gt;%
-  filter(lat &gt; low_lat, lat&lt;high_lat) %&gt;%
-  mutate(var = var) %&gt;% 
-  dplyr::select(date_time, value, var, lat) %&gt;% 
-    filter(date_time &gt;= start_date &amp; date_time &lt;= end_date)
+for (var in c(&quot;mld_rho&quot;, &quot;u10&quot;, &quot;v10&quot;)) {
   
-  gt_u10_ngs_2d &lt;- gt_u10_ngs_2d %&gt;% 
-  group_by(var,date_time ) %&gt;% 
+#var &lt;- &quot;mld_rho&quot;
+
+array &lt;- ncvar_get(nc_2d, var) # store the data in a 3-dimensional array
+fillvalue &lt;- ncatt_get(nc_2d, var, &quot;_FillValue&quot;)
+array[array == fillvalue$value] &lt;- NA
+
+array &lt;- as.data.frame(t(array), xy=TRUE)
+array &lt;- as_tibble(array)
+      
+  gt_2d_part &lt;- array %&gt;%
+  set_names(as.character(lat)) %&gt;%
+  mutate(date_time = t) %&gt;%
+  filter(date_time &gt;= start_date &amp; date_time &lt;= end_date) %&gt;% 
+  gather(&quot;lat&quot;, &quot;value&quot;, 1:length(lat)) %&gt;%
+  mutate(lat = as.numeric(lat)) %&gt;%
+  filter(lat &gt; low_lat, lat&lt;high_lat) %&gt;%
+  select(-lat) %&gt;% 
+  group_by(date_time) %&gt;% 
   summarise_all(list(value=~mean(.,na.rm=TRUE))) %&gt;%
   ungroup() %&gt;% 
-  mutate(value = value_value) %&gt;% 
-  select(var, value, date_time)
- 
-  
-  rm(var, array, fillvalue, t, time_units, lat, nc_2d)
-  
-# component v10
-var &lt;- &quot;v10&quot;
+  mutate(var = var)
+     
+  if (exists(&quot;gt_2d&quot;)) {
+    gt_2d &lt;- bind_rows(gt_2d, gt_2d_part)
+    } else {gt_2d &lt;- gt_2d_part} 
 
-nc_2d &lt;- nc_open(paste(&quot;data/GETM/Finnmaid.E.2d.2018.nc&quot;, sep = &quot;&quot;))
+rm(array, fillvalue, gt_2d_part)
 
-lat &lt;- ncvar_get(nc_2d, &quot;latc&quot;)
+}
 
-
-time_units &lt;- nc_2d$dim$time$units %&gt;%     #we read the time unit from the netcdf file to calibrate the time 
-    substr(start = 15, stop = 33) %&gt;%   #calculation, we take the relevant information from the string
-    ymd_hms()                           # and transform it to the right format
-
-t &lt;- time_units + ncvar_get(nc_2d, &quot;time&quot;) # read time vector
-
-array &lt;- ncvar_get(nc_2d, var) # store the data in a 3-dimensional array
-#dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
-
-fillvalue &lt;- ncatt_get(nc_2d, var, &quot;_FillValue&quot;)
 nc_close(nc_2d)
+rm(nc_2d)
 
-# Working with the data
-array[array == fillvalue$value] &lt;- NA
+gt_2d &lt;- gt_2d %&gt;% 
+  pivot_wider(values_from = value, names_from = var) %&gt;% 
+  mutate(U_10 = (sqrt(u10^2 + v10^2))) %&gt;% 
+  select(-c(u10, v10))
 
-array &lt;- as.data.frame(t(array), xy=TRUE)
-array &lt;- as_tibble(array)
-      
-  gt_v10_ngs_2d &lt;- array %&gt;%
-  set_names(as.character(lat)) %&gt;%
-  mutate(date_time = t) %&gt;%
-  gather(&quot;lat&quot;, &quot;value&quot;, 1:length(lat)) %&gt;%
-  mutate(lat = as.numeric(lat)) %&gt;%
-  filter(lat &gt; low_lat, lat&lt;high_lat) %&gt;%
-  mutate(var = var) %&gt;% 
-  dplyr::select(date_time, value, var) %&gt;% 
-    filter(date_time &gt;= start_date &amp; date_time &lt;= end_date)
-  
-  gt_v10_ngs_2d &lt;- gt_v10_ngs_2d %&gt;% 
-  group_by(var,date_time ) %&gt;% 
-  summarise_all(list(value=~mean(.,na.rm=TRUE))) %&gt;%
+
+gt_2d %&gt;% 
+  vroom_write((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_2d_jun_aug_2018.csv&quot;)))
+
+rm(t, var, gt_2d, lat)</code></pre>
+</div>
+</div>
+<div id="hovmoeller-plots" class="section level1">
+<h1><span class="header-section-number">2</span> Hovmoeller Plots</h1>
+<pre class="r"><code>gt_3d_jun_aug &lt;- 
+  read_tsv((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_3d_jun_aug_2018.csv&quot;)))
+
+gt_2d_jun_aug &lt;- 
+  read_tsv((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_2d_jun_aug_2018.csv&quot;)))
+
+gt_3d_jun_aug &lt;- gt_3d_jun_aug %&gt;% 
+  pivot_wider(values_from = value, names_from = var) %&gt;% 
+  mutate(rho = swSigma(salinity = salt, temperature = temp, pressure = dep/10))
+
+gt_2d_jun_aug_daily &lt;- gt_2d_jun_aug %&gt;% 
+  mutate(day = yday(date_time)) %&gt;% 
+  group_by(day) %&gt;% 
+  summarise_all(list(~mean(.,na.rm=TRUE))) %&gt;%
   ungroup() %&gt;% 
-  select(var, value, date_time)
-  
-# combine both
-  
-  gt_v10_u10_ngs_2d &lt;- full_join(gt_u10_ngs_2d, gt_v10_ngs_2d, by = &quot;date_time&quot;)
-  
-  gt_v10_u10_ngs_2d &lt;- gt_v10_u10_ngs_2d %&gt;% 
-    mutate(windspeed = (sqrt(value.x^2+value.y^2)))
+  select(-day)
 
-gt_v10_u10_ngs_2d %&gt;% 
+# gt_temp_salt_ngs_3d_jun_aug &lt;- gt_temp_salt_ngs_3d_jun_aug %&gt;% 
+#   mutate(date = ymd(date_time), 
+#          year = year(date_time))
+
+p_sal &lt;- gt_3d_jun_aug %&gt;% 
+  filter(dep &lt;= 30) %&gt;% 
   ggplot()+
-  geom_line(aes(x= date_time, y = windspeed), color = &quot;blue&quot;)+
-  labs(y=&quot;Windspeed&quot;, x = &quot;Date&quot;)+
-      theme_bw()+
-      theme(
-        axis.title.x = element_blank(),
-        legend.position = &quot;bottom&quot;,
-        legend.key.width = unit(1.3, &quot;cm&quot;),
-        legend.key.height = unit(0.3, &quot;cm&quot;))</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/winspeed_calc_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>gt_v10_u10_ngs_2d %&gt;% 
-  vroom_write((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_u10_v10_windspeed_ngs_3d_jun_aug_2018.csv&quot;)))
+  geom_raster(aes(date_time, dep, fill=salt))+
+  scale_fill_viridis_c(name=&quot;Salinity &quot;, direction = -1)+
+  scale_y_reverse()+
+  coord_cartesian(expand = 0)+
+  labs(y=&quot;Depth [m]&quot;)+
+  theme_bw()+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())+
+  geom_line(data= gt_2d_jun_aug_daily,
+            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)+
+  scale_color_discrete(name = &quot;Legend&quot;, labels = c(&quot;MLD Rho&quot;))
 
-rm(array, fillvalue, nc_2d, var, t, time_units, lat, gt_u10_ngs_2d, gt_v10_ngs_2d, gt_v10_u10_ngs_2d) </code></pre>
+
+p_tem &lt;- gt_3d_jun_aug %&gt;% 
+  filter(dep &lt;= 30) %&gt;% 
+  ggplot()+
+  geom_raster(aes(date_time, dep, fill=temp))+
+  scale_fill_viridis_c(name=&quot;Temperature (°C)&quot;, option = &quot;B&quot;)+
+  scale_y_reverse()+
+  coord_cartesian(expand = 0)+
+  labs(y=&quot;Depth [m]&quot;, x=&quot;&quot;)+
+  theme_bw()+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())+
+  geom_line(data= gt_2d_jun_aug_daily,
+            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)+
+  scale_color_discrete(name = &quot;Legend&quot;, labels = c(&quot;MLD Rho&quot;))
+
+p_rho &lt;- gt_3d_jun_aug %&gt;% 
+  filter(dep &lt;= 30) %&gt;% 
+  ggplot()+
+  geom_raster(aes(date_time, dep, fill=rho))+
+  scale_fill_viridis_c(name=&quot;d Rho (kg/m^3)&quot;, direction = -1)+
+  scale_y_reverse()+
+  coord_cartesian(expand = 0)+
+  labs(y=&quot;Depth [m]&quot;, x=&quot;&quot;)+
+  theme_bw()+
+  theme(axis.title.x = element_blank())+
+  geom_line(data= gt_2d_jun_aug_daily,
+            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)+
+  scale_color_discrete(name = &quot;Legend&quot;, labels = c(&quot;MLD Rho&quot;))
+
+p_sal / p_tem / p_rho</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/hovmoeller_gt_salt_temp_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="windspeeds" class="section level1">
+<h1><span class="header-section-number">3</span> Windspeeds</h1>
+<pre class="r"><code>gt_2d_jun_aug %&gt;% 
+  ggplot()+
+  geom_line(aes(x= date_time, y = U_10, col=&quot;3-hourly&quot;))+
+  geom_line(data = gt_2d_jun_aug_daily,
+            aes(x= date_time, y = U_10, col=&quot;Daily mean&quot;))+
+  labs(y=&quot;U (m/s)&quot;, x = &quot;Date&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;, direction = -1)+
+  theme_bw()</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/plot_winspeed-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="finnmaid-data" class="section level1">
-<h1><span class="header-section-number">2</span> Finnmaid data</h1>
+<h1><span class="header-section-number">4</span> Finnmaid data</h1>
 <p>Finnmaid data, including reconstructed data during LICOS operation failure.</p>
 <pre class="r"><code>#df &lt;-
 #  read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
@@ -1005,29 +873,28 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] seacarb_3.2.12  oce_1.2-0       gsw_1.0-5       testthat_2.3.1 
- [5] here_0.1        lubridate_1.7.4 vroom_1.2.0     ncdf4_1.17     
- [9] forcats_0.4.0   stringr_1.4.0   dplyr_0.8.3     purrr_0.3.3    
-[13] readr_1.3.1     tidyr_1.0.0     tibble_2.1.3    ggplot2_3.3.0  
-[17] tidyverse_1.3.0
+ [1] patchwork_1.0.0 seacarb_3.2.12  oce_1.2-0       gsw_1.0-5      
+ [5] testthat_2.3.1  here_0.1        lubridate_1.7.4 vroom_1.2.0    
+ [9] ncdf4_1.17      forcats_0.4.0   stringr_1.4.0   dplyr_0.8.3    
+[13] purrr_0.3.3     readr_1.3.1     tidyr_1.0.0     tibble_2.1.3   
+[17] ggplot2_3.3.0   tidyverse_1.3.0
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.2        lattice_0.20-35   assertthat_0.2.1  zeallot_0.1.0    
- [5] rprojroot_1.3-2   digest_0.6.22     R6_2.4.0          cellranger_1.1.0 
- [9] backports_1.1.5   reprex_0.3.0      evaluate_0.14     httr_1.4.1       
-[13] pillar_1.4.2      rlang_0.4.5       readxl_1.3.1      rstudioapi_0.10  
-[17] rmarkdown_2.0     labeling_0.3      bit_1.1-14        munsell_0.5.0    
-[21] broom_0.5.3       compiler_3.5.0    httpuv_1.5.2      modelr_0.1.5     
-[25] xfun_0.10         pkgconfig_2.0.3   htmltools_0.4.0   tidyselect_0.2.5 
-[29] workflowr_1.6.0   viridisLite_0.3.0 crayon_1.3.4      dbplyr_1.4.2     
-[33] withr_2.1.2       later_1.0.0       grid_3.5.0        nlme_3.1-137     
-[37] jsonlite_1.6      gtable_0.3.0      lifecycle_0.1.0   DBI_1.0.0        
-[41] git2r_0.26.1      magrittr_1.5      scales_1.0.0      cli_1.1.0        
-[45] stringi_1.4.3     fs_1.3.1          promises_1.1.0    xml2_1.2.2       
-[49] ellipsis_0.3.0    generics_0.0.2    vctrs_0.2.0       tools_3.5.0      
-[53] bit64_0.9-7       glue_1.3.1        hms_0.5.2         parallel_3.5.0   
-[57] yaml_2.2.0        colorspace_1.4-1  rvest_0.3.5       knitr_1.26       
-[61] haven_2.2.0      </code></pre>
+ [1] Rcpp_1.0.2         lattice_0.20-35    assertthat_0.2.1   zeallot_0.1.0     
+ [5] rprojroot_1.3-2    digest_0.6.22      R6_2.4.0           cellranger_1.1.0  
+ [9] backports_1.1.5    reprex_0.3.0       evaluate_0.14      httr_1.4.1        
+[13] pillar_1.4.2       rlang_0.4.5        readxl_1.3.1       rstudioapi_0.10   
+[17] rmarkdown_2.0      labeling_0.3       bit_1.1-14         munsell_0.5.0     
+[21] broom_0.5.3        compiler_3.5.0     httpuv_1.5.2       modelr_0.1.5      
+[25] xfun_0.10          pkgconfig_2.0.3    htmltools_0.4.0    tidyselect_0.2.5  
+[29] workflowr_1.6.0    viridisLite_0.3.0  crayon_1.3.4       dbplyr_1.4.2      
+[33] withr_2.1.2        later_1.0.0        grid_3.5.0         nlme_3.1-137      
+[37] jsonlite_1.6       gtable_0.3.0       lifecycle_0.1.0    DBI_1.0.0         
+[41] git2r_0.26.1       magrittr_1.5       scales_1.0.0       cli_1.1.0         
+[45] stringi_1.4.3      fs_1.3.1           promises_1.1.0     xml2_1.2.2        
+[49] generics_0.0.2     vctrs_0.2.0        RColorBrewer_1.1-2 tools_3.5.0       
+[53] bit64_0.9-7        glue_1.3.1         hms_0.5.2          yaml_2.2.0        
+[57] colorspace_1.4-1   rvest_0.3.5        knitr_1.26         haven_2.2.0       </code></pre>
 </div>
 </div>
 

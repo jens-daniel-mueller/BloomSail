@@ -24,15 +24,14 @@ library(vroom)
 library(lubridate)
 library(here)
 library(seacarb)
+library(oce)
+library(patchwork)
 ```
 
 ```{r subsetting_criteria}
 
 # route
 select_route <- "E"
-
-# variable names in 2d and 3d GETM files
-#defined later, since more than one needed
 
 # latitude limits
 low_lat <- 57.3
@@ -43,49 +42,50 @@ d1_shallow <- 0
 d1_deep <- 80
 
 # date limits
-start_date <- "2018-06-01"
-end_date <- "2018-08-31"
+start_date <- "2018-07-01"
+end_date <- "2018-08-22"
 
 ```
 
 # GETM Data preparation
 
-```{r getm_data_prep, eval=FALSE}
+## Salinity and temperature profiles
 
-# data Salinity
+Mean salinity and temperature profiles within the BloomSail area were extracted from daily GETM transects beneath the Finnmaid track.
 
-var_3d <- "salt"
+```{r read_getm_3d_sal_tem, eval=FALSE}
 
-nc <- nc_open(paste("data/GETM/Finnmaid.E.3d.2018.nc", sep = ""))
-nc_2d <- nc_open(paste("data/GETM/Finnmaid.E.2d.2018.nc", sep = ""))
+nc <- nc_open(here::here("data/GETM", "Finnmaid.E.3d.2018.nc"))
 
 lat <- ncvar_get(nc, "latc")
 
 time_units <- nc$dim$time$units %>%     #we read the time unit from the netcdf file to calibrate the time 
     substr(start = 15, stop = 33) %>%   #calculation, we take the relevant information from the string
     ymd_hms()                           # and transform it to the right format
-
 t <- time_units + ncvar_get(nc, "time") # read time vector
+rm(time_units)
+
 d <- ncvar_get(nc, "zax") # read depths vector
 
+for (var_3d in c("salt", "temp")) {
+  
 array <- ncvar_get(nc, var_3d) # store the data in a 3-dimensional array
 #dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
 
 fillvalue <- ncatt_get(nc, var_3d, "_FillValue")
-nc_close(nc)
 
 # Working with the data
 array[array == fillvalue$value] <- NA
 
     for (i in seq(1,length(t),1)){
       
-      #i <- 3
+      # i <- 3
       array_slice <- array[, , i] # slices data from one day
       
       array_slice_df <- as.data.frame(t(array_slice))
       array_slice_df <- as_tibble(array_slice_df)
       
-      gt_salt_ngs_3d_part <- array_slice_df %>%
+      gt_3d_part <- array_slice_df %>%
         set_names(as.character(lat)) %>%
         mutate(dep = -d) %>%
         gather("lat", "value", 1:length(lat)) %>%
@@ -97,334 +97,225 @@ array[array == fillvalue$value] <- NA
                date_time=t[i]) %>% 
         dplyr::select(date_time, dep, value, var) #%>% 
         #filter(date_time >= start_date, date_time <= end_date)
+
       
+      if (exists("gt_3d")) {
+        gt_3d <- bind_rows(gt_3d, gt_3d_part)
+        } else {gt_3d <- gt_3d_part}
       
-      if (exists("gt_salt_ngs_3d")) {
-        gt_salt_ngs_3d <- bind_rows(gt_salt_ngs_3d, gt_salt_ngs_3d_part)
-        } else {gt_salt_ngs_3d <- gt_salt_ngs_3d_part}
-      
-  rm(array_slice, array_slice_df, gt_salt_ngs_3d_part)
+  rm(array_slice, array_slice_df, gt_3d_part)
       
     }
-rm(nc, time_units, t, d, array, fillvalue)
+rm(array, fillvalue)
 
-gt_salt_ngs_3d$date_time %>% 
-  cut.POSIXt(breaks = "days") %>% 
-  round.POSIXt(units = "days")
+}
 
-gt_salt_ngs_3d_jun_aug <- gt_salt_ngs_3d %>% 
-  group_by(dep,var,date_time ) %>% 
-  summarise_all(list(value=~mean(.,na.rm=TRUE))) %>%
-  ungroup() %>% 
-  filter(date_time >= start_date & date_time <= end_date)
-
-# data temperature
-var_3d <- "temp"
-
-nc <- nc_open(paste("data/GETM/Finnmaid.E.3d.2018.nc", sep = ""))
-
-lat <- ncvar_get(nc, "latc")
-
-time_units <- nc$dim$time$units %>%     #we read the time unit from the netcdf file to calibrate the time 
-    substr(start = 15, stop = 33) %>%   #calculation, we take the relevant information from the string
-    ymd_hms()                           # and transform it to the right format
-
-t <- time_units + ncvar_get(nc, "time") # read time vector
-d <- ncvar_get(nc, "zax") # read depths vector
-
-array <- ncvar_get(nc, var_3d) # store the data in a 3-dimensional array
-#dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
-
-fillvalue <- ncatt_get(nc, var_3d, "_FillValue")
 nc_close(nc)
+rm(nc)
 
-# Working with the data
-array[array == fillvalue$value] <- NA
-
-    for (i in seq(1,length(t),1)){
-      
-      #i <- 3
-      array_slice <- array[, , i] # slices data from one day
-      
-      array_slice_df <- as.data.frame(t(array_slice))
-      array_slice_df <- as_tibble(array_slice_df)
-      
-      gt_temp_ngs_3d_part <- array_slice_df %>%
-        set_names(as.character(lat)) %>%
-        mutate(dep = -d) %>%
-        gather("lat", "value", 1:length(lat)) %>%
-        mutate(lat = as.numeric(lat)) %>%
-        filter(lat > low_lat, lat < high_lat,
-               dep >= d1_shallow, dep <= d1_deep) %>%
-        #summarise_all("mean") %>%
-        mutate(var = var_3d,
-               date_time=t[i]) %>% 
-        dplyr::select(date_time, dep, value, var) #%>% 
-        #filter(date_time >= start_date, date_time <= end_date)
-      
-      
-      if (exists("gt_temp_ngs_3d")) {
-        gt_temp_ngs_3d <- bind_rows(gt_temp_ngs_3d, gt_temp_ngs_3d_part)
-        } else {gt_temp_ngs_3d <- gt_temp_ngs_3d_part}
-      
-  rm(array_slice, array_slice_df, gt_temp_ngs_3d_part)
-      
-    }
-rm(nc, time_units, t, d, array, fillvalue, var_3d)
-
-gt_temp_ngs_3d$date_time %>% 
-  cut.POSIXt(breaks = "days") %>% 
-  round.POSIXt(units = "days")
-
-gt_temp_ngs_3d_jun_aug <- gt_temp_ngs_3d %>% 
+gt_3d_jun_aug <- gt_3d %>% 
+  filter(date_time >= start_date & date_time <= end_date) %>% 
   group_by(dep,var,date_time ) %>% 
   summarise_all(list(value=~mean(.,na.rm=TRUE))) %>%
-  ungroup() %>% 
-  filter(date_time >= start_date & date_time <= end_date)
+  ungroup()
 
-# mld rho data
-var <- "mld_rho"
+gt_3d_jun_aug %>% 
+  vroom_write((here::here("data/_summarized_data_files", file = "gt_3d_jun_aug_2018.csv")))
 
-nc_2d <- nc_open(paste("data/GETM/Finnmaid.E.2d.2018.nc", sep = ""))
+
+rm(gt_3d, gt_3d_jun_aug, d1_deep, d1_shallow, i, lat, d, t, var_3d)
+
+```
+
+
+## Mixed layer depth
+
+Regional mean mixed layer depth estimates based on sewater density and windspeed within the BloomSail area were extracted from 3h GETM surface data along the Finnmaid track.
+
+```{r read_getm_2d_mld_wind, eval=FALSE}
+
+nc_2d <- nc_open(here("data/GETM", "Finnmaid.E.2d.2018.nc"))
+#print(nc_2d)
 
 lat <- ncvar_get(nc_2d, "latc")
-
 
 time_units <- nc_2d$dim$time$units %>%     #we read the time unit from the netcdf file to calibrate the time 
     substr(start = 15, stop = 33) %>%   #calculation, we take the relevant information from the string
     ymd_hms()                           # and transform it to the right format
-
 t <- time_units + ncvar_get(nc_2d, "time") # read time vector
+rm(time_units)
 
-array <- ncvar_get(nc_2d, var) # store the data in a 3-dimensional array
-#dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
-
-fillvalue <- ncatt_get(nc_2d, var, "_FillValue")
-#nc_close(nc_2d)
-
-# Working with the data
-array[array == fillvalue$value] <- NA
-
-array <- ncvar_get(nc_2d, var) # store the data in a 3-dimensional array
-dim(array) # should be 2d with dimensions: 1575 coordinate, 31d*(24h/d/3h)=248 time steps
-
-array <- as.data.frame(t(array), xy=TRUE)
-array <- as_tibble(array)
-      
-  gt_mldrho_ngs_2d <- array %>%
-  set_names(as.character(lat)) %>%
-  mutate(date_time = t) %>%
-  gather("lat", "value", 1:length(lat)) %>%
-  mutate(lat = as.numeric(lat)) %>%
-  filter(lat > low_lat, lat<high_lat) %>%
-  mutate(var = var) %>% 
-  dplyr::select(date_time, value, var) %>% 
-    filter(date_time >= start_date & date_time <= end_date)
-      
-      
-rm(nc_2d, time_units, t, array, fillvalue, var)
-
-# combine salinity and temperature data
-
-gt_temp_salt_ngs_3d_jun_aug <- inner_join(gt_temp_ngs_3d_jun_aug,gt_salt_ngs_3d_jun_aug, by = c("dep", "date_time")) 
-
-gt_temp_salt_ngs_3d_jun_aug %>% 
-  vroom_write((here::here("data/_summarized_data_files", file = "gt_temp_salt_ngs_3d_jun_aug_2018.csv")))
-
-gt_mldrho_ngs_2d %>% 
-  vroom_write((here::here("data/_summarized_data_files", file = "gt_mldrho_ngs_2d_jun_aug_2018.csv")))
-
-rm(gt_salt_ngs_3d, gt_temp_ngs_3d, gt_salt_ngs_3d_jun_aug, gt_temp_ngs_3d_jun_aug, d1_deep, d1_shallow, i, lat)
-
-```
-#Hovmoeller Plots
-
-```{r hovmoeller_depth_profil_salt}
-
-gt_temp_salt_ngs_3d_jun_aug <- 
-  vroom((here::here("data/_summarized_data_files", file = "gt_temp_salt_ngs_3d_jun_aug_2018.csv")))
-
-gt_mldrho_ngs_2d <- 
-  vroom((here::here("data/_summarized_data_files", file = "gt_mldrho_ngs_2d_jun_aug_2018.csv")))
-
-
-
-gt_temp_salt_ngs_3d_jun_aug <- gt_temp_salt_ngs_3d_jun_aug %>% 
-  mutate(date = ymd(date_time), 
-         year = year(date_time))
-
-  p1 <- ggplot()+
-    geom_raster(data= gt_temp_salt_ngs_3d_jun_aug ,aes(date, dep, fill=value.y))+
-      #scale_fill_scico(palette = "vik", name="mean difference in SST [°C]")+
-      scale_fill_viridis_c(name="Salility ", option = "B")+
-      scale_x_date(expand = c(0,0))+
-      scale_y_continuous(expand = c(0,0))+
-      labs(y="Depth [m]")+
-      theme_bw()+
-      theme(
-        axis.title.x = element_blank(),
-        legend.position = "bottom",
-        legend.key.width = unit(1.3, "cm"),
-        legend.key.height = unit(0.3, "cm")
-      )
-  # add mld rho as white line
-  p1+ 
-      geom_line(data= gt_mldrho_ngs_2d, aes(x = as.Date(date_time),y = value, color = "white"), color = "white")+
-      scale_color_discrete(name = "Legend", labels = c("MLD Rho"))
-      
-      
-
-
-```
-
-```{r hovmoeller_depth_profil_temp}
-
-gt_temp_salt_ngs_3d_jun_aug <- gt_temp_salt_ngs_3d_jun_aug %>% 
-  mutate(date = ymd(date_time), 
-         year = year(date_time))
-
-  p2 <- ggplot()+
-    geom_raster(data= gt_temp_salt_ngs_3d_jun_aug ,aes(date, dep, fill=value.x))+
-      #scale_fill_scico(palette = "vik", name="mean difference in SST [°C]")+
-      scale_fill_viridis_c(name="Temperature [°C] ", option = "B")+
-      scale_x_date(expand = c(0,0))+
-      scale_y_continuous(expand = c(0,0))+
-      labs(y="Depth [m]")+
-      theme_bw()+
-      theme(
-        axis.title.x = element_blank(),
-        legend.position = "bottom",
-        legend.key.width = unit(1.3, "cm"),
-        legend.key.height = unit(0.3, "cm")
-      )
-  # add mld rho as white line
-  p2+ 
-      geom_line(data= gt_mldrho_ngs_2d, aes(x = as.Date(date_time),y = value, color = "white"), color = "white")+
-      scale_color_discrete(name = "Legend", labels = c("MLD Rho"))
-      
-      
-
-
-```
-
-#Windspeeds
-
-In the following section, we calculate windspeeds from the parameters v and u. The windspeeds are plotted over time.
-
-```{r winspeed_calc_plot}
-
-# component u10
-var <- "u10"
-
-nc_2d <- nc_open(paste("data/GETM/Finnmaid.E.2d.2018.nc", sep = ""))
-
-lat <- ncvar_get(nc_2d, "latc")
-
-
-time_units <- nc_2d$dim$time$units %>%     #we read the time unit from the netcdf file to calibrate the time 
-    substr(start = 15, stop = 33) %>%   #calculation, we take the relevant information from the string
-    ymd_hms()                           # and transform it to the right format
-
-t <- time_units + ncvar_get(nc_2d, "time") # read time vector
-
-array <- ncvar_get(nc_2d, var) # store the data in a 3-dimensional array
-#dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
-
-fillvalue <- ncatt_get(nc_2d, var, "_FillValue")
-nc_close(nc_2d)
-
-# Working with the data
-array[array == fillvalue$value] <- NA
-
-array <- as.data.frame(t(array), xy=TRUE)
-array <- as_tibble(array)
-      
-  gt_u10_ngs_2d <- array %>%
-  set_names(as.character(lat)) %>%
-  mutate(date_time = t) %>%
-  gather("lat", "value", 1:length(lat)) %>%
-  mutate(lat = as.numeric(lat)) %>%
-  filter(lat > low_lat, lat<high_lat) %>%
-  mutate(var = var) %>% 
-  dplyr::select(date_time, value, var, lat) %>% 
-    filter(date_time >= start_date & date_time <= end_date)
+for (var in c("mld_rho", "u10", "v10")) {
   
-  gt_u10_ngs_2d <- gt_u10_ngs_2d %>% 
-  group_by(var,date_time ) %>% 
+#var <- "mld_rho"
+
+array <- ncvar_get(nc_2d, var) # store the data in a 3-dimensional array
+fillvalue <- ncatt_get(nc_2d, var, "_FillValue")
+array[array == fillvalue$value] <- NA
+
+array <- as.data.frame(t(array), xy=TRUE)
+array <- as_tibble(array)
+      
+  gt_2d_part <- array %>%
+  set_names(as.character(lat)) %>%
+  mutate(date_time = t) %>%
+  filter(date_time >= start_date & date_time <= end_date) %>% 
+  gather("lat", "value", 1:length(lat)) %>%
+  mutate(lat = as.numeric(lat)) %>%
+  filter(lat > low_lat, lat<high_lat) %>%
+  select(-lat) %>% 
+  group_by(date_time) %>% 
   summarise_all(list(value=~mean(.,na.rm=TRUE))) %>%
   ungroup() %>% 
-  mutate(value = value_value) %>% 
-  select(var, value, date_time)
- 
-  
-  rm(var, array, fillvalue, t, time_units, lat, nc_2d)
-  
-# component v10
-var <- "v10"
+  mutate(var = var)
+     
+  if (exists("gt_2d")) {
+    gt_2d <- bind_rows(gt_2d, gt_2d_part)
+    } else {gt_2d <- gt_2d_part} 
 
-nc_2d <- nc_open(paste("data/GETM/Finnmaid.E.2d.2018.nc", sep = ""))
+rm(array, fillvalue, gt_2d_part)
 
-lat <- ncvar_get(nc_2d, "latc")
+}
 
-
-time_units <- nc_2d$dim$time$units %>%     #we read the time unit from the netcdf file to calibrate the time 
-    substr(start = 15, stop = 33) %>%   #calculation, we take the relevant information from the string
-    ymd_hms()                           # and transform it to the right format
-
-t <- time_units + ncvar_get(nc_2d, "time") # read time vector
-
-array <- ncvar_get(nc_2d, var) # store the data in a 3-dimensional array
-#dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
-
-fillvalue <- ncatt_get(nc_2d, var, "_FillValue")
 nc_close(nc_2d)
+rm(nc_2d)
 
-# Working with the data
-array[array == fillvalue$value] <- NA
+gt_2d <- gt_2d %>% 
+  pivot_wider(values_from = value, names_from = var) %>% 
+  mutate(U_10 = (sqrt(u10^2 + v10^2))) %>% 
+  select(-c(u10, v10))
 
-array <- as.data.frame(t(array), xy=TRUE)
-array <- as_tibble(array)
-      
-  gt_v10_ngs_2d <- array %>%
-  set_names(as.character(lat)) %>%
-  mutate(date_time = t) %>%
-  gather("lat", "value", 1:length(lat)) %>%
-  mutate(lat = as.numeric(lat)) %>%
-  filter(lat > low_lat, lat<high_lat) %>%
-  mutate(var = var) %>% 
-  dplyr::select(date_time, value, var) %>% 
-    filter(date_time >= start_date & date_time <= end_date)
-  
-  gt_v10_ngs_2d <- gt_v10_ngs_2d %>% 
-  group_by(var,date_time ) %>% 
-  summarise_all(list(value=~mean(.,na.rm=TRUE))) %>%
+
+gt_2d %>% 
+  vroom_write((here::here("data/_summarized_data_files", file = "gt_2d_jun_aug_2018.csv")))
+
+rm(t, var, gt_2d, lat)
+
+```
+
+# Hydrography
+
+## Read summary files
+
+```{r read_gt_summary_files}
+
+gt_3d_jun_aug <- 
+  read_tsv((here::here("data/_summarized_data_files", file = "gt_3d_jun_aug_2018.csv")))
+
+gt_2d_jun_aug <- 
+  read_tsv((here::here("data/_summarized_data_files", file = "gt_2d_jun_aug_2018.csv")))
+
+gt_3d_jun_aug <- gt_3d_jun_aug %>% 
+  pivot_wider(values_from = value, names_from = var) %>% 
+  mutate(rho = swSigma(salinity = salt, temperature = temp, pressure = dep/10))
+
+gt_2d_jun_aug_daily <- gt_2d_jun_aug %>% 
+  mutate(day = yday(date_time)) %>% 
+  group_by(day) %>% 
+  summarise_all(list(~mean(.,na.rm=TRUE))) %>%
   ungroup() %>% 
-  select(var, value, date_time)
-  
-# combine both
-  
-  gt_v10_u10_ngs_2d <- full_join(gt_u10_ngs_2d, gt_v10_ngs_2d, by = "date_time")
-  
-  gt_v10_u10_ngs_2d <- gt_v10_u10_ngs_2d %>% 
-    mutate(windspeed = (sqrt(value.x^2+value.y^2)))
+  select(-day)
 
-gt_v10_u10_ngs_2d %>% 
+```
+
+
+## Hovmoeller Plots
+
+```{r plot_hovmoeller_gt_salt_temp_rho}
+
+p_sal <- gt_3d_jun_aug %>% 
+  filter(dep <= 30) %>% 
   ggplot()+
-  geom_line(aes(x= date_time, y = windspeed), color = "blue")+
-  labs(y="Windspeed", x = "Date")+
-      theme_bw()+
-      theme(
-        axis.title.x = element_blank(),
-        legend.position = "bottom",
-        legend.key.width = unit(1.3, "cm"),
-        legend.key.height = unit(0.3, "cm"))
+  geom_raster(aes(date_time, dep, fill=salt))+
+  scale_fill_viridis_c(name="Salinity ", direction = -1)+
+  scale_y_reverse()+
+  coord_cartesian(expand = 0)+
+  labs(y="Depth [m]")+
+  theme_bw()+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())+
+  geom_line(data= gt_2d_jun_aug_daily,
+            aes(x = date_time, y = mld_rho), color = "white")+
+  scale_color_discrete(name = "Legend", labels = c("MLD Rho"))
 
-gt_v10_u10_ngs_2d %>% 
-  vroom_write((here::here("data/_summarized_data_files", file = "gt_u10_v10_windspeed_ngs_3d_jun_aug_2018.csv")))
 
-rm(array, fillvalue, nc_2d, var, t, time_units, lat, gt_u10_ngs_2d, gt_v10_ngs_2d, gt_v10_u10_ngs_2d) 
-  
+p_tem <- gt_3d_jun_aug %>% 
+  filter(dep <= 30) %>% 
+  ggplot()+
+  geom_raster(aes(date_time, dep, fill=temp))+
+  scale_fill_viridis_c(name="Temperature (°C)", option = "B")+
+  scale_y_reverse()+
+  coord_cartesian(expand = 0)+
+  labs(y="Depth [m]", x="")+
+  theme_bw()+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())+
+  geom_line(data= gt_2d_jun_aug_daily,
+            aes(x = date_time, y = mld_rho), color = "white")+
+  scale_color_discrete(name = "Legend", labels = c("MLD Rho"))
+
+p_rho <- gt_3d_jun_aug %>% 
+  filter(dep <= 30) %>% 
+  ggplot()+
+  geom_raster(aes(date_time, dep, fill=rho))+
+  scale_fill_viridis_c(name="d Rho (kg/m^3)", direction = -1)+
+  scale_y_reverse()+
+  coord_cartesian(expand = 0)+
+  labs(y="Depth [m]", x="")+
+  theme_bw()+
+  theme(axis.title.x = element_blank())+
+  geom_line(data= gt_2d_jun_aug_daily,
+            aes(x = date_time, y = mld_rho), color = "white")+
+  scale_color_discrete(name = "Legend", labels = c("MLD Rho"))
+
+p_sal / p_tem / p_rho
+
 ```
+
+## Profiles
+
+```{r plot_profiles_gt_salt_temp_rho}
+
+gt_3d_jun_aug_long <- gt_3d_jun_aug %>% 
+  pivot_longer(3:5, values_to = "value", names_to = "parameter")
+#
+lab_dates <- pretty(gt_3d_jun_aug_long$date_time)
+
+gt_3d_jun_aug_long %>% 
+  filter(dep<30) %>% 
+  ggplot(aes(value, dep,
+             col=as.numeric(date_time),
+             group=as.factor(date_time)))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0))+
+  scale_color_viridis_c(breaks = as.numeric(lab_dates),
+                        labels = lab_dates,
+                        name="Date")+
+  theme_bw()+
+  facet_grid(~parameter, scales = "free_x")
+
+```
+
+
+# Metrology
+
+## Windspeeds
+
+```{r plot_winspeed}
+
+gt_2d_jun_aug %>% 
+  ggplot()+
+  geom_line(aes(x= date_time, y = U_10, col="3-hourly"))+
+  geom_line(data = gt_2d_jun_aug_daily,
+            aes(x= date_time, y = U_10, col="Daily mean"))+
+  labs(y="U (m/s)", x = "Date")+
+  scale_color_brewer(palette = "Set1", name="", direction = -1)+
+  theme_bw()
+
+```
+
+
+
 # Finnmaid data
 
 Finnmaid data, including reconstructed data during LICOS operation failure.
