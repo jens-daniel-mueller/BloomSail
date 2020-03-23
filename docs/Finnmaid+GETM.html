@@ -451,7 +451,7 @@ div.section {
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -460,7 +460,7 @@ div.section {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -472,7 +472,7 @@ div.section {
 <strong>Last updated:</strong> 2020-03-23
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
 </p>
 <p>
 <strong>Knit directory:</strong> <code>BloomSail/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
@@ -488,12 +488,12 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
 </div>
 </div>
 </div>
@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0c4d34800959442398cdefa1db0321ba2e3039edtargetblank0c4d348a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/0c4d34800959442398cdefa1db0321ba2e3039ed" target="_blank">0c4d348</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree247cf5e6efbf0c85df7779f58742c3fc7d937429targetblank247cf5ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/247cf5e6efbf0c85df7779f58742c3fc7d937429" target="_blank">247cf5e</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0c4d34800959442398cdefa1db0321ba2e3039edtargetblank0c4d348a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree247cf5e6efbf0c85df7779f58742c3fc7d937429targetblank247cf5ea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -579,9 +579,6 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
-
-Unstaged changes:
-    Modified:   analysis/Finnmaid+GETM.Rmd
 
 </code></pre>
 <p>
@@ -621,8 +618,8 @@ d1_shallow &lt;- 0
 d1_deep &lt;- 80
 
 # date limits
-start_date &lt;- &quot;2018-06-01&quot;
-end_date &lt;- &quot;2018-08-31&quot;</code></pre>
+start_date &lt;- &quot;2018-07-01&quot;
+end_date &lt;- &quot;2018-08-22&quot;</code></pre>
 <div id="getm-data-preparation" class="section level1">
 <h1><span class="header-section-number">1</span> GETM Data preparation</h1>
 <div id="salinity-and-temperature-profiles" class="section level2">
@@ -759,8 +756,10 @@ gt_2d %&gt;%
 rm(t, var, gt_2d, lat)</code></pre>
 </div>
 </div>
-<div id="hovmoeller-plots" class="section level1">
-<h1><span class="header-section-number">2</span> Hovmoeller Plots</h1>
+<div id="hydrography" class="section level1">
+<h1><span class="header-section-number">2</span> Hydrography</h1>
+<div id="read-summary-files" class="section level2">
+<h2><span class="header-section-number">2.1</span> Read summary files</h2>
 <pre class="r"><code>gt_3d_jun_aug &lt;- 
   read_tsv((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_3d_jun_aug_2018.csv&quot;)))
 
@@ -776,13 +775,11 @@ gt_2d_jun_aug_daily &lt;- gt_2d_jun_aug %&gt;%
   group_by(day) %&gt;% 
   summarise_all(list(~mean(.,na.rm=TRUE))) %&gt;%
   ungroup() %&gt;% 
-  select(-day)
-
-# gt_temp_salt_ngs_3d_jun_aug &lt;- gt_temp_salt_ngs_3d_jun_aug %&gt;% 
-#   mutate(date = ymd(date_time), 
-#          year = year(date_time))
-
-p_sal &lt;- gt_3d_jun_aug %&gt;% 
+  select(-day)</code></pre>
+</div>
+<div id="hovmoeller-plots" class="section level2">
+<h2><span class="header-section-number">2.2</span> Hovmoeller Plots</h2>
+<pre class="r"><code>p_sal &lt;- gt_3d_jun_aug %&gt;% 
   filter(dep &lt;= 30) %&gt;% 
   ggplot()+
   geom_raster(aes(date_time, dep, fill=salt))+
@@ -828,10 +825,34 @@ p_rho &lt;- gt_3d_jun_aug %&gt;%
   scale_color_discrete(name = &quot;Legend&quot;, labels = c(&quot;MLD Rho&quot;))
 
 p_sal / p_tem / p_rho</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/hovmoeller_gt_salt_temp_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Finnmaid+GETM.Rmd/plot_hovmoeller_gt_salt_temp_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="windspeeds" class="section level1">
-<h1><span class="header-section-number">3</span> Windspeeds</h1>
+<div id="profiles" class="section level2">
+<h2><span class="header-section-number">2.3</span> Profiles</h2>
+<pre class="r"><code>gt_3d_jun_aug_long &lt;- gt_3d_jun_aug %&gt;% 
+  pivot_longer(3:5, values_to = &quot;value&quot;, names_to = &quot;parameter&quot;)
+#
+lab_dates &lt;- pretty(gt_3d_jun_aug_long$date_time)
+
+gt_3d_jun_aug_long %&gt;% 
+  filter(dep&lt;30) %&gt;% 
+  ggplot(aes(value, dep,
+             col=as.numeric(date_time),
+             group=as.factor(date_time)))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0))+
+  scale_color_viridis_c(breaks = as.numeric(lab_dates),
+                        labels = lab_dates,
+                        name=&quot;Date&quot;)+
+  theme_bw()+
+  facet_grid(~parameter, scales = &quot;free_x&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/plot_profiles_gt_salt_temp_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="metrology" class="section level1">
+<h1><span class="header-section-number">3</span> Metrology</h1>
+<div id="windspeeds" class="section level2">
+<h2><span class="header-section-number">3.1</span> Windspeeds</h2>
 <pre class="r"><code>gt_2d_jun_aug %&gt;% 
   ggplot()+
   geom_line(aes(x= date_time, y = U_10, col=&quot;3-hourly&quot;))+
@@ -841,6 +862,7 @@ p_sal / p_tem / p_rho</code></pre>
   scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;, direction = -1)+
   theme_bw()</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/plot_winspeed-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 <div id="finnmaid-data" class="section level1">
 <h1><span class="header-section-number">4</span> Finnmaid data</h1>
