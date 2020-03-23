@@ -392,9 +392,52 @@ FM_ts %>%
 ```
 
 
+# C~T~ vs temperature
+
+As primary production (negative changes in C~T~) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated.
+
+
+```{r CT_vs_temperature}
+
+CT_tem <- FM_ts %>%
+  filter(parameter %in% c("tem", "CT")) %>% 
+  select(date, parameter, mean) %>% 
+  pivot_wider(values_from = mean, names_from = parameter)
+
+CT_tem <- CT_tem %>% 
+  arrange(date) %>%
+  mutate(dCT = CT - lag(CT),
+         dtem = tem - lag(tem),
+         sign = if_else(dCT < 0, "neg", "pos")) %>% 
+  drop_na()
+
+
+lab_dates <- pretty(CT_tem$date)
+
+CT_tem %>% 
+  filter(date > start_date,
+         date < end_date) %>% 
+  arrange(date) %>% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_vline(xintercept = 0)+
+  geom_smooth(aes(dtem, dCT), method = "lm", se=FALSE)+
+  geom_point(aes(dtem, dCT, fill=as.numeric(date)), shape=21)+
+  scale_fill_viridis_c(breaks = as.numeric(lab_dates),
+                        labels = lab_dates,
+                        name="Date")+
+  guides(fill = guide_legend(override.aes=list(shape=21)))
+
+
+```
 
 
 
+# NCP
+
+## MLD approach
+
+## delta T appraoch
 
 
 
