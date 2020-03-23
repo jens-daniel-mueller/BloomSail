@@ -270,6 +270,8 @@ p_rho <- gt_3d_jun_aug %>%
 
 p_sal / p_tem / p_rho
 
+rm(p_sal, p_tem, p_rho)
+
 ```
 
 ## Profiles
@@ -316,14 +318,84 @@ gt_2d_jun_aug %>%
 
 
 
-# Finnmaid data
+# Finnmaid
+
+## Read data
 
 Finnmaid data, including reconstructed data during LICOS operation failure.
 
-```{r read_Tina-V_Sensor_data, eval= FALSE}
+```{r read_Finnmaid}
 
-#df <-
-#  read_csv(here::here("Data/_summarized_data_files",
-#                       "Finnmaid.csv"))
+df <-
+ read_csv(here::here("Data/_summarized_data_files",
+                      "Finnmaid.csv"))
+
+df <- df %>% 
+  filter(Area == "BS") %>% 
+  select(-c(Lon, Lat, patm, Teq, xCO2, route, Area)) %>% 
+  mutate(ID = as.factor(ID)) %>% 
+  rename(tem=Tem,
+         sal=Sal)
 
 ```
+
+## C~T~ calculation
+
+Calculate based on fixed A~T~ and salinity mean values. 
+
+```{r CT_calculation}
+
+df <- df %>% 
+  mutate(CT = carb(24, var1=pCO2, var2=1720*1e-6,
+                   S=6.9, T=tem, k1k2="m10", kf="dg", ks="d",
+                   gas="insitu")[,16]*1e6)
+
+```
+
+## Timeseries
+
+```{r timeseries_of_regional_averages}
+
+FM_ts_mean <- df %>% 
+  arrange(date) %>% 
+  group_by(ID, sensor) %>% 
+  summarise_all(list(~mean(.)), na.rm=TRUE) %>%
+  ungroup() %>% 
+  pivot_longer(4:8, values_to = "mean", names_to = "parameter")
+
+FM_ts_sd <- df %>% 
+  arrange(date) %>% 
+  group_by(ID, sensor) %>% 
+  summarise_all(list(~sd(.)), na.rm=TRUE) %>%
+  ungroup() %>% 
+  pivot_longer(4:8, values_to = "sd", names_to = "parameter") %>% 
+  select(-date)
+
+FM_ts <- inner_join(FM_ts_mean, FM_ts_sd)
+
+rm(FM_ts_mean, FM_ts_sd)
+
+```
+
+
+```{r Plot_Finnmaid_crossings, fig.asp=1.5}
+
+FM_ts %>% 
+  ggplot(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
+  geom_path()+
+  geom_ribbon(alpha=0.5)+
+  geom_point(aes(col=sensor))+
+  facet_grid(parameter~., scales = "free_y")+
+  scale_color_brewer(palette = "Set1", direction=-1)+
+  theme_bw()
+
+```
+
+
+
+
+
+
+
+
+

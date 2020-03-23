@@ -230,7 +230,9 @@ df %>%
 
 # Reconstruct NCP
 
-## Caclulation
+## Calculation
+
+Integrated C~T~ depletion was calculated as the product of observed incremental C~T~ changes in surface waters and the respective mixed layer depth. 
 
 ```{r NCP_calculation}
 
