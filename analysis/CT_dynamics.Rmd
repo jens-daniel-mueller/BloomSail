@@ -891,6 +891,71 @@ rm(CT_hov, bin_CT, Tem_hov, bin_Tem)
 
 ```
 
+# Nomenclature of objectes
+
+Should be identical for stored files and objectes in R environment
+
+- source
+  - ts: tina 5 sensor
+  - tb: tina 5 bottle
+  - fm: finnmaid
+  - og: ostergarnsholm tower
+  - mp: bathymetric map
+
+- subsetting and modification levels
+  - profiles vs surface: operation mode tina 5
+  - ID: mean values for cruise (reduced temporal resolution)
+  - daily: daily mean values
+  - long: data stored in long format (all observations in only 2 columns "var" and "value")
+  - fix: constant, unique values such as long-term means, starting dates, etc
+  - NCP: includes cumulative numbers as NCP estimates
+  - CT_tem: data subset to analyse changes of CT with tem
+  - 3d vs 2d: surface vs depth resolved GETM data
+ 
+# Nomenclature of variables
+
+- Descriptive variables
+  - date
+  - date_time
+  - date_time_ID: mean date of cruise
+  - date_time_ID_diff: mean date of cruise
+  - station
+  - ID: character identifying starting date of cruise as YYMMDD
+  - dep: 1m depth intervals
+
+- Observed variables: column names, or identifier in column "var" for long-format tables 
+  - pCO2
+  - sal
+  - tem
+  - CT
+  - U10: wind speed at 10m
+  - mld: mixed or mixing layer depth
+
+- Variable name extension
+  - mean
+  - sd
+  - min
+  - max
+  - diff: difference to previous value
+  - diff_daily: difference to previous value divided by number of days
+  - cum: cumulative value over time
+  - sign: identifier for pos. or neg. differences
+
+- p_XXX: ggplot object
+
+# NCP estimation
+
+Possible approaches
+
+- cumulative negative changes of CT
+- cumulative negative changes of CT + positive changes in range where negative changes occured
+- cumulative changes of CT above MLD
+- cumulative positive changes of CT above MLD
+- cumulative changes of CT above 10 m
+- cumulative positive changes of CT above 10 m
+
+
+
 # Open tasks / questions
 
 - Significance of changes in AT for calculated CT changes
