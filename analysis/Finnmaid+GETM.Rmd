@@ -39,11 +39,15 @@ high_lat <- 57.5
 
 #depth range to subset GETM 3d files
 d1_shallow <- 0
-d1_deep <- 80
+d1_deep <- 30
 
 # date limits
-start_date <- "2018-07-01"
-end_date <- "2018-08-22"
+start_date <- "2018-06-20"
+end_date <- "2018-08-25"
+
+fixed_values <- 
+  read_csv(here::here("Data/_summarized_data_files", "BloomSail_fixed_values.csv"))
+
 
 ```
 
@@ -145,7 +149,7 @@ time_units <- nc_2d$dim$time$units %>%     #we read the time unit from the netcd
 t <- time_units + ncvar_get(nc_2d, "time") # read time vector
 rm(time_units)
 
-for (var in c("mld_rho", "u10", "v10")) {
+for (var in names(nc_2d$var)[c(3,4,6:12)]) {
   
 #var <- "mld_rho"
 
@@ -181,8 +185,9 @@ nc_close(nc_2d)
 rm(nc_2d)
 
 gt_2d <- gt_2d %>% 
+  mutate(value = round(value, 3)) %>% 
   pivot_wider(values_from = value, names_from = var) %>% 
-  mutate(U_10 = (sqrt(u10^2 + v10^2))) %>% 
+  mutate(U_10 = round(sqrt(u10^2 + v10^2), 3)) %>% 
   select(-c(u10, v10))
 
 
@@ -224,9 +229,10 @@ gt_2d_jun_aug_daily <- gt_2d_jun_aug %>%
 ```{r plot_hovmoeller_gt_salt_temp_rho}
 
 p_sal <- gt_3d_jun_aug %>% 
-  filter(dep <= 30) %>% 
   ggplot()+
   geom_raster(aes(date_time, dep, fill=salt))+
+  geom_vline(data=fixed_values, aes(xintercept = start))+
+  geom_vline(data=fixed_values, aes(xintercept = end))+
   scale_fill_viridis_c(name="Salinity ", direction = -1)+
   scale_y_reverse()+
   coord_cartesian(expand = 0)+
@@ -240,9 +246,10 @@ p_sal <- gt_3d_jun_aug %>%
 
 
 p_tem <- gt_3d_jun_aug %>% 
-  filter(dep <= 30) %>% 
   ggplot()+
   geom_raster(aes(date_time, dep, fill=temp))+
+  geom_vline(data=fixed_values, aes(xintercept = start))+
+  geom_vline(data=fixed_values, aes(xintercept = end))+
   scale_fill_viridis_c(name="Temperature (°C)", option = "B")+
   scale_y_reverse()+
   coord_cartesian(expand = 0)+
@@ -255,9 +262,10 @@ p_tem <- gt_3d_jun_aug %>%
   scale_color_discrete(name = "Legend", labels = c("MLD Rho"))
 
 p_rho <- gt_3d_jun_aug %>% 
-  filter(dep <= 30) %>% 
   ggplot()+
   geom_raster(aes(date_time, dep, fill=rho))+
+  geom_vline(data=fixed_values, aes(xintercept = start))+
+  geom_vline(data=fixed_values, aes(xintercept = end))+
   scale_fill_viridis_c(name="d Rho (kg/m^3)", direction = -1)+
   scale_y_reverse()+
   coord_cartesian(expand = 0)+
@@ -284,7 +292,6 @@ gt_3d_jun_aug_long <- gt_3d_jun_aug %>%
 lab_dates <- pretty(gt_3d_jun_aug_long$date_time)
 
 gt_3d_jun_aug_long %>% 
-  filter(dep<30) %>% 
   ggplot(aes(value, dep,
              col=as.numeric(date_time),
              group=as.factor(date_time)))+
@@ -307,6 +314,7 @@ gt_3d_jun_aug_long %>%
 
 gt_2d_jun_aug %>% 
   ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
   geom_line(aes(x= date_time, y = U_10, col="3-hourly"))+
   geom_line(data = gt_2d_jun_aug_daily,
             aes(x= date_time, y = U_10, col="Daily mean"))+
@@ -331,7 +339,9 @@ df <-
                       "Finnmaid.csv"))
 
 df <- df %>% 
-  filter(Area == "BS") %>% 
+  filter(Area == "BS",
+         date > start_date,
+         date < end_date) %>% 
   select(-c(Lon, Lat, patm, Teq, xCO2, route, Area)) %>% 
   mutate(ID = as.factor(ID)) %>% 
   rename(tem=Tem,
@@ -381,10 +391,11 @@ rm(FM_ts_mean, FM_ts_sd)
 ```{r Plot_Finnmaid_crossings, fig.asp=1.5}
 
 FM_ts %>% 
-  ggplot(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
-  geom_path()+
-  geom_ribbon(alpha=0.5)+
-  geom_point(aes(col=sensor))+
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_path(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
+  geom_ribbon(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd), alpha=0.5)+
+  geom_point(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd, col=sensor))+
   facet_grid(parameter~., scales = "free_y")+
   scale_color_brewer(palette = "Set1", direction=-1)+
   theme_bw()
@@ -437,8 +448,11 @@ CT_tem %>%
 
 ## MLD approach
 
+Use dCT/dtem from Finnmaid, MLD from GETM
+
 ## delta T appraoch
 
+Use dCT/dtem from Finnmaid/GETM, T-profiles from GETM
 
 
 

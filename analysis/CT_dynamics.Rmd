@@ -326,6 +326,17 @@ sal_mean
 
 ```
 
+```{r write_fixed_values}
+
+bind_cols(start = min(df$date_time), 
+          end = max(df$date_time),
+          AT = AT_mean,
+          sal = sal_mean) %>% 
+  write_csv(here::here("Data/_summarized_data_files", "BloomSail_fixed_values.csv"))
+
+```
+
+
 
 # C~T~ profiles
 
