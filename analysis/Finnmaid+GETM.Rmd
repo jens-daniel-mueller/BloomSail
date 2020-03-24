@@ -528,7 +528,7 @@ NCP_MLD <- NCP_MLD %>%
 ```
 
 
-## Incremental and cumulative timeseries
+### Incremental and cumulative timeseries
 
 Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated.
 
@@ -562,10 +562,114 @@ rm(p_iNCP, p_iNCPcum)
 ```
 
 
-
 ## delta T appraoch
 
-Use dCT/dtem from Finnmaid/GETM, T-profiles from GETM
+```{r reconctruction_CT_incremental_changes_profiles}
 
+CT_tem <- CT_tem %>% 
+  filter(obs == "FM") %>% 
+  mutate(factor = dCT/dSST,
+         factor = if_else(is.na(factor), 0, factor)) %>% 
+  select(date_time, factor)
+
+CT_tem <- expand_grid(CT_tem, dep = unique(gt_3d_jun_aug$dep))
+
+NCP_dT <- full_join(gt_3d_jun_aug %>% select(date_time, dep, temp), 
+                    CT_tem)
+
+NCP_dT <- NCP_dT %>% 
+  arrange(dep, date_time) %>% 
+  group_by(dep) %>% 
+  mutate(temp = na.approx(temp)) %>% 
+  ungroup() %>% 
+  drop_na()
+
+NCP_dT <- NCP_dT %>% 
+  group_by(dep) %>% 
+  arrange(date_time) %>% 
+  mutate(dtem = temp - lag(temp)) %>% 
+  ungroup() %>% 
+  mutate(diff_value = dtem * factor) %>% 
+  select(-factor)
+
+```
+
+The reconstructed incremental changes are added up to derive cummulative C~T~ changes throughout the water column.
+
+```{r reconctruction_CT_cumulative_changes_profiles}
+
+NCP_dT <- NCP_dT %>% 
+  group_by(dep) %>% 
+  arrange(date_time) %>% 
+  mutate(diff_time  = as.numeric(date_time - lag(date_time)),
+         diff_value_daily = diff_value / diff_time,
+         cum_value = replace_na(diff_value, 0))
+
+```
+
+## Profiles of incremental changes
+
+Changes of seawater parameters at each depth were reconstructed from one cruise day to the next and divided by the number of days inbetween.
+
+```{r incremental_changes_profiles}
+
+NCP_dT %>% 
+  arrange(dep) %>% 
+  ggplot(aes(diff_value_daily, dep, col=as.factor(date_time)))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  #scale_color_viridis_d()+
+  #facet_wrap(~parameter, scales = "free_x")+
+  labs(x="Change of value inbetween cruises per day")
+
+
+```
+
+
+
+## Profiles of cumulative changes
+
+Cumulative changes of seawater parameters were calculated at each depth relative to the first cruise day on July 5.
+
+```{r cumulative_changes_profiles}
+
+NCP_dT %>% 
+  arrange(dep) %>% 
+  ggplot(aes(cum_value, dep, col=as.factor(date_time)))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  #scale_color_viridis_d()+
+  labs(x="Cumulative change of value")
+
+```
+
+Reconstructed cumulative positive and negative changes of seawater parameters were calculated separately at each depth relative to the first cruise day on July 5.
+
+```{r cumulative_directional_changes_profiles}
+
+NCP_dT <- NCP_dT %>% 
+  mutate(sign = if_else(diff_value < 0, "neg", "pos")) %>% 
+  group_by(dep, sign) %>%
+  arrange(date_time) %>%
+  mutate(cum_value_sign = replace_na(diff_value, 0)) %>% 
+  ungroup()
+
+NCP_dT %>% 
+  arrange(dep) %>% 
+  ggplot(aes(cum_value_sign, dep, col=as.factor(date_time)))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  scale_fill_viridis_d()+
+  facet_wrap(~sign, scales = "free_x", ncol=4)+
+  labs(x="Cumulative directional change of value")
+
+```
 
 
