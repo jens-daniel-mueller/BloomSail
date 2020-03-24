@@ -545,9 +545,9 @@ p_iNCP <- NCP_MLD %>%
 p_iNCPcum <-  NCP_MLD %>% 
   ggplot(aes(date_time,  NCP_cum, 
              fill= Parameter))+
+  geom_hline(yintercept = -0.4)+
   geom_area(position = "identity", col="black")+
   geom_hline(yintercept = 0)+
-  scale_fill_viridis_d()+
   scale_y_continuous(breaks = seq(-100, 100, 0.2))+
   facet_grid(Parameter~., scales = "free_y", space = "free_y")+
   theme(strip.background = element_blank(),
