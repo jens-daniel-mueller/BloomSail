@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1e2508a27700db15a1bd63f1249151f6987c72a2targetblank1e2508aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/1e2508a27700db15a1bd63f1249151f6987c72a2" target="_blank">1e2508a</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree5f33d21b9a22a1074537c1c3e4600f842a6c1a98targetblank5f33d21a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/5f33d21b9a22a1074537c1c3e4600f842a6c1a98" target="_blank">5f33d21</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1e2508a27700db15a1bd63f1249151f6987c72a2targetblank1e2508aa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree5f33d21b9a22a1074537c1c3e4600f842a6c1a98targetblank5f33d21a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -605,7 +605,8 @@ library(lubridate)
 library(here)
 library(seacarb)
 library(oce)
-library(patchwork)</code></pre>
+library(patchwork)
+library(zoo)</code></pre>
 <pre class="r"><code># route
 select_route &lt;- &quot;E&quot;
 
@@ -932,45 +933,142 @@ rm(FM_ts_mean, FM_ts_sd)</code></pre>
 </div>
 <div id="ct-vs-temperature" class="section level1">
 <h1><span class="header-section-number">5</span> C<sub>T</sub> vs temperature</h1>
+<div id="sst-time-series" class="section level2">
+<h2><span class="header-section-number">5.1</span> SST time series</h2>
+<pre class="r"><code>FM_ts %&gt;% 
+  filter(parameter == &quot;tem&quot;) %&gt;% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_path(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
+  geom_ribbon(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd), alpha=0.5)+
+  geom_point(aes(x=date, y=mean, col=&quot;Finnmaid&quot;))+
+  geom_path(data = gt_2d_jun_aug, aes(x=date_time, y=SST, col=&quot;GETM, 3h&quot;))+
+  geom_path(data = gt_2d_jun_aug_daily, aes(x=date_time, y=SST, col=&quot;GETM, daily&quot;))+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
+  labs(x=&quot;&quot;, y=&quot;SST (°C)&quot;)+
+  theme_bw()</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/plot_FM_gt_temp_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="dct-vs-dsst" class="section level2">
+<h2><span class="header-section-number">5.2</span> dC<sub>T</sub> vs dSST</h2>
 <p>As primary production (negative changes in C<sub>T</sub>) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated.</p>
+<p>The following analysis is restricted to the BloomSail period.</p>
 <pre class="r"><code>CT_tem &lt;- FM_ts %&gt;%
+  filter(date &gt; fixed_values$start,
+         date &lt; fixed_values$end) %&gt;% 
   filter(parameter %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
   select(date, parameter, mean) %&gt;% 
-  pivot_wider(values_from = mean, names_from = parameter)
+  pivot_wider(values_from = mean, names_from = parameter) %&gt;% 
+  set_names(c(&quot;date_time&quot;, &quot;FM&quot;, &quot;CT&quot;))
+
+CT_tem &lt;- full_join(CT_tem,
+                    gt_2d_jun_aug_daily %&gt;% select(date_time, gt = SST))
 
 CT_tem &lt;- CT_tem %&gt;% 
-  arrange(date) %&gt;%
-  mutate(dCT = CT - lag(CT),
-         dtem = tem - lag(tem),
-         sign = if_else(dCT &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;% 
+  arrange(date_time) %&gt;%
+  mutate(gt = na.approx(gt)) %&gt;% 
   drop_na()
 
+CT_tem &lt;- CT_tem %&gt;% 
+  pivot_longer(cols = c(FM, gt), values_to = &quot;SST&quot;, names_to = &quot;obs&quot;)
 
-lab_dates &lt;- pretty(CT_tem$date)
+CT_tem &lt;- CT_tem %&gt;% 
+  group_by(obs) %&gt;% 
+  arrange(date_time) %&gt;% 
+  mutate(dCT = CT - lag(CT),
+         dSST = SST - lag(SST),
+         sign = if_else(dCT &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;% 
+  ungroup()
+
+
+lab_dates &lt;- pretty(CT_tem$date_time)
 
 CT_tem %&gt;% 
-  filter(date &gt; start_date,
-         date &lt; end_date) %&gt;% 
-  arrange(date) %&gt;% 
   ggplot()+
   geom_hline(yintercept = 0)+
   geom_vline(xintercept = 0)+
-  geom_smooth(aes(dtem, dCT), method = &quot;lm&quot;, se=FALSE)+
-  geom_point(aes(dtem, dCT, fill=as.numeric(date)), shape=21)+
+  geom_smooth(aes(dSST, dCT), method = &quot;lm&quot;, se=FALSE)+
+  geom_point(aes(dSST, dCT, fill=as.numeric(date_time)), shape=21)+
   scale_fill_viridis_c(breaks = as.numeric(lab_dates),
                         labels = lab_dates,
                         name=&quot;Date&quot;)+
-  guides(fill = guide_legend(override.aes=list(shape=21)))</code></pre>
+  guides(fill = guide_legend(override.aes=list(shape=21)))+
+  facet_wrap(~obs)</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/CT_vs_temperature-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 <div id="ncp" class="section level1">
 <h1><span class="header-section-number">6</span> NCP</h1>
 <div id="mld-approach" class="section level2">
 <h2><span class="header-section-number">6.1</span> MLD approach</h2>
 <p>Use dCT/dtem from Finnmaid, MLD from GETM</p>
+<pre class="r"><code>NCP_MLD &lt;- FM_ts %&gt;%
+  filter(date &gt; fixed_values$start,
+         date &lt; fixed_values$end) %&gt;% 
+  filter(parameter %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
+  select(date, parameter, mean) %&gt;% 
+  pivot_wider(values_from = mean, names_from = parameter) %&gt;% 
+  set_names(c(&quot;date_time&quot;, &quot;SST&quot;, &quot;CT&quot;))
+
+NCP_MLD &lt;- full_join(NCP_MLD,
+                     gt_2d_jun_aug_daily %&gt;% select(-c(SSS, SST, U_10)))
+
+NCP_MLD &lt;- NCP_MLD %&gt;% 
+  pivot_longer(cols = 4:8, values_to = &quot;MLD&quot;, names_to = &quot;Parameter&quot;) %&gt;% 
+  arrange(date_time) %&gt;%
+  group_by(Parameter) %&gt;% 
+  mutate(MLD = na.approx(MLD)) %&gt;%
+  ungroup()
+
+NCP_MLD %&gt;% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_line(aes(date_time, MLD, col=Parameter))+
+  geom_point(data = NCP_MLD %&gt;% drop_na, aes(date_time, MLD, col=Parameter))+
+  scale_color_brewer(palette = &quot;Set1&quot;)+
+  labs(x=&quot;&quot;, y=&quot;MLD (m)&quot;)+
+  theme_bw()</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/NCP_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>NCP_MLD &lt;- NCP_MLD %&gt;% 
+  drop_na() %&gt;% 
+  group_by(Parameter) %&gt;% 
+  arrange(date_time) %&gt;% 
+  mutate(dCT = CT - lag(CT),
+         dSST = SST - lag(SST),
+         dNCP = dCT * MLD / 1000,
+         NCP_cum = cumsum(replace_na(dNCP, 0))) %&gt;% 
+  ungroup()</code></pre>
+</div>
+<div id="incremental-and-cumulative-timeseries" class="section level2">
+<h2><span class="header-section-number">6.2</span> Incremental and cumulative timeseries</h2>
+<p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated.</p>
+<pre class="r"><code>p_iNCP &lt;- NCP_MLD %&gt;% 
+  ggplot(aes(date_time, dNCP, fill= Parameter))+
+  geom_hline(yintercept = 0)+
+  geom_col(col=&quot;black&quot;, position = &quot;dodge&quot;)+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  labs(y=&quot;integrated, directional CT changes [mol/m2]&quot;, x=&quot;date&quot;)
+
+p_iNCPcum &lt;-  NCP_MLD %&gt;% 
+  ggplot(aes(date_time,  NCP_cum, 
+             fill= Parameter))+
+  geom_area(position = &quot;identity&quot;, col=&quot;black&quot;)+
+  geom_hline(yintercept = 0)+
+  scale_fill_viridis_d()+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  facet_grid(Parameter~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
+  theme(strip.background = element_blank(),
+        strip.text = element_blank())+
+  labs(y=&quot;integrated, cumulative, directional CT changes [mol/m2]&quot;, x=&quot;date&quot;)
+
+
+(p_iNCP / p_iNCPcum)+
+  plot_layout(guides = &#39;collect&#39;, heights = c(1, 2))</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/plot_integrated_NCP_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(p_iNCP, p_iNCPcum)</code></pre>
 </div>
 <div id="delta-t-appraoch" class="section level2">
-<h2><span class="header-section-number">6.2</span> delta T appraoch</h2>
+<h2><span class="header-section-number">6.3</span> delta T appraoch</h2>
 <p>Use dCT/dtem from Finnmaid/GETM, T-profiles from GETM</p>
 <br>
 <p>
@@ -997,11 +1095,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] patchwork_1.0.0 seacarb_3.2.12  oce_1.2-0       gsw_1.0-5      
- [5] testthat_2.3.1  here_0.1        lubridate_1.7.4 vroom_1.2.0    
- [9] ncdf4_1.17      forcats_0.4.0   stringr_1.4.0   dplyr_0.8.3    
-[13] purrr_0.3.3     readr_1.3.1     tidyr_1.0.0     tibble_2.1.3   
-[17] ggplot2_3.3.0   tidyverse_1.3.0
+ [1] zoo_1.8-6       patchwork_1.0.0 seacarb_3.2.12  oce_1.2-0      
+ [5] gsw_1.0-5       testthat_2.3.1  here_0.1        lubridate_1.7.4
+ [9] vroom_1.2.0     ncdf4_1.17      forcats_0.4.0   stringr_1.4.0  
+[13] dplyr_0.8.3     purrr_0.3.3     readr_1.3.1     tidyr_1.0.0    
+[17] tibble_2.1.3    ggplot2_3.3.0   tidyverse_1.3.0
 
 loaded via a namespace (and not attached):
  [1] Rcpp_1.0.2         lattice_0.20-35    assertthat_0.2.1   zeallot_0.1.0     
