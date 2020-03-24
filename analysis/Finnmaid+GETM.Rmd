@@ -26,6 +26,7 @@ library(here)
 library(seacarb)
 library(oce)
 library(patchwork)
+library(zoo)
 ```
 
 ```{r subsetting_criteria}
@@ -405,50 +406,162 @@ FM_ts %>%
 
 # C~T~ vs temperature
 
+## SST time series
+
+```{r plot_FM_gt_temp_timeseries}
+
+FM_ts %>% 
+  filter(parameter == "tem") %>% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_path(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
+  geom_ribbon(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd), alpha=0.5)+
+  geom_point(aes(x=date, y=mean, col="Finnmaid"))+
+  geom_path(data = gt_2d_jun_aug, aes(x=date_time, y=SST, col="GETM, 3h"))+
+  geom_path(data = gt_2d_jun_aug_daily, aes(x=date_time, y=SST, col="GETM, daily"))+
+  scale_color_brewer(palette = "Set1", name="")+
+  labs(x="", y="SST (°C)")+
+  theme_bw()
+
+```
+
+## dC~T~ vs dSST
+
 As primary production (negative changes in C~T~) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated.
 
+The following analysis is restricted to the BloomSail period. 
 
 ```{r CT_vs_temperature}
 
 CT_tem <- FM_ts %>%
+  filter(date > fixed_values$start,
+         date < fixed_values$end) %>% 
   filter(parameter %in% c("tem", "CT")) %>% 
   select(date, parameter, mean) %>% 
-  pivot_wider(values_from = mean, names_from = parameter)
+  pivot_wider(values_from = mean, names_from = parameter) %>% 
+  set_names(c("date_time", "FM", "CT"))
+
+CT_tem <- full_join(CT_tem,
+                    gt_2d_jun_aug_daily %>% select(date_time, gt = SST))
 
 CT_tem <- CT_tem %>% 
-  arrange(date) %>%
-  mutate(dCT = CT - lag(CT),
-         dtem = tem - lag(tem),
-         sign = if_else(dCT < 0, "neg", "pos")) %>% 
+  arrange(date_time) %>%
+  mutate(gt = na.approx(gt)) %>% 
   drop_na()
 
+CT_tem <- CT_tem %>% 
+  pivot_longer(cols = c(FM, gt), values_to = "SST", names_to = "obs")
 
-lab_dates <- pretty(CT_tem$date)
+CT_tem <- CT_tem %>% 
+  group_by(obs) %>% 
+  arrange(date_time) %>% 
+  mutate(dCT = CT - lag(CT),
+         dSST = SST - lag(SST),
+         sign = if_else(dCT < 0, "neg", "pos")) %>% 
+  ungroup()
+
+
+lab_dates <- pretty(CT_tem$date_time)
 
 CT_tem %>% 
-  filter(date > start_date,
-         date < end_date) %>% 
-  arrange(date) %>% 
   ggplot()+
   geom_hline(yintercept = 0)+
   geom_vline(xintercept = 0)+
-  geom_smooth(aes(dtem, dCT), method = "lm", se=FALSE)+
-  geom_point(aes(dtem, dCT, fill=as.numeric(date)), shape=21)+
+  geom_smooth(aes(dSST, dCT), method = "lm", se=FALSE)+
+  geom_point(aes(dSST, dCT, fill=as.numeric(date_time)), shape=21)+
   scale_fill_viridis_c(breaks = as.numeric(lab_dates),
                         labels = lab_dates,
                         name="Date")+
-  guides(fill = guide_legend(override.aes=list(shape=21)))
+  guides(fill = guide_legend(override.aes=list(shape=21)))+
+  facet_wrap(~obs)
 
 
 ```
-
-
 
 # NCP
 
 ## MLD approach
 
 Use dCT/dtem from Finnmaid, MLD from GETM
+
+```{r NCP_MLD}
+
+NCP_MLD <- FM_ts %>%
+  filter(date > fixed_values$start,
+         date < fixed_values$end) %>% 
+  filter(parameter %in% c("tem", "CT")) %>% 
+  select(date, parameter, mean) %>% 
+  pivot_wider(values_from = mean, names_from = parameter) %>% 
+  set_names(c("date_time", "SST", "CT"))
+
+NCP_MLD <- full_join(NCP_MLD,
+                     gt_2d_jun_aug_daily %>% select(-c(SSS, SST, U_10)))
+
+NCP_MLD <- NCP_MLD %>% 
+  pivot_longer(cols = 4:8, values_to = "MLD", names_to = "Parameter") %>% 
+  arrange(date_time) %>%
+  group_by(Parameter) %>% 
+  mutate(MLD = na.approx(MLD)) %>%
+  ungroup()
+
+NCP_MLD %>% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_line(aes(date_time, MLD, col=Parameter))+
+  geom_point(data = NCP_MLD %>% drop_na, aes(date_time, MLD, col=Parameter))+
+  scale_color_brewer(palette = "Set1")+
+  labs(x="", y="MLD (m)")+
+  theme_bw()
+
+
+NCP_MLD <- NCP_MLD %>% 
+  drop_na() %>% 
+  group_by(Parameter) %>% 
+  arrange(date_time) %>% 
+  mutate(dCT = CT - lag(CT),
+         dSST = SST - lag(SST),
+         dNCP = dCT * MLD / 1000,
+         NCP_cum = cumsum(replace_na(dNCP, 0))) %>% 
+  ungroup()
+
+
+```
+
+
+## Incremental and cumulative timeseries
+
+Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated.
+
+
+```{r plot_integrated_NCP_timeseries, fig.asp=1.5}
+
+p_iNCP <- NCP_MLD %>% 
+  ggplot(aes(date_time, dNCP, fill= Parameter))+
+  geom_hline(yintercept = 0)+
+  geom_col(col="black", position = "dodge")+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  labs(y="integrated, directional CT changes [mol/m2]", x="date")
+
+p_iNCPcum <-  NCP_MLD %>% 
+  ggplot(aes(date_time,  NCP_cum, 
+             fill= Parameter))+
+  geom_area(position = "identity", col="black")+
+  geom_hline(yintercept = 0)+
+  scale_fill_viridis_d()+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  facet_grid(Parameter~., scales = "free_y", space = "free_y")+
+  theme(strip.background = element_blank(),
+        strip.text = element_blank())+
+  labs(y="integrated, cumulative, directional CT changes [mol/m2]", x="date")
+
+
+(p_iNCP / p_iNCPcum)+
+  plot_layout(guides = 'collect', heights = c(1, 2))
+
+rm(p_iNCP, p_iNCPcum)
+```
+
+
 
 ## delta T appraoch
 
