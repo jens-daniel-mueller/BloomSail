@@ -444,7 +444,7 @@ div.section {
 
 <h1 class="title toc-ignore">Finnmaid and GETM</h1>
 <h4 class="author">Jens Daniel Müller und Lara Sophie Burchardt</h4>
-<h4 class="date">23 March, 2020</h4>
+<h4 class="date">24 March, 2020</h4>
 
 </div>
 
@@ -469,7 +469,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-03-23
+<strong>Last updated:</strong> 2020-03-24
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeca1591e92bc36f442506b7eaedefd21df23bbbb7targetblankca1591ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ca1591e92bc36f442506b7eaedefd21df23bbbb7" target="_blank">ca1591e</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1e2508a27700db15a1bd63f1249151f6987c72a2targetblank1e2508aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/1e2508a27700db15a1bd63f1249151f6987c72a2" target="_blank">1e2508a</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeca1591e92bc36f442506b7eaedefd21df23bbbb7targetblankca1591ea" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1e2508a27700db15a1bd63f1249151f6987c72a2targetblank1e2508aa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -615,11 +615,14 @@ high_lat &lt;- 57.5
 
 #depth range to subset GETM 3d files
 d1_shallow &lt;- 0
-d1_deep &lt;- 80
+d1_deep &lt;- 30
 
 # date limits
-start_date &lt;- &quot;2018-07-01&quot;
-end_date &lt;- &quot;2018-08-22&quot;</code></pre>
+start_date &lt;- &quot;2018-06-20&quot;
+end_date &lt;- &quot;2018-08-25&quot;
+
+fixed_values &lt;- 
+  read_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;BloomSail_fixed_values.csv&quot;))</code></pre>
 <div id="getm-data-preparation" class="section level1">
 <h1><span class="header-section-number">1</span> GETM Data preparation</h1>
 <div id="salinity-and-temperature-profiles" class="section level2">
@@ -709,7 +712,7 @@ time_units &lt;- nc_2d$dim$time$units %&gt;%     #we read the time unit from the
 t &lt;- time_units + ncvar_get(nc_2d, &quot;time&quot;) # read time vector
 rm(time_units)
 
-for (var in c(&quot;mld_rho&quot;, &quot;u10&quot;, &quot;v10&quot;)) {
+for (var in names(nc_2d$var)[c(3,4,6:12)]) {
   
 #var &lt;- &quot;mld_rho&quot;
 
@@ -745,8 +748,9 @@ nc_close(nc_2d)
 rm(nc_2d)
 
 gt_2d &lt;- gt_2d %&gt;% 
+  mutate(value = round(value, 3)) %&gt;% 
   pivot_wider(values_from = value, names_from = var) %&gt;% 
-  mutate(U_10 = (sqrt(u10^2 + v10^2))) %&gt;% 
+  mutate(U_10 = round(sqrt(u10^2 + v10^2), 3)) %&gt;% 
   select(-c(u10, v10))
 
 
@@ -780,9 +784,10 @@ gt_2d_jun_aug_daily &lt;- gt_2d_jun_aug %&gt;%
 <div id="hovmoeller-plots" class="section level2">
 <h2><span class="header-section-number">2.2</span> Hovmoeller Plots</h2>
 <pre class="r"><code>p_sal &lt;- gt_3d_jun_aug %&gt;% 
-  filter(dep &lt;= 30) %&gt;% 
   ggplot()+
   geom_raster(aes(date_time, dep, fill=salt))+
+  geom_vline(data=fixed_values, aes(xintercept = start))+
+  geom_vline(data=fixed_values, aes(xintercept = end))+
   scale_fill_viridis_c(name=&quot;Salinity &quot;, direction = -1)+
   scale_y_reverse()+
   coord_cartesian(expand = 0)+
@@ -796,9 +801,10 @@ gt_2d_jun_aug_daily &lt;- gt_2d_jun_aug %&gt;%
 
 
 p_tem &lt;- gt_3d_jun_aug %&gt;% 
-  filter(dep &lt;= 30) %&gt;% 
   ggplot()+
   geom_raster(aes(date_time, dep, fill=temp))+
+  geom_vline(data=fixed_values, aes(xintercept = start))+
+  geom_vline(data=fixed_values, aes(xintercept = end))+
   scale_fill_viridis_c(name=&quot;Temperature (°C)&quot;, option = &quot;B&quot;)+
   scale_y_reverse()+
   coord_cartesian(expand = 0)+
@@ -811,9 +817,10 @@ p_tem &lt;- gt_3d_jun_aug %&gt;%
   scale_color_discrete(name = &quot;Legend&quot;, labels = c(&quot;MLD Rho&quot;))
 
 p_rho &lt;- gt_3d_jun_aug %&gt;% 
-  filter(dep &lt;= 30) %&gt;% 
   ggplot()+
   geom_raster(aes(date_time, dep, fill=rho))+
+  geom_vline(data=fixed_values, aes(xintercept = start))+
+  geom_vline(data=fixed_values, aes(xintercept = end))+
   scale_fill_viridis_c(name=&quot;d Rho (kg/m^3)&quot;, direction = -1)+
   scale_y_reverse()+
   coord_cartesian(expand = 0)+
@@ -836,7 +843,6 @@ p_sal / p_tem / p_rho</code></pre>
 lab_dates &lt;- pretty(gt_3d_jun_aug_long$date_time)
 
 gt_3d_jun_aug_long %&gt;% 
-  filter(dep&lt;30) %&gt;% 
   ggplot(aes(value, dep,
              col=as.numeric(date_time),
              group=as.factor(date_time)))+
@@ -856,6 +862,7 @@ gt_3d_jun_aug_long %&gt;%
 <h2><span class="header-section-number">3.1</span> Windspeeds</h2>
 <pre class="r"><code>gt_2d_jun_aug %&gt;% 
   ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
   geom_line(aes(x= date_time, y = U_10, col=&quot;3-hourly&quot;))+
   geom_line(data = gt_2d_jun_aug_daily,
             aes(x= date_time, y = U_10, col=&quot;Daily mean&quot;))+
@@ -875,7 +882,9 @@ gt_3d_jun_aug_long %&gt;%
                       &quot;Finnmaid.csv&quot;))
 
 df &lt;- df %&gt;% 
-  filter(Area == &quot;BS&quot;) %&gt;% 
+  filter(Area == &quot;BS&quot;,
+         date &gt; start_date,
+         date &lt; end_date) %&gt;% 
   select(-c(Lon, Lat, patm, Teq, xCO2, route, Area)) %&gt;% 
   mutate(ID = as.factor(ID)) %&gt;% 
   rename(tem=Tem,
@@ -910,10 +919,11 @@ FM_ts &lt;- inner_join(FM_ts_mean, FM_ts_sd)
 
 rm(FM_ts_mean, FM_ts_sd)</code></pre>
 <pre class="r"><code>FM_ts %&gt;% 
-  ggplot(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
-  geom_path()+
-  geom_ribbon(alpha=0.5)+
-  geom_point(aes(col=sensor))+
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_path(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
+  geom_ribbon(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd), alpha=0.5)+
+  geom_point(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd, col=sensor))+
   facet_grid(parameter~., scales = &quot;free_y&quot;)+
   scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
   theme_bw()</code></pre>
@@ -957,9 +967,11 @@ CT_tem %&gt;%
 <h1><span class="header-section-number">6</span> NCP</h1>
 <div id="mld-approach" class="section level2">
 <h2><span class="header-section-number">6.1</span> MLD approach</h2>
+<p>Use dCT/dtem from Finnmaid, MLD from GETM</p>
 </div>
 <div id="delta-t-appraoch" class="section level2">
 <h2><span class="header-section-number">6.2</span> delta T appraoch</h2>
+<p>Use dCT/dtem from Finnmaid/GETM, T-profiles from GETM</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
