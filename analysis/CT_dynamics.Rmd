@@ -775,7 +775,7 @@ rm(CT_hov, bin_CT, Tem_hov, bin_Tem)
 Incremental and cumulative C~T~ changes inbetween cruise dates were integrated across the water colums down to predefined depth limits.
 
 
-```{r integrated_NCP}
+```{r integrated_NCP_fixed_depth, fig.asp=1.2}
 
 
 NCP_grid_sign <- ts_profiles_ID_long %>% 
@@ -854,7 +854,8 @@ NCP %>%
   scale_color_viridis_d(name="Depth limit (m)")+
   scale_fill_viridis_d(name="Depth limit (m)")+
   labs(y="iCT [mol/m2]", x="")+
-  facet_grid(sign~., scales = "free_y", space = "free_y")
+  facet_grid(sign~., scales = "free_y", space = "free_y")+
+  theme_bw()
 
 
 # NCP %>%
@@ -862,6 +863,215 @@ NCP %>%
 
 ```
 
+## Depth of first production pulse
+
+Approach: Determine the depth across which most of the NCP signal was observed after the initial production pulse on July 23. Thereafter, restrict calcualtion of cummulative CT changes to that depth.
+
+```{r integrated_NCP_first_pulse}
+
+NCP <- ts_profiles_ID_long %>% 
+  filter(ID == 180723,
+         var == "CT")
+
+NCP %>% 
+  arrange(dep) %>% 
+  ggplot(aes(value_cum, dep, col="total"))+
+  geom_vline(xintercept = 0)+
+  geom_path(aes(value_cum_sign, dep, col="directional"))+
+  geom_point(aes(value_cum_sign, dep, col="directional"))+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_brewer(palette = "Set1", name="estimate")+
+  labs(x="Cumulative change of CT on July 23 (180723)")
+
+```
+
+```{r depth_distribution_NCP_180723}
+
+NCP_dep <- NCP %>% 
+  select(dep, value_cum) %>% 
+  filter(value_cum < 0) %>%
+  arrange(dep) %>% 
+  mutate(value_cum_i = sum(value_cum),
+         value_cum_dep = cumsum(value_cum),
+         value_cum_i_rel = value_cum_dep/value_cum_i*100)
+
+NCP_dep %>% 
+  ggplot(aes(dep, value_cum_i_rel))+
+  geom_hline(yintercept = 90, col="red")+
+  geom_point()+
+  geom_line()+
+  labs(x="Depth (m)", y = "Relative contribution to NCP on July 23")+
+  ylim(0,100)+
+  theme_bw()
+
+rm(NCP, NCP_dep)
+
+```
+
+90% of the cumulative NCP observed until July 23 is observed and homogeniouly spread across the upper ten metres of the water column. The intial idea to restrict ongoing CT changes after July 23 to the depth were most of the NCP signal was located is stopped here, as it would lead to the exact same result as the intergration over the upper 10 m of the water column executed above. 
+
+## MLD approach
+
+### MLD Calculation
+
+Seawater density Rho was determined from S, T, and p according to TEOS-10.
+
+```{r calulcate_seawater_density}
+
+ts_profiles <- ts_profiles %>% 
+  mutate(rho = swSigma(salinity = sal, temperature = tem, pressure = dep/10))
+
+```
+
+### Mean hydrographic profiles
+
+```{r plot_hydrographical_profiles_all, fig.cap="Mean vertical profiles per cruise day across all stations."}
+
+ts_profiles_ID_mean_hydro <- ts_profiles %>% 
+  select(-c(station,lat, lon, pCO2_raw, pCO2, CT, date_time)) %>% 
+  group_by(ID, date_time_ID, dep) %>% 
+  summarise_all(list(mean), na.rm=TRUE) %>% 
+  ungroup()
+
+ts_profiles_ID_sd_hydro <- ts_profiles %>% 
+  select(-c(station,lat, lon, pCO2_raw, pCO2, CT, date_time)) %>% 
+  group_by(ID, date_time_ID, dep) %>% 
+  summarise_all(list(sd), na.rm=TRUE) %>% 
+  ungroup()
+
+
+ts_profiles_ID_sd_hydro_long <- ts_profiles_ID_sd_hydro %>% 
+  pivot_longer(4:6, names_to = "var", values_to = "sd")
+  
+ts_profiles_ID_mean_hydro_long <- ts_profiles_ID_mean_hydro %>% 
+  pivot_longer(4:6, names_to = "var", values_to = "value")
+  
+ts_profiles_ID_hydro_long <- inner_join(ts_profiles_ID_mean_hydro_long, ts_profiles_ID_sd_hydro_long)
+
+rm(ts_profiles_ID_sd_hydro_long,
+   ts_profiles_ID_sd_hydro,
+   ts_profiles_ID_mean_hydro_long)
+
+ts_profiles_ID_hydro_long %>% 
+  ggplot(aes(value, dep, col=ID))+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  facet_wrap(~var, scales = "free_x")
+  
+```
+
+### MLD timeseries
+
+Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria
+
+```{r calculate_MLD}
+# density criterion
+
+ts_profiles_ID_mean_hydro <- expand_grid(ts_profiles_ID_mean_hydro, rho_lim = c(0.1,0.2,0.5))
+
+MLD <- ts_profiles_ID_mean_hydro  %>% 
+  arrange(dep) %>% 
+  group_by(ID, date_time_ID, rho_lim) %>% 
+  mutate(d_rho = rho - first(rho)) %>% 
+  filter(d_rho > rho_lim) %>% 
+  summarise(MLD = min(dep)) %>% 
+  ungroup()
+
+MLD %>% 
+  ggplot(aes(date_time_ID, MLD, col=as.factor(rho_lim)))+
+  geom_point()+
+  geom_path()
+
+```
+
+### Daily density profiles
+
+```{r plot_density_profiles, fig.cap="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD", fig.asp=1.2}
+
+ts_profiles_ID_mean_hydro <- 
+  full_join(ts_profiles_ID_mean_hydro, MLD)
+
+ts_profiles_ID_mean_hydro %>% 
+  arrange(dep) %>% 
+  ggplot(aes(rho, dep))+
+  geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_discrete(name="Rho lim")+
+  facet_wrap(~ID)+
+  theme_bw()
+
+```
+
+### NCP calculation
+
+
+```{r integrated_NCP_MLD}
+
+# NCP_grid_sign <- ts_profiles_ID_long %>% 
+#   select(ID, date_time_ID, date_time_ID_ref) %>% 
+#   unique() %>% 
+#   expand_grid(sign = c("pos", "neg"))
+# 
+# NCP_grid_total <- ts_profiles_ID_long %>% 
+#   select(ID, date_time_ID, date_time_ID_ref) %>% 
+#   unique() %>% 
+#   expand_grid(sign = c("total"))
+
+
+NCP <- ts_profiles_ID_long %>% 
+  filter(var == "CT")
+
+NCP <- full_join(NCP, MLD)
+
+NCP <- NCP %>% 
+  filter(dep <= MLD)
+
+NCP <- NCP %>% 
+  group_by(ID, date_time_ID, date_time_ID_ref, rho_lim) %>% 
+  summarise(CT_i_diff = sum(value_diff)/1000) %>% 
+  ungroup()
+
+NCP %>% 
+  ggplot(aes(date_time_ID_ref, CT_i_diff, fill=as.factor(rho_lim)))+
+  geom_col(position = "dodge")
+
+NCP <- NCP %>% 
+  group_by(rho_lim) %>% 
+  arrange(date_time_ID) %>% 
+  mutate(CT_i_cum = cumsum(CT_i_diff)) %>% 
+  ungroup()
+
+# NCP_total_temp <- full_join(NCP_total_temp, NCP_grid_total) %>% 
+#   arrange(sign, date_time_ID) %>% 
+#   fill(CT_i_cum)
+
+NCP <- NCP %>% 
+  mutate(rho_lim = as.factor(rho_lim))
+
+NCP %>% 
+  ggplot()+
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_col(aes(date_time_ID_ref, CT_i_diff, fill=rho_lim),
+           position = "dodge", alpha=0.3)+
+  geom_line(aes(date_time_ID, CT_i_cum, col=rho_lim))+
+  scale_color_viridis_d(name="Rho limit")+
+  scale_fill_viridis_d(name="Rho limit")+
+  labs(y="iCT [mol/m2]", x="")+
+  #facet_grid(sign~., scales = "free_y", space = "free_y")+
+  theme_bw()
+
+
+# NCP %>%
+#   write_csv(here::here("Data/_merged_data_files", "NCP_dep_limits.csv"))
+
+```
+
+# Old schript parts
 
 ```{r integrated_NCP_old,eval=FALSE}
 
