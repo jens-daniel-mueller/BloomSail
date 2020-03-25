@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree93800e0f6c25ea8f8229817b5b81fbd876dc2013targetblank93800e0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/93800e0f6c25ea8f8229817b5b81fbd876dc2013" target="_blank">93800e0</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree07690b6bd17c5c82870a77d664d89a0d0f2045bdtargetblank07690b6a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/07690b6bd17c5c82870a77d664d89a0d0f2045bd" target="_blank">07690b6</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree93800e0f6c25ea8f8229817b5b81fbd876dc2013targetblank93800e0a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree07690b6bd17c5c82870a77d664d89a0d0f2045bdtargetblank07690b6a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -1526,11 +1526,7 @@ NCP &lt;- NCP %&gt;%
   summarise(CT_i_diff = sum(value_diff)/1000) %&gt;% 
   ungroup()
 
-NCP %&gt;% 
-  ggplot(aes(date_time_ID_ref, CT_i_diff, fill=as.factor(rho_lim)))+
-  geom_col(position = &quot;dodge&quot;)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/integrated_NCP_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>NCP &lt;- NCP %&gt;% 
+NCP &lt;- NCP %&gt;% 
   group_by(rho_lim) %&gt;% 
   arrange(date_time_ID) %&gt;% 
   mutate(CT_i_cum = cumsum(CT_i_diff)) %&gt;% 
@@ -1554,10 +1550,13 @@ NCP %&gt;%
   labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)+
   #facet_grid(sign~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
   theme_bw()</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/integrated_NCP_MLD-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/CT_dynamics.Rmd/integrated_NCP_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code># NCP %&gt;%
 #   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;NCP_dep_limits.csv&quot;))</code></pre>
 </div>
+</div>
+<div id="air-sea-co2-flux" class="section level2">
+<h2><span class="header-section-number">5.4</span> Air-Sea CO<sub>2</sub> flux</h2>
 </div>
 </div>
 <div id="old-schript-parts" class="section level1">
