@@ -1036,10 +1036,6 @@ NCP <- NCP %>%
   summarise(CT_i_diff = sum(value_diff)/1000) %>% 
   ungroup()
 
-NCP %>% 
-  ggplot(aes(date_time_ID_ref, CT_i_diff, fill=as.factor(rho_lim)))+
-  geom_col(position = "dodge")
-
 NCP <- NCP %>% 
   group_by(rho_lim) %>% 
   arrange(date_time_ID) %>% 
@@ -1070,6 +1066,8 @@ NCP %>%
 #   write_csv(here::here("Data/_merged_data_files", "NCP_dep_limits.csv"))
 
 ```
+
+## Air-Sea CO~2~ flux
 
 # Old schript parts
 
