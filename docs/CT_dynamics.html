@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea13c901e29c94a69f6fff76b26644981315be5datargetblanka13c901a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a13c901e29c94a69f6fff76b26644981315be5da" target="_blank">a13c901</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree93800e0f6c25ea8f8229817b5b81fbd876dc2013targetblank93800e0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/93800e0f6c25ea8f8229817b5b81fbd876dc2013" target="_blank">93800e0</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea13c901e29c94a69f6fff76b26644981315be5datargetblanka13c901a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree93800e0f6c25ea8f8229817b5b81fbd876dc2013targetblank93800e0a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -572,7 +572,6 @@ Great! You are using Git for version control. Tracking code development and conn
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
     Ignored:    data/Finnmaid_2018/
     Ignored:    data/GETM/
     Ignored:    data/Maps/
@@ -580,10 +579,6 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
-
-Untracked files:
-    Untracked:  code/Finnmaid.pdf
-    Untracked:  output/Plots/CT_dynamics/
 
 </code></pre>
 <p>
@@ -1369,10 +1364,204 @@ NCP %&gt;%
   scale_color_viridis_d(name=&quot;Depth limit (m)&quot;)+
   scale_fill_viridis_d(name=&quot;Depth limit (m)&quot;)+
   labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)+
-  facet_grid(sign~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/integrated_NCP-1.png" width="672" style="display: block; margin: auto;" /></p>
+  facet_grid(sign~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
+  theme_bw()</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/integrated_NCP_fixed_depth-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code># NCP %&gt;%
 #   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;NCP_dep_limits.csv&quot;))</code></pre>
+</div>
+<div id="depth-of-first-production-pulse" class="section level2">
+<h2><span class="header-section-number">5.2</span> Depth of first production pulse</h2>
+<p>Approach: Determine the depth across which most of the NCP signal was observed after the initial production pulse on July 23. Thereafter, restrict calcualtion of cummulative CT changes to that depth.</p>
+<pre class="r"><code>NCP &lt;- ts_profiles_ID_long %&gt;% 
+  filter(ID == 180723,
+         var == &quot;CT&quot;)
+
+NCP %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(value_cum, dep, col=&quot;total&quot;))+
+  geom_vline(xintercept = 0)+
+  geom_path(aes(value_cum_sign, dep, col=&quot;directional&quot;))+
+  geom_point(aes(value_cum_sign, dep, col=&quot;directional&quot;))+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;estimate&quot;)+
+  labs(x=&quot;Cumulative change of CT on July 23 (180723)&quot;)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/integrated_NCP_first_pulse-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>NCP_dep &lt;- NCP %&gt;% 
+  select(dep, value_cum) %&gt;% 
+  filter(value_cum &lt; 0) %&gt;%
+  arrange(dep) %&gt;% 
+  mutate(value_cum_i = sum(value_cum),
+         value_cum_dep = cumsum(value_cum),
+         value_cum_i_rel = value_cum_dep/value_cum_i*100)
+
+NCP_dep %&gt;% 
+  ggplot(aes(dep, value_cum_i_rel))+
+  geom_hline(yintercept = 90, col=&quot;red&quot;)+
+  geom_point()+
+  geom_line()+
+  labs(x=&quot;Depth (m)&quot;, y = &quot;Relative contribution to NCP on July 23&quot;)+
+  ylim(0,100)+
+  theme_bw()</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/depth_distribution_NCP_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(NCP, NCP_dep)</code></pre>
+<p>90% of the cumulative NCP observed until July 23 is observed and homogeniouly spread across the upper ten metres of the water column. The intial idea to restrict ongoing CT changes after July 23 to the depth were most of the NCP signal was located is stopped here, as it would lead to the exact same result as the intergration over the upper 10 m of the water column executed above.</p>
+</div>
+<div id="mld-approach" class="section level2">
+<h2><span class="header-section-number">5.3</span> MLD approach</h2>
+<div id="mld-calculation" class="section level3">
+<h3><span class="header-section-number">5.3.1</span> MLD Calculation</h3>
+<p>Seawater density Rho was determined from S, T, and p according to TEOS-10.</p>
+<pre class="r"><code>ts_profiles &lt;- ts_profiles %&gt;% 
+  mutate(rho = swSigma(salinity = sal, temperature = tem, pressure = dep/10))</code></pre>
+</div>
+<div id="mean-hydrographic-profiles" class="section level3">
+<h3><span class="header-section-number">5.3.2</span> Mean hydrographic profiles</h3>
+<pre class="r"><code>ts_profiles_ID_mean_hydro &lt;- ts_profiles %&gt;% 
+  select(-c(station,lat, lon, pCO2_raw, pCO2, CT, date_time)) %&gt;% 
+  group_by(ID, date_time_ID, dep) %&gt;% 
+  summarise_all(list(mean), na.rm=TRUE) %&gt;% 
+  ungroup()
+
+ts_profiles_ID_sd_hydro &lt;- ts_profiles %&gt;% 
+  select(-c(station,lat, lon, pCO2_raw, pCO2, CT, date_time)) %&gt;% 
+  group_by(ID, date_time_ID, dep) %&gt;% 
+  summarise_all(list(sd), na.rm=TRUE) %&gt;% 
+  ungroup()
+
+
+ts_profiles_ID_sd_hydro_long &lt;- ts_profiles_ID_sd_hydro %&gt;% 
+  pivot_longer(4:6, names_to = &quot;var&quot;, values_to = &quot;sd&quot;)
+  
+ts_profiles_ID_mean_hydro_long &lt;- ts_profiles_ID_mean_hydro %&gt;% 
+  pivot_longer(4:6, names_to = &quot;var&quot;, values_to = &quot;value&quot;)
+  
+ts_profiles_ID_hydro_long &lt;- inner_join(ts_profiles_ID_mean_hydro_long, ts_profiles_ID_sd_hydro_long)
+
+rm(ts_profiles_ID_sd_hydro_long,
+   ts_profiles_ID_sd_hydro,
+   ts_profiles_ID_mean_hydro_long)
+
+ts_profiles_ID_hydro_long %&gt;% 
+  ggplot(aes(value, dep, col=ID))+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  facet_wrap(~var, scales = &quot;free_x&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_hydrographical_profiles_all-1.png" alt="Mean vertical profiles per cruise day across all stations." width="672" />
+<p class="caption">
+Mean vertical profiles per cruise day across all stations.
+</p>
+</div>
+</div>
+<div id="mld-timeseries" class="section level3">
+<h3><span class="header-section-number">5.3.3</span> MLD timeseries</h3>
+<p>Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria</p>
+<pre class="r"><code># density criterion
+
+ts_profiles_ID_mean_hydro &lt;- expand_grid(ts_profiles_ID_mean_hydro, rho_lim = c(0.1,0.2,0.5))
+
+MLD &lt;- ts_profiles_ID_mean_hydro  %&gt;% 
+  arrange(dep) %&gt;% 
+  group_by(ID, date_time_ID, rho_lim) %&gt;% 
+  mutate(d_rho = rho - first(rho)) %&gt;% 
+  filter(d_rho &gt; rho_lim) %&gt;% 
+  summarise(MLD = min(dep)) %&gt;% 
+  ungroup()
+
+MLD %&gt;% 
+  ggplot(aes(date_time_ID, MLD, col=as.factor(rho_lim)))+
+  geom_point()+
+  geom_path()</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/calculate_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="daily-density-profiles" class="section level3">
+<h3><span class="header-section-number">5.3.4</span> Daily density profiles</h3>
+<pre class="r"><code>ts_profiles_ID_mean_hydro &lt;- 
+  full_join(ts_profiles_ID_mean_hydro, MLD)
+
+ts_profiles_ID_mean_hydro %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(rho, dep))+
+  geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_discrete(name=&quot;Rho lim&quot;)+
+  facet_wrap(~ID)+
+  theme_bw()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_density_profiles-1.png" alt="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD" width="672" />
+<p class="caption">
+Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD
+</p>
+</div>
+</div>
+<div id="ncp-calculation" class="section level3">
+<h3><span class="header-section-number">5.3.5</span> NCP calculation</h3>
+<pre class="r"><code># NCP_grid_sign &lt;- ts_profiles_ID_long %&gt;% 
+#   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
+#   unique() %&gt;% 
+#   expand_grid(sign = c(&quot;pos&quot;, &quot;neg&quot;))
+# 
+# NCP_grid_total &lt;- ts_profiles_ID_long %&gt;% 
+#   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
+#   unique() %&gt;% 
+#   expand_grid(sign = c(&quot;total&quot;))
+
+
+NCP &lt;- ts_profiles_ID_long %&gt;% 
+  filter(var == &quot;CT&quot;)
+
+NCP &lt;- full_join(NCP, MLD)
+
+NCP &lt;- NCP %&gt;% 
+  filter(dep &lt;= MLD)
+
+NCP &lt;- NCP %&gt;% 
+  group_by(ID, date_time_ID, date_time_ID_ref, rho_lim) %&gt;% 
+  summarise(CT_i_diff = sum(value_diff)/1000) %&gt;% 
+  ungroup()
+
+NCP %&gt;% 
+  ggplot(aes(date_time_ID_ref, CT_i_diff, fill=as.factor(rho_lim)))+
+  geom_col(position = &quot;dodge&quot;)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/integrated_NCP_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>NCP &lt;- NCP %&gt;% 
+  group_by(rho_lim) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  mutate(CT_i_cum = cumsum(CT_i_diff)) %&gt;% 
+  ungroup()
+
+# NCP_total_temp &lt;- full_join(NCP_total_temp, NCP_grid_total) %&gt;% 
+#   arrange(sign, date_time_ID) %&gt;% 
+#   fill(CT_i_cum)
+
+NCP &lt;- NCP %&gt;% 
+  mutate(rho_lim = as.factor(rho_lim))
+
+NCP %&gt;% 
+  ggplot()+
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_col(aes(date_time_ID_ref, CT_i_diff, fill=rho_lim),
+           position = &quot;dodge&quot;, alpha=0.3)+
+  geom_line(aes(date_time_ID, CT_i_cum, col=rho_lim))+
+  scale_color_viridis_d(name=&quot;Rho limit&quot;)+
+  scale_fill_viridis_d(name=&quot;Rho limit&quot;)+
+  labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)+
+  #facet_grid(sign~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
+  theme_bw()</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/integrated_NCP_MLD-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># NCP %&gt;%
+#   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;NCP_dep_limits.csv&quot;))</code></pre>
+</div>
+</div>
+</div>
+<div id="old-schript-parts" class="section level1">
+<h1><span class="header-section-number">6</span> Old schript parts</h1>
 <pre class="r"><code>NCP &lt;- ts_profiles_ID_long %&gt;% 
   filter(var == &quot;CT&quot;) %&gt;% 
   mutate(dep = cut(dep, seq(0,30,5))) %&gt;% 
@@ -1437,9 +1626,8 @@ p_iNCPcum &lt;- NCP %&gt;%
 
 rm(p_iNCP, p_iNCPcum)</code></pre>
 </div>
-</div>
 <div id="nomenclature-of-objectes" class="section level1">
-<h1><span class="header-section-number">6</span> Nomenclature of objectes</h1>
+<h1><span class="header-section-number">7</span> Nomenclature of objectes</h1>
 <p>Should be identical for stored files and objectes in R environment</p>
 <ul>
 <li>source
@@ -1464,7 +1652,7 @@ rm(p_iNCP, p_iNCPcum)</code></pre>
 </ul>
 </div>
 <div id="nomenclature-of-variables" class="section level1">
-<h1><span class="header-section-number">7</span> Nomenclature of variables</h1>
+<h1><span class="header-section-number">8</span> Nomenclature of variables</h1>
 <ul>
 <li>Descriptive variables
 <ul>
@@ -1506,7 +1694,7 @@ rm(p_iNCP, p_iNCPcum)</code></pre>
 </ul>
 </div>
 <div id="ncp-estimation" class="section level1">
-<h1><span class="header-section-number">8</span> NCP estimation</h1>
+<h1><span class="header-section-number">9</span> NCP estimation</h1>
 <p>Possible approaches</p>
 <ul>
 <li>cumulative negative changes of CT + positive changes in range where negative changes occured</li>
@@ -1515,7 +1703,7 @@ rm(p_iNCP, p_iNCPcum)</code></pre>
 </ul>
 </div>
 <div id="open-tasks-questions" class="section level1">
-<h1><span class="header-section-number">9</span> Open tasks / questions</h1>
+<h1><span class="header-section-number">10</span> Open tasks / questions</h1>
 <ul>
 <li>Significance of changes in AT for calculated CT changes</li>
 <li>Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)</li>
