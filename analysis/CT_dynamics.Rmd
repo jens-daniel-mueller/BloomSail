@@ -12,11 +12,6 @@ editor_options:
   chunk_output_type: console
 ---
 
-
-```{r global_options, include = FALSE}
-knitr::opts_chunk$set(warning=FALSE, message=FALSE)
-```
-
 ```{r packages}
 library(tidyverse)
 library(patchwork)
@@ -27,6 +22,13 @@ library(scico)
 # library(broom)
 # library(lubridate)
 # library(tibbletime)
+```
+
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+theme_set(theme_bw())
+
 ```
 
 
@@ -651,6 +653,7 @@ ts_profiles_ID_long %>%
 
 Timeseries of changes in seawater vars were calculated for 5m depth intervals.
 
+## Timeseries plots
 ```{r observed_timeseries, fig.asp=1.3}
 
 ts_profiles_ID_long_grid <- ts_profiles_ID_long %>% 
@@ -672,7 +675,9 @@ rm(ts_profiles_ID_long_grid)
 
 ## Hovmoeller plots
 
-Absolute values were plotted.
+
+### Absolute values
+
 
 ```{r plot_hovmoeller_absolut, fig.cap="Hovmoeller plots of absolute changes in C~T~ and temperature."}
 
@@ -720,7 +725,7 @@ rm(CT_hov, bin_CT, Tem_hov, bin_Tem)
 ```
 
 
-## Daily changes
+### Incremental changes
 
 ```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily changes in C~T~ and temperature."}
 
@@ -749,6 +754,53 @@ Tem_hov <- ts_profiles_ID_long %>%
   filter(var == "tem") %>% 
   ggplot()+
   geom_contour_fill(aes(x=date_time_ID_ref, y=dep, z=value_diff_daily),
+                    breaks = MakeBreaks(bin_Tem),
+                    col="black")+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill="white")+
+  scale_fill_divergent(breaks = MakeBreaks(bin_Tem),
+                       guide = "colorstrip",
+                       name="Tem (°C)")+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(x="",y="Depth (m)")+
+  coord_cartesian(expand = 0)
+
+CT_hov / Tem_hov
+
+rm(CT_hov, bin_CT, Tem_hov, bin_Tem)
+
+```
+
+
+### Cumulative changes
+
+```{r plot_hovmoeller_cumulative, fig.cap="Hovmoeller plots of cumulative changes in C~T~ and temperature."}
+
+bin_CT <- 20
+
+CT_hov <- ts_profiles_ID_long %>% 
+  filter(var == "CT") %>% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=value_cum),
+                    breaks = MakeBreaks(bin_CT),
+                    col="black")+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill="white")+
+  scale_fill_divergent(breaks = MakeBreaks(bin_CT),
+                       guide = "colorstrip",
+                       name="CT (µmol/kg)")+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y="Depth (m)")+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+bin_Tem <- 2
+
+Tem_hov <- ts_profiles_ID_long %>% 
+  filter(var == "tem") %>% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=value_cum),
                     breaks = MakeBreaks(bin_Tem),
                     col="black")+
   geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill="white")+
@@ -857,7 +909,8 @@ NCP %>%
   facet_grid(sign~., scales = "free_y", space = "free_y")+
   theme_bw()
 
-
+NCP_fixed_dep <- NCP
+rm(NCP)
 # NCP %>%
 #   write_csv(here::here("Data/_merged_data_files", "NCP_dep_limits.csv"))
 
@@ -984,7 +1037,9 @@ MLD <- ts_profiles_ID_mean_hydro  %>%
 MLD %>% 
   ggplot(aes(date_time_ID, MLD, col=as.factor(rho_lim)))+
   geom_point()+
-  geom_path()
+  geom_path()+
+  scale_color_brewer(palette = "Set1", name= "Rho limit")+
+  labs(x="")
 
 ```
 
@@ -1061,11 +1116,41 @@ NCP %>%
   #facet_grid(sign~., scales = "free_y", space = "free_y")+
   theme_bw()
 
+NCP_MLD <- NCP
+rm(NCP)
 
 # NCP %>%
 #   write_csv(here::here("Data/_merged_data_files", "NCP_dep_limits.csv"))
 
 ```
+
+## Comparison of approaches
+
+```{r comparing_NCP_estimates}
+
+NCP <- full_join(NCP_fixed_dep, NCP_MLD)
+
+NCP <- NCP %>% 
+  mutate(group = paste(as.character(sign), as.character(dep_i), as.character(rho_lim)))
+
+NCP %>% 
+  arrange(date_time_ID) %>% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_line(aes(date_time_ID, CT_i_cum,
+                group=group), col="grey")+
+  geom_line(data = NCP_fixed_dep %>% filter(dep_i==10, sign=="total"),
+            aes(date_time_ID, CT_i_cum, col="10m - total"))+
+  geom_line(data = NCP_MLD %>% filter(rho_lim == 0.1),
+            aes(date_time_ID, CT_i_cum, col="MLD - 0.1"))+
+  scale_color_brewer(palette = "Set1", name="")+
+  labs(y="iCT [mol/m2]", x="")
+
+rm(NCP, NCP_fixed_dep, NCP_MLD)
+
+```
+
 
 ## Air-Sea CO~2~ flux
 
