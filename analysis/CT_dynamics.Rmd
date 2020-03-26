@@ -1132,8 +1132,17 @@ rm(iCT, iCT_fixed_dep, iCT_MLD)
 
 ```
 
+# NCP determination
 
-## Depth of first production pulse
+In order to derive an estimate of the net community production NCP (which is equivalent to the formed organic matter that can be exported from the investigated surface layer), two steps are required:
+
+- decision about the most appropiate iCT trajectory
+- correction of quantifyable CO~2~ fluxes in and out of the investigated water volume during the period of interest, this includes:
+  - Air-sea CO~2~ fluxes
+  - CO~2~ fluxes due to vertical mixing
+  - CO~2~ fluxes due to lateral transport of water masses (not corrected here)
+
+# Best iC~T~ estimate
 
 Approach: Determine the depth across which most of the iCT signal was observed after the initial production pulse on July 23. Thereafter, restrict calcualtion of cummulative CT changes to that depth.
 
