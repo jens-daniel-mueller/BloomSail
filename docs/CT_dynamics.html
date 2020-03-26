@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree69ec53ec5dae4d28e4393547df9ee9ad7185ed0btargetblank69ec53ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/69ec53ec5dae4d28e4393547df9ee9ad7185ed0b" target="_blank">69ec53e</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree069600ca34c89c1211863d53c3eed2cdfde07b3btargetblank069600ca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/069600ca34c89c1211863d53c3eed2cdfde07b3b" target="_blank">069600c</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree69ec53ec5dae4d28e4393547df9ee9ad7185ed0btargetblank69ec53ea" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree069600ca34c89c1211863d53c3eed2cdfde07b3btargetblank069600ca" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -598,53 +598,11 @@ There are no past versions. Publish this analysis with <code>wflow_publish()</co
 </div>
 </div>
 </div>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>Warning: package &#39;tidyverse&#39; was built under R version 3.5.3</code></pre>
-<pre><code>-- Attaching packages --------------------------------------------------------------------------------------------------------- tidyverse 1.3.0 --</code></pre>
-<pre><code>v ggplot2 3.3.0     v purrr   0.3.3
-v tibble  2.1.3     v dplyr   0.8.3
-v tidyr   1.0.0     v stringr 1.4.0
-v readr   1.3.1     v forcats 0.4.0</code></pre>
-<pre><code>Warning: package &#39;tibble&#39; was built under R version 3.5.3</code></pre>
-<pre><code>Warning: package &#39;tidyr&#39; was built under R version 3.5.3</code></pre>
-<pre><code>Warning: package &#39;readr&#39; was built under R version 3.5.3</code></pre>
-<pre><code>Warning: package &#39;purrr&#39; was built under R version 3.5.3</code></pre>
-<pre><code>Warning: package &#39;dplyr&#39; was built under R version 3.5.3</code></pre>
-<pre><code>Warning: package &#39;stringr&#39; was built under R version 3.5.3</code></pre>
-<pre><code>Warning: package &#39;forcats&#39; was built under R version 3.5.3</code></pre>
-<pre><code>-- Conflicts ------------------------------------------------------------------------------------------------------------ tidyverse_conflicts() --
-x dplyr::filter() masks stats::filter()
-x dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>library(patchwork)
-library(seacarb)</code></pre>
-<pre><code>Warning: package &#39;seacarb&#39; was built under R version 3.5.3</code></pre>
-<pre><code>Loading required package: oce</code></pre>
-<pre><code>Warning: package &#39;oce&#39; was built under R version 3.5.3</code></pre>
-<pre><code>Loading required package: gsw</code></pre>
-<pre><code>Loading required package: testthat</code></pre>
-<pre><code>Warning: package &#39;testthat&#39; was built under R version 3.5.3</code></pre>
-<pre><code>
-Attaching package: &#39;testthat&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:dplyr&#39;:
-
-    matches</code></pre>
-<pre><code>The following object is masked from &#39;package:purrr&#39;:
-
-    is_null</code></pre>
-<pre><code>The following object is masked from &#39;package:tidyr&#39;:
-
-    matches</code></pre>
-<pre class="r"><code>library(metR)</code></pre>
-<pre><code>Warning: package &#39;metR&#39; was built under R version 3.5.3</code></pre>
-<pre><code>
-Attaching package: &#39;metR&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:oce&#39;:
-
-    coriolis</code></pre>
-<pre><code>The following object is masked from &#39;package:purrr&#39;:
-
-    cross</code></pre>
-<pre class="r"><code>library(scico)
+<pre class="r"><code>library(tidyverse)
+library(patchwork)
+library(seacarb)
+library(metR)
+library(scico)
 # library(cmocean)
 # library(broom)
 # library(lubridate)
