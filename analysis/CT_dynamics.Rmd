@@ -146,7 +146,7 @@ ts_profiles %>%
   geom_point()+
   geom_path()+
   scale_y_reverse()+
-  scale_x_continuous(breaks = c(0,300,600), labels = c(0,300,600))+
+  scale_x_continuous(breaks = c(0, 600), labels = c(0, 600))+
   scale_color_brewer(palette = "Set1", direction = -1)+
   coord_cartesian(xlim = c(0,600))+
   facet_grid(ID~station)
@@ -222,7 +222,7 @@ rm(cover)
 
 # Bottle C~T~ and A~T~
 
-At stations P07 and P10 discrete samples for lab measurments of C~T~ and A~T~ were collected. Please note that - in contrast to the pCO~2~ profiles - samples were taken on June 16.
+At stations P07 and P10 discrete samples for lab measurments of C~T~ and A~T~ were collected. Please note that - in contrast to the pCO~2~ profiles - samples were taken on June 16, but removed here for harmonization of results.
 
 ```{r read_bottle_CO2}
 
@@ -258,6 +258,9 @@ tb_long %>%
 
 ```
 
+Important notes:
+- Spatio-temporal variation of AT is small, which jusitfies conversion of pCO~2~ to C~T~ based on a fixed mean AT - On July 30 we see a drop in surface salinity, associated with a rise in A~T~, clearly pointing at exchange of water masses, presumably later 
+
 ## Surface time series
 
 ```{r plot_bottle_CO2_surface_timeseries, fig.cap="Time series of bottle data. Shown are mean values of samples collected at water depths < 10m (usually collected at 0 and 5 m).", fig.asp=1.2}
@@ -283,7 +286,7 @@ tb_surface %>%
 
 ```
 
-```{r plot_bottle_CT_surface_timeseries, fig.cap="CT timeseries, derived by multiplying the CT-AT-ratio with mean AT"}
+```{r plot_bottle_CT_surface_timeseries, fig.cap="CT timeseries, derived by multiplying the CT-AT-ratio with mean AT", fig.asp=0.7}
 
 AT_mean <- tb_surface %>% 
   filter(var == "AT") %>% 
@@ -300,6 +303,9 @@ tb_surface %>%
   labs(x="Mean transect date", y="CT-AT-ratio * mean AT")
 
 ```
+
+Important notes:
+- C~T~ drop and temporal patterns observed in the C~T~/A~T~ time series agrees well with those found in the C~T~ time series derived from pCO~2~ measurements
 
 
 ## Mean alkalinity
@@ -373,7 +379,6 @@ ts_profiles %>%
 Mean vertical profiles were calculated for each cruise day (ID). Note that:
 
 - ID represents the start date of the cruise, not the exact mean sampling date
-- Coastal station P14 was excluded so far from the analysis
 
 ```{r plot_CT_profiles_all, fig.cap="Mean vertical profiles per cruise day across all stations."}
 
@@ -1304,5 +1309,7 @@ Possible approaches
 
 # Open tasks / questions
 
+- clean and harmonize chunk labeling (label: plot, 1 plot per chunk, etc)
+- included removed stations in map and coverage plot
 - Significance of changes in AT for calculated CT changes
 - Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)
