@@ -290,7 +290,7 @@ tb_surface %>%
 
 ```
 
-```{r plot_bottle_CT_surface_timeseries, fig.cap="CT timeseries, derived by multiplying the CT-AT-ratio with mean AT", fig.asp=0.3}
+```{r plot_bottle_CT_surface_timeseries, fig.cap="CT timeseries, derived by multiplying the CT-AT-ratio with mean AT", fig.asp=0.4}
 
 AT_mean <- tb_surface %>% 
   filter(var == "AT") %>% 
@@ -939,7 +939,7 @@ rm(NCP)
 
 As an alternative to fixed depth levels, vertical integration as low as the mixed layer depth was tested.
 
-### MLD Calculation
+### Density Calculation
 
 Seawater density Rho was determined from S, T, and p according to TEOS-10.
 
@@ -950,7 +950,7 @@ ts_profiles <- ts_profiles %>%
 
 ```
 
-### Mean hydrographic profiles
+### Density profiles
 
 ```{r plot_hydrographical_profiles_all, fig.cap="Mean vertical profiles per cruise day across all stations."}
 
@@ -989,11 +989,11 @@ ts_profiles_ID_hydro_long %>%
   
 ```
 
-### MLD timeseries
+### MLD calculation
 
 Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria
 
-```{r calculate_MLD}
+```{r calculate_MLD, fig.asp=0.4}
 # density criterion
 
 ts_profiles_ID_mean_hydro <- expand_grid(ts_profiles_ID_mean_hydro, rho_lim = c(0.1,0.2,0.5))
@@ -1005,13 +1005,6 @@ MLD <- ts_profiles_ID_mean_hydro  %>%
   filter(d_rho > rho_lim) %>% 
   summarise(MLD = min(dep)) %>% 
   ungroup()
-
-MLD %>% 
-  ggplot(aes(date_time_ID, MLD, col=as.factor(rho_lim)))+
-  geom_point()+
-  geom_path()+
-  scale_color_brewer(palette = "Set1", name= "Rho limit")+
-  labs(x="")
 
 ```
 
@@ -1033,6 +1026,20 @@ ts_profiles_ID_mean_hydro %>%
   theme_bw()
 
 ```
+
+### MLD timeseries
+
+```{r plot_MLD_time_series}
+
+MLD %>% 
+  ggplot(aes(date_time_ID, MLD, col=as.factor(rho_lim)))+
+  geom_point()+
+  geom_path()+
+  scale_color_brewer(palette = "Set1", name= "Rho limit")+
+  labs(x="")
+
+```
+
 
 ### NCP calculation
 
