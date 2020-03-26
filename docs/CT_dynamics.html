@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreebaa81d650bf047ec7f0de93d9174bed72b43c9e8targetblankbaa81d6a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/baa81d650bf047ec7f0de93d9174bed72b43c9e8" target="_blank">baa81d6</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0405651e6dbd09a4261302305427fe2ca581858ftargetblank0405651a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/0405651e6dbd09a4261302305427fe2ca581858f" target="_blank">0405651</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreebaa81d650bf047ec7f0de93d9174bed72b43c9e8targetblankbaa81d6a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0405651e6dbd09a4261302305427fe2ca581858ftargetblank0405651a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -1442,14 +1442,14 @@ rm(NCP)
 <div id="mld-approach" class="section level2">
 <h2><span class="header-section-number">5.2</span> MLD approach</h2>
 <p>As an alternative to fixed depth levels, vertical integration as low as the mixed layer depth was tested.</p>
-<div id="mld-calculation" class="section level3">
-<h3><span class="header-section-number">5.2.1</span> MLD Calculation</h3>
+<div id="density-calculation" class="section level3">
+<h3><span class="header-section-number">5.2.1</span> Density Calculation</h3>
 <p>Seawater density Rho was determined from S, T, and p according to TEOS-10.</p>
 <pre class="r"><code>ts_profiles &lt;- ts_profiles %&gt;% 
   mutate(rho = swSigma(salinity = sal, temperature = tem, pressure = dep/10))</code></pre>
 </div>
-<div id="mean-hydrographic-profiles" class="section level3">
-<h3><span class="header-section-number">5.2.2</span> Mean hydrographic profiles</h3>
+<div id="density-profiles" class="section level3">
+<h3><span class="header-section-number">5.2.2</span> Density profiles</h3>
 <pre class="r"><code>ts_profiles_ID_mean_hydro &lt;- ts_profiles %&gt;% 
   select(-c(station,lat, lon, pCO2_raw, pCO2, CT, date_time)) %&gt;% 
   group_by(ID, date_time_ID, dep) %&gt;% 
@@ -1489,8 +1489,8 @@ Mean vertical profiles per cruise day across all stations.
 </p>
 </div>
 </div>
-<div id="mld-timeseries" class="section level3">
-<h3><span class="header-section-number">5.2.3</span> MLD timeseries</h3>
+<div id="mld-calculation" class="section level3">
+<h3><span class="header-section-number">5.2.3</span> MLD calculation</h3>
 <p>Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria</p>
 <pre class="r"><code># density criterion
 
@@ -1502,15 +1502,7 @@ MLD &lt;- ts_profiles_ID_mean_hydro  %&gt;%
   mutate(d_rho = rho - first(rho)) %&gt;% 
   filter(d_rho &gt; rho_lim) %&gt;% 
   summarise(MLD = min(dep)) %&gt;% 
-  ungroup()
-
-MLD %&gt;% 
-  ggplot(aes(date_time_ID, MLD, col=as.factor(rho_lim)))+
-  geom_point()+
-  geom_path()+
-  scale_color_brewer(palette = &quot;Set1&quot;, name= &quot;Rho limit&quot;)+
-  labs(x=&quot;&quot;)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/calculate_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
+  ungroup()</code></pre>
 </div>
 <div id="daily-density-profiles" class="section level3">
 <h3><span class="header-section-number">5.2.4</span> Daily density profiles</h3>
@@ -1533,8 +1525,18 @@ Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizonta
 </p>
 </div>
 </div>
+<div id="mld-timeseries" class="section level3">
+<h3><span class="header-section-number">5.2.5</span> MLD timeseries</h3>
+<pre class="r"><code>MLD %&gt;% 
+  ggplot(aes(date_time_ID, MLD, col=as.factor(rho_lim)))+
+  geom_point()+
+  geom_path()+
+  scale_color_brewer(palette = &quot;Set1&quot;, name= &quot;Rho limit&quot;)+
+  labs(x=&quot;&quot;)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/plot_MLD_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 <div id="ncp-calculation" class="section level3">
-<h3><span class="header-section-number">5.2.5</span> NCP calculation</h3>
+<h3><span class="header-section-number">5.2.6</span> NCP calculation</h3>
 <pre class="r"><code># NCP_grid_sign &lt;- ts_profiles_ID_long %&gt;% 
 #   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
 #   unique() %&gt;% 
