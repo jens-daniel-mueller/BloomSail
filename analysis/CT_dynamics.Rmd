@@ -290,7 +290,7 @@ tb_surface %>%
 
 ```
 
-```{r plot_bottle_CT_surface_timeseries, fig.cap="CT timeseries, derived by multiplying the CT-AT-ratio with mean AT", fig.asp=0.7}
+```{r plot_bottle_CT_surface_timeseries, fig.cap="CT timeseries, derived by multiplying the CT-AT-ratio with mean AT", fig.asp=0.3}
 
 AT_mean <- tb_surface %>% 
   filter(var == "AT") %>% 
@@ -836,7 +836,7 @@ rm(CT_hov, bin_CT, Tem_hov, bin_Tem)
 
 # Depth-integration of CT changes
 
-A critical step for the determination of net community production (NCP) is the integration of observed changes in C~T~ over depth. Two approaches were tested:
+A critical first step for the determination of net community production (NCP) is the integration of observed changes in C~T~ over depth to derive iC~T~. Two approaches were tested:
 
 - Integration of changes in CT over a predefined, fixed water depth
 - Integration of changes in CT over a mixed layer depth (MLD)
@@ -936,6 +936,8 @@ rm(NCP)
 ```
 
 ## MLD approach
+
+As an alternative to fixed depth levels, vertical integration as low as the mixed layer depth was tested.
 
 ### MLD Calculation
 
