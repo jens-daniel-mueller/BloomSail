@@ -834,89 +834,90 @@ rm(CT_hov, bin_CT, Tem_hov, bin_Tem)
 
 
 
-# Depth-integration of CT changes
+# Depth-integration C~T~
 
 A critical first step for the determination of net community production (NCP) is the integration of observed changes in C~T~ over depth to derive iC~T~. Two approaches were tested:
 
 - Integration of changes in CT over a predefined, fixed water depth
 - Integration of changes in CT over a mixed layer depth (MLD)
 
+Both aproaches deliver depth-integrated, incremental changes of C~T~ inbetween cruise dates. Those were summed up to derive a trajectory of cummulative iC~T~ changes.
 
-## Fixed depths
+## Fixed depths approach
 
 Incremental and cumulative C~T~ changes inbetween cruise dates were integrated across the water colums down to predefined depth limits. This was done separately for observed positive/negative changes in C~T~, as well as for the total observed changes.
 
-```{r integrated_NCP_fixed_depth, fig.asp=1.2}
+```{r integrated_iCT_fixed_depth, fig.asp=1.1}
 
 
-NCP_grid_sign <- ts_profiles_ID_long %>% 
+iCT_grid_sign <- ts_profiles_ID_long %>% 
   select(ID, date_time_ID, date_time_ID_ref) %>% 
   unique() %>% 
   expand_grid(sign = c("pos", "neg"))
 
-NCP_grid_total <- ts_profiles_ID_long %>% 
+iCT_grid_total <- ts_profiles_ID_long %>% 
   select(ID, date_time_ID, date_time_ID_ref) %>% 
   unique() %>% 
   expand_grid(sign = c("total"))
 
 # dep_i <- 10
-rm(NCP, dep_i)
+rm(iCT, dep_i)
 
 for (dep_i in seq(5,20,5)) {
 
 
-NCP_sign_temp <- ts_profiles_ID_long %>% 
+iCT_sign_temp <- ts_profiles_ID_long %>% 
   filter(var == "CT", dep < dep_i) %>% 
   mutate(sign = if_else(ID == "180705" & dep == 0.5, "neg", sign)) %>% 
   group_by(ID, date_time_ID, date_time_ID_ref, sign) %>% 
   summarise(CT_i_diff = sum(value_diff)/1000) %>% 
   ungroup()
 
-NCP_sign_temp <- NCP_sign_temp %>% 
+iCT_sign_temp <- iCT_sign_temp %>% 
   group_by(sign) %>%
   arrange(date_time_ID) %>% 
   mutate(CT_i_cum = cumsum(CT_i_diff)) %>% 
   ungroup()
 
-NCP_sign_temp <- full_join(NCP_sign_temp, NCP_grid_sign) %>% 
+iCT_sign_temp <- full_join(iCT_sign_temp, iCT_grid_sign) %>% 
   arrange(sign, date_time_ID) %>% 
   fill(CT_i_cum)
 
 
-NCP_total_temp <- ts_profiles_ID_long %>% 
+iCT_total_temp <- ts_profiles_ID_long %>% 
   filter(var == "CT", dep < dep_i) %>% 
   group_by(ID, date_time_ID, date_time_ID_ref) %>% 
   summarise(CT_i_diff = sum(value_diff)/1000) %>% 
   ungroup()
 
-NCP_total_temp <- NCP_total_temp %>% 
+iCT_total_temp <- iCT_total_temp %>% 
   arrange(date_time_ID) %>% 
   mutate(CT_i_cum = cumsum(CT_i_diff)) %>% 
   ungroup() %>% 
   mutate(sign = "total")
 
-NCP_total_temp <- full_join(NCP_total_temp, NCP_grid_total) %>% 
+iCT_total_temp <- full_join(iCT_total_temp, iCT_grid_total) %>% 
   arrange(sign, date_time_ID) %>% 
   fill(CT_i_cum)
 
-NCP_temp <- bind_rows(NCP_sign_temp, NCP_total_temp) %>% 
+iCT_temp <- bind_rows(iCT_sign_temp, iCT_total_temp) %>% 
     mutate(dep_i = dep_i)
 
 
-if (exists("NCP")) {
-  NCP <- bind_rows(NCP, NCP_temp)
-  } else {NCP <- NCP_temp}
+if (exists("iCT")) {
+  iCT <- bind_rows(iCT, iCT_temp)
+  } else {iCT <- iCT_temp}
 
-rm(NCP_temp, NCP_sign_temp, NCP_total_temp)
+rm(iCT_temp, iCT_sign_temp, iCT_total_temp)
 
 }
 
-rm(NCP_grid_sign, NCP_grid_total)
+rm(iCT_grid_sign, iCT_grid_total)
 
-NCP <- NCP %>% 
+iCT <- iCT %>% 
   mutate(dep_i = as.factor(dep_i))
 
-NCP %>% 
+iCT %>% 
   ggplot()+
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
   geom_col(aes(date_time_ID_ref, CT_i_diff, fill=dep_i),
@@ -928,10 +929,10 @@ NCP %>%
   facet_grid(sign~., scales = "free_y", space = "free_y")+
   theme_bw()
 
-NCP_fixed_dep <- NCP
-rm(NCP)
-# NCP %>%
-#   write_csv(here::here("Data/_merged_data_files", "NCP_dep_limits.csv"))
+iCT_fixed_dep <- iCT
+rm(iCT)
+# iCT %>%
+#   write_csv(here::here("Data/_merged_data_files", "iCT_dep_limits.csv"))
 
 ```
 
@@ -993,7 +994,7 @@ ts_profiles_ID_hydro_long %>%
 
 Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria
 
-```{r calculate_MLD, fig.asp=0.4}
+```{r calculate_MLD}
 # density criterion
 
 ts_profiles_ID_mean_hydro <- expand_grid(ts_profiles_ID_mean_hydro, rho_lim = c(0.1,0.2,0.5))
@@ -1021,7 +1022,7 @@ ts_profiles_ID_mean_hydro %>%
   geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
   geom_path()+
   scale_y_reverse()+
-  scale_color_discrete(name="Rho lim")+
+  scale_color_brewer(palette = "Set1", name= "Rho limit")+
   facet_wrap(~ID)+
   theme_bw()
 
@@ -1029,7 +1030,7 @@ ts_profiles_ID_mean_hydro %>%
 
 ### MLD timeseries
 
-```{r plot_MLD_time_series}
+```{r plot_MLD_time_series, fig.asp=0.4}
 
 MLD %>% 
   ggplot(aes(date_time_ID, MLD, col=as.factor(rho_lim)))+
@@ -1041,49 +1042,48 @@ MLD %>%
 ```
 
 
-### NCP calculation
+### iCT calculation
 
+```{r integrated_iCT_MLD}
 
-```{r integrated_NCP_MLD}
-
-# NCP_grid_sign <- ts_profiles_ID_long %>% 
+# iCT_grid_sign <- ts_profiles_ID_long %>% 
 #   select(ID, date_time_ID, date_time_ID_ref) %>% 
 #   unique() %>% 
 #   expand_grid(sign = c("pos", "neg"))
 # 
-# NCP_grid_total <- ts_profiles_ID_long %>% 
+# iCT_grid_total <- ts_profiles_ID_long %>% 
 #   select(ID, date_time_ID, date_time_ID_ref) %>% 
 #   unique() %>% 
 #   expand_grid(sign = c("total"))
 
 
-NCP <- ts_profiles_ID_long %>% 
+iCT <- ts_profiles_ID_long %>% 
   filter(var == "CT")
 
-NCP <- full_join(NCP, MLD)
+iCT <- full_join(iCT, MLD)
 
-NCP <- NCP %>% 
+iCT <- iCT %>% 
   filter(dep <= MLD)
 
-NCP <- NCP %>% 
+iCT <- iCT %>% 
   group_by(ID, date_time_ID, date_time_ID_ref, rho_lim) %>% 
   summarise(CT_i_diff = sum(value_diff)/1000) %>% 
   ungroup()
 
-NCP <- NCP %>% 
+iCT <- iCT %>% 
   group_by(rho_lim) %>% 
   arrange(date_time_ID) %>% 
   mutate(CT_i_cum = cumsum(CT_i_diff)) %>% 
   ungroup()
 
-# NCP_total_temp <- full_join(NCP_total_temp, NCP_grid_total) %>% 
+# iCT_total_temp <- full_join(iCT_total_temp, iCT_grid_total) %>% 
 #   arrange(sign, date_time_ID) %>% 
 #   fill(CT_i_cum)
 
-NCP <- NCP %>% 
+iCT <- iCT %>% 
   mutate(rho_lim = as.factor(rho_lim))
 
-NCP %>% 
+iCT %>% 
   ggplot()+
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
   geom_col(aes(date_time_ID_ref, CT_i_diff, fill=rho_lim),
@@ -1095,53 +1095,55 @@ NCP %>%
   #facet_grid(sign~., scales = "free_y", space = "free_y")+
   theme_bw()
 
-NCP_MLD <- NCP
-rm(NCP)
+iCT_MLD <- iCT
+rm(iCT)
 
-# NCP %>%
-#   write_csv(here::here("Data/_merged_data_files", "NCP_dep_limits.csv"))
+# iCT %>%
+#   write_csv(here::here("Data/_merged_data_files", "iCT_dep_limits.csv"))
 
 ```
 
 ## Comparison of approaches
 
-```{r comparing_NCP_estimates}
+In the following, all cummulative iC~T~ trajectories are displayed. Highlighted are those obtained for the fixed depth approach with 10 m limit, and the MLD approach with a high density threshold of 0.5 kg/m3.
 
-NCP <- full_join(NCP_fixed_dep, NCP_MLD)
+```{r comparing_iCT_estimates}
 
-NCP <- NCP %>% 
+iCT <- full_join(iCT_fixed_dep, iCT_MLD)
+
+iCT <- iCT %>% 
   mutate(group = paste(as.character(sign), as.character(dep_i), as.character(rho_lim)))
 
-NCP %>% 
+iCT %>% 
   arrange(date_time_ID) %>% 
   ggplot()+
   geom_hline(yintercept = 0)+
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
   geom_line(aes(date_time_ID, CT_i_cum,
                 group=group), col="grey")+
-  geom_line(data = NCP_fixed_dep %>% filter(dep_i==10, sign=="total"),
+  geom_line(data = iCT_fixed_dep %>% filter(dep_i==10, sign=="total"),
             aes(date_time_ID, CT_i_cum, col="10m - total"))+
-  geom_line(data = NCP_MLD %>% filter(rho_lim == 0.1),
+  geom_line(data = iCT_MLD %>% filter(rho_lim == 0.1),
             aes(date_time_ID, CT_i_cum, col="MLD - 0.1"))+
   scale_color_brewer(palette = "Set1", name="")+
   labs(y="iCT [mol/m2]", x="")
 
-rm(NCP, NCP_fixed_dep, NCP_MLD)
+rm(iCT, iCT_fixed_dep, iCT_MLD)
 
 ```
 
 
 ## Depth of first production pulse
 
-Approach: Determine the depth across which most of the NCP signal was observed after the initial production pulse on July 23. Thereafter, restrict calcualtion of cummulative CT changes to that depth.
+Approach: Determine the depth across which most of the iCT signal was observed after the initial production pulse on July 23. Thereafter, restrict calcualtion of cummulative CT changes to that depth.
 
-```{r integrated_NCP_first_pulse}
+```{r integrated_iCT_first_pulse}
 
-NCP <- ts_profiles_ID_long %>% 
+iCT <- ts_profiles_ID_long %>% 
   filter(ID == 180723,
          var == "CT")
 
-NCP %>% 
+iCT %>% 
   arrange(dep) %>% 
   ggplot(aes(value_cum, dep, col="total"))+
   geom_vline(xintercept = 0)+
@@ -1155,9 +1157,9 @@ NCP %>%
 
 ```
 
-```{r depth_distribution_NCP_180723}
+```{r depth_distribution_iCT_180723}
 
-NCP_dep <- NCP %>% 
+iCT_dep <- iCT %>% 
   select(dep, value_cum) %>% 
   filter(value_cum < 0) %>%
   arrange(dep) %>% 
@@ -1165,98 +1167,23 @@ NCP_dep <- NCP %>%
          value_cum_dep = cumsum(value_cum),
          value_cum_i_rel = value_cum_dep/value_cum_i*100)
 
-NCP_dep %>% 
+iCT_dep %>% 
   ggplot(aes(dep, value_cum_i_rel))+
   geom_hline(yintercept = 90, col="red")+
   geom_point()+
   geom_line()+
-  labs(x="Depth (m)", y = "Relative contribution to NCP on July 23")+
+  labs(x="Depth (m)", y = "Relative contribution to iCT on July 23")+
   ylim(0,100)+
   theme_bw()
 
-rm(NCP, NCP_dep)
+rm(iCT, iCT_dep)
 
 ```
 
-90% of the cumulative NCP observed until July 23 is observed and homogeniouly spread across the upper ten metres of the water column. The intial idea to restrict ongoing CT changes after July 23 to the depth were most of the NCP signal was located is stopped here, as it would lead to the exact same result as the intergration over the upper 10 m of the water column executed above. 
+90% of the cumulative iCT observed until July 23 is observed and homogeniouly spread across the upper ten metres of the water column. The intial idea to restrict ongoing CT changes after July 23 to the depth were most of the iCT signal was located is stopped here, as it would lead to the exact same result as the intergration over the upper 10 m of the water column executed above. 
 
 
 ## Air-Sea CO~2~ flux
-
-# Old schript parts
-
-```{r integrated_NCP_old,eval=FALSE}
-
-NCP <- ts_profiles_ID_long %>% 
-  filter(var == "CT") %>% 
-  mutate(dep = cut(dep, seq(0,30,5))) %>% 
-  group_by(ID, date_time_ID, dep, sign) %>% 
-  summarise(dCT = sum(value_diff)/1000) %>% 
-  ungroup()
-
-NCP <- NCP %>% 
-  group_by(sign, dep) %>% 
-  arrange(date_time_ID) %>%
-  mutate(dCT_cum = cumsum(dCT)) %>% 
-  ungroup()
-
-NCP %>%
-  write_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_CT_cumulative_timeseries.csv"))
-
-
-NCP_grid <- expand_grid(
-  unique(NCP$date_time_ID),
-  unique(NCP$dep),
-  unique(NCP$sign)
-)
-
-NCP_grid <- NCP_grid %>% 
-  set_names(c("date_time_ID","dep", "sign"))
-
-NCP <- full_join(NCP, NCP_grid)
-
-rm(NCP_grid)
-
-NCP <- NCP %>% 
-  arrange(sign, dep, date_time_ID) %>% 
-  group_by(sign, dep) %>% 
-  fill(dCT_cum) %>% 
-  ungroup() %>% 
-  mutate(dCT_cum = if_else(is.na(dCT_cum), 0, dCT_cum))
-
-
-```
-
-```{r plot_integrated_NCP_timeseries_old, eval=FALSE, fig.asp=1.5}
-
-p_iNCP <- NCP %>% 
-  ggplot(aes(date_time_ID, dCT, fill=dep))+
-  geom_hline(yintercept = 0)+
-  geom_bar(stat="identity", col="black")+
-  scale_fill_viridis_d()+
-  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
-  facet_grid(rev(sign)~., scales = "free_y", space = "free_y")+
-  theme(strip.background = element_blank(),
-        strip.text = element_blank())+
-  labs(y="integrated, directional CT changes [mol/m2]", x="date")
-
-p_iNCPcum <- NCP %>% 
-  ggplot(aes(date_time_ID,  dCT_cum, fill=dep))+
-  geom_hline(yintercept = 0)+
-  geom_area(col="black")+
-  scale_fill_viridis_d()+
-  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
-  facet_grid(rev(sign)~., scales = "free_y", space = "free_y")+
-  theme(strip.background = element_blank(),
-        strip.text = element_blank())+
-  labs(y="integrated, cumulative, directional CT changes [mol/m2]", x="date")
-
-
-(p_iNCP / p_iNCPcum)+
-  plot_layout(guides = 'collect')
-
-rm(p_iNCP, p_iNCPcum)
-```
 
 
 
@@ -1277,6 +1204,7 @@ Should be identical for stored files and objectes in R environment
   - daily: daily mean values
   - long: data stored in long format (all observations in only 2 columns "var" and "value")
   - fix: constant, unique values such as long-term means, starting dates, etc
+  - iCT: includes cumulative numbers as iCT estimates
   - NCP: includes cumulative numbers as NCP estimates
   - CT_tem: data subset to analyse changes of CT with tem
   - 3d vs 2d: surface vs depth resolved GETM data
@@ -1317,16 +1245,6 @@ Should be identical for stored files and objectes in R environment
   - sign: identifier for pos. or neg. differences
 
 - p_XXX: ggplot object
-
-
-# NCP estimation
-
-Possible approaches
-
-- cumulative negative changes of CT + positive changes in range where negative changes occured
-- cumulative changes of CT above MLD
-- cumulative positive changes of CT above MLD
-
 
 
 # Open tasks / questions
