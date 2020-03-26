@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1b8a11e0d3313acb5605ca1e75e43cdd4cd3cebftargetblank1b8a11ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/1b8a11e0d3313acb5605ca1e75e43cdd4cd3cebf" target="_blank">1b8a11e</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreebaa81d650bf047ec7f0de93d9174bed72b43c9e8targetblankbaa81d6a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/baa81d650bf047ec7f0de93d9174bed72b43c9e8" target="_blank">baa81d6</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1b8a11e0d3313acb5605ca1e75e43cdd4cd3cebftargetblank1b8a11ea" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreebaa81d650bf047ec7f0de93d9174bed72b43c9e8targetblankbaa81d6a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -1347,7 +1347,7 @@ Hovmoeller plots of cumulative changes in C<sub>T</sub> and temperature.
 </div>
 <div id="depth-integration-of-ct-changes" class="section level1">
 <h1><span class="header-section-number">5</span> Depth-integration of CT changes</h1>
-<p>A critical step for the determination of net community production (NCP) is the integration of observed changes in C<sub>T</sub> over depth. Two approaches were tested:</p>
+<p>A critical first step for the determination of net community production (NCP) is the integration of observed changes in C<sub>T</sub> over depth to derive iC<sub>T</sub>. Two approaches were tested:</p>
 <ul>
 <li>Integration of changes in CT over a predefined, fixed water depth</li>
 <li>Integration of changes in CT over a mixed layer depth (MLD)</li>
@@ -1441,6 +1441,7 @@ rm(NCP)
 </div>
 <div id="mld-approach" class="section level2">
 <h2><span class="header-section-number">5.2</span> MLD approach</h2>
+<p>As an alternative to fixed depth levels, vertical integration as low as the mixed layer depth was tested.</p>
 <div id="mld-calculation" class="section level3">
 <h3><span class="header-section-number">5.2.1</span> MLD Calculation</h3>
 <p>Seawater density Rho was determined from S, T, and p according to TEOS-10.</p>
