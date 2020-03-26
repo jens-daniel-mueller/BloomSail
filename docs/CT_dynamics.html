@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree6ec40053315daf32c77244b81cd6cf7b2f685b02targetblank6ec4005a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/6ec40053315daf32c77244b81cd6cf7b2f685b02" target="_blank">6ec4005</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1b8a11e0d3313acb5605ca1e75e43cdd4cd3cebftargetblank1b8a11ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/1b8a11e0d3313acb5605ca1e75e43cdd4cd3cebf" target="_blank">1b8a11e</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree6ec40053315daf32c77244b81cd6cf7b2f685b02targetblank6ec4005a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree1b8a11e0d3313acb5605ca1e75e43cdd4cd3cebftargetblank1b8a11ea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -619,6 +619,10 @@ library(scico)
 <li>assigning mean date_time_ID value to all profiles belonging to one cruise</li>
 <li>discarding “coastal” station P01, P13, P14</li>
 <li>Restricting profiles to upper 25m</li>
+</ul>
+<p>Please note that:</p>
+<ul>
+<li>The label ID represents the start date of the cruise (“YYMMDD”), not the exact mean sampling date</li>
 </ul>
 <div id="pco2-profile-overview" class="section level2">
 <h2><span class="header-section-number">1.1</span> pCO<sub>2</sub> profile overview</h2>
@@ -920,10 +924,7 @@ ts_profiles %&gt;%
 </div>
 <div id="mean-profiles" class="section level2">
 <h2><span class="header-section-number">3.2</span> Mean profiles</h2>
-<p>Mean vertical profiles were calculated for each cruise day (ID). Note that:</p>
-<ul>
-<li>ID represents the start date of the cruise, not the exact mean sampling date</li>
-</ul>
+<p>Mean vertical profiles were calculated for each cruise day (ID).</p>
 <pre class="r"><code>ts_profiles_ID_mean &lt;- ts_profiles %&gt;% 
   select(-c(station,lat, lon, pCO2_raw, date_time)) %&gt;% 
   group_by(ID, date_time_ID, dep) %&gt;% 
@@ -980,6 +981,10 @@ Mean vertical profiles per cruise day across all stations plotted indivdually. R
 </p>
 </div>
 <pre class="r"><code>rm(all)</code></pre>
+<p>Important notes:</p>
+<ul>
+<li>the standard deviation of C<sub>T</sub> in the upper 10m increases on June 30.</li>
+</ul>
 </div>
 <div id="individual-profiles" class="section level2">
 <h2><span class="header-section-number">3.3</span> Individual profiles</h2>
@@ -1145,6 +1150,10 @@ ts_profiles_ID_long %&gt;%
   facet_wrap(~var, scales = &quot;free_x&quot;)+
   labs(x=&quot;Cumulative change of value&quot;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/cumulative_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Important notes:</p>
+<ul>
+<li>Salinity in the upper 10m decreases by &gt;0.1 on June 30, and returns to average conditions already on Aug 02.</li>
+</ul>
 <p>Cumulative positive and negative changes of seawater vars were calculated separately at each depth relative to the first cruise day on July 5.</p>
 <pre class="r"><code>ts_profiles_ID_long &lt;- ts_profiles_ID_long %&gt;% 
   mutate(sign = if_else(value_diff &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;% 
@@ -1172,9 +1181,9 @@ ts_profiles_ID_long %&gt;%
 </div>
 <div id="timeseries" class="section level1">
 <h1><span class="header-section-number">4</span> Timeseries</h1>
-<p>Timeseries of changes in seawater vars were calculated for 5m depth intervals.</p>
-<div id="timeseries-plots" class="section level2">
-<h2><span class="header-section-number">4.1</span> Timeseries plots</h2>
+<div id="timeseries-depth-intervals" class="section level2">
+<h2><span class="header-section-number">4.1</span> Timeseries depth intervals</h2>
+<p>Mean seawater parameters were calculated for 5m depth intervals.</p>
 <pre class="r"><code>ts_profiles_ID_long_grid &lt;- ts_profiles_ID_long %&gt;% 
   mutate(dep = cut(dep, seq(0,30,5))) %&gt;% 
   group_by(ID, date_time_ID, dep, var)  %&gt;% 
@@ -1280,9 +1289,9 @@ Tem_hov &lt;- ts_profiles_ID_long %&gt;%
 
 CT_hov / Tem_hov</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/CT_dynamics.Rmd/plot_hovmoeller_daily-1.png" alt="Hovmoeller plots of daily changes in C~T~ and temperature." width="672" />
+<img src="figure/CT_dynamics.Rmd/plot_hovmoeller_daily-1.png" alt="Hovmoeller plots of daily changes in C~T~ and temperature. Note that calculated  value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period." width="672" />
 <p class="caption">
-Hovmoeller plots of daily changes in C<sub>T</sub> and temperature.
+Hovmoeller plots of daily changes in C<sub>T</sub> and temperature. Note that calculated value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period.
 </p>
 </div>
 <pre class="r"><code>rm(CT_hov, bin_CT, Tem_hov, bin_Tem)</code></pre>
@@ -1336,11 +1345,16 @@ Hovmoeller plots of cumulative changes in C<sub>T</sub> and temperature.
 </div>
 </div>
 </div>
-<div id="ncp" class="section level1">
-<h1><span class="header-section-number">5</span> NCP</h1>
+<div id="depth-integration-of-ct-changes" class="section level1">
+<h1><span class="header-section-number">5</span> Depth-integration of CT changes</h1>
+<p>A critical step for the determination of net community production (NCP) is the integration of observed changes in C<sub>T</sub> over depth. Two approaches were tested:</p>
+<ul>
+<li>Integration of changes in CT over a predefined, fixed water depth</li>
+<li>Integration of changes in CT over a mixed layer depth (MLD)</li>
+</ul>
 <div id="fixed-depths" class="section level2">
 <h2><span class="header-section-number">5.1</span> Fixed depths</h2>
-<p>Incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were integrated across the water colums down to predefined depth limits.</p>
+<p>Incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were integrated across the water colums down to predefined depth limits. This was done separately for observed positive/negative changes in C<sub>T</sub>, as well as for the total observed changes.</p>
 <pre class="r"><code>NCP_grid_sign &lt;- ts_profiles_ID_long %&gt;% 
   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
   unique() %&gt;% 
@@ -1425,55 +1439,16 @@ rm(NCP)
 # NCP %&gt;%
 #   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;NCP_dep_limits.csv&quot;))</code></pre>
 </div>
-<div id="depth-of-first-production-pulse" class="section level2">
-<h2><span class="header-section-number">5.2</span> Depth of first production pulse</h2>
-<p>Approach: Determine the depth across which most of the NCP signal was observed after the initial production pulse on July 23. Thereafter, restrict calcualtion of cummulative CT changes to that depth.</p>
-<pre class="r"><code>NCP &lt;- ts_profiles_ID_long %&gt;% 
-  filter(ID == 180723,
-         var == &quot;CT&quot;)
-
-NCP %&gt;% 
-  arrange(dep) %&gt;% 
-  ggplot(aes(value_cum, dep, col=&quot;total&quot;))+
-  geom_vline(xintercept = 0)+
-  geom_path(aes(value_cum_sign, dep, col=&quot;directional&quot;))+
-  geom_point(aes(value_cum_sign, dep, col=&quot;directional&quot;))+
-  geom_point()+
-  geom_path()+
-  scale_y_reverse()+
-  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;estimate&quot;)+
-  labs(x=&quot;Cumulative change of CT on July 23 (180723)&quot;)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/integrated_NCP_first_pulse-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>NCP_dep &lt;- NCP %&gt;% 
-  select(dep, value_cum) %&gt;% 
-  filter(value_cum &lt; 0) %&gt;%
-  arrange(dep) %&gt;% 
-  mutate(value_cum_i = sum(value_cum),
-         value_cum_dep = cumsum(value_cum),
-         value_cum_i_rel = value_cum_dep/value_cum_i*100)
-
-NCP_dep %&gt;% 
-  ggplot(aes(dep, value_cum_i_rel))+
-  geom_hline(yintercept = 90, col=&quot;red&quot;)+
-  geom_point()+
-  geom_line()+
-  labs(x=&quot;Depth (m)&quot;, y = &quot;Relative contribution to NCP on July 23&quot;)+
-  ylim(0,100)+
-  theme_bw()</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/depth_distribution_NCP_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>rm(NCP, NCP_dep)</code></pre>
-<p>90% of the cumulative NCP observed until July 23 is observed and homogeniouly spread across the upper ten metres of the water column. The intial idea to restrict ongoing CT changes after July 23 to the depth were most of the NCP signal was located is stopped here, as it would lead to the exact same result as the intergration over the upper 10 m of the water column executed above.</p>
-</div>
 <div id="mld-approach" class="section level2">
-<h2><span class="header-section-number">5.3</span> MLD approach</h2>
+<h2><span class="header-section-number">5.2</span> MLD approach</h2>
 <div id="mld-calculation" class="section level3">
-<h3><span class="header-section-number">5.3.1</span> MLD Calculation</h3>
+<h3><span class="header-section-number">5.2.1</span> MLD Calculation</h3>
 <p>Seawater density Rho was determined from S, T, and p according to TEOS-10.</p>
 <pre class="r"><code>ts_profiles &lt;- ts_profiles %&gt;% 
   mutate(rho = swSigma(salinity = sal, temperature = tem, pressure = dep/10))</code></pre>
 </div>
 <div id="mean-hydrographic-profiles" class="section level3">
-<h3><span class="header-section-number">5.3.2</span> Mean hydrographic profiles</h3>
+<h3><span class="header-section-number">5.2.2</span> Mean hydrographic profiles</h3>
 <pre class="r"><code>ts_profiles_ID_mean_hydro &lt;- ts_profiles %&gt;% 
   select(-c(station,lat, lon, pCO2_raw, pCO2, CT, date_time)) %&gt;% 
   group_by(ID, date_time_ID, dep) %&gt;% 
@@ -1514,7 +1489,7 @@ Mean vertical profiles per cruise day across all stations.
 </div>
 </div>
 <div id="mld-timeseries" class="section level3">
-<h3><span class="header-section-number">5.3.3</span> MLD timeseries</h3>
+<h3><span class="header-section-number">5.2.3</span> MLD timeseries</h3>
 <p>Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria</p>
 <pre class="r"><code># density criterion
 
@@ -1537,7 +1512,7 @@ MLD %&gt;%
 <p><img src="figure/CT_dynamics.Rmd/calculate_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="daily-density-profiles" class="section level3">
-<h3><span class="header-section-number">5.3.4</span> Daily density profiles</h3>
+<h3><span class="header-section-number">5.2.4</span> Daily density profiles</h3>
 <pre class="r"><code>ts_profiles_ID_mean_hydro &lt;- 
   full_join(ts_profiles_ID_mean_hydro, MLD)
 
@@ -1558,7 +1533,7 @@ Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizonta
 </div>
 </div>
 <div id="ncp-calculation" class="section level3">
-<h3><span class="header-section-number">5.3.5</span> NCP calculation</h3>
+<h3><span class="header-section-number">5.2.5</span> NCP calculation</h3>
 <pre class="r"><code># NCP_grid_sign &lt;- ts_profiles_ID_long %&gt;% 
 #   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
 #   unique() %&gt;% 
@@ -1616,7 +1591,7 @@ rm(NCP)
 </div>
 </div>
 <div id="comparison-of-approaches" class="section level2">
-<h2><span class="header-section-number">5.4</span> Comparison of approaches</h2>
+<h2><span class="header-section-number">5.3</span> Comparison of approaches</h2>
 <pre class="r"><code>NCP &lt;- full_join(NCP_fixed_dep, NCP_MLD)
 
 NCP &lt;- NCP %&gt;% 
@@ -1637,6 +1612,45 @@ NCP %&gt;%
   labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/comparing_NCP_estimates-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(NCP, NCP_fixed_dep, NCP_MLD)</code></pre>
+</div>
+<div id="depth-of-first-production-pulse" class="section level2">
+<h2><span class="header-section-number">5.4</span> Depth of first production pulse</h2>
+<p>Approach: Determine the depth across which most of the NCP signal was observed after the initial production pulse on July 23. Thereafter, restrict calcualtion of cummulative CT changes to that depth.</p>
+<pre class="r"><code>NCP &lt;- ts_profiles_ID_long %&gt;% 
+  filter(ID == 180723,
+         var == &quot;CT&quot;)
+
+NCP %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(value_cum, dep, col=&quot;total&quot;))+
+  geom_vline(xintercept = 0)+
+  geom_path(aes(value_cum_sign, dep, col=&quot;directional&quot;))+
+  geom_point(aes(value_cum_sign, dep, col=&quot;directional&quot;))+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;estimate&quot;)+
+  labs(x=&quot;Cumulative change of CT on July 23 (180723)&quot;)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/integrated_NCP_first_pulse-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>NCP_dep &lt;- NCP %&gt;% 
+  select(dep, value_cum) %&gt;% 
+  filter(value_cum &lt; 0) %&gt;%
+  arrange(dep) %&gt;% 
+  mutate(value_cum_i = sum(value_cum),
+         value_cum_dep = cumsum(value_cum),
+         value_cum_i_rel = value_cum_dep/value_cum_i*100)
+
+NCP_dep %&gt;% 
+  ggplot(aes(dep, value_cum_i_rel))+
+  geom_hline(yintercept = 90, col=&quot;red&quot;)+
+  geom_point()+
+  geom_line()+
+  labs(x=&quot;Depth (m)&quot;, y = &quot;Relative contribution to NCP on July 23&quot;)+
+  ylim(0,100)+
+  theme_bw()</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/depth_distribution_NCP_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(NCP, NCP_dep)</code></pre>
+<p>90% of the cumulative NCP observed until July 23 is observed and homogeniouly spread across the upper ten metres of the water column. The intial idea to restrict ongoing CT changes after July 23 to the depth were most of the NCP signal was located is stopped here, as it would lead to the exact same result as the intergration over the upper 10 m of the water column executed above.</p>
 </div>
 <div id="air-sea-co2-flux" class="section level2">
 <h2><span class="header-section-number">5.5</span> Air-Sea CO<sub>2</sub> flux</h2>
