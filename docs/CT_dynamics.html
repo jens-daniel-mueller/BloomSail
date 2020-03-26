@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4d734a11f166c9f07c733acad56b119cb6829650targetblank4d734a1a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/4d734a11f166c9f07c733acad56b119cb6829650" target="_blank">4d734a1</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree6afdea92f2343ffc0fbe807140fd231c72a9cd2ctargetblank6afdea9a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/6afdea92f2343ffc0fbe807140fd231c72a9cd2c" target="_blank">6afdea9</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4d734a11f166c9f07c733acad56b119cb6829650targetblank4d734a1a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree6afdea92f2343ffc0fbe807140fd231c72a9cd2ctargetblank6afdea9a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -1436,7 +1436,7 @@ iCT %&gt;%
   theme_bw()</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/integrated_iCT_fixed_depth-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>iCT_fixed_dep &lt;- iCT
-rm(iCT)
+rm(iCT, dep_i)
 # iCT %&gt;%
 #   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;iCT_dep_limits.csv&quot;))</code></pre>
 </div>
@@ -1588,7 +1588,7 @@ iCT %&gt;%
   theme_bw()</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/integrated_iCT_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>iCT_MLD &lt;- iCT
-rm(iCT)
+rm(iCT, MLD)
 
 # iCT %&gt;%
 #   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;iCT_dep_limits.csv&quot;))</code></pre>
@@ -1616,7 +1616,7 @@ iCT %&gt;%
   scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
   labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/comparing_iCT_estimates-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>rm(iCT, iCT_fixed_dep, iCT_MLD)</code></pre>
+<pre class="r"><code>rm(iCT, iCT_MLD)</code></pre>
 </div>
 </div>
 <div id="ncp-determination" class="section level1">
@@ -1634,24 +1634,37 @@ iCT %&gt;%
 </div>
 <div id="best-ict-estimate" class="section level1">
 <h1><span class="header-section-number">7</span> Best iC<sub>T</sub> estimate</h1>
-<p>Approach: Determine the depth across which most of the iCT signal was observed after the initial production pulse on July 23. Thereafter, restrict calcualtion of cummulative CT changes to that depth.</p>
-<pre class="r"><code>iCT &lt;- ts_profiles_ID_long %&gt;% 
+<p>The cummulative iC<sub>T</sub> trajectory determined by integration of CT to a fixed water depth of 10 m was used for NCP calculation for the following reasons:</p>
+<ul>
+<li>During the first productivity pulse that lasted until July 23:
+<ul>
+<li><blockquote>
+<p>90% of iCT changes were located within the upper 10m</p>
+</blockquote></li>
+<li>no positive iCT changes were located within the upper 10m</li>
+</ul></li>
+<li>Deeper (fixed() layers were affected by iCT changes</li>
+<li>MLD were too shallow to cover all observed negative CT changes</li>
+</ul>
+<pre class="r"><code>ts_profiles_ID_long_180723 &lt;- ts_profiles_ID_long %&gt;% 
   filter(ID == 180723,
          var == &quot;CT&quot;)
 
-iCT %&gt;% 
+p_ts_profiles_ID_long &lt;- ts_profiles_ID_long_180723 %&gt;% 
   arrange(dep) %&gt;% 
   ggplot(aes(value_cum, dep, col=&quot;total&quot;))+
   geom_vline(xintercept = 0)+
+  geom_hline(yintercept = 10, col=&quot;red&quot;)+
   geom_path(aes(value_cum_sign, dep, col=&quot;directional&quot;))+
   geom_point(aes(value_cum_sign, dep, col=&quot;directional&quot;))+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
   scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;estimate&quot;)+
-  labs(x=&quot;Cumulative change of CT on July 23 (180723)&quot;)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/integrated_iCT_first_pulse-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>iCT_dep &lt;- iCT %&gt;% 
+  labs(x=&quot;Cumulative change of CT on July 23 (180723)&quot;)+
+  theme(legend.position = &quot;left&quot;)
+
+ts_profiles_ID_long_180723_dep &lt;- ts_profiles_ID_long_180723 %&gt;% 
   select(dep, value_cum) %&gt;% 
   filter(value_cum &lt; 0) %&gt;%
   arrange(dep) %&gt;% 
@@ -1659,19 +1672,40 @@ iCT %&gt;%
          value_cum_dep = cumsum(value_cum),
          value_cum_i_rel = value_cum_dep/value_cum_i*100)
 
-iCT_dep %&gt;% 
-  ggplot(aes(dep, value_cum_i_rel))+
-  geom_hline(yintercept = 90, col=&quot;red&quot;)+
+p_ts_profiles_ID_long_rel &lt;- ts_profiles_ID_long_180723_dep %&gt;% 
+  ggplot(aes(value_cum_i_rel, dep))+
+  geom_hline(yintercept = 10, col=&quot;red&quot;)+
+  geom_vline(xintercept = 90)+
   geom_point()+
   geom_line()+
-  labs(x=&quot;Depth (m)&quot;, y = &quot;Relative contribution to iCT on July 23&quot;)+
-  ylim(0,100)+
-  theme_bw()</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/depth_distribution_iCT_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>rm(iCT, iCT_dep)</code></pre>
-<p>90% of the cumulative iCT observed until July 23 is observed and homogeniouly spread across the upper ten metres of the water column. The intial idea to restrict ongoing CT changes after July 23 to the depth were most of the iCT signal was located is stopped here, as it would lead to the exact same result as the intergration over the upper 10 m of the water column executed above.</p>
+  scale_y_reverse(limits = c(25,0))+
+  scale_x_continuous(breaks = seq(0,100,10))+
+  labs(y = &quot;Depth (m)&quot;, x = &quot;Relative contribution to ts_profiles_ID_long on July 23&quot;)+
+  theme_bw()
+
+p_ts_profiles_ID_long + p_ts_profiles_ID_long_rel</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/iCT_depth_distribution_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(ts_profiles_ID_long_180723,
+   ts_profiles_ID_long_180723_dep,
+   p_ts_profiles_ID_long,
+   p_ts_profiles_ID_long_rel)</code></pre>
 <div id="air-sea-co2-flux" class="section level2">
 <h2><span class="header-section-number">7.1</span> Air-Sea CO<sub>2</sub> flux</h2>
+<pre class="r"><code>iCT &lt;- iCT_fixed_dep %&gt;% 
+  filter(dep_i == 10, sign==&quot;total&quot;) %&gt;% 
+  select(-c(sign, dep_i))
+
+rm(iCT_fixed_dep)
+
+iCT %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_line(aes(date_time_ID, CT_i_cum, col=&quot;iCT observed&quot;))+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
+  labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/iCT_fix_10-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="nomenclature-of-objectes" class="section level1">
