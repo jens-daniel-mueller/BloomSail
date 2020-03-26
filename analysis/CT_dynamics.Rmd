@@ -930,7 +930,7 @@ iCT %>%
   theme_bw()
 
 iCT_fixed_dep <- iCT
-rm(iCT)
+rm(iCT, dep_i)
 # iCT %>%
 #   write_csv(here::here("Data/_merged_data_files", "iCT_dep_limits.csv"))
 
@@ -1096,7 +1096,7 @@ iCT %>%
   theme_bw()
 
 iCT_MLD <- iCT
-rm(iCT)
+rm(iCT, MLD)
 
 # iCT %>%
 #   write_csv(here::here("Data/_merged_data_files", "iCT_dep_limits.csv"))
@@ -1128,7 +1128,7 @@ iCT %>%
   scale_color_brewer(palette = "Set1", name="")+
   labs(y="iCT [mol/m2]", x="")
 
-rm(iCT, iCT_fixed_dep, iCT_MLD)
+rm(iCT, iCT_MLD)
 
 ```
 
@@ -1144,31 +1144,36 @@ In order to derive an estimate of the net community production NCP (which is equ
 
 # Best iC~T~ estimate
 
-Approach: Determine the depth across which most of the iCT signal was observed after the initial production pulse on July 23. Thereafter, restrict calcualtion of cummulative CT changes to that depth.
+The cummulative iC~T~ trajectory determined by integration of CT to a fixed water depth of 10 m was used for NCP calculation for the following reasons:
 
-```{r integrated_iCT_first_pulse}
+- During the first productivity pulse that lasted until July 23:
+  - >90% of iCT changes were located within the upper 10m
+  - no positive iCT changes were located within the upper 10m
+- Deeper (fixed() layers were affected by iCT changes
+- MLD were too shallow to cover all observed negative CT changes
+  
 
-iCT <- ts_profiles_ID_long %>% 
+```{r iCT_depth_distribution_180723}
+
+ts_profiles_ID_long_180723 <- ts_profiles_ID_long %>% 
   filter(ID == 180723,
          var == "CT")
 
-iCT %>% 
+p_ts_profiles_ID_long <- ts_profiles_ID_long_180723 %>% 
   arrange(dep) %>% 
   ggplot(aes(value_cum, dep, col="total"))+
   geom_vline(xintercept = 0)+
+  geom_hline(yintercept = 10, col="red")+
   geom_path(aes(value_cum_sign, dep, col="directional"))+
   geom_point(aes(value_cum_sign, dep, col="directional"))+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
   scale_color_brewer(palette = "Set1", name="estimate")+
-  labs(x="Cumulative change of CT on July 23 (180723)")
+  labs(x="Cumulative change of CT on July 23 (180723)")+
+  theme(legend.position = "left")
 
-```
-
-```{r depth_distribution_iCT_180723}
-
-iCT_dep <- iCT %>% 
+ts_profiles_ID_long_180723_dep <- ts_profiles_ID_long_180723 %>% 
   select(dep, value_cum) %>% 
   filter(value_cum < 0) %>%
   arrange(dep) %>% 
@@ -1176,23 +1181,47 @@ iCT_dep <- iCT %>%
          value_cum_dep = cumsum(value_cum),
          value_cum_i_rel = value_cum_dep/value_cum_i*100)
 
-iCT_dep %>% 
-  ggplot(aes(dep, value_cum_i_rel))+
-  geom_hline(yintercept = 90, col="red")+
+p_ts_profiles_ID_long_rel <- ts_profiles_ID_long_180723_dep %>% 
+  ggplot(aes(value_cum_i_rel, dep))+
+  geom_hline(yintercept = 10, col="red")+
+  geom_vline(xintercept = 90)+
   geom_point()+
   geom_line()+
-  labs(x="Depth (m)", y = "Relative contribution to iCT on July 23")+
-  ylim(0,100)+
+  scale_y_reverse(limits = c(25,0))+
+  scale_x_continuous(breaks = seq(0,100,10))+
+  labs(y = "Depth (m)", x = "Relative contribution to ts_profiles_ID_long on July 23")+
   theme_bw()
 
-rm(iCT, iCT_dep)
+p_ts_profiles_ID_long + p_ts_profiles_ID_long_rel
+
+rm(ts_profiles_ID_long_180723,
+   ts_profiles_ID_long_180723_dep,
+   p_ts_profiles_ID_long,
+   p_ts_profiles_ID_long_rel)
 
 ```
 
-90% of the cumulative iCT observed until July 23 is observed and homogeniouly spread across the upper ten metres of the water column. The intial idea to restrict ongoing CT changes after July 23 to the depth were most of the iCT signal was located is stopped here, as it would lead to the exact same result as the intergration over the upper 10 m of the water column executed above. 
-
-
 ## Air-Sea CO~2~ flux
+
+```{r iCT_fix_10}
+
+iCT <- iCT_fixed_dep %>% 
+  filter(dep_i == 10, sign=="total") %>% 
+  select(-c(sign, dep_i))
+
+rm(iCT_fixed_dep)
+
+iCT %>% 
+  arrange(date_time_ID) %>% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_line(aes(date_time_ID, CT_i_cum, col="iCT observed"))+
+  scale_color_brewer(palette = "Set1", name="")+
+  labs(y="iCT [mol/m2]", x="")
+
+```
+
 
 
 
