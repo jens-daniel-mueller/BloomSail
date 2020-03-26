@@ -47,6 +47,10 @@ Profile data are prepared by:
 - discarding "coastal" station P01, P13, P14
 - Restricting profiles to upper 25m
 
+Please note that:
+
+- The label ID represents the start date of the cruise ("YYMMDD"), not the exact mean sampling date
+
 ## pCO~2~ profile overview
 
 ```{r read_prepare_sensor_data, fig.cap="Overview pCO2 profiles at stations (P02-P12) and cruise dates (ID). y-axis restricted to displayed range.", fig.asp = 1.5}
@@ -376,9 +380,7 @@ ts_profiles %>%
 
 ## Mean profiles
 
-Mean vertical profiles were calculated for each cruise day (ID). Note that:
-
-- ID represents the start date of the cruise, not the exact mean sampling date
+Mean vertical profiles were calculated for each cruise day (ID).
 
 ```{r plot_CT_profiles_all, fig.cap="Mean vertical profiles per cruise day across all stations."}
 
@@ -435,9 +437,11 @@ rm(all)
 
 ```
 
+Important notes:
+
+- the standard deviation of C~T~ in the upper 10m increases on June 30.
 
 ## Individual profiles
-
 
 C~T~, pCO~2~, S, and T profiles were plotted individually 
 [pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/ts_profiles_pCO2_tem_sal_CT.pdf){target="_blank"} 
@@ -627,6 +631,10 @@ ts_profiles_ID_long %>%
 
 ```
 
+Important notes:
+
+- Salinity in the upper 10m decreases by >0.1 on June 30, and returns to average conditions already on Aug 02.
+
 Cumulative positive and negative changes of seawater vars were calculated separately at each depth relative to the first cruise day on July 5.
 
 ```{r cumulative_directional_changes_profiles}
@@ -658,9 +666,10 @@ ts_profiles_ID_long %>%
 
 # Timeseries
 
-Timeseries of changes in seawater vars were calculated for 5m depth intervals.
+## Timeseries depth intervals
 
-## Timeseries plots
+Mean seawater parameters were calculated for 5m depth intervals.
+
 ```{r observed_timeseries, fig.asp=1.3}
 
 ts_profiles_ID_long_grid <- ts_profiles_ID_long %>% 
@@ -682,9 +691,7 @@ rm(ts_profiles_ID_long_grid)
 
 ## Hovmoeller plots
 
-
 ### Absolute values
-
 
 ```{r plot_hovmoeller_absolut, fig.cap="Hovmoeller plots of absolute changes in C~T~ and temperature."}
 
@@ -734,7 +741,7 @@ rm(CT_hov, bin_CT, Tem_hov, bin_Tem)
 
 ### Incremental changes
 
-```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily changes in C~T~ and temperature."}
+```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily changes in C~T~ and temperature. Note that calculated  value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period."}
 
 bin_CT <- 2.5
 
@@ -827,12 +834,17 @@ rm(CT_hov, bin_CT, Tem_hov, bin_Tem)
 
 
 
-# NCP
+# Depth-integration of CT changes
+
+A critical step for the determination of net community production (NCP) is the integration of observed changes in C~T~ over depth. Two approaches were tested:
+
+- Integration of changes in CT over a predefined, fixed water depth
+- Integration of changes in CT over a mixed layer depth (MLD)
+
 
 ## Fixed depths
 
-Incremental and cumulative C~T~ changes inbetween cruise dates were integrated across the water colums down to predefined depth limits.
-
+Incremental and cumulative C~T~ changes inbetween cruise dates were integrated across the water colums down to predefined depth limits. This was done separately for observed positive/negative changes in C~T~, as well as for the total observed changes.
 
 ```{r integrated_NCP_fixed_depth, fig.asp=1.2}
 
@@ -922,55 +934,6 @@ rm(NCP)
 #   write_csv(here::here("Data/_merged_data_files", "NCP_dep_limits.csv"))
 
 ```
-
-## Depth of first production pulse
-
-Approach: Determine the depth across which most of the NCP signal was observed after the initial production pulse on July 23. Thereafter, restrict calcualtion of cummulative CT changes to that depth.
-
-```{r integrated_NCP_first_pulse}
-
-NCP <- ts_profiles_ID_long %>% 
-  filter(ID == 180723,
-         var == "CT")
-
-NCP %>% 
-  arrange(dep) %>% 
-  ggplot(aes(value_cum, dep, col="total"))+
-  geom_vline(xintercept = 0)+
-  geom_path(aes(value_cum_sign, dep, col="directional"))+
-  geom_point(aes(value_cum_sign, dep, col="directional"))+
-  geom_point()+
-  geom_path()+
-  scale_y_reverse()+
-  scale_color_brewer(palette = "Set1", name="estimate")+
-  labs(x="Cumulative change of CT on July 23 (180723)")
-
-```
-
-```{r depth_distribution_NCP_180723}
-
-NCP_dep <- NCP %>% 
-  select(dep, value_cum) %>% 
-  filter(value_cum < 0) %>%
-  arrange(dep) %>% 
-  mutate(value_cum_i = sum(value_cum),
-         value_cum_dep = cumsum(value_cum),
-         value_cum_i_rel = value_cum_dep/value_cum_i*100)
-
-NCP_dep %>% 
-  ggplot(aes(dep, value_cum_i_rel))+
-  geom_hline(yintercept = 90, col="red")+
-  geom_point()+
-  geom_line()+
-  labs(x="Depth (m)", y = "Relative contribution to NCP on July 23")+
-  ylim(0,100)+
-  theme_bw()
-
-rm(NCP, NCP_dep)
-
-```
-
-90% of the cumulative NCP observed until July 23 is observed and homogeniouly spread across the upper ten metres of the water column. The intial idea to restrict ongoing CT changes after July 23 to the depth were most of the NCP signal was located is stopped here, as it would lead to the exact same result as the intergration over the upper 10 m of the water column executed above. 
 
 ## MLD approach
 
@@ -1157,6 +1120,56 @@ NCP %>%
 rm(NCP, NCP_fixed_dep, NCP_MLD)
 
 ```
+
+
+## Depth of first production pulse
+
+Approach: Determine the depth across which most of the NCP signal was observed after the initial production pulse on July 23. Thereafter, restrict calcualtion of cummulative CT changes to that depth.
+
+```{r integrated_NCP_first_pulse}
+
+NCP <- ts_profiles_ID_long %>% 
+  filter(ID == 180723,
+         var == "CT")
+
+NCP %>% 
+  arrange(dep) %>% 
+  ggplot(aes(value_cum, dep, col="total"))+
+  geom_vline(xintercept = 0)+
+  geom_path(aes(value_cum_sign, dep, col="directional"))+
+  geom_point(aes(value_cum_sign, dep, col="directional"))+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_brewer(palette = "Set1", name="estimate")+
+  labs(x="Cumulative change of CT on July 23 (180723)")
+
+```
+
+```{r depth_distribution_NCP_180723}
+
+NCP_dep <- NCP %>% 
+  select(dep, value_cum) %>% 
+  filter(value_cum < 0) %>%
+  arrange(dep) %>% 
+  mutate(value_cum_i = sum(value_cum),
+         value_cum_dep = cumsum(value_cum),
+         value_cum_i_rel = value_cum_dep/value_cum_i*100)
+
+NCP_dep %>% 
+  ggplot(aes(dep, value_cum_i_rel))+
+  geom_hline(yintercept = 90, col="red")+
+  geom_point()+
+  geom_line()+
+  labs(x="Depth (m)", y = "Relative contribution to NCP on July 23")+
+  ylim(0,100)+
+  theme_bw()
+
+rm(NCP, NCP_dep)
+
+```
+
+90% of the cumulative NCP observed until July 23 is observed and homogeniouly spread across the upper ten metres of the water column. The intial idea to restrict ongoing CT changes after July 23 to the depth were most of the NCP signal was located is stopped here, as it would lead to the exact same result as the intergration over the upper 10 m of the water column executed above. 
 
 
 ## Air-Sea CO~2~ flux
