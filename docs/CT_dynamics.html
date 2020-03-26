@@ -444,7 +444,7 @@ div.section {
 
 <h1 class="title toc-ignore">CT dynamics</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">25 March, 2020</h4>
+<h4 class="date">26 March, 2020</h4>
 
 </div>
 
@@ -469,7 +469,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-03-25
+<strong>Last updated:</strong> 2020-03-26
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree07690b6bd17c5c82870a77d664d89a0d0f2045bdtargetblank07690b6a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/07690b6bd17c5c82870a77d664d89a0d0f2045bd" target="_blank">07690b6</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree69ec53ec5dae4d28e4393547df9ee9ad7185ed0btargetblank69ec53ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/69ec53ec5dae4d28e4393547df9ee9ad7185ed0b" target="_blank">69ec53e</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree07690b6bd17c5c82870a77d664d89a0d0f2045bdtargetblank07690b6a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree69ec53ec5dae4d28e4393547df9ee9ad7185ed0btargetblank69ec53ea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -598,11 +598,53 @@ There are no past versions. Publish this analysis with <code>wflow_publish()</co
 </div>
 </div>
 </div>
-<pre class="r"><code>library(tidyverse)
-library(patchwork)
-library(seacarb)
-library(metR)
-library(scico)
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>Warning: package &#39;tidyverse&#39; was built under R version 3.5.3</code></pre>
+<pre><code>-- Attaching packages --------------------------------------------------------------------------------------------------------- tidyverse 1.3.0 --</code></pre>
+<pre><code>v ggplot2 3.3.0     v purrr   0.3.3
+v tibble  2.1.3     v dplyr   0.8.3
+v tidyr   1.0.0     v stringr 1.4.0
+v readr   1.3.1     v forcats 0.4.0</code></pre>
+<pre><code>Warning: package &#39;tibble&#39; was built under R version 3.5.3</code></pre>
+<pre><code>Warning: package &#39;tidyr&#39; was built under R version 3.5.3</code></pre>
+<pre><code>Warning: package &#39;readr&#39; was built under R version 3.5.3</code></pre>
+<pre><code>Warning: package &#39;purrr&#39; was built under R version 3.5.3</code></pre>
+<pre><code>Warning: package &#39;dplyr&#39; was built under R version 3.5.3</code></pre>
+<pre><code>Warning: package &#39;stringr&#39; was built under R version 3.5.3</code></pre>
+<pre><code>Warning: package &#39;forcats&#39; was built under R version 3.5.3</code></pre>
+<pre><code>-- Conflicts ------------------------------------------------------------------------------------------------------------ tidyverse_conflicts() --
+x dplyr::filter() masks stats::filter()
+x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(patchwork)
+library(seacarb)</code></pre>
+<pre><code>Warning: package &#39;seacarb&#39; was built under R version 3.5.3</code></pre>
+<pre><code>Loading required package: oce</code></pre>
+<pre><code>Warning: package &#39;oce&#39; was built under R version 3.5.3</code></pre>
+<pre><code>Loading required package: gsw</code></pre>
+<pre><code>Loading required package: testthat</code></pre>
+<pre><code>Warning: package &#39;testthat&#39; was built under R version 3.5.3</code></pre>
+<pre><code>
+Attaching package: &#39;testthat&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:dplyr&#39;:
+
+    matches</code></pre>
+<pre><code>The following object is masked from &#39;package:purrr&#39;:
+
+    is_null</code></pre>
+<pre><code>The following object is masked from &#39;package:tidyr&#39;:
+
+    matches</code></pre>
+<pre class="r"><code>library(metR)</code></pre>
+<pre><code>Warning: package &#39;metR&#39; was built under R version 3.5.3</code></pre>
+<pre><code>
+Attaching package: &#39;metR&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:oce&#39;:
+
+    coriolis</code></pre>
+<pre><code>The following object is masked from &#39;package:purrr&#39;:
+
+    cross</code></pre>
+<pre class="r"><code>library(scico)
 # library(cmocean)
 # library(broom)
 # library(lubridate)
@@ -1172,6 +1214,8 @@ ts_profiles_ID_long %&gt;%
 <div id="timeseries" class="section level1">
 <h1><span class="header-section-number">4</span> Timeseries</h1>
 <p>Timeseries of changes in seawater vars were calculated for 5m depth intervals.</p>
+<div id="timeseries-plots" class="section level2">
+<h2><span class="header-section-number">4.1</span> Timeseries plots</h2>
 <pre class="r"><code>ts_profiles_ID_long_grid &lt;- ts_profiles_ID_long %&gt;% 
   mutate(dep = cut(dep, seq(0,30,5))) %&gt;% 
   group_by(ID, date_time_ID, dep, var)  %&gt;% 
@@ -1186,9 +1230,11 @@ ts_profiles_ID_long_grid %&gt;%
   facet_wrap(~var, scales = &quot;free_y&quot;, ncol=1)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/observed_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(ts_profiles_ID_long_grid)</code></pre>
+</div>
 <div id="hovmoeller-plots" class="section level2">
-<h2><span class="header-section-number">4.1</span> Hovmoeller plots</h2>
-<p>Absolute values were plotted.</p>
+<h2><span class="header-section-number">4.2</span> Hovmoeller plots</h2>
+<div id="absolute-values" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> Absolute values</h3>
 <pre class="r"><code>bin_CT &lt;- 20
 
 CT_hov &lt;- ts_profiles_ID_long %&gt;% 
@@ -1235,8 +1281,8 @@ Hovmoeller plots of absolute changes in C<sub>T</sub> and temperature.
 </div>
 <pre class="r"><code>rm(CT_hov, bin_CT, Tem_hov, bin_Tem)</code></pre>
 </div>
-<div id="daily-changes" class="section level2">
-<h2><span class="header-section-number">4.2</span> Daily changes</h2>
+<div id="incremental-changes" class="section level3">
+<h3><span class="header-section-number">4.2.2</span> Incremental changes</h3>
 <pre class="r"><code>bin_CT &lt;- 2.5
 
 CT_hov &lt;- ts_profiles_ID_long %&gt;% 
@@ -1281,6 +1327,54 @@ Hovmoeller plots of daily changes in C<sub>T</sub> and temperature.
 </p>
 </div>
 <pre class="r"><code>rm(CT_hov, bin_CT, Tem_hov, bin_Tem)</code></pre>
+</div>
+<div id="cumulative-changes" class="section level3">
+<h3><span class="header-section-number">4.2.3</span> Cumulative changes</h3>
+<pre class="r"><code>bin_CT &lt;- 20
+
+CT_hov &lt;- ts_profiles_ID_long %&gt;% 
+  filter(var == &quot;CT&quot;) %&gt;% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=value_cum),
+                    breaks = MakeBreaks(bin_CT),
+                    col=&quot;black&quot;)+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill=&quot;white&quot;)+
+  scale_fill_divergent(breaks = MakeBreaks(bin_CT),
+                       guide = &quot;colorstrip&quot;,
+                       name=&quot;CT (µmol/kg)&quot;)+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y=&quot;Depth (m)&quot;)+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+bin_Tem &lt;- 2
+
+Tem_hov &lt;- ts_profiles_ID_long %&gt;% 
+  filter(var == &quot;tem&quot;) %&gt;% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=value_cum),
+                    breaks = MakeBreaks(bin_Tem),
+                    col=&quot;black&quot;)+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill=&quot;white&quot;)+
+  scale_fill_divergent(breaks = MakeBreaks(bin_Tem),
+                       guide = &quot;colorstrip&quot;,
+                       name=&quot;Tem (°C)&quot;)+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(x=&quot;&quot;,y=&quot;Depth (m)&quot;)+
+  coord_cartesian(expand = 0)
+
+CT_hov / Tem_hov</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_hovmoeller_cumulative-1.png" alt="Hovmoeller plots of cumulative changes in C~T~ and temperature." width="672" />
+<p class="caption">
+Hovmoeller plots of cumulative changes in C<sub>T</sub> and temperature.
+</p>
+</div>
+<pre class="r"><code>rm(CT_hov, bin_CT, Tem_hov, bin_Tem)</code></pre>
+</div>
 </div>
 </div>
 <div id="ncp" class="section level1">
@@ -1367,7 +1461,9 @@ NCP %&gt;%
   facet_grid(sign~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
   theme_bw()</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/integrated_NCP_fixed_depth-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code># NCP %&gt;%
+<pre class="r"><code>NCP_fixed_dep &lt;- NCP
+rm(NCP)
+# NCP %&gt;%
 #   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;NCP_dep_limits.csv&quot;))</code></pre>
 </div>
 <div id="depth-of-first-production-pulse" class="section level2">
@@ -1476,7 +1572,9 @@ MLD &lt;- ts_profiles_ID_mean_hydro  %&gt;%
 MLD %&gt;% 
   ggplot(aes(date_time_ID, MLD, col=as.factor(rho_lim)))+
   geom_point()+
-  geom_path()</code></pre>
+  geom_path()+
+  scale_color_brewer(palette = &quot;Set1&quot;, name= &quot;Rho limit&quot;)+
+  labs(x=&quot;&quot;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/calculate_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="daily-density-profiles" class="section level3">
@@ -1551,12 +1649,38 @@ NCP %&gt;%
   #facet_grid(sign~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
   theme_bw()</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/integrated_NCP_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code># NCP %&gt;%
+<pre class="r"><code>NCP_MLD &lt;- NCP
+rm(NCP)
+
+# NCP %&gt;%
 #   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;NCP_dep_limits.csv&quot;))</code></pre>
 </div>
 </div>
+<div id="comparison-of-approaches" class="section level2">
+<h2><span class="header-section-number">5.4</span> Comparison of approaches</h2>
+<pre class="r"><code>NCP &lt;- full_join(NCP_fixed_dep, NCP_MLD)
+
+NCP &lt;- NCP %&gt;% 
+  mutate(group = paste(as.character(sign), as.character(dep_i), as.character(rho_lim)))
+
+NCP %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_line(aes(date_time_ID, CT_i_cum,
+                group=group), col=&quot;grey&quot;)+
+  geom_line(data = NCP_fixed_dep %&gt;% filter(dep_i==10, sign==&quot;total&quot;),
+            aes(date_time_ID, CT_i_cum, col=&quot;10m - total&quot;))+
+  geom_line(data = NCP_MLD %&gt;% filter(rho_lim == 0.1),
+            aes(date_time_ID, CT_i_cum, col=&quot;MLD - 0.1&quot;))+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
+  labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/comparing_NCP_estimates-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(NCP, NCP_fixed_dep, NCP_MLD)</code></pre>
+</div>
 <div id="air-sea-co2-flux" class="section level2">
-<h2><span class="header-section-number">5.4</span> Air-Sea CO<sub>2</sub> flux</h2>
+<h2><span class="header-section-number">5.5</span> Air-Sea CO<sub>2</sub> flux</h2>
 </div>
 </div>
 <div id="old-schript-parts" class="section level1">
