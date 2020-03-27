@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9118b70d2f47849ea02ad8df2e412e1edc5ad86btargetblank9118b70a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/9118b70d2f47849ea02ad8df2e412e1edc5ad86b" target="_blank">9118b70</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree858e01f5776c965dd20f7ae6008da2b269bcf128targetblank858e01fa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/858e01f5776c965dd20f7ae6008da2b269bcf128" target="_blank">858e01f</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9118b70d2f47849ea02ad8df2e412e1edc5ad86btargetblank9118b70a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree858e01f5776c965dd20f7ae6008da2b269bcf128targetblank858e01fa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -1848,28 +1848,19 @@ ts_og %&gt;%
 <div id="ict-correction" class="section level3">
 <h3><span class="header-section-number">7.1.7</span> iC<sub>T</sub> correction</h3>
 <p>The cumulative iC<sub>T</sub> time series obtained through integration across the upper 10m of the water column was used for further calculations of NCP.</p>
-<pre class="r"><code>iCT_10 &lt;- iCT_fixed_dep %&gt;% 
-  filter(dep_i == 10, sign==&quot;total&quot;) %&gt;% 
-  select(-c(sign, dep_i))
-
-rm(iCT_fixed_dep)
-
-iCT_10 %&gt;% 
-  arrange(date_time_ID) %&gt;% 
-  ggplot()+
-  geom_hline(yintercept = 0)+
-  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
-  geom_line(aes(date_time_ID, CT_i_cum, col=&quot;iCT observed&quot;))+
-  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
-  labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/iCT_fix_10-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Correction of iC<sub>T</sub> for air-sea CO<sub>2</sub> fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014).</p>
 <p>To derive an integrated NCP estimated, the observed change in iC<sub>T</sub> must be corrected for the air-sea flux of CO<sub>2</sub>. iC<sub>T</sub> was determined for the upper 10m of the water column. The MLD was always shallower 10m, except for the last cruise day. Therefore:</p>
 <ul>
 <li>Cumulative air-sea fluxes can be added completely to iC<sub>T</sub> before Aug 7.</li>
 <li>Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO<sub>2</sub> flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD.</li>
 </ul>
-<pre class="r"><code>iCT_10_flux &lt;- iCT_10 %&gt;%
+<pre class="r"><code>iCT_10 &lt;- iCT_fixed_dep %&gt;% 
+  filter(dep_i == 10, sign==&quot;total&quot;) %&gt;% 
+  select(-c(sign, dep_i))
+
+rm(iCT_fixed_dep)
+
+iCT_10_flux &lt;- iCT_10 %&gt;%
   select(date_time = date_time_ID, CT_i_cum)
 
 date_180806 &lt;- unique(iCT_10_flux$date_time)[7]
