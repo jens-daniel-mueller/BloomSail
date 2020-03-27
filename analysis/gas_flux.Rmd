@@ -39,7 +39,7 @@ The cruise mean pCO~2~ recorded in profiling-mode (stations only) and depths < 3
 ```{r read_Tina-V_Sensor_data}
 
 water <-
-  read_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_CT.csv"))
+  read_csv(here::here("Data/_merged_data_files", "ts_profiles_CT.csv"))
 
 water <- water %>% 
   filter(dep < 3) %>% 

@@ -21,12 +21,12 @@ knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 library(tidyverse)
 library(patchwork)
 library(seacarb)
+library(marelac)
 library(metR)
 library(scico)
-# library(cmocean)
-# library(broom)
-# library(lubridate)
-# library(tibbletime)
+library(lubridate)
+library(zoo)
+
 ```
 
 ```{r ggplot_theme, include = FALSE}
@@ -1136,7 +1136,7 @@ rm(iCT, iCT_MLD)
 
 In order to derive an estimate of the net community production NCP (which is equivalent to the formed organic matter that can be exported from the investigated surface layer), two steps are required:
 
-- decision about the most appropiate iCT trajectory
+- decision about the most appropiate iC~T~ trajectory
 - correction of quantifyable CO~2~ fluxes in and out of the investigated water volume during the period of interest, this includes:
   - Air-sea CO~2~ fluxes
   - CO~2~ fluxes due to vertical mixing
@@ -1144,13 +1144,13 @@ In order to derive an estimate of the net community production NCP (which is equ
 
 # Best iC~T~ estimate
 
-The cummulative iC~T~ trajectory determined by integration of CT to a fixed water depth of 10 m was used for NCP calculation for the following reasons:
+The cummulative iC~T~ trajectory determined by integration of C~T~ to a fixed water depth of 10 m was used for NCP calculation for the following reasons:
 
 - During the first productivity pulse that lasted until July 23:
-  - >90% of iCT changes were located within the upper 10m
-  - no positive iCT changes were located within the upper 10m
-- Deeper (fixed() layers were affected by iCT changes
-- MLD were too shallow to cover all observed negative CT changes
+  - more than 90% of iC~T~ changes were located within the upper 10m
+  - no positive iC~T~ changes were located within the upper 10m
+- Deeper (fixed() layers were affected by iC~T~ changes
+- MLD were too shallow to cover all observed negative C~T~ changes
   
 
 ```{r iCT_depth_distribution_180723}
@@ -1203,15 +1203,216 @@ rm(ts_profiles_ID_long_180723,
 
 ## Air-Sea CO~2~ flux
 
+
+### pCO~2~ water
+
+The cruise mean pCO~2~ recorded in profiling-mode (stations only) and depths < 3m was used for gas exchange calcualtions.
+
+```{r read_Tina-V_Sensor_data}
+
+ts_profiles_surface <- ts_profiles %>% 
+  filter(dep < 3) %>% 
+  select(date_time_ID, ID, tem, pCO2_water = pCO2)
+
+ts_profiles_surface_ID <- ts_profiles_surface %>% 
+  group_by(ID) %>% 
+  summarise_all(mean) %>% 
+  ungroup() %>% 
+  select(-ID, date_time = date_time_ID)
+
+ts_profiles_surface_ID %>% 
+  ggplot(aes(date_time, pCO2_water, col="Cruise mean"))+
+  geom_point(data=ts_profiles_surface,
+             aes(date_time_ID, pCO2_water, col="observed"))+
+  geom_path()+
+  geom_point()+
+  scale_color_brewer(palette = "Set1", name="")+
+  theme(axis.title.x = element_blank())
+
+#rm(ts_profiles_surface)
+
+start <- min(ts_profiles_surface_ID$date_time)
+end   <- max(ts_profiles_surface_ID$date_time)
+
+```
+
+### Wind and atm. pCO~2~
+
+Metrological data were recorded on the flux tower located on Ostergarnsholm island.
+
+```{r read_wind_Ostergarn_tower}
+
+og <- read_delim(here::here("Data/Ostergarnsholm/Tower", "Oes_Jens_atm_water_June_to_August_2018.csv"),
+                 delim = ";"               )
+
+og <- og %>%
+  mutate(date_time = ymd_hms( paste(paste(year, month, day, sep = "/"),
+                                          paste(hour, min, sec, sep = ":")))) %>% 
+  select("date_time",
+         "CO2 12m [ppm]",
+         "w_c [ppm m/s]",
+         "WS 12m [m/s]",
+         "WD 12m [degrees]",
+         "T 12m [degrees C]",
+         "RIS [W/m^2]"
+         ) %>% 
+  filter(date_time > start,
+         date_time < end)
+
+rm(end, start)
+
+og <- og %>% 
+  mutate(freq = "30 min") %>% 
+  select(date_time, freq, pCO2_atm = "CO2 12m [ppm]", wind = "WS 12m [m/s]")
+
+
+```
+
+### Time series plots
+
+Data sets for atmospheric and seawater observations were merged and interpolated to a common time stamp.
+
+```{r join_interpolate_wind_water_data}
+
+ts_og <- full_join(og, ts_profiles_surface_ID) %>% 
+  arrange(date_time)
+
+ts_og <- ts_og %>% 
+  mutate(pCO2_water = na.approx(pCO2_water, rule = 2),
+         tem = na.approx(tem, rule = 2),
+         wind = na.approx(wind, rule = 2)) %>% 
+  filter(!is.na(pCO2_atm))
+
+ts_og_daily <- ts_og %>% 
+  mutate(day = yday(date_time)) %>% 
+  group_by(day) %>% 
+  summarise_all(mean, na.rm = TRUE) %>% 
+  ungroup() %>% 
+  select(-day) %>% 
+  mutate(freq = "daily")
+
+ts_og <- bind_rows(ts_og, ts_og_daily)
+
+rm(ts_profiles_surface, ts_profiles_surface_ID, og, ts_og_daily)
+
+
+```
+
+
+```{r plot_wind_Ostergarn_tower}
+
+ts_og_long <- ts_og %>% 
+  gather("parameter", "value", 3:6)
+
+ts_og_long %>% 
+  ggplot(aes(date_time, value, col=freq))+
+  geom_line()+
+  facet_grid(parameter~., scales = "free_y")+
+  scale_color_brewer(palette = "Set1", direction = -1)+
+  theme(axis.title.x = element_blank())
+
+```
+
+### Flux calculation
+
+F = k * dCO2
+
+with
+
+dCO2 = K0 * dpCO2 and 
+
+k = coeff * U^2 * (660/Sc)^0.5
+
+
+Units used here are:
+
+- dpCO~2~: µatm
+- K0: mol atm-1 kg-1
+- dCO~2~: µmol kg-1
+
+- wind speed U: m s-1
+
+- coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2 
+- gas transfer velocities k: cm hr-1 (= 60*60*100 m s-1)
+
+- air sea CO~2~ flux F: mol m–2 d–1
+
+- conversion between the unit of k * dCO2 and F requires a factor of 10-5 * 24
+
+```{r gas_exchange_calc}
+
+Sc_W14 <- function(tem) {
+  2116.8 - 136.25 * tem + 4.7353 * tem^2 - 0.092307 * tem^3 + 0.0007555 * tem^4
+}
+
+Sc_W14(20)
+
+ts_og <- ts_og %>% 
+  mutate(dpCO2 = pCO2_water - pCO2_atm,
+         dCO2  = dpCO2 * K0(S=6.92, T=tem),
+         W92 = gas_transfer(t = tem, u10 = wind, species = "CO2",
+                              method = "Wanninkhof1")* 60^2 * 100,
+         #k_SM18 = 0.24 * wind^2 * ((1943-119.6*tem + 3.488*tem^2 - 0.0417*tem^3) / 660)^(-0.5),
+         W14 = 0.251 * wind^2 * (Sc_W14(tem)/660)^(-0.5)) %>% 
+  pivot_longer(9:10, names_to = "k_para", values_to = "k_value")
+
+# calculate flux F [mol m–2 d–1]
+
+ts_og <- ts_og %>% 
+  mutate(flux_daily = k_value*dCO2*1e-5*24) 
+
+rm(Sc_W14)
+
+```
+
+### Daily fluxes
+
+```{r flux_air_sea_daily_CO2}
+
+ts_og %>% 
+  ggplot(aes(date_time, flux_daily, col=k_para))+
+  geom_line()+
+  labs(y="F (mol m-2 d-1)")+
+  scale_color_brewer(palette = "Set1")+
+  facet_wrap(~freq)+
+  theme(axis.title.x = element_blank())
+
+
+```
+
+### Cumulative Fluxes
+
+```{r flux_air_sea_cumulative_CO2}
+# scale flux to time interval
+
+ts_og <- ts_og %>% 
+  mutate(scale = if_else(freq == "daily", 1, 24*2)) %>% 
+  mutate(flux_scale = flux_daily / scale) %>% 
+  group_by(freq, k_para) %>% 
+  arrange(date_time) %>% 
+  mutate(flux_cum = cumsum(flux_scale)) %>% 
+  ungroup()
+
+ts_og %>% 
+  ggplot(aes(date_time, flux_cum, col=k_para, linetype=freq))+
+  geom_line()+
+  labs(y="F (mol m-2)")+
+  scale_color_brewer(palette = "Set1")+
+  theme(axis.title.x = element_blank())
+
+```
+
+### iC~T~ correction
+
 ```{r iCT_fix_10}
 
-iCT <- iCT_fixed_dep %>% 
+iCT_10 <- iCT_fixed_dep %>% 
   filter(dep_i == 10, sign=="total") %>% 
   select(-c(sign, dep_i))
 
 rm(iCT_fixed_dep)
 
-iCT %>% 
+iCT_10 %>% 
   arrange(date_time_ID) %>% 
   ggplot()+
   geom_hline(yintercept = 0)+
@@ -1222,6 +1423,10 @@ iCT %>%
 
 ```
 
+To derive an integrated NCP estimated, the observed change in iC~T~ must be corrected for the air-sea flux of CO~2~. iC~T~ was determined for the upper 10m of the water column. The MLD was always shallower 10m, except for the last cruise day. Therefore:
+
+- Cumulative air-sea fluxes can be added completely to iC~T~ before Aug 7.
+- Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO~2~ flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD. 
 
 
 
