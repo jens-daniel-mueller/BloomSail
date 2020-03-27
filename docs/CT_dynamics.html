@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreed17a2b06c2430db13cd486c9ce2d483c3d463fbdtargetblankd17a2b0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/d17a2b06c2430db13cd486c9ce2d483c3d463fbd" target="_blank">d17a2b0</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9118b70d2f47849ea02ad8df2e412e1edc5ad86btargetblank9118b70a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/9118b70d2f47849ea02ad8df2e412e1edc5ad86b" target="_blank">9118b70</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreed17a2b06c2430db13cd486c9ce2d483c3d463fbdtargetblankd17a2b0a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9118b70d2f47849ea02ad8df2e412e1edc5ad86btargetblank9118b70a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -1796,9 +1796,9 @@ ts_og_long %&gt;%
   2116.8 - 136.25 * tem + 4.7353 * tem^2 - 0.092307 * tem^3 + 0.0007555 * tem^4
 }
 
-Sc_W14(20)</code></pre>
-<pre><code>[1] 668.344</code></pre>
-<pre class="r"><code>ts_og &lt;- ts_og %&gt;% 
+# Sc_W14(20)
+
+ts_og &lt;- ts_og %&gt;% 
   mutate(dpCO2 = pCO2_water - pCO2_atm,
          dCO2  = dpCO2 * K0(S=6.92, T=tem),
          W92 = gas_transfer(t = tem, u10 = wind, species = &quot;CO2&quot;,
@@ -1847,6 +1847,7 @@ ts_og %&gt;%
 </div>
 <div id="ict-correction" class="section level3">
 <h3><span class="header-section-number">7.1.7</span> iC<sub>T</sub> correction</h3>
+<p>The cumulative iC<sub>T</sub> time series obtained through integration across the upper 10m of the water column was used for further calculations of NCP.</p>
 <pre class="r"><code>iCT_10 &lt;- iCT_fixed_dep %&gt;% 
   filter(dep_i == 10, sign==&quot;total&quot;) %&gt;% 
   select(-c(sign, dep_i))
@@ -1862,11 +1863,51 @@ iCT_10 %&gt;%
   scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
   labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/iCT_fix_10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Correction of iC<sub>T</sub> for air-sea CO<sub>2</sub> fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014).</p>
 <p>To derive an integrated NCP estimated, the observed change in iC<sub>T</sub> must be corrected for the air-sea flux of CO<sub>2</sub>. iC<sub>T</sub> was determined for the upper 10m of the water column. The MLD was always shallower 10m, except for the last cruise day. Therefore:</p>
 <ul>
 <li>Cumulative air-sea fluxes can be added completely to iC<sub>T</sub> before Aug 7.</li>
 <li>Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO<sub>2</sub> flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD.</li>
 </ul>
+<pre class="r"><code>iCT_10_flux &lt;- iCT_10 %&gt;%
+  select(date_time = date_time_ID, CT_i_cum)
+
+date_180806 &lt;- unique(iCT_10_flux$date_time)[7]
+
+ts_og_flux &lt;- ts_og %&gt;% 
+  mutate(flux_scale = if_else(date_time &gt; date_180806,
+                              10/17 * flux_scale,
+                              flux_scale)) %&gt;% 
+  group_by(freq, k_para) %&gt;% 
+  arrange(date_time) %&gt;% 
+  mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
+  ungroup() %&gt;% 
+  filter(k_para == &quot;W14&quot;, freq ==&quot;30 min&quot;) %&gt;% 
+  select(date_time, flux_cum)
+
+iCT_10_flux &lt;- full_join(iCT_10_flux, ts_og_flux) %&gt;% 
+  arrange(date_time)
+
+rm(ts_og_flux)
+
+iCT_10_flux &lt;- iCT_10_flux %&gt;% 
+  mutate(CT_i_cum = na.approx(CT_i_cum, rule = 2),
+         flux_cum = na.approx(flux_cum, rule = 2),
+         CT_i_cum_total = CT_i_cum + flux_cum)
+  
+iCT_10_flux %&gt;% 
+  arrange(date_time) %&gt;% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_line(aes(date_time, CT_i_cum, col=&quot;observed&quot;))+
+  geom_line(aes(date_time, CT_i_cum_total, col=&quot;flux corrected&quot;))+
+  geom_ribbon(aes(date_time, ymin = CT_i_cum, ymax = CT_i_cum_total,
+                  fill=&quot;Air-sea flux&quot;), alpha=0.2)+
+  scale_fill_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
+  labs(y=&quot;integrated, cumulative CT [mol/m2]&quot;)+
+  theme(axis.title.x = element_blank())</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/iCT_correction-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 </div>
