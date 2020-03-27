@@ -444,7 +444,7 @@ div.section {
 
 <h1 class="title toc-ignore">CT dynamics</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">26 March, 2020</h4>
+<h4 class="date">27 March, 2020</h4>
 
 </div>
 
@@ -469,7 +469,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-03-26
+<strong>Last updated:</strong> 2020-03-27
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -560,10 +560,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree6afdea92f2343ffc0fbe807140fd231c72a9cd2ctargetblank6afdea9a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/6afdea92f2343ffc0fbe807140fd231c72a9cd2c" target="_blank">6afdea9</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreed17a2b06c2430db13cd486c9ce2d483c3d463fbdtargetblankd17a2b0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/d17a2b06c2430db13cd486c9ce2d483c3d463fbd" target="_blank">d17a2b0</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree6afdea92f2343ffc0fbe807140fd231c72a9cd2ctargetblank6afdea9a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreed17a2b06c2430db13cd486c9ce2d483c3d463fbdtargetblankd17a2b0a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -601,12 +601,11 @@ There are no past versions. Publish this analysis with <code>wflow_publish()</co
 <pre class="r"><code>library(tidyverse)
 library(patchwork)
 library(seacarb)
+library(marelac)
 library(metR)
 library(scico)
-# library(cmocean)
-# library(broom)
-# library(lubridate)
-# library(tibbletime)</code></pre>
+library(lubridate)
+library(zoo)</code></pre>
 <div id="sensor-data" class="section level1">
 <h1><span class="header-section-number">1</span> Sensor data</h1>
 <p>Profile data are prepared by:</p>
@@ -1623,7 +1622,7 @@ iCT %&gt;%
 <h1><span class="header-section-number">6</span> NCP determination</h1>
 <p>In order to derive an estimate of the net community production NCP (which is equivalent to the formed organic matter that can be exported from the investigated surface layer), two steps are required:</p>
 <ul>
-<li>decision about the most appropiate iCT trajectory</li>
+<li>decision about the most appropiate iC<sub>T</sub> trajectory</li>
 <li>correction of quantifyable CO<sub>2</sub> fluxes in and out of the investigated water volume during the period of interest, this includes:
 <ul>
 <li>Air-sea CO<sub>2</sub> fluxes</li>
@@ -1634,17 +1633,15 @@ iCT %&gt;%
 </div>
 <div id="best-ict-estimate" class="section level1">
 <h1><span class="header-section-number">7</span> Best iC<sub>T</sub> estimate</h1>
-<p>The cummulative iC<sub>T</sub> trajectory determined by integration of CT to a fixed water depth of 10 m was used for NCP calculation for the following reasons:</p>
+<p>The cummulative iC<sub>T</sub> trajectory determined by integration of C<sub>T</sub> to a fixed water depth of 10 m was used for NCP calculation for the following reasons:</p>
 <ul>
 <li>During the first productivity pulse that lasted until July 23:
 <ul>
-<li><blockquote>
-<p>90% of iCT changes were located within the upper 10m</p>
-</blockquote></li>
-<li>no positive iCT changes were located within the upper 10m</li>
+<li>more than 90% of iC<sub>T</sub> changes were located within the upper 10m</li>
+<li>no positive iC<sub>T</sub> changes were located within the upper 10m</li>
 </ul></li>
-<li>Deeper (fixed() layers were affected by iCT changes</li>
-<li>MLD were too shallow to cover all observed negative CT changes</li>
+<li>Deeper (fixed() layers were affected by iC<sub>T</sub> changes</li>
+<li>MLD were too shallow to cover all observed negative C<sub>T</sub> changes</li>
 </ul>
 <pre class="r"><code>ts_profiles_ID_long_180723 &lt;- ts_profiles_ID_long %&gt;% 
   filter(ID == 180723,
@@ -1691,13 +1688,172 @@ p_ts_profiles_ID_long + p_ts_profiles_ID_long_rel</code></pre>
    p_ts_profiles_ID_long_rel)</code></pre>
 <div id="air-sea-co2-flux" class="section level2">
 <h2><span class="header-section-number">7.1</span> Air-Sea CO<sub>2</sub> flux</h2>
-<pre class="r"><code>iCT &lt;- iCT_fixed_dep %&gt;% 
+<div id="pco2-water" class="section level3">
+<h3><span class="header-section-number">7.1.1</span> pCO<sub>2</sub> water</h3>
+<p>The cruise mean pCO<sub>2</sub> recorded in profiling-mode (stations only) and depths &lt; 3m was used for gas exchange calcualtions.</p>
+<pre class="r"><code>ts_profiles_surface &lt;- ts_profiles %&gt;% 
+  filter(dep &lt; 3) %&gt;% 
+  select(date_time_ID, ID, tem, pCO2_water = pCO2)
+
+ts_profiles_surface_ID &lt;- ts_profiles_surface %&gt;% 
+  group_by(ID) %&gt;% 
+  summarise_all(mean) %&gt;% 
+  ungroup() %&gt;% 
+  select(-ID, date_time = date_time_ID)
+
+ts_profiles_surface_ID %&gt;% 
+  ggplot(aes(date_time, pCO2_water, col=&quot;Cruise mean&quot;))+
+  geom_point(data=ts_profiles_surface,
+             aes(date_time_ID, pCO2_water, col=&quot;observed&quot;))+
+  geom_path()+
+  geom_point()+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
+  theme(axis.title.x = element_blank())</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/read_Tina-V_Sensor_data-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#rm(ts_profiles_surface)
+
+start &lt;- min(ts_profiles_surface_ID$date_time)
+end   &lt;- max(ts_profiles_surface_ID$date_time)</code></pre>
+</div>
+<div id="wind-and-atm.-pco2" class="section level3">
+<h3><span class="header-section-number">7.1.2</span> Wind and atm. pCO<sub>2</sub></h3>
+<p>Metrological data were recorded on the flux tower located on Ostergarnsholm island.</p>
+<pre class="r"><code>og &lt;- read_delim(here::here(&quot;Data/Ostergarnsholm/Tower&quot;, &quot;Oes_Jens_atm_water_June_to_August_2018.csv&quot;),
+                 delim = &quot;;&quot;               )
+
+og &lt;- og %&gt;%
+  mutate(date_time = ymd_hms( paste(paste(year, month, day, sep = &quot;/&quot;),
+                                          paste(hour, min, sec, sep = &quot;:&quot;)))) %&gt;% 
+  select(&quot;date_time&quot;,
+         &quot;CO2 12m [ppm]&quot;,
+         &quot;w_c [ppm m/s]&quot;,
+         &quot;WS 12m [m/s]&quot;,
+         &quot;WD 12m [degrees]&quot;,
+         &quot;T 12m [degrees C]&quot;,
+         &quot;RIS [W/m^2]&quot;
+         ) %&gt;% 
+  filter(date_time &gt; start,
+         date_time &lt; end)
+
+rm(end, start)
+
+og &lt;- og %&gt;% 
+  mutate(freq = &quot;30 min&quot;) %&gt;% 
+  select(date_time, freq, pCO2_atm = &quot;CO2 12m [ppm]&quot;, wind = &quot;WS 12m [m/s]&quot;)</code></pre>
+</div>
+<div id="time-series-plots" class="section level3">
+<h3><span class="header-section-number">7.1.3</span> Time series plots</h3>
+<p>Data sets for atmospheric and seawater observations were merged and interpolated to a common time stamp.</p>
+<pre class="r"><code>ts_og &lt;- full_join(og, ts_profiles_surface_ID) %&gt;% 
+  arrange(date_time)
+
+ts_og &lt;- ts_og %&gt;% 
+  mutate(pCO2_water = na.approx(pCO2_water, rule = 2),
+         tem = na.approx(tem, rule = 2),
+         wind = na.approx(wind, rule = 2)) %&gt;% 
+  filter(!is.na(pCO2_atm))
+
+ts_og_daily &lt;- ts_og %&gt;% 
+  mutate(day = yday(date_time)) %&gt;% 
+  group_by(day) %&gt;% 
+  summarise_all(mean, na.rm = TRUE) %&gt;% 
+  ungroup() %&gt;% 
+  select(-day) %&gt;% 
+  mutate(freq = &quot;daily&quot;)
+
+ts_og &lt;- bind_rows(ts_og, ts_og_daily)
+
+rm(ts_profiles_surface, ts_profiles_surface_ID, og, ts_og_daily)</code></pre>
+<pre class="r"><code>ts_og_long &lt;- ts_og %&gt;% 
+  gather(&quot;parameter&quot;, &quot;value&quot;, 3:6)
+
+ts_og_long %&gt;% 
+  ggplot(aes(date_time, value, col=freq))+
+  geom_line()+
+  facet_grid(parameter~., scales = &quot;free_y&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;, direction = -1)+
+  theme(axis.title.x = element_blank())</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/plot_wind_Ostergarn_tower-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="flux-calculation" class="section level3">
+<h3><span class="header-section-number">7.1.4</span> Flux calculation</h3>
+<p>F = k * dCO2</p>
+<p>with</p>
+<p>dCO2 = K0 * dpCO2 and</p>
+<p>k = coeff * U^2 * (660/Sc)^0.5</p>
+<p>Units used here are:</p>
+<ul>
+<li>dpCO<sub>2</sub>: µatm</li>
+<li>K0: mol atm-1 kg-1</li>
+<li><p>dCO<sub>2</sub>: µmol kg-1</p></li>
+<li><p>wind speed U: m s-1</p></li>
+<li>coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2</li>
+<li><p>gas transfer velocities k: cm hr-1 (= 60<em>60</em>100 m s-1)</p></li>
+<li><p>air sea CO<sub>2</sub> flux F: mol m–2 d–1</p></li>
+<li><p>conversion between the unit of k * dCO2 and F requires a factor of 10-5 * 24</p></li>
+</ul>
+<pre class="r"><code>Sc_W14 &lt;- function(tem) {
+  2116.8 - 136.25 * tem + 4.7353 * tem^2 - 0.092307 * tem^3 + 0.0007555 * tem^4
+}
+
+Sc_W14(20)</code></pre>
+<pre><code>[1] 668.344</code></pre>
+<pre class="r"><code>ts_og &lt;- ts_og %&gt;% 
+  mutate(dpCO2 = pCO2_water - pCO2_atm,
+         dCO2  = dpCO2 * K0(S=6.92, T=tem),
+         W92 = gas_transfer(t = tem, u10 = wind, species = &quot;CO2&quot;,
+                              method = &quot;Wanninkhof1&quot;)* 60^2 * 100,
+         #k_SM18 = 0.24 * wind^2 * ((1943-119.6*tem + 3.488*tem^2 - 0.0417*tem^3) / 660)^(-0.5),
+         W14 = 0.251 * wind^2 * (Sc_W14(tem)/660)^(-0.5)) %&gt;% 
+  pivot_longer(9:10, names_to = &quot;k_para&quot;, values_to = &quot;k_value&quot;)
+
+# calculate flux F [mol m–2 d–1]
+
+ts_og &lt;- ts_og %&gt;% 
+  mutate(flux_daily = k_value*dCO2*1e-5*24) 
+
+rm(Sc_W14)</code></pre>
+</div>
+<div id="daily-fluxes" class="section level3">
+<h3><span class="header-section-number">7.1.5</span> Daily fluxes</h3>
+<pre class="r"><code>ts_og %&gt;% 
+  ggplot(aes(date_time, flux_daily, col=k_para))+
+  geom_line()+
+  labs(y=&quot;F (mol m-2 d-1)&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;)+
+  facet_wrap(~freq)+
+  theme(axis.title.x = element_blank())</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/flux_air_sea_daily_CO2-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cumulative-fluxes" class="section level3">
+<h3><span class="header-section-number">7.1.6</span> Cumulative Fluxes</h3>
+<pre class="r"><code># scale flux to time interval
+
+ts_og &lt;- ts_og %&gt;% 
+  mutate(scale = if_else(freq == &quot;daily&quot;, 1, 24*2)) %&gt;% 
+  mutate(flux_scale = flux_daily / scale) %&gt;% 
+  group_by(freq, k_para) %&gt;% 
+  arrange(date_time) %&gt;% 
+  mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
+  ungroup()
+
+ts_og %&gt;% 
+  ggplot(aes(date_time, flux_cum, col=k_para, linetype=freq))+
+  geom_line()+
+  labs(y=&quot;F (mol m-2)&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;)+
+  theme(axis.title.x = element_blank())</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/flux_air_sea_cumulative_CO2-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="ict-correction" class="section level3">
+<h3><span class="header-section-number">7.1.7</span> iC<sub>T</sub> correction</h3>
+<pre class="r"><code>iCT_10 &lt;- iCT_fixed_dep %&gt;% 
   filter(dep_i == 10, sign==&quot;total&quot;) %&gt;% 
   select(-c(sign, dep_i))
 
 rm(iCT_fixed_dep)
 
-iCT %&gt;% 
+iCT_10 %&gt;% 
   arrange(date_time_ID) %&gt;% 
   ggplot()+
   geom_hline(yintercept = 0)+
@@ -1706,6 +1862,12 @@ iCT %&gt;%
   scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
   labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/iCT_fix_10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>To derive an integrated NCP estimated, the observed change in iC<sub>T</sub> must be corrected for the air-sea flux of CO<sub>2</sub>. iC<sub>T</sub> was determined for the upper 10m of the water column. The MLD was always shallower 10m, except for the last cruise day. Therefore:</p>
+<ul>
+<li>Cumulative air-sea fluxes can be added completely to iC<sub>T</sub> before Aug 7.</li>
+<li>Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO<sub>2</sub> flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD.</li>
+</ul>
+</div>
 </div>
 </div>
 <div id="nomenclature-of-objectes" class="section level1">
@@ -1809,39 +1971,40 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] scico_1.1.0     metR_0.5.0      seacarb_3.2.12  oce_1.2-0      
- [5] gsw_1.0-5       testthat_2.3.1  patchwork_1.0.0 forcats_0.4.0  
- [9] stringr_1.4.0   dplyr_0.8.3     purrr_0.3.3     readr_1.3.1    
-[13] tidyr_1.0.0     tibble_2.1.3    ggplot2_3.3.0   tidyverse_1.3.0
+ [1] zoo_1.8-6       lubridate_1.7.4 scico_1.1.0     metR_0.5.0     
+ [5] marelac_2.1.9   shape_1.4.4     seacarb_3.2.12  oce_1.2-0      
+ [9] gsw_1.0-5       testthat_2.3.1  patchwork_1.0.0 forcats_0.4.0  
+[13] stringr_1.4.0   dplyr_0.8.3     purrr_0.3.3     readr_1.3.1    
+[17] tidyr_1.0.0     tibble_2.1.3    ggplot2_3.3.0   tidyverse_1.3.0
 
 loaded via a namespace (and not attached):
  [1] nlme_3.1-137         bitops_1.0-6         fs_1.3.1            
- [4] lubridate_1.7.4      RColorBrewer_1.1-2   httr_1.4.1          
- [7] rprojroot_1.3-2      tools_3.5.0          backports_1.1.5     
-[10] R6_2.4.0             DBI_1.0.0            colorspace_1.4-1    
-[13] withr_2.1.2          sp_1.3-2             tidyselect_0.2.5    
-[16] gridExtra_2.3        compiler_3.5.0       git2r_0.26.1        
-[19] cli_1.1.0            rvest_0.3.5          xml2_1.2.2          
-[22] labeling_0.3         scales_1.0.0         checkmate_1.9.4     
-[25] digest_0.6.22        foreign_0.8-70       rmarkdown_2.0       
-[28] pkgconfig_2.0.3      htmltools_0.4.0      dbplyr_1.4.2        
-[31] highr_0.8            maps_3.3.0           rlang_0.4.5         
-[34] readxl_1.3.1         rstudioapi_0.10      generics_0.0.2      
-[37] jsonlite_1.6         RCurl_1.95-4.12      magrittr_1.5        
-[40] Formula_1.2-3        dotCall64_1.0-0      Matrix_1.2-14       
-[43] Rcpp_1.0.2           munsell_0.5.0        lifecycle_0.1.0     
-[46] stringi_1.4.3        yaml_2.2.0           plyr_1.8.4          
-[49] grid_3.5.0           maptools_0.9-8       formula.tools_1.7.1 
-[52] promises_1.1.0       crayon_1.3.4         lattice_0.20-35     
-[55] haven_2.2.0          hms_0.5.2            zeallot_0.1.0       
-[58] knitr_1.26           pillar_1.4.2         reprex_0.3.0        
-[61] glue_1.3.1           evaluate_0.14        data.table_1.12.6   
-[64] modelr_0.1.5         operator.tools_1.6.3 vctrs_0.2.0         
-[67] spam_2.3-0.2         httpuv_1.5.2         cellranger_1.1.0    
-[70] gtable_0.3.0         assertthat_0.2.1     xfun_0.10           
-[73] broom_0.5.3          later_1.0.0          viridisLite_0.3.0   
-[76] memoise_1.1.0        fields_9.9           workflowr_1.6.0     
-[79] ellipsis_0.3.0       here_0.1            </code></pre>
+ [4] RColorBrewer_1.1-2   httr_1.4.1           rprojroot_1.3-2     
+ [7] tools_3.5.0          backports_1.1.5      R6_2.4.0            
+[10] DBI_1.0.0            colorspace_1.4-1     withr_2.1.2         
+[13] sp_1.3-2             tidyselect_0.2.5     gridExtra_2.3       
+[16] compiler_3.5.0       git2r_0.26.1         cli_1.1.0           
+[19] rvest_0.3.5          xml2_1.2.2           labeling_0.3        
+[22] scales_1.0.0         checkmate_1.9.4      digest_0.6.22       
+[25] foreign_0.8-70       rmarkdown_2.0        pkgconfig_2.0.3     
+[28] htmltools_0.4.0      highr_0.8            dbplyr_1.4.2        
+[31] maps_3.3.0           rlang_0.4.5          readxl_1.3.1        
+[34] rstudioapi_0.10      generics_0.0.2       jsonlite_1.6        
+[37] RCurl_1.95-4.12      magrittr_1.5         Formula_1.2-3       
+[40] dotCall64_1.0-0      Matrix_1.2-14        Rcpp_1.0.2          
+[43] munsell_0.5.0        lifecycle_0.1.0      stringi_1.4.3       
+[46] yaml_2.2.0           plyr_1.8.4           grid_3.5.0          
+[49] maptools_0.9-8       formula.tools_1.7.1  promises_1.1.0      
+[52] crayon_1.3.4         lattice_0.20-35      haven_2.2.0         
+[55] hms_0.5.2            zeallot_0.1.0        knitr_1.26          
+[58] pillar_1.4.2         reprex_0.3.0         glue_1.3.1          
+[61] evaluate_0.14        data.table_1.12.6    modelr_0.1.5        
+[64] operator.tools_1.6.3 vctrs_0.2.0          spam_2.3-0.2        
+[67] httpuv_1.5.2         cellranger_1.1.0     gtable_0.3.0        
+[70] assertthat_0.2.1     xfun_0.10            broom_0.5.3         
+[73] later_1.0.0          viridisLite_0.3.0    memoise_1.1.0       
+[76] fields_9.9           workflowr_1.6.0      ellipsis_0.3.0      
+[79] here_0.1            </code></pre>
 </div>
 </div>
 
