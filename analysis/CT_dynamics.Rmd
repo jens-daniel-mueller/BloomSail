@@ -1208,7 +1208,7 @@ rm(ts_profiles_ID_long_180723,
 
 The cruise mean pCO~2~ recorded in profiling-mode (stations only) and depths < 3m was used for gas exchange calcualtions.
 
-```{r read_Tina-V_Sensor_data}
+```{r read_Tina-V_Sensor_data, fig.asp=0.5}
 
 ts_profiles_surface <- ts_profiles %>% 
   filter(dep < 3) %>% 
@@ -1407,26 +1407,6 @@ ts_og %>%
 
 The cumulative iC~T~ time series obtained through integration across the upper 10m of the water column was used for further calculations of NCP.
 
-```{r iCT_fix_10}
-
-iCT_10 <- iCT_fixed_dep %>% 
-  filter(dep_i == 10, sign=="total") %>% 
-  select(-c(sign, dep_i))
-
-rm(iCT_fixed_dep)
-
-iCT_10 %>% 
-  arrange(date_time_ID) %>% 
-  ggplot()+
-  geom_hline(yintercept = 0)+
-  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
-  geom_line(aes(date_time_ID, CT_i_cum, col="iCT observed"))+
-  scale_color_brewer(palette = "Set1", name="")+
-  labs(y="iCT [mol/m2]", x="")
-
-```
-
-
 Correction of iC~T~ for air-sea CO~2~ fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014). 
 
 To derive an integrated NCP estimated, the observed change in iC~T~ must be corrected for the air-sea flux of CO~2~. iC~T~ was determined for the upper 10m of the water column. The MLD was always shallower 10m, except for the last cruise day. Therefore:
@@ -1434,7 +1414,14 @@ To derive an integrated NCP estimated, the observed change in iC~T~ must be corr
 - Cumulative air-sea fluxes can be added completely to iC~T~ before Aug 7.
 - Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO~2~ flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD. 
 
-```{r iCT_correction}
+```{r iCT_correction, fig.asp=0.7}
+
+
+iCT_10 <- iCT_fixed_dep %>% 
+  filter(dep_i == 10, sign=="total") %>% 
+  select(-c(sign, dep_i))
+
+rm(iCT_fixed_dep)
 
 iCT_10_flux <- iCT_10 %>%
   select(date_time = date_time_ID, CT_i_cum)
