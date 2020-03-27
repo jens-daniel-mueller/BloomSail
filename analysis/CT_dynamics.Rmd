@@ -1345,7 +1345,7 @@ Sc_W14 <- function(tem) {
   2116.8 - 136.25 * tem + 4.7353 * tem^2 - 0.092307 * tem^3 + 0.0007555 * tem^4
 }
 
-Sc_W14(20)
+# Sc_W14(20)
 
 ts_og <- ts_og %>% 
   mutate(dpCO2 = pCO2_water - pCO2_atm,
@@ -1367,7 +1367,7 @@ rm(Sc_W14)
 
 ### Daily fluxes
 
-```{r flux_air_sea_daily_CO2}
+```{r flux_air_sea_daily_CO2, fig.asp=0.3}
 
 ts_og %>% 
   ggplot(aes(date_time, flux_daily, col=k_para))+
@@ -1382,7 +1382,8 @@ ts_og %>%
 
 ### Cumulative Fluxes
 
-```{r flux_air_sea_cumulative_CO2}
+
+```{r flux_air_sea_cumulative_CO2, fig.asp=0.3}
 # scale flux to time interval
 
 ts_og <- ts_og %>% 
@@ -1404,6 +1405,8 @@ ts_og %>%
 
 ### iC~T~ correction
 
+The cumulative iC~T~ time series obtained through integration across the upper 10m of the water column was used for further calculations of NCP.
+
 ```{r iCT_fix_10}
 
 iCT_10 <- iCT_fixed_dep %>% 
@@ -1423,10 +1426,57 @@ iCT_10 %>%
 
 ```
 
+
+Correction of iC~T~ for air-sea CO~2~ fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014). 
+
 To derive an integrated NCP estimated, the observed change in iC~T~ must be corrected for the air-sea flux of CO~2~. iC~T~ was determined for the upper 10m of the water column. The MLD was always shallower 10m, except for the last cruise day. Therefore:
 
 - Cumulative air-sea fluxes can be added completely to iC~T~ before Aug 7.
 - Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO~2~ flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD. 
+
+```{r iCT_correction}
+
+iCT_10_flux <- iCT_10 %>%
+  select(date_time = date_time_ID, CT_i_cum)
+
+date_180806 <- unique(iCT_10_flux$date_time)[7]
+
+ts_og_flux <- ts_og %>% 
+  mutate(flux_scale = if_else(date_time > date_180806,
+                              10/17 * flux_scale,
+                              flux_scale)) %>% 
+  group_by(freq, k_para) %>% 
+  arrange(date_time) %>% 
+  mutate(flux_cum = cumsum(flux_scale)) %>% 
+  ungroup() %>% 
+  filter(k_para == "W14", freq =="30 min") %>% 
+  select(date_time, flux_cum)
+
+iCT_10_flux <- full_join(iCT_10_flux, ts_og_flux) %>% 
+  arrange(date_time)
+
+rm(ts_og_flux)
+
+iCT_10_flux <- iCT_10_flux %>% 
+  mutate(CT_i_cum = na.approx(CT_i_cum, rule = 2),
+         flux_cum = na.approx(flux_cum, rule = 2),
+         CT_i_cum_total = CT_i_cum + flux_cum)
+  
+iCT_10_flux %>% 
+  arrange(date_time) %>% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_line(aes(date_time, CT_i_cum, col="observed"))+
+  geom_line(aes(date_time, CT_i_cum_total, col="flux corrected"))+
+  geom_ribbon(aes(date_time, ymin = CT_i_cum, ymax = CT_i_cum_total,
+                  fill="Air-sea flux"), alpha=0.2)+
+  scale_fill_brewer(palette = "Set1", name="")+
+  scale_color_brewer(palette = "Set1", name="")+
+  labs(y="integrated, cumulative CT [mol/m2]")+
+  theme(axis.title.x = element_blank())
+
+
+```
 
 
 
