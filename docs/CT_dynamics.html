@@ -557,10 +557,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9edf20d32135ee888b86c770785c3696772d5fddtargetblank9edf20da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/9edf20d32135ee888b86c770785c3696772d5fdd" target="_blank">9edf20d</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee69d1f0afd490a2e3c0b8716dca249be812f9f13targetblanke69d1f0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/e69d1f0afd490a2e3c0b8716dca249be812f9f13" target="_blank">e69d1f0</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9edf20d32135ee888b86c770785c3696772d5fddtargetblank9edf20da" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee69d1f0afd490a2e3c0b8716dca249be812f9f13targetblanke69d1f0a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -678,10 +678,14 @@ rm(meta)
 # creating descriptive variables
 ts_profiles &lt;- ts_profiles %&gt;% 
   mutate(phase = &quot;standby&quot;,
-         phase = if_else(duration &gt;= start &amp; duration &lt; down &amp; !is.na(down) &amp; !is.na(start),   &quot;down&quot;, phase),
-         phase = if_else(duration &gt;= down  &amp; duration &lt; lift &amp; !is.na(lift) &amp; !is.na(down ),   &quot;low&quot;,  phase),
-         phase = if_else(duration &gt;= lift  &amp; duration &lt; up   &amp; !is.na(up  ) &amp; !is.na(lift  ),  &quot;mid&quot;,  phase),
-         phase = if_else(duration &gt;= up    &amp; duration &lt; end  &amp; !is.na(end ) &amp; !is.na(up   ),   &quot;up&quot;,   phase))
+         phase = if_else(duration &gt;= start &amp; duration &lt; down &amp; !is.na(down) &amp; !is.na(start),
+                         &quot;down&quot;, phase),
+         phase = if_else(duration &gt;= down  &amp; duration &lt; lift &amp; !is.na(lift) &amp; !is.na(down ),
+                         &quot;low&quot;,  phase),
+         phase = if_else(duration &gt;= lift  &amp; duration &lt; up   &amp; !is.na(up  ) &amp; !is.na(lift  ),
+                         &quot;mid&quot;,  phase),
+         phase = if_else(duration &gt;= up    &amp; duration &lt; end  &amp; !is.na(end ) &amp; !is.na(up   ),
+                         &quot;up&quot;,   phase))
 
 ts_profiles &lt;- ts_profiles %&gt;% 
   select(-c(start, down, lift, up, end, comment, p_type, duration))
@@ -900,7 +904,9 @@ sal_mean</code></pre>
           end = max(ts$date_time),
           AT = AT_mean,
           sal = sal_mean) %&gt;% 
-  write_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;tb_fix.csv&quot;))</code></pre>
+  write_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;tb_fix.csv&quot;))
+
+rm(tb, tb_surface)</code></pre>
 </div>
 </div>
 <div id="ct-profiles" class="section level1">
@@ -1164,9 +1170,6 @@ ts_profiles_ID_long %&gt;%
   mutate(value_cum_sign = cumsum(value_diff)) %&gt;% 
   ungroup()
 
-ts_profiles_ID_long %&gt;%
-  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum.csv&quot;))
-
 ts_profiles_ID_long %&gt;% 
   arrange(dep) %&gt;% 
   ggplot(aes(value_cum_sign, dep, col=ID))+
@@ -1179,6 +1182,8 @@ ts_profiles_ID_long %&gt;%
   facet_wrap(~interaction(sign, var), scales = &quot;free_x&quot;, ncol=4)+
   labs(x=&quot;Cumulative directional change of value&quot;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/cumulative_directional_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ts_profiles_ID_long %&gt;%
+  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum.csv&quot;))</code></pre>
 </div>
 </div>
 <div id="timeseries" class="section level1">
@@ -1473,10 +1478,12 @@ ts_profiles_ID_mean_hydro_long &lt;- ts_profiles_ID_mean_hydro %&gt;%
   pivot_longer(4:6, names_to = &quot;var&quot;, values_to = &quot;value&quot;)
   
 ts_profiles_ID_hydro_long &lt;- inner_join(ts_profiles_ID_mean_hydro_long, ts_profiles_ID_sd_hydro_long)
+ts_profiles_ID_hydro &lt;- ts_profiles_ID_mean_hydro
 
-rm(ts_profiles_ID_sd_hydro_long,
-   ts_profiles_ID_sd_hydro,
-   ts_profiles_ID_mean_hydro_long)
+rm(ts_profiles_ID_mean_hydro_long,
+   ts_profiles_ID_mean_hydro,
+   ts_profiles_ID_sd_hydro_long,
+   ts_profiles_ID_sd_hydro)
 
 ts_profiles_ID_hydro_long %&gt;% 
   ggplot(aes(value, dep, col=ID))+
@@ -1497,9 +1504,9 @@ Mean vertical profiles per cruise day across all stations.
 <p>Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria</p>
 <pre class="r"><code># density criterion
 
-ts_profiles_ID_mean_hydro &lt;- expand_grid(ts_profiles_ID_mean_hydro, rho_lim = c(0.1,0.2,0.5))
+ts_profiles_ID_hydro &lt;- expand_grid(ts_profiles_ID_hydro, rho_lim = c(0.1,0.2,0.5))
 
-MLD &lt;- ts_profiles_ID_mean_hydro  %&gt;% 
+MLD &lt;- ts_profiles_ID_hydro  %&gt;% 
   arrange(dep) %&gt;% 
   group_by(ID, date_time_ID, rho_lim) %&gt;% 
   mutate(d_rho = rho - first(rho)) %&gt;% 
@@ -1509,10 +1516,10 @@ MLD &lt;- ts_profiles_ID_mean_hydro  %&gt;%
 </div>
 <div id="daily-density-profiles" class="section level3">
 <h3><span class="header-section-number">5.2.4</span> Daily density profiles</h3>
-<pre class="r"><code>ts_profiles_ID_mean_hydro &lt;- 
-  full_join(ts_profiles_ID_mean_hydro, MLD)
+<pre class="r"><code>ts_profiles_ID_hydro &lt;- 
+  full_join(ts_profiles_ID_hydro, MLD)
 
-ts_profiles_ID_mean_hydro %&gt;% 
+ts_profiles_ID_hydro %&gt;% 
   arrange(dep) %&gt;% 
   ggplot(aes(rho, dep))+
   geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
@@ -1859,16 +1866,20 @@ ts_og %&gt;%
 <li>Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO2 flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD</li>
 </ul>
 <p>During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased CT values at 0-10 m and a decrease of CT in 10-17m. The loss of CT in 10-17m can be assumed to be entirely cause by mixing with low-CT surface water. Some CT loss is balanced through CT input attributable to the air-sea flux. Therefore, the observed loss, corrected for 7m/MLD-share of the air-sea-flux, was added to the integrated CT changes in 0-10m.</p>
-<pre class="r"><code># extract CT data for fixed depth approach
+<pre class="r"><code># extract CT data for fixed depth approach, depth limit 10m
 iCT_10 &lt;- iCT_fixed_dep %&gt;% 
   filter(dep_i == 10, sign==&quot;total&quot;) %&gt;% 
   select(-c(sign, dep_i))
 
+rm(iCT_fixed_dep)
+
 iCT_10 &lt;- iCT_10 %&gt;%
   select(ID, date_time = date_time_ID, date_time_ID_ref, CT_i_diff, CT_i_cum)
 
+# date of the second last cruise
 date_180806 &lt;- unique(iCT_10$date_time)[7]
 
+# calculate cumulative air-sea fluxes affecting 0-10m
 ts_og_flux &lt;- ts_og %&gt;% 
   mutate(flux_scale = if_else(date_time &gt; date_180806,
                               10/17 * flux_scale,
@@ -1880,6 +1891,7 @@ ts_og_flux &lt;- ts_og %&gt;%
   filter(k_para == &quot;W14&quot;, freq ==&quot;30 min&quot;) %&gt;% 
   select(date_time, flux_cum)
 
+# calculate cumulative air-sea fluxes affecting 10-17m
 ts_og_flux_dep &lt;- ts_og %&gt;% 
   filter(date_time &gt; date_180806) %&gt;% 
   mutate(flux_scale = 7/17 * flux_scale) %&gt;%
@@ -1893,13 +1905,16 @@ ts_og_flux_dep &lt;- ts_og %&gt;%
 iCT_10_flux &lt;- full_join(iCT_10, ts_og_flux) %&gt;% 
   arrange(date_time)
 
-rm(ts_og_flux, iCT_10)
+rm(ts_og_flux, iCT_10, ts_og_long, ts_og)
 
+
+# linear interpolation of cumulative changes to frequency of the flux estimates estimates 
 iCT_10_flux &lt;- iCT_10_flux %&gt;% 
   mutate(CT_i_cum = na.approx(CT_i_cum, rule = 2),
          flux_cum = na.approx(flux_cum, rule = 2),
          CT_i_flux_cum = CT_i_cum + flux_cum)
 
+# calculate cumulative fluxes inbetween cruises 
 iCT_10_flux_diff &lt;- iCT_10_flux %&gt;% 
   filter(!is.na(date_time_ID_ref)) %&gt;% 
   mutate(flux_diff = flux_cum - lag(flux_cum, default = 0)) %&gt;% 
@@ -1907,6 +1922,7 @@ iCT_10_flux_diff &lt;- iCT_10_flux %&gt;%
   pivot_longer(cols = 2:3, names_to = &quot;var&quot;, values_to = &quot;value_diff&quot;)
 
 
+# calculate mixing with deep waters, corrected for air sea fluxes
 iCT_10_mix &lt;- ts_profiles_ID_long %&gt;% 
   filter(ID == &quot;180815&quot;,
          var == &quot;CT&quot;,
@@ -1929,6 +1945,8 @@ iCT_10_flux_mix_diff &lt;-
 iCT_10_flux_mix &lt;-
   full_join(iCT_10_flux,
             iCT_10_mix %&gt;% rename(mix_cum = value_diff))
+
+rm(iCT_10_mix, iCT_10_mix_diff, iCT_10_flux, iCT_10_flux_diff, date_180806)
 
 iCT_10_flux_mix &lt;- iCT_10_flux_mix %&gt;% 
   arrange(date_time) %&gt;% 
@@ -1955,6 +1973,11 @@ iCT_10_flux_mix %&gt;%
   labs(y=&quot;integrated CT [mol/m2]&quot;)+
   theme(axis.title.x = element_blank())</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/iCT_correction-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>iCT_10_flux_mix %&gt;%
+  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_NCP_cum.csv&quot;))
+
+iCT_10_flux_mix_diff %&gt;%
+  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_NCP_inc.csv&quot;))</code></pre>
 </div>
 </div>
 <div id="nomenclature-of-objectes" class="section level1">
