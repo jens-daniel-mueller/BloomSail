@@ -1,0 +1,159 @@
+---
+title: "MLD"
+author: "Jens Daniel Müller"
+date:  "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  workflowr::wflow_html:
+    number_sections: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+editor_options:
+  chunk_output_type: console
+---
+
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
+
+```{r packages}
+library(tidyverse)
+library(seacarb)
+library(oce)
+library(marelac)
+library(patchwork)
+```
+
+
+```{r ggplot_theme, include = FALSE}
+theme_set(theme_bw())
+```
+
+# Approach
+
+In order to test how (and how well) the depth-integrated NCP estimates can be reproduced if only surface CO2 data were available, the BloomSail observations were restricted to those made in surface water and two reconstruction approaches were tested:
+
+1. Integration of surface observation across the MLD, assuming homogenious vertical patterns
+2. Vertical reconstruction of incremental CT changes based on profiles of incremental changes in temperature
+
+# Sensor data
+
+1m gridded, downcast profiles were used.
+
+```{r read_Tina-V_Sensor_data}
+
+ts_profiles_ID <-
+  read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum_MLD.csv"))
+
+ts_profiles_ID <- ts_profiles_ID %>% 
+  select(ID, date_time_ID, dep, CT = value, CT_diff = value_diff, CT_cum = value_cum, sign, rho_lim, MLD)
+
+ts_profiles_ID <- ts_profiles_ID %>% 
+  mutate(CT = if_else(dep == 3.5, CT, NaN),
+         rho_lim = as.factor(rho_lim))
+
+```
+
+
+# MLD approach
+
+MLD calculation was previously described in the [CT dynamics](https://jens-daniel-mueller.github.io/BloomSail/CT_dynamics.html) chapter.
+
+## Timeseries
+
+For comparison to MLD, the effective penetration depth of NCP, z~eff~, was calculated as the ratio of the inremental, depth-integrated change of C~T~, divided by the change in surface C~T~, for all cases where the change in surface C~T~ was negative.
+
+```{r NCP_penetration_depth}
+
+ts_profiles_ID_surface <- ts_profiles_ID %>% 
+  filter(sign=="neg",
+         rho_lim == "0.5",
+         dep == 3.5) %>% 
+  group_by(ID, date_time_ID) %>% 
+  summarise(CT_diff_surf = mean(CT_diff, na.rm = TRUE)) %>% 
+  ungroup()
+
+ts_profiles_ID_i <- ts_profiles_ID %>% 
+  filter(sign=="neg",
+         rho_lim == "0.5") %>% 
+  group_by(ID, date_time_ID) %>% 
+  summarise(CT_diff_i = sum(CT_diff, na.rm = TRUE))
+
+zeff <- inner_join(ts_profiles_ID_surface, ts_profiles_ID_i)
+rm(ts_profiles_ID_surface, ts_profiles_ID_i)
+
+zeff <- zeff %>% 
+  mutate(zeff = CT_diff_i / CT_diff_surf)
+
+```
+
+
+
+```{r MLD_time_series, fig.asp=0.4}
+
+ts_profiles_ID %>% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_line(data = zeff, aes(date_time_ID, zeff, linetype="zeff"))+
+  geom_line(aes(date_time_ID, MLD, col=rho_lim, linetype="MLD"))+
+  scale_y_reverse()+
+  scale_color_viridis_d(name="Rho limit")+
+  scale_linetype(name="Estimate")+
+  labs(y="Depth (m)")+
+  theme(axis.title.x = element_blank())
+
+rm(zeff)
+
+```
+
+## iC~T~ calculation
+
+Integrated C~T~ depletion was calculated as the product of observed incremental C~T~ changes in surface waters and the respective mixed layer depth. 
+
+```{r NCP_calculation, eval=FALSE}
+
+ts_profiles_ID_surface <- ts_profiles_ID %>% 
+  filter(dep==3.5) %>% 
+  group_by(rho_lim) %>% 
+  arrange(date_time_ID) %>% 
+  mutate(iCT_diff = CT_diff * MLD / 1000,
+         iCT_cum = cumsum(replace_na(iCT_diff, 0))) %>% 
+  ungroup()
+  
+```
+
+
+## Incremental and cumulative timeseries
+
+Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated.
+
+
+```{r plot_integrated_NCP_timeseries, fig.asp=1.5, eval=FALSE}
+
+p_iCT <- ts_profiles_ID_surface %>% 
+  ggplot(aes(date_time_ID, iCT_diff, fill= rho_lim))+
+  geom_hline(yintercept = 0)+
+  geom_col(col="black", position = "dodge")+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  scale_fill_viridis_d()+
+  labs(y="integrated CT changes [mol/m2]")+
+  theme(axis.title.x = element_blank())
+
+p_iCT_cum <- ts_profiles_ID_surface %>% 
+  ggplot(aes(date_time_ID,  iCT_cum, 
+             col=rho_lim))+
+  geom_line()+
+  geom_hline(yintercept = 0)+
+  scale_color_viridis_d()+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  theme(strip.background = element_blank(),
+        strip.text = element_blank())+
+  labs(y="integrated, cumulative CT changes [mol/m2]", x="date")
+
+
+(p_iCT / p_iCT_cum)+
+  plot_layout(guides = 'collect')
+
+rm(p_iCT, p_iCT_cum)
+```

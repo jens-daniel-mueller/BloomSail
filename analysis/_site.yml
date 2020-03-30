@@ -15,10 +15,8 @@ navbar:
     href: CT_dynamics.html
   - text: NCP reconstruction
     menu:
-    - text: BloomSail delta T approach
-      href: BloomSail_dT.html
-    - text: BloomSail MLD approach
-      href: BloomSail_MLD.html
+    - text: BloomSail surface observations
+      href: BloomSail_surface.html
     - text: Finnmaid + GETM
       href: Finnmaid+GETM.html
   right:

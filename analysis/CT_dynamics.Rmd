@@ -1071,6 +1071,9 @@ iCT <- ts_profiles_ID_long %>%
 
 iCT <- full_join(iCT, MLD)
 
+iCT %>%
+    write_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum_MLD.csv"))
+
 iCT <- iCT %>% 
   filter(dep <= MLD)
 
