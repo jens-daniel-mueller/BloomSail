@@ -111,7 +111,7 @@ rm(zeff)
 
 Integrated C~T~ depletion was calculated as the product of observed incremental C~T~ changes in surface waters and the respective mixed layer depth. 
 
-```{r NCP_calculation, eval=FALSE}
+```{r NCP_calculation}
 
 ts_profiles_ID_surface <- ts_profiles_ID %>% 
   filter(dep==3.5) %>% 
@@ -129,7 +129,7 @@ ts_profiles_ID_surface <- ts_profiles_ID %>%
 Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated.
 
 
-```{r plot_integrated_NCP_timeseries, fig.asp=1.5, eval=FALSE}
+```{r plot_integrated_NCP_timeseries, fig.asp=1.5}
 
 p_iCT <- ts_profiles_ID_surface %>% 
   ggplot(aes(date_time_ID, iCT_diff, fill= rho_lim))+
