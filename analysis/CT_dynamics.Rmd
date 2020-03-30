@@ -1403,16 +1403,19 @@ ts_og %>%
 
 ```
 
-### iC~T~ correction
+## iC~T~ correction
 
-The cumulative iC~T~ time series obtained through integration across the upper 10m of the water column was used for further calculations of NCP.
+The cumulative iCT time series obtained through integration across the upper 10m of the water column was used for further calculations of NCP.
 
-Correction of iC~T~ for air-sea CO~2~ fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014). 
+Correction of iCT for air-sea CO2 fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014).
 
-To derive an integrated NCP estimated, the observed change in iC~T~ must be corrected for the air-sea flux of CO~2~. iC~T~ was determined for the upper 10m of the water column. The MLD was always shallower 10m, except for the last cruise day. Therefore:
+To derive an integrated NCP estimated, the observed change in iCT must be corrected for the air-sea flux of CO2. iCT was determined for the upper 10m of the water column. The MLD was always shallower 10m, except for the last cruise day. Therefore:
 
-- Cumulative air-sea fluxes can be added completely to iC~T~ before Aug 7.
-- Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO~2~ flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD. 
+- Cumulative air-sea fluxes can be added completely to iCT before Aug 7.
+- Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO2 flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD
+    
+During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased CT values at 0-10 m and a decrease of CT in 10-17m. The loss of CT in 10-17m can be assumed to be entirely cause by mixing with low-CT surface water. Some CT loss is balanced through CT input attributable to the air-sea flux. Therefore, the observed loss, corrected for 7m/MLD-share of the air-sea-flux, was added to the integrated CT changes in 0-10m.
+
 
 ```{r iCT_correction, fig.asp=0.7}
 
@@ -1429,7 +1432,17 @@ date_180806 <- unique(iCT_10$date_time)[7]
 ts_og_flux <- ts_og %>% 
   mutate(flux_scale = if_else(date_time > date_180806,
                               10/17 * flux_scale,
-                              flux_scale)) %>% 
+                              flux_scale)) %>%
+  group_by(freq, k_para) %>% 
+  arrange(date_time) %>% 
+  mutate(flux_cum = cumsum(flux_scale)) %>% 
+  ungroup() %>% 
+  filter(k_para == "W14", freq =="30 min") %>% 
+  select(date_time, flux_cum)
+
+ts_og_flux_dep <- ts_og %>% 
+  filter(date_time > date_180806) %>% 
+  mutate(flux_scale = 7/17 * flux_scale) %>%
   group_by(freq, k_para) %>% 
   arrange(date_time) %>% 
   mutate(flux_cum = cumsum(flux_scale)) %>% 
@@ -1461,8 +1474,10 @@ iCT_10_mix <- ts_profiles_ID_long %>%
          dep > 10) %>% 
   group_by(ID, date_time_ID,
            date_time_ID_ref) %>% 
-  summarise(value_diff = sum(value_diff)/1000) %>% 
+  summarise(value_diff = sum(value_diff)/1000 + min(ts_og_flux_dep$flux_cum)) %>% 
   ungroup()
+
+rm(ts_og_flux_dep)
 
 iCT_10_mix_diff <- iCT_10_mix %>% 
   select(date_time_ID_ref, value_diff) %>% 
@@ -1565,6 +1580,7 @@ Should be identical for stored files and objectes in R environment
 
 # Open tasks / questions
 
+- is the CT correction for mixing and fluxes between the last cruises correct?
 - clean and harmonize chunk labeling (label: plot, 1 plot per chunk, etc)
 - included removed stations in map and coverage plot
 - Significance of changes in AT for calculated CT changes
