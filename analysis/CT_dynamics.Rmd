@@ -105,10 +105,14 @@ rm(meta)
 # creating descriptive variables
 ts_profiles <- ts_profiles %>% 
   mutate(phase = "standby",
-         phase = if_else(duration >= start & duration < down & !is.na(down) & !is.na(start),   "down", phase),
-         phase = if_else(duration >= down  & duration < lift & !is.na(lift) & !is.na(down ),   "low",  phase),
-         phase = if_else(duration >= lift  & duration < up   & !is.na(up  ) & !is.na(lift  ),  "mid",  phase),
-         phase = if_else(duration >= up    & duration < end  & !is.na(end ) & !is.na(up   ),   "up",   phase))
+         phase = if_else(duration >= start & duration < down & !is.na(down) & !is.na(start),
+                         "down", phase),
+         phase = if_else(duration >= down  & duration < lift & !is.na(lift) & !is.na(down ),
+                         "low",  phase),
+         phase = if_else(duration >= lift  & duration < up   & !is.na(up  ) & !is.na(lift  ),
+                         "mid",  phase),
+         phase = if_else(duration >= up    & duration < end  & !is.na(end ) & !is.na(up   ),
+                         "up",   phase))
 
 ts_profiles <- ts_profiles %>% 
   select(-c(start, down, lift, up, end, comment, p_type, duration))
@@ -347,6 +351,8 @@ bind_cols(start = min(ts$date_time),
           AT = AT_mean,
           sal = sal_mean) %>% 
   write_csv(here::here("Data/_summarized_data_files", "tb_fix.csv"))
+
+rm(tb, tb_surface)
 
 ```
 
@@ -646,9 +652,6 @@ ts_profiles_ID_long <- ts_profiles_ID_long %>%
   mutate(value_cum_sign = cumsum(value_diff)) %>% 
   ungroup()
 
-ts_profiles_ID_long %>%
-  write_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum.csv"))
-
 ts_profiles_ID_long %>% 
   arrange(dep) %>% 
   ggplot(aes(value_cum_sign, dep, col=ID))+
@@ -660,6 +663,10 @@ ts_profiles_ID_long %>%
   scale_fill_viridis_d()+
   facet_wrap(~interaction(sign, var), scales = "free_x", ncol=4)+
   labs(x="Cumulative directional change of value")
+
+
+ts_profiles_ID_long %>%
+  write_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum.csv"))
 
 ```
 
@@ -975,10 +982,12 @@ ts_profiles_ID_mean_hydro_long <- ts_profiles_ID_mean_hydro %>%
   pivot_longer(4:6, names_to = "var", values_to = "value")
   
 ts_profiles_ID_hydro_long <- inner_join(ts_profiles_ID_mean_hydro_long, ts_profiles_ID_sd_hydro_long)
+ts_profiles_ID_hydro <- ts_profiles_ID_mean_hydro
 
-rm(ts_profiles_ID_sd_hydro_long,
-   ts_profiles_ID_sd_hydro,
-   ts_profiles_ID_mean_hydro_long)
+rm(ts_profiles_ID_mean_hydro_long,
+   ts_profiles_ID_mean_hydro,
+   ts_profiles_ID_sd_hydro_long,
+   ts_profiles_ID_sd_hydro)
 
 ts_profiles_ID_hydro_long %>% 
   ggplot(aes(value, dep, col=ID))+
@@ -997,9 +1006,9 @@ Mixed layer depth (MLD) was determined based on the difference between density a
 ```{r calculate_MLD}
 # density criterion
 
-ts_profiles_ID_mean_hydro <- expand_grid(ts_profiles_ID_mean_hydro, rho_lim = c(0.1,0.2,0.5))
+ts_profiles_ID_hydro <- expand_grid(ts_profiles_ID_hydro, rho_lim = c(0.1,0.2,0.5))
 
-MLD <- ts_profiles_ID_mean_hydro  %>% 
+MLD <- ts_profiles_ID_hydro  %>% 
   arrange(dep) %>% 
   group_by(ID, date_time_ID, rho_lim) %>% 
   mutate(d_rho = rho - first(rho)) %>% 
@@ -1013,10 +1022,10 @@ MLD <- ts_profiles_ID_mean_hydro  %>%
 
 ```{r plot_density_profiles, fig.cap="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD", fig.asp=1.2}
 
-ts_profiles_ID_mean_hydro <- 
-  full_join(ts_profiles_ID_mean_hydro, MLD)
+ts_profiles_ID_hydro <- 
+  full_join(ts_profiles_ID_hydro, MLD)
 
-ts_profiles_ID_mean_hydro %>% 
+ts_profiles_ID_hydro %>% 
   arrange(dep) %>% 
   ggplot(aes(rho, dep))+
   geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
@@ -1419,16 +1428,20 @@ During the last cruise, deeper mixing up to 17m water depth was observed, result
 
 ```{r iCT_correction, fig.asp=0.7}
 
-# extract CT data for fixed depth approach
+# extract CT data for fixed depth approach, depth limit 10m
 iCT_10 <- iCT_fixed_dep %>% 
   filter(dep_i == 10, sign=="total") %>% 
   select(-c(sign, dep_i))
 
+rm(iCT_fixed_dep)
+
 iCT_10 <- iCT_10 %>%
   select(ID, date_time = date_time_ID, date_time_ID_ref, CT_i_diff, CT_i_cum)
 
+# date of the second last cruise
 date_180806 <- unique(iCT_10$date_time)[7]
 
+# calculate cumulative air-sea fluxes affecting 0-10m
 ts_og_flux <- ts_og %>% 
   mutate(flux_scale = if_else(date_time > date_180806,
                               10/17 * flux_scale,
@@ -1440,6 +1453,7 @@ ts_og_flux <- ts_og %>%
   filter(k_para == "W14", freq =="30 min") %>% 
   select(date_time, flux_cum)
 
+# calculate cumulative air-sea fluxes affecting 10-17m
 ts_og_flux_dep <- ts_og %>% 
   filter(date_time > date_180806) %>% 
   mutate(flux_scale = 7/17 * flux_scale) %>%
@@ -1453,13 +1467,16 @@ ts_og_flux_dep <- ts_og %>%
 iCT_10_flux <- full_join(iCT_10, ts_og_flux) %>% 
   arrange(date_time)
 
-rm(ts_og_flux, iCT_10)
+rm(ts_og_flux, iCT_10, ts_og_long, ts_og)
 
+
+# linear interpolation of cumulative changes to frequency of the flux estimates estimates 
 iCT_10_flux <- iCT_10_flux %>% 
   mutate(CT_i_cum = na.approx(CT_i_cum, rule = 2),
          flux_cum = na.approx(flux_cum, rule = 2),
          CT_i_flux_cum = CT_i_cum + flux_cum)
 
+# calculate cumulative fluxes inbetween cruises 
 iCT_10_flux_diff <- iCT_10_flux %>% 
   filter(!is.na(date_time_ID_ref)) %>% 
   mutate(flux_diff = flux_cum - lag(flux_cum, default = 0)) %>% 
@@ -1467,6 +1484,7 @@ iCT_10_flux_diff <- iCT_10_flux %>%
   pivot_longer(cols = 2:3, names_to = "var", values_to = "value_diff")
 
 
+# calculate mixing with deep waters, corrected for air sea fluxes
 iCT_10_mix <- ts_profiles_ID_long %>% 
   filter(ID == "180815",
          var == "CT",
@@ -1489,6 +1507,8 @@ iCT_10_flux_mix_diff <-
 iCT_10_flux_mix <-
   full_join(iCT_10_flux,
             iCT_10_mix %>% rename(mix_cum = value_diff))
+
+rm(iCT_10_mix, iCT_10_mix_diff, iCT_10_flux, iCT_10_flux_diff, date_180806)
 
 iCT_10_flux_mix <- iCT_10_flux_mix %>% 
   arrange(date_time) %>% 
@@ -1515,6 +1535,12 @@ iCT_10_flux_mix %>%
   labs(y="integrated CT [mol/m2]")+
   theme(axis.title.x = element_blank())
 
+
+iCT_10_flux_mix %>%
+  write_csv(here::here("Data/_merged_data_files", "ts_NCP_cum.csv"))
+
+iCT_10_flux_mix_diff %>%
+  write_csv(here::here("Data/_merged_data_files", "ts_NCP_inc.csv"))
 
 ```
 
