@@ -152,13 +152,13 @@ The effective NCP penetration depth, z~eff~, was calculated as the ratio of the 
 
 ## C~T~ and NCP changes
 
-```{r NCP_penetration_depth_calculation}
+```{r NCP_penetration_depth_calculation, eval=FALSE}
 
 CT_ts <-
   read_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_CT_cumulative_timeseries.csv"))
 
 CT_profiles <-
-  read_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_CT_cumulative_profiles.csv"))
+  read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum.csv"))
 
 CT_conc_surf <-
   CT_profiles %>% 
@@ -195,7 +195,7 @@ CT_long %>%
 
 ## Time series MLD and zeff
 
-```{r plot_NCP_penetration_depth_and_MLD}
+```{r plot_NCP_penetration_depth_and_MLD, eval=FALSE}
 
 df <- full_join(MLD_sum, CT)
 
@@ -234,7 +234,7 @@ df %>%
 
 Integrated C~T~ depletion was calculated as the product of observed incremental C~T~ changes in surface waters and the respective mixed layer depth. 
 
-```{r NCP_calculation}
+```{r NCP_calculation, eval=FALSE}
 
 df <- df %>% 
   mutate(rho_lim = as.factor(rho_lim))
@@ -256,7 +256,7 @@ df_cum <- df %>%
 Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated.
 
 
-```{r plot_integrated_NCP_timeseries, fig.asp=1.5}
+```{r plot_integrated_NCP_timeseries, fig.asp=1.5, eval=FALSE}
 
 p_iNCP <- df_cum %>% 
   ggplot(aes(mean_date, NCP_recalc, fill= rho_lim))+

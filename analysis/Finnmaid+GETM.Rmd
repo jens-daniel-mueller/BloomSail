@@ -47,7 +47,7 @@ start_date <- "2018-06-20"
 end_date <- "2018-08-25"
 
 fixed_values <- 
-  read_csv(here::here("Data/_summarized_data_files", "BloomSail_fixed_values.csv"))
+  read_csv(here::here("Data/_summarized_data_files", "tb_fix.csv"))
 
 
 ```

@@ -31,11 +31,11 @@ library(metR)
 ```{r read_Tina-V_Sensor_data}
 
 df <-
-  read_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_CT_cumulative_profiles.csv"))
+  read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum.csv"))
 
 df <- df %>% 
   select(1:5) %>% 
-  pivot_wider(names_from = "parameter", values_from = "value") %>% 
+  pivot_wider(names_from = "var", values_from = "value") %>% 
   mutate(ID = as.factor(ID),
          CT = if_else(dep==3.5, CT, NaN))
 
