@@ -1142,7 +1142,7 @@ In order to derive an estimate of the net community production NCP (which is equ
   - CO~2~ fluxes due to vertical mixing
   - CO~2~ fluxes due to lateral transport of water masses (not corrected here)
 
-# Best iC~T~ estimate
+## Best iC~T~ estimate
 
 The cummulative iC~T~ trajectory determined by integration of C~T~ to a fixed water depth of 10 m was used for NCP calculation for the following reasons:
 
@@ -1416,17 +1416,15 @@ To derive an integrated NCP estimated, the observed change in iC~T~ must be corr
 
 ```{r iCT_correction, fig.asp=0.7}
 
-
+# extract CT data for fixed depth approach
 iCT_10 <- iCT_fixed_dep %>% 
   filter(dep_i == 10, sign=="total") %>% 
   select(-c(sign, dep_i))
 
-rm(iCT_fixed_dep)
+iCT_10 <- iCT_10 %>%
+  select(ID, date_time = date_time_ID, date_time_ID_ref, CT_i_diff, CT_i_cum)
 
-iCT_10_flux <- iCT_10 %>%
-  select(date_time = date_time_ID, CT_i_cum)
-
-date_180806 <- unique(iCT_10_flux$date_time)[7]
+date_180806 <- unique(iCT_10$date_time)[7]
 
 ts_og_flux <- ts_og %>% 
   mutate(flux_scale = if_else(date_time > date_180806,
@@ -1439,33 +1437,71 @@ ts_og_flux <- ts_og %>%
   filter(k_para == "W14", freq =="30 min") %>% 
   select(date_time, flux_cum)
 
-iCT_10_flux <- full_join(iCT_10_flux, ts_og_flux) %>% 
+iCT_10_flux <- full_join(iCT_10, ts_og_flux) %>% 
   arrange(date_time)
 
-rm(ts_og_flux)
+rm(ts_og_flux, iCT_10)
 
 iCT_10_flux <- iCT_10_flux %>% 
   mutate(CT_i_cum = na.approx(CT_i_cum, rule = 2),
          flux_cum = na.approx(flux_cum, rule = 2),
-         CT_i_cum_total = CT_i_cum + flux_cum)
+         CT_i_flux_cum = CT_i_cum + flux_cum)
+
+iCT_10_flux_diff <- iCT_10_flux %>% 
+  filter(!is.na(date_time_ID_ref)) %>% 
+  mutate(flux_diff = flux_cum - lag(flux_cum, default = 0)) %>% 
+  select(date_time_ID_ref, observed=CT_i_diff, flux=flux_diff) %>% 
+  pivot_longer(cols = 2:3, names_to = "var", values_to = "value_diff")
+
+
+iCT_10_mix <- ts_profiles_ID_long %>% 
+  filter(ID == "180815",
+         var == "CT",
+         dep < 17,
+         dep > 10) %>% 
+  group_by(ID, date_time_ID,
+           date_time_ID_ref) %>% 
+  summarise(value_diff = sum(value_diff)/1000) %>% 
+  ungroup()
+
+iCT_10_mix_diff <- iCT_10_mix %>% 
+  select(date_time_ID_ref, value_diff) %>% 
+  mutate(var="mixing")
+
+iCT_10_flux_mix_diff <- 
+  full_join(iCT_10_flux_diff, iCT_10_mix_diff)
+
+iCT_10_flux_mix <-
+  full_join(iCT_10_flux,
+            iCT_10_mix %>% rename(mix_cum = value_diff))
+
+iCT_10_flux_mix <- iCT_10_flux_mix %>% 
+  arrange(date_time) %>% 
+  fill(ID) %>% 
+  mutate(mix_cum = if_else(ID %in% c("180806", 180815), mix_cum, 0),
+         mix_cum = na.approx(mix_cum),
+         CT_i_flux_mix_cum = CT_i_flux_cum + mix_cum)
+
   
-iCT_10_flux %>% 
+iCT_10_flux_mix %>% 
   arrange(date_time) %>% 
   ggplot()+
+  geom_col(data = iCT_10_flux_mix_diff,
+           aes(date_time_ID_ref, value_diff, fill=var),
+           position = position_dodge2(preserve = "single"),
+           alpha=0.5)+
   geom_hline(yintercept = 0)+
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
   geom_line(aes(date_time, CT_i_cum, col="observed"))+
-  geom_line(aes(date_time, CT_i_cum_total, col="flux corrected"))+
-  geom_ribbon(aes(date_time, ymin = CT_i_cum, ymax = CT_i_cum_total,
-                  fill="Air-sea flux"), alpha=0.2)+
-  scale_fill_brewer(palette = "Set1", name="")+
-  scale_color_brewer(palette = "Set1", name="")+
-  labs(y="integrated, cumulative CT [mol/m2]")+
+  geom_line(aes(date_time, CT_i_flux_mix_cum, col="mixing + flux corrected"))+
+  geom_line(aes(date_time, CT_i_flux_cum, col="flux corrected"))+
+  scale_fill_brewer(palette = "Set1", name="Incremental")+
+  scale_color_brewer(palette = "Set1", name="Cumulative")+
+  labs(y="integrated CT [mol/m2]")+
   theme(axis.title.x = element_blank())
 
 
 ```
-
-
 
 # Nomenclature of objectes
 
