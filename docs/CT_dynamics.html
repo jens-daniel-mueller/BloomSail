@@ -557,10 +557,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree265e5681d14897630d2bbf560d06891c80dd3d99targetblank265e568a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/265e5681d14897630d2bbf560d06891c80dd3d99" target="_blank">265e568</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9edf20d32135ee888b86c770785c3696772d5fddtargetblank9edf20da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/9edf20d32135ee888b86c770785c3696772d5fdd" target="_blank">9edf20d</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree265e5681d14897630d2bbf560d06891c80dd3d99targetblank265e568a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9edf20d32135ee888b86c770785c3696772d5fddtargetblank9edf20da" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -569,7 +569,6 @@ Great! You are using Git for version control. Tracking code development and conn
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
     Ignored:    data/Finnmaid_2018/
     Ignored:    data/GETM/
     Ignored:    data/Maps/
@@ -1849,15 +1848,17 @@ ts_og %&gt;%
   theme(axis.title.x = element_blank())</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/flux_air_sea_cumulative_CO2-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="ict-correction" class="section level3">
-<h3><span class="header-section-number">6.2.7</span> iC<sub>T</sub> correction</h3>
-<p>The cumulative iC<sub>T</sub> time series obtained through integration across the upper 10m of the water column was used for further calculations of NCP.</p>
-<p>Correction of iC<sub>T</sub> for air-sea CO<sub>2</sub> fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014).</p>
-<p>To derive an integrated NCP estimated, the observed change in iC<sub>T</sub> must be corrected for the air-sea flux of CO<sub>2</sub>. iC<sub>T</sub> was determined for the upper 10m of the water column. The MLD was always shallower 10m, except for the last cruise day. Therefore:</p>
+</div>
+<div id="ict-correction" class="section level2">
+<h2><span class="header-section-number">6.3</span> iC<sub>T</sub> correction</h2>
+<p>The cumulative iCT time series obtained through integration across the upper 10m of the water column was used for further calculations of NCP.</p>
+<p>Correction of iCT for air-sea CO2 fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014).</p>
+<p>To derive an integrated NCP estimated, the observed change in iCT must be corrected for the air-sea flux of CO2. iCT was determined for the upper 10m of the water column. The MLD was always shallower 10m, except for the last cruise day. Therefore:</p>
 <ul>
-<li>Cumulative air-sea fluxes can be added completely to iC<sub>T</sub> before Aug 7.</li>
-<li>Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO<sub>2</sub> flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD.</li>
+<li>Cumulative air-sea fluxes can be added completely to iCT before Aug 7.</li>
+<li>Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO2 flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD</li>
 </ul>
+<p>During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased CT values at 0-10 m and a decrease of CT in 10-17m. The loss of CT in 10-17m can be assumed to be entirely cause by mixing with low-CT surface water. Some CT loss is balanced through CT input attributable to the air-sea flux. Therefore, the observed loss, corrected for 7m/MLD-share of the air-sea-flux, was added to the integrated CT changes in 0-10m.</p>
 <pre class="r"><code># extract CT data for fixed depth approach
 iCT_10 &lt;- iCT_fixed_dep %&gt;% 
   filter(dep_i == 10, sign==&quot;total&quot;) %&gt;% 
@@ -1871,7 +1872,17 @@ date_180806 &lt;- unique(iCT_10$date_time)[7]
 ts_og_flux &lt;- ts_og %&gt;% 
   mutate(flux_scale = if_else(date_time &gt; date_180806,
                               10/17 * flux_scale,
-                              flux_scale)) %&gt;% 
+                              flux_scale)) %&gt;%
+  group_by(freq, k_para) %&gt;% 
+  arrange(date_time) %&gt;% 
+  mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
+  ungroup() %&gt;% 
+  filter(k_para == &quot;W14&quot;, freq ==&quot;30 min&quot;) %&gt;% 
+  select(date_time, flux_cum)
+
+ts_og_flux_dep &lt;- ts_og %&gt;% 
+  filter(date_time &gt; date_180806) %&gt;% 
+  mutate(flux_scale = 7/17 * flux_scale) %&gt;%
   group_by(freq, k_para) %&gt;% 
   arrange(date_time) %&gt;% 
   mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
@@ -1903,8 +1914,10 @@ iCT_10_mix &lt;- ts_profiles_ID_long %&gt;%
          dep &gt; 10) %&gt;% 
   group_by(ID, date_time_ID,
            date_time_ID_ref) %&gt;% 
-  summarise(value_diff = sum(value_diff)/1000) %&gt;% 
+  summarise(value_diff = sum(value_diff)/1000 + min(ts_og_flux_dep$flux_cum)) %&gt;% 
   ungroup()
+
+rm(ts_og_flux_dep)
 
 iCT_10_mix_diff &lt;- iCT_10_mix %&gt;% 
   select(date_time_ID_ref, value_diff) %&gt;% 
@@ -1942,7 +1955,6 @@ iCT_10_flux_mix %&gt;%
   labs(y=&quot;integrated CT [mol/m2]&quot;)+
   theme(axis.title.x = element_blank())</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/iCT_correction-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
 </div>
 </div>
 <div id="nomenclature-of-objectes" class="section level1">
@@ -2016,6 +2028,7 @@ iCT_10_flux_mix %&gt;%
 <div id="open-tasks-questions" class="section level1">
 <h1><span class="header-section-number">9</span> Open tasks / questions</h1>
 <ul>
+<li>is the CT correction for mixing and fluxes between the last cruises correct?</li>
 <li>clean and harmonize chunk labeling (label: plot, 1 plot per chunk, etc)</li>
 <li>included removed stations in map and coverage plot</li>
 <li>Significance of changes in AT for calculated CT changes</li>
