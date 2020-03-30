@@ -13,8 +13,6 @@ navbar:
     href: response_time.html
   - text: CT dynamics
     href: CT_dynamics.html
-  - text: Gas flux
-    href: gas_flux.html
   - text: NCP reconstruction
     menu:
     - text: BloomSail delta T approach

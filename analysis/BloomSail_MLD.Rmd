@@ -32,7 +32,7 @@ library(patchwork)
 ```{r read_Tina-V_Sensor_data}
 
 df <-
-  read_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_CT.csv"))
+  read_csv(here::here("Data/_merged_data_files", "ts_profiles_CT.csv"))
 
 ```
 
