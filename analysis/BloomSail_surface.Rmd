@@ -23,6 +23,7 @@ library(seacarb)
 library(oce)
 library(marelac)
 library(patchwork)
+library(metR)
 ```
 
 
@@ -39,7 +40,7 @@ In order to test how (and how well) the depth-integrated NCP estimates can be re
 
 # Sensor data
 
-1m gridded, downcast profiles were used.
+1m gridded, downcast profiles, from which CO~2~ data other than 3.5 m water depth were removed, were used.
 
 ```{r read_Tina-V_Sensor_data}
 
@@ -233,8 +234,9 @@ ts_profiles_ID_long <- ts_profiles_ID %>%
   pivot_longer(4:5, names_to = "var", values_to = "value_diff") %>% 
   group_by(dep, var) %>% 
   arrange(date_time_ID) %>% 
-  mutate(diff_time  = as.numeric(date_time_ID - lag(date_time_ID)),
-         value_diff_daily = value_diff / diff_time,
+  mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
+         value_diff_daily = value_diff / date_time_ID_diff,
          value_cum = cumsum(value_diff)) %>% 
   ungroup()
 
@@ -280,47 +282,47 @@ ts_profiles_ID_long %>%
 
 ```
 
-## Timeseries
-
-Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated for the upper 10 m of the water body.
-
-```{r integrated_NCP}
-
-iCT_10 <- ts_profiles_ID_long %>%
-  filter(dep < 10, 
-         var == "CT") %>% 
-  select(ID, date_time_ID, CT_diff=value_diff, CT_cum=value_cum) %>% 
-  group_by(ID, date_time_ID) %>% 
-  summarise(CT_i_diff = sum(CT_diff)/1000,
-            CT_i_cum = sum(CT_cum)/1000) %>% 
-  ungroup()
-
-iCT_10 %>% 
-  ggplot()+
-  #geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
-  geom_col(aes(date_time_ID, CT_i_diff),
-           position = "dodge", alpha=0.3)+
-  geom_line(aes(date_time_ID, CT_i_cum))+
-  scale_color_viridis_d(name="Depth limit (m)")+
-  scale_fill_viridis_d(name="Depth limit (m)")+
-  labs(y="iCT [mol/m2]", x="")+
-  theme_bw()
-
-
-
-```
-
 ## Hovmoeller plots
+
+Hoevmoeller plots were generated for the reconstructed daily and cumulative changes in C~T~. Absolute values are not reproducible with this approach. Furthermore, it meets our expectations 
 
 ### Daily changes
 
-```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily changes in C~T~ and temperature. Note: Daily changes are currently plotted against the day when they were observed compared to the previous transect, although plotting against the mean date would be more plausible.", fig.asp=0.5, eval=FALSE}
+```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature. Note: Daily changes are currently plotted against the day when they were observed compared to the previous transect, although plotting against the mean date would be more plausible.", fig.asp=0.5, eval=FALSE}
 
 bin_CT <- 2.5
 
-df %>% 
+ts_profiles_ID_long %>%
+  filter(var == "CT") %>% 
   ggplot()+
-  geom_contour_fill(aes(x=date_time_ID, y=dep, z=diff_value_daily),
+  geom_contour_fill(aes(x=date_time_ID_ref, y=dep, z=value_diff_daily),
+                    breaks = MakeBreaks(bin_CT),
+                    col="black")+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill="white")+
+  scale_fill_divergent(breaks = MakeBreaks(bin_CT),
+                       guide = "colorstrip",
+                       name="CT (µmol/kg)")+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y="Depth (m)")+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+rm(bin_CT)
+
+```
+
+### Cumulative changes
+
+```{r plot_hovmoeller_cum, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature.", fig.asp=0.5, eval=FALSE}
+
+bin_CT <- 20
+
+ts_profiles_ID_long %>%
+  filter(var == "CT") %>% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=value_cum),
                     breaks = MakeBreaks(bin_CT),
                     col="black")+
   geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill="white")+
@@ -335,6 +337,35 @@ df %>%
         axis.text.x = element_blank())
 
 
+rm(bin_CT)
 
 ```
 
+## iC~T~ time series
+
+Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated for the upper 10 m of the water body.
+
+```{r integrated_NCP}
+
+iCT_10 <- ts_profiles_ID_long %>%
+  filter(dep < 10, 
+         var == "CT") %>% 
+  select(ID, date_time_ID, date_time_ID_ref, CT_diff=value_diff, CT_cum=value_cum) %>% 
+  group_by(ID, date_time_ID, date_time_ID_ref) %>% 
+  summarise(CT_i_diff = sum(CT_diff)/1000,
+            CT_i_cum = sum(CT_cum)/1000) %>% 
+  ungroup()
+
+iCT_10 %>% 
+  ggplot()+
+  #geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_col(aes(date_time_ID_ref, CT_i_diff),
+           position = "dodge", alpha=0.3)+
+  geom_line(aes(date_time_ID, CT_i_cum))+
+  scale_color_viridis_d(name="Depth limit (m)")+
+  scale_fill_viridis_d(name="Depth limit (m)")+
+  labs(y="iCT [mol/m2]", x="")+
+  theme_bw()
+
+
+```
