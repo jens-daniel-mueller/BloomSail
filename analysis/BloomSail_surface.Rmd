@@ -34,8 +34,8 @@ theme_set(theme_bw())
 
 In order to test how (and how well) the depth-integrated NCP estimates can be reproduced if only surface CO2 data were available, the BloomSail observations were restricted to those made in surface water and two reconstruction approaches were tested:
 
-1. Integration of surface observation across the MLD, assuming homogenious vertical patterns
-2. Vertical reconstruction of incremental CT changes based on profiles of incremental changes in temperature
+1. MLD: Integration of surface observation across the MLD, assuming homogenious vertical patterns
+2. Temperature: Vertical reconstruction of incremental CT changes based on profiles of incremental changes in temperature
 
 # Sensor data
 
@@ -156,4 +156,185 @@ p_iCT_cum <- ts_profiles_ID_surface %>%
   plot_layout(guides = 'collect')
 
 rm(p_iCT, p_iCT_cum)
+
+rm(ts_profiles_ID, ts_profiles_ID_surface)
+
 ```
+
+
+# Temperature approach
+
+
+```{r read_ts_data}
+
+ts_profiles_ID <-
+  read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID.csv"))
+
+ts_profiles_ID <- ts_profiles_ID %>% 
+  mutate(CT = if_else(dep == 3.5, CT, NaN),
+         ID = as.factor(ID))
+
+```
+
+
+## C~T~ vs temperature
+
+As primary production (negative changes in C~T~) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated.
+
+```{r CT_and_temperature_changes_in_surface}
+
+ts_profiles_ID_diff <- ts_profiles_ID %>% 
+  drop_na() %>% 
+  arrange(date_time_ID) %>%
+  mutate(CT_diff = CT - lag(CT, default = first(CT)),
+         tem_diff = tem - lag(tem, default = first(tem)),
+         factor = CT_diff / tem_diff,
+         factor = if_else(is.na(factor), 0, factor))
+
+ts_profiles_ID_diff %>% 
+  ggplot(aes(tem_diff, CT_diff))+
+  geom_hline(yintercept = 0)+
+  geom_vline(xintercept = 0)+
+  geom_path()+
+  geom_point()
+
+```
+
+## Reconstruction of C~T~ dynamics
+
+The ratio of the incremental change of C~T~ with temperature at the seasurface was applied to calculate the C~T~ in other water depth based on the known change in temperature.
+
+```{r reconctruction_CT_incremental_changes_profiles}
+
+ts_profiles_ID_diff <- ts_profiles_ID_diff %>% 
+  select(ID, factor)
+
+ts_profiles_ID <- full_join(ts_profiles_ID, ts_profiles_ID_diff)
+rm(ts_profiles_ID_diff)
+
+ts_profiles_ID <- ts_profiles_ID %>%
+  arrange(date_time_ID) %>%
+  group_by(dep) %>% 
+  mutate(tem_diff = tem - lag(tem, default = first(tem))) %>% 
+  ungroup()
+
+ts_profiles_ID <- ts_profiles_ID %>% 
+  mutate(CT_diff = tem_diff * factor) %>% 
+  select(-factor)
+
+```
+
+The reconstructed incremental changes are added up to derive cummulative C~T~ changes throughout the water column.
+
+```{r reconctruction_CT_cumulative_changes_profiles}
+
+ts_profiles_ID_long <- ts_profiles_ID %>% 
+  select(ID, date_time_ID, dep, tem = tem_diff, CT = CT_diff) %>% 
+  pivot_longer(4:5, names_to = "var", values_to = "value_diff") %>% 
+  group_by(dep, var) %>% 
+  arrange(date_time_ID) %>% 
+  mutate(diff_time  = as.numeric(date_time_ID - lag(date_time_ID)),
+         value_diff_daily = value_diff / diff_time,
+         value_cum = cumsum(value_diff)) %>% 
+  ungroup()
+
+```
+
+## Profiles of incremental changes
+
+Changes of seawater parameters at each depth were reconstructed from one cruise day to the next and divided by the number of days inbetween.
+
+```{r incremental_changes_profiles}
+
+ts_profiles_ID_long %>% 
+  arrange(dep) %>% 
+  ggplot(aes(value_diff, dep, col=ID))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  facet_wrap(~var, scales = "free_x")+
+  labs(x="Change of value inbetween cruises per day")
+
+
+```
+
+
+## Profiles of cumulative changes
+
+Cumulative changes of seawater parameters were calculated at each depth relative to the first cruise day on July 5.
+
+```{r cumulative_changes_profiles}
+
+ts_profiles_ID_long %>% 
+  arrange(dep) %>% 
+  ggplot(aes(value_cum, dep, col=ID))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  labs(x="Cumulative change of value")+
+  facet_wrap(~var, scales = "free_x")
+
+```
+
+## Timeseries
+
+Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated for the upper 10 m of the water body.
+
+```{r integrated_NCP}
+
+iCT_10 <- ts_profiles_ID_long %>%
+  filter(dep < 10, 
+         var == "CT") %>% 
+  select(ID, date_time_ID, CT_diff=value_diff, CT_cum=value_cum) %>% 
+  group_by(ID, date_time_ID) %>% 
+  summarise(CT_i_diff = sum(CT_diff)/1000,
+            CT_i_cum = sum(CT_cum)/1000) %>% 
+  ungroup()
+
+iCT_10 %>% 
+  ggplot()+
+  #geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_col(aes(date_time_ID, CT_i_diff),
+           position = "dodge", alpha=0.3)+
+  geom_line(aes(date_time_ID, CT_i_cum))+
+  scale_color_viridis_d(name="Depth limit (m)")+
+  scale_fill_viridis_d(name="Depth limit (m)")+
+  labs(y="iCT [mol/m2]", x="")+
+  theme_bw()
+
+
+
+```
+
+## Hovmoeller plots
+
+### Daily changes
+
+```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily changes in C~T~ and temperature. Note: Daily changes are currently plotted against the day when they were observed compared to the previous transect, although plotting against the mean date would be more plausible.", fig.asp=0.5, eval=FALSE}
+
+bin_CT <- 2.5
+
+df %>% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=diff_value_daily),
+                    breaks = MakeBreaks(bin_CT),
+                    col="black")+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill="white")+
+  scale_fill_divergent(breaks = MakeBreaks(bin_CT),
+                       guide = "colorstrip",
+                       name="CT (µmol/kg)")+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y="Depth (m)")+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+
+
+```
+

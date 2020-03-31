@@ -380,7 +380,7 @@ ts_profiles <- ts_profiles %>%
 rm(sal_mean, AT_mean)
 
 ts_profiles %>% 
-  write_csv(here::here("Data/_merged_data_files", "ts_profiles_CT.csv"))
+  write_csv(here::here("Data/_merged_data_files", "ts_profiles.csv"))
 
 ```
 
@@ -409,6 +409,9 @@ ts_profiles_ID_mean_long <- ts_profiles_ID_mean %>%
   pivot_longer(4:7, names_to = "var", values_to = "value")
   
 ts_profiles_ID_long <- inner_join(ts_profiles_ID_mean_long, ts_profiles_ID_sd_long)
+
+ts_profiles_ID_mean %>% 
+  write_csv(here::here("Data/_merged_data_files", "ts_profiles_ID.csv"))
 
 rm(ts_profiles_ID_sd_long, ts_profiles_ID_sd, ts_profiles_ID_mean_long, ts_profiles_ID_mean)
 
