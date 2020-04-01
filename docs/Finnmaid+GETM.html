@@ -554,10 +554,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb1613b7e3a6370169a2dc8f71712490041f68d6btargetblankb1613b7a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b1613b7e3a6370169a2dc8f71712490041f68d6b" target="_blank">b1613b7</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec19920043d8af20fba341b95f03d041226357b98targetblankc199200a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c19920043d8af20fba341b95f03d041226357b98" target="_blank">c199200</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb1613b7e3a6370169a2dc8f71712490041f68d6btargetblankb1613b7a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec19920043d8af20fba341b95f03d041226357b98targetblankc199200a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -709,7 +709,7 @@ gt_3d &lt;- gt_3d_long %&gt;%
   pivot_wider(values_from = value, names_from = var) %&gt;% 
   mutate(rho = swSigma(salinity = salt, temperature = temp, pressure = dep/10))</code></pre>
 <pre class="r"><code>gt_3d_long &lt;- gt_3d %&gt;% 
-  pivot_longer(3:5, values_to = &quot;value&quot;, names_to = &quot;parameter&quot;)
+  pivot_longer(3:5, values_to = &quot;value&quot;, names_to = &quot;var&quot;)
 
 lab_dates &lt;- pretty(gt_3d_long$date_time)
 
@@ -722,7 +722,7 @@ gt_3d_long %&gt;%
   scale_color_viridis_c(breaks = as.numeric(lab_dates),
                         labels = lab_dates,
                         name=&quot;Date&quot;)+
-  facet_grid(~parameter, scales = &quot;free_x&quot;)</code></pre>
+  facet_grid(~var, scales = &quot;free_x&quot;)</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/plot_gt_profiles_salt_temp_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="mixed-layer-depth" class="section level2">
@@ -908,11 +908,11 @@ p_MLD_gt / p_MLD_recalc</code></pre>
 <div id="read-data" class="section level2">
 <h2><span class="header-section-number">3.1</span> Read data</h2>
 <p>Finnmaid data, including reconstructed data during LICOS operation failure.</p>
-<pre class="r"><code>df &lt;-
+<pre class="r"><code>fm &lt;-
  read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
                       &quot;Finnmaid.csv&quot;))
 
-df &lt;- df %&gt;% 
+fm &lt;- fm %&gt;% 
   filter(Area == &quot;BS&quot;,
          date &gt; start_date,
          date &lt; end_date) %&gt;% 
@@ -924,49 +924,61 @@ df &lt;- df %&gt;%
 <div id="ct-calculation" class="section level2">
 <h2><span class="header-section-number">3.2</span> C<sub>T</sub> calculation</h2>
 <p>Calculate based on fixed A<sub>T</sub> and salinity mean values.</p>
-<pre class="r"><code>df &lt;- df %&gt;% 
-  mutate(CT = carb(24, var1=pCO2, var2=1720*1e-6,
-                   S=6.9, T=tem, k1k2=&quot;m10&quot;, kf=&quot;dg&quot;, ks=&quot;d&quot;,
-                   gas=&quot;insitu&quot;)[,16]*1e6)</code></pre>
+<pre class="r"><code>fm &lt;- fm %&gt;% 
+  mutate(CT = carb(24,
+                   var1=pCO2,
+                   var2=fixed_values$AT*1e-6,
+                   S=fixed_values$sal,
+                   T=tem,
+                   k1k2=&quot;m10&quot;, kf=&quot;dg&quot;, ks=&quot;d&quot;, gas=&quot;insitu&quot;)[,16]*1e6)</code></pre>
 </div>
 <div id="timeseries" class="section level2">
 <h2><span class="header-section-number">3.3</span> Timeseries</h2>
-<pre class="r"><code>FM_ts_mean &lt;- df %&gt;% 
+<p>Calculate regional mean and sd values for each crossing of the area.</p>
+<pre class="r"><code>FM_ID_mean &lt;- fm %&gt;% 
   arrange(date) %&gt;% 
   group_by(ID, sensor) %&gt;% 
   summarise_all(list(~mean(.)), na.rm=TRUE) %&gt;%
   ungroup() %&gt;% 
-  pivot_longer(4:8, values_to = &quot;mean&quot;, names_to = &quot;parameter&quot;)
+  pivot_longer(4:8, values_to = &quot;mean&quot;, names_to = &quot;var&quot;)
 
-FM_ts_sd &lt;- df %&gt;% 
+FM_ID_sd &lt;- fm %&gt;% 
   arrange(date) %&gt;% 
   group_by(ID, sensor) %&gt;% 
   summarise_all(list(~sd(.)), na.rm=TRUE) %&gt;%
   ungroup() %&gt;% 
-  pivot_longer(4:8, values_to = &quot;sd&quot;, names_to = &quot;parameter&quot;) %&gt;% 
+  pivot_longer(4:8, values_to = &quot;sd&quot;, names_to = &quot;var&quot;) %&gt;% 
   select(-date)
 
-FM_ts &lt;- inner_join(FM_ts_mean, FM_ts_sd)
+FM_ID &lt;- inner_join(FM_ID_mean, FM_ID_sd)
 
-rm(FM_ts_mean, FM_ts_sd)</code></pre>
-<pre class="r"><code>FM_ts %&gt;% 
+rm(FM_ID_mean, FM_ID_sd)</code></pre>
+<p>Read BloomSail data to fill observational gap of Finnmaid date in second half of June.</p>
+<pre class="r"><code>ts_profiles_ID_long &lt;-
+  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum.csv&quot;))
+
+ts_profiles_ID_long_surface &lt;- ts_profiles_ID_long %&gt;% 
+  filter(dep == 3.5)</code></pre>
+<pre class="r"><code>FM_ID %&gt;% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
   geom_path(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
   geom_ribbon(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd), alpha=0.5)+
   geom_point(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd, col=sensor))+
-  facet_grid(parameter~., scales = &quot;free_y&quot;)+
+  geom_point(data = ts_profiles_ID_long_surface,
+             aes(x=date_time_ID, y=value, col=&quot;BloomSail&quot;))+
+  facet_grid(var~., scales = &quot;free_y&quot;)+
   scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
   theme_bw()</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/Plot_Finnmaid_crossings-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Finnmaid+GETM.Rmd/Finnmaid_BloomSail_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="ct-vs-temperature" class="section level1">
 <h1><span class="header-section-number">4</span> C<sub>T</sub> vs temperature</h1>
 <div id="sst-time-series" class="section level2">
 <h2><span class="header-section-number">4.1</span> SST time series</h2>
-<pre class="r"><code>FM_ts %&gt;% 
-  filter(parameter == &quot;tem&quot;) %&gt;% 
+<pre class="r"><code>FM_ID %&gt;% 
+  filter(var == &quot;tem&quot;) %&gt;% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
   geom_path(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
@@ -983,12 +995,12 @@ rm(FM_ts_mean, FM_ts_sd)</code></pre>
 <h2><span class="header-section-number">4.2</span> dC<sub>T</sub> vs dSST</h2>
 <p>As primary production (negative changes in C<sub>T</sub>) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated.</p>
 <p>The following analysis is restricted to the BloomSail period.</p>
-<pre class="r"><code>CT_tem &lt;- FM_ts %&gt;%
+<pre class="r"><code>CT_tem &lt;- FM_ID %&gt;%
   filter(date &gt; fixed_values$start,
          date &lt; fixed_values$end) %&gt;% 
-  filter(parameter %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
-  select(date, parameter, mean) %&gt;% 
-  pivot_wider(values_from = mean, names_from = parameter) %&gt;% 
+  filter(var %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
+  select(date, var, mean) %&gt;% 
+  pivot_wider(values_from = mean, names_from = var) %&gt;% 
   set_names(c(&quot;date_time&quot;, &quot;FM&quot;, &quot;CT&quot;))
 
 CT_tem &lt;- full_join(CT_tem,
@@ -1032,36 +1044,27 @@ CT_tem %&gt;%
 <div id="mld-approach" class="section level2">
 <h2><span class="header-section-number">5.1</span> MLD approach</h2>
 <p>Use dCT/dtem from Finnmaid, MLD from GETM</p>
-<pre class="r"><code>NCP_MLD &lt;- FM_ts %&gt;%
+<pre class="r"><code>NCP_MLD &lt;- FM_ID %&gt;%
   filter(date &gt; fixed_values$start,
          date &lt; fixed_values$end) %&gt;% 
-  filter(parameter %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
-  select(date, parameter, mean) %&gt;% 
-  pivot_wider(values_from = mean, names_from = parameter) %&gt;% 
+  filter(var %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
+  select(date, var, mean) %&gt;% 
+  pivot_wider(values_from = mean, names_from = var) %&gt;% 
   set_names(c(&quot;date_time&quot;, &quot;SST&quot;, &quot;CT&quot;))
 
 NCP_MLD &lt;- full_join(NCP_MLD,
                      gt_2d_daily %&gt;% select(-c(SSS, SST, U_10)))
 
 NCP_MLD &lt;- NCP_MLD %&gt;% 
-  pivot_longer(cols = 4:8, values_to = &quot;MLD&quot;, names_to = &quot;Parameter&quot;) %&gt;% 
+  pivot_longer(cols = 4:8, values_to = &quot;MLD&quot;, names_to = &quot;var&quot;) %&gt;% 
   arrange(date_time) %&gt;%
-  group_by(Parameter) %&gt;% 
+  group_by(var) %&gt;% 
   mutate(MLD = na.approx(MLD)) %&gt;%
   ungroup()
 
-NCP_MLD %&gt;% 
-  ggplot()+
-  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_line(aes(date_time, MLD, col=Parameter))+
-  geom_point(data = NCP_MLD %&gt;% drop_na, aes(date_time, MLD, col=Parameter))+
-  scale_color_brewer(palette = &quot;Set1&quot;)+
-  labs(x=&quot;&quot;, y=&quot;MLD (m)&quot;)+
-  theme_bw()</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/NCP_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>NCP_MLD &lt;- NCP_MLD %&gt;% 
+NCP_MLD &lt;- NCP_MLD %&gt;% 
   drop_na() %&gt;% 
-  group_by(Parameter) %&gt;% 
+  group_by(var) %&gt;% 
   arrange(date_time) %&gt;% 
   mutate(dCT = CT - lag(CT),
          dSST = SST - lag(SST),
@@ -1072,7 +1075,7 @@ NCP_MLD %&gt;%
 <h3><span class="header-section-number">5.1.1</span> Incremental and cumulative timeseries</h3>
 <p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated.</p>
 <pre class="r"><code>p_iNCP &lt;- NCP_MLD %&gt;% 
-  ggplot(aes(date_time, dNCP, fill= Parameter))+
+  ggplot(aes(date_time, dNCP, fill= var))+
   geom_hline(yintercept = 0)+
   geom_col(col=&quot;black&quot;, position = &quot;dodge&quot;)+
   scale_y_continuous(breaks = seq(-100, 100, 0.2))+
@@ -1080,12 +1083,12 @@ NCP_MLD %&gt;%
 
 p_iNCPcum &lt;-  NCP_MLD %&gt;% 
   ggplot(aes(date_time,  NCP_cum, 
-             fill= Parameter))+
+             fill= var))+
   geom_hline(yintercept = -0.4)+
   geom_area(position = &quot;identity&quot;, col=&quot;black&quot;)+
   geom_hline(yintercept = 0)+
   scale_y_continuous(breaks = seq(-100, 100, 0.2))+
-  facet_grid(Parameter~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
+  facet_grid(var~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
   theme(strip.background = element_blank(),
         strip.text = element_blank())+
   labs(y=&quot;integrated, cumulative, directional CT changes [mol/m2]&quot;, x=&quot;date&quot;)
@@ -1143,7 +1146,7 @@ NCP_dT &lt;- NCP_dT %&gt;%
   geom_path()+
   scale_y_reverse()+
   #scale_color_viridis_d()+
-  #facet_wrap(~parameter, scales = &quot;free_x&quot;)+
+  #facet_wrap(~var, scales = &quot;free_x&quot;)+
   labs(x=&quot;Change of value inbetween cruises per day&quot;)</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
