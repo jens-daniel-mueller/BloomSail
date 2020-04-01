@@ -438,7 +438,7 @@ div.section {
 
 <h1 class="title toc-ignore">Finnmaid and GETM</h1>
 <h4 class="author">Jens Daniel Müller und Lara Sophie Burchardt</h4>
-<h4 class="date">30 March, 2020</h4>
+<h4 class="date">01 April, 2020</h4>
 
 </div>
 
@@ -463,7 +463,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-03-30
+<strong>Last updated:</strong> 2020-04-01
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -554,10 +554,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreed8120b3711f19badd9ed062c1b3fdcd217a2ed72targetblankd8120b3a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/d8120b3711f19badd9ed062c1b3fdcd217a2ed72" target="_blank">d8120b3</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb1613b7e3a6370169a2dc8f71712490041f68d6btargetblankb1613b7a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b1613b7e3a6370169a2dc8f71712490041f68d6b" target="_blank">b1613b7</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreed8120b3711f19badd9ed062c1b3fdcd217a2ed72targetblankd8120b3a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb1613b7e3a6370169a2dc8f71712490041f68d6btargetblankb1613b7a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -573,9 +573,6 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
-
-Unstaged changes:
-    Deleted:    analysis/BloomSail_MLD.Rmd
 
 </code></pre>
 <p>
@@ -621,11 +618,20 @@ end_date &lt;- &quot;2018-08-25&quot;
 
 fixed_values &lt;- 
   read_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;tb_fix.csv&quot;))</code></pre>
-<div id="getm-data-preparation" class="section level1">
-<h1><span class="header-section-number">1</span> GETM Data preparation</h1>
-<div id="salinity-and-temperature-profiles" class="section level2">
-<h2><span class="header-section-number">1.1</span> Salinity and temperature profiles</h2>
-<p>Mean salinity and temperature profiles within the BloomSail area were extracted from daily GETM transects beneath the Finnmaid track.</p>
+<div id="approach" class="section level1">
+<h1><span class="header-section-number">1</span> Approach</h1>
+<p>In order to test how (and how well) the depth-integrated C<sub>T</sub> estimates can be reproduced if only surface CO<sub>2</sub> data from VOS Finnamaid and hydrographical GETM model date were available, two reconstruction approaches were tested:</p>
+<ol style="list-style-type: decimal">
+<li>MLD: Integration of surface observation across the MLD, assuming homogenious vertical patterns</li>
+<li>Temperature: Vertical reconstruction of incremental CT changes based on profiles of incremental changes in temperature</li>
+</ol>
+</div>
+<div id="getm" class="section level1">
+<h1><span class="header-section-number">2</span> GETM</h1>
+<p>The following information refer to regional mean values modeled along the Finnmaid track east and within the BloomSail field work area (57.3 - 57.5 N).</p>
+<div id="std-profiles" class="section level2">
+<h2><span class="header-section-number">2.1</span> STD Profiles</h2>
+<p>Mean daily salinity and temperature profiles were extracted from 3d GETM data (vertically resolved transects).</p>
 <pre class="r"><code>nc &lt;- nc_open(here::here(&quot;data/GETM&quot;, &quot;Finnmaid.E.3d.2018.nc&quot;))
 
 lat &lt;- ncvar_get(nc, &quot;latc&quot;)
@@ -684,21 +690,44 @@ rm(array, fillvalue)
 nc_close(nc)
 rm(nc)
 
-gt_3d_jun_aug &lt;- gt_3d %&gt;% 
+gt_3d &lt;- gt_3d %&gt;% 
   filter(date_time &gt;= start_date &amp; date_time &lt;= end_date) %&gt;% 
   group_by(dep,var,date_time ) %&gt;% 
   summarise_all(list(value=~mean(.,na.rm=TRUE))) %&gt;%
   ungroup()
 
-gt_3d_jun_aug %&gt;% 
-  vroom_write((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_3d_jun_aug_2018.csv&quot;)))
+gt_3d %&gt;% 
+  vroom_write((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_3d_long.csv&quot;)))
 
 
-rm(gt_3d, gt_3d_jun_aug, d1_deep, d1_shallow, i, lat, d, t, var_3d)</code></pre>
+rm(gt_3d, gt_3d, d1_deep, d1_shallow, i, lat, d, t, var_3d)</code></pre>
+<p>Seawater density was calculated according to TEOS-10.</p>
+<pre class="r"><code>gt_3d_long &lt;- 
+  read_tsv((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_3d_long.csv&quot;)))
+
+gt_3d &lt;- gt_3d_long %&gt;% 
+  pivot_wider(values_from = value, names_from = var) %&gt;% 
+  mutate(rho = swSigma(salinity = salt, temperature = temp, pressure = dep/10))</code></pre>
+<pre class="r"><code>gt_3d_long &lt;- gt_3d %&gt;% 
+  pivot_longer(3:5, values_to = &quot;value&quot;, names_to = &quot;parameter&quot;)
+
+lab_dates &lt;- pretty(gt_3d_long$date_time)
+
+gt_3d_long %&gt;% 
+  ggplot(aes(value, dep,
+             col=as.numeric(date_time),
+             group=as.factor(date_time)))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0))+
+  scale_color_viridis_c(breaks = as.numeric(lab_dates),
+                        labels = lab_dates,
+                        name=&quot;Date&quot;)+
+  facet_grid(~parameter, scales = &quot;free_x&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/plot_gt_profiles_salt_temp_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="mixed-layer-depth" class="section level2">
-<h2><span class="header-section-number">1.2</span> Mixed layer depth</h2>
-<p>Regional mean mixed layer depth estimates based on sewater density and windspeed within the BloomSail area were extracted from 3h GETM surface data along the Finnmaid track.</p>
+<h2><span class="header-section-number">2.2</span> Mixed layer depth</h2>
+<p>Mean mixed/mixing layer depth estimates based on sewater density and windspeed were extracted from 3h GETM surface data.</p>
 <pre class="r"><code>nc_2d &lt;- nc_open(here(&quot;data/GETM&quot;, &quot;Finnmaid.E.2d.2018.nc&quot;))
 #print(nc_2d)
 
@@ -753,35 +782,22 @@ gt_2d &lt;- gt_2d %&gt;%
 
 
 gt_2d %&gt;% 
-  vroom_write((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_2d_jun_aug_2018.csv&quot;)))
+  vroom_write((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_2d.csv&quot;)))
 
 rm(t, var, gt_2d, lat)</code></pre>
-</div>
-</div>
-<div id="hydrography" class="section level1">
-<h1><span class="header-section-number">2</span> Hydrography</h1>
-<div id="read-summary-files" class="section level2">
-<h2><span class="header-section-number">2.1</span> Read summary files</h2>
-<pre class="r"><code>gt_3d_jun_aug &lt;- 
-  read_tsv((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_3d_jun_aug_2018.csv&quot;)))
+<div id="hovmoeller-plots" class="section level3">
+<h3><span class="header-section-number">2.2.1</span> Hovmoeller Plots</h3>
+<pre class="r"><code>gt_2d &lt;- 
+  read_tsv((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_2d.csv&quot;)))
 
-gt_2d_jun_aug &lt;- 
-  read_tsv((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_2d_jun_aug_2018.csv&quot;)))
-
-gt_3d_jun_aug &lt;- gt_3d_jun_aug %&gt;% 
-  pivot_wider(values_from = value, names_from = var) %&gt;% 
-  mutate(rho = swSigma(salinity = salt, temperature = temp, pressure = dep/10))
-
-gt_2d_jun_aug_daily &lt;- gt_2d_jun_aug %&gt;% 
+gt_2d_daily &lt;- gt_2d %&gt;% 
   mutate(day = yday(date_time)) %&gt;% 
   group_by(day) %&gt;% 
   summarise_all(list(~mean(.,na.rm=TRUE))) %&gt;%
   ungroup() %&gt;% 
-  select(-day)</code></pre>
-</div>
-<div id="hovmoeller-plots" class="section level2">
-<h2><span class="header-section-number">2.2</span> Hovmoeller Plots</h2>
-<pre class="r"><code>p_sal &lt;- gt_3d_jun_aug %&gt;% 
+  select(-day)
+
+p_sal &lt;- gt_3d %&gt;% 
   ggplot()+
   geom_raster(aes(date_time, dep, fill=salt))+
   geom_vline(data=fixed_values, aes(xintercept = start))+
@@ -790,15 +806,14 @@ gt_2d_jun_aug_daily &lt;- gt_2d_jun_aug %&gt;%
   scale_y_reverse()+
   coord_cartesian(expand = 0)+
   labs(y=&quot;Depth [m]&quot;)+
-  theme_bw()+
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())+
-  geom_line(data= gt_2d_jun_aug_daily,
+  geom_line(data= gt_2d_daily,
             aes(x = date_time, y = mld_rho), color = &quot;white&quot;)+
   scale_color_discrete(name = &quot;Legend&quot;, labels = c(&quot;MLD Rho&quot;))
 
 
-p_tem &lt;- gt_3d_jun_aug %&gt;% 
+p_tem &lt;- gt_3d %&gt;% 
   ggplot()+
   geom_raster(aes(date_time, dep, fill=temp))+
   geom_vline(data=fixed_values, aes(xintercept = start))+
@@ -807,14 +822,13 @@ p_tem &lt;- gt_3d_jun_aug %&gt;%
   scale_y_reverse()+
   coord_cartesian(expand = 0)+
   labs(y=&quot;Depth [m]&quot;, x=&quot;&quot;)+
-  theme_bw()+
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())+
-  geom_line(data= gt_2d_jun_aug_daily,
+  geom_line(data= gt_2d_daily,
             aes(x = date_time, y = mld_rho), color = &quot;white&quot;)+
   scale_color_discrete(name = &quot;Legend&quot;, labels = c(&quot;MLD Rho&quot;))
 
-p_rho &lt;- gt_3d_jun_aug %&gt;% 
+p_rho &lt;- gt_3d %&gt;% 
   ggplot()+
   geom_raster(aes(date_time, dep, fill=rho))+
   geom_vline(data=fixed_values, aes(xintercept = start))+
@@ -823,9 +837,8 @@ p_rho &lt;- gt_3d_jun_aug %&gt;%
   scale_y_reverse()+
   coord_cartesian(expand = 0)+
   labs(y=&quot;Depth [m]&quot;, x=&quot;&quot;)+
-  theme_bw()+
   theme(axis.title.x = element_blank())+
-  geom_line(data= gt_2d_jun_aug_daily,
+  geom_line(data= gt_2d_daily,
             aes(x = date_time, y = mld_rho), color = &quot;white&quot;)+
   scale_color_discrete(name = &quot;Legend&quot;, labels = c(&quot;MLD Rho&quot;))
 
@@ -833,47 +846,67 @@ p_sal / p_tem / p_rho</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/plot_hovmoeller_gt_salt_temp_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(p_sal, p_tem, p_rho)</code></pre>
 </div>
-<div id="profiles" class="section level2">
-<h2><span class="header-section-number">2.3</span> Profiles</h2>
-<pre class="r"><code>gt_3d_jun_aug_long &lt;- gt_3d_jun_aug %&gt;% 
-  pivot_longer(3:5, values_to = &quot;value&quot;, names_to = &quot;parameter&quot;)
-#
-lab_dates &lt;- pretty(gt_3d_jun_aug_long$date_time)
+<div id="test-calculation" class="section level3">
+<h3><span class="header-section-number">2.2.2</span> Test calculation</h3>
+<p>Mean mixed layer depth estimates were also calculated for a range of density threshold criteria, Rho lim, from sewater density based on daily mean GETM STD profiles.</p>
+<pre class="r"><code>gt_3d_MLD &lt;- expand_grid(gt_3d, rho_lim = seq(0.1,0.5,0.1))
 
-gt_3d_jun_aug_long %&gt;% 
-  ggplot(aes(value, dep,
-             col=as.numeric(date_time),
-             group=as.factor(date_time)))+
-  geom_path()+
-  scale_y_reverse(expand = c(0,0))+
-  scale_color_viridis_c(breaks = as.numeric(lab_dates),
-                        labels = lab_dates,
-                        name=&quot;Date&quot;)+
-  theme_bw()+
-  facet_grid(~parameter, scales = &quot;free_x&quot;)</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/plot_profiles_gt_salt_temp_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
+gt_3d_MLD &lt;- gt_3d_MLD %&gt;% 
+  arrange(dep) %&gt;% 
+  group_by(date_time, rho_lim) %&gt;% 
+  mutate(d_rho = rho - first(rho)) %&gt;% 
+  filter(d_rho &gt; rho_lim) %&gt;% 
+  summarise(MLD = min(dep)) %&gt;% 
+  ungroup() %&gt;% 
+  mutate(rho_lim = as.factor(rho_lim))</code></pre>
+</div>
+<div id="time-series" class="section level3">
+<h3><span class="header-section-number">2.2.3</span> Time series</h3>
+<pre class="r"><code>gt_2d_daily_long &lt;- gt_2d_daily %&gt;% 
+  pivot_longer(4:8, names_to = &quot;var&quot;, values_to = &quot;value&quot;)
+
+p_MLD_gt &lt;- gt_2d_daily_long %&gt;% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_hline(yintercept = 0)+
+  geom_line(aes(date_time, value, col=var))+
+  scale_y_reverse(limits = c(25,0))+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;GETM variable&quot;)+
+  labs(x=&quot;&quot;, y=&quot;MLD (m)&quot;)+
+  theme(axis.title.x = element_blank())
+
+p_MLD_recalc &lt;- gt_3d_MLD %&gt;% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_hline(yintercept = 0)+
+  geom_line(aes(date_time, MLD, col=rho_lim))+
+  scale_y_reverse(limits = c(25,0))+
+  scale_color_viridis_d(name=&quot;Rho lim&quot;)+
+  labs(x=&quot;&quot;, y=&quot;MLD (m)&quot;)
+
+p_MLD_gt / p_MLD_recalc</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/gt_MLD_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(p_MLD_gt, p_MLD_recalc)</code></pre>
 </div>
 </div>
-<div id="metrology" class="section level1">
-<h1><span class="header-section-number">3</span> Metrology</h1>
-<div id="windspeeds" class="section level2">
-<h2><span class="header-section-number">3.1</span> Windspeeds</h2>
-<pre class="r"><code>gt_2d_jun_aug %&gt;% 
+<div id="windspeed" class="section level2">
+<h2><span class="header-section-number">2.3</span> Windspeed</h2>
+<pre class="r"><code>gt_2d %&gt;% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
   geom_line(aes(x= date_time, y = U_10, col=&quot;3-hourly&quot;))+
-  geom_line(data = gt_2d_jun_aug_daily,
+  geom_line(data = gt_2d_daily,
             aes(x= date_time, y = U_10, col=&quot;Daily mean&quot;))+
   labs(y=&quot;U (m/s)&quot;, x = &quot;Date&quot;)+
   scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;, direction = -1)+
   theme_bw()</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/plot_winspeed-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Finnmaid+GETM.Rmd/plot_gt_winspeed-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="finnmaid" class="section level1">
-<h1><span class="header-section-number">4</span> Finnmaid</h1>
+<h1><span class="header-section-number">3</span> Finnmaid</h1>
 <div id="read-data" class="section level2">
-<h2><span class="header-section-number">4.1</span> Read data</h2>
+<h2><span class="header-section-number">3.1</span> Read data</h2>
 <p>Finnmaid data, including reconstructed data during LICOS operation failure.</p>
 <pre class="r"><code>df &lt;-
  read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
@@ -889,7 +922,7 @@ df &lt;- df %&gt;%
          sal=Sal)</code></pre>
 </div>
 <div id="ct-calculation" class="section level2">
-<h2><span class="header-section-number">4.2</span> C<sub>T</sub> calculation</h2>
+<h2><span class="header-section-number">3.2</span> C<sub>T</sub> calculation</h2>
 <p>Calculate based on fixed A<sub>T</sub> and salinity mean values.</p>
 <pre class="r"><code>df &lt;- df %&gt;% 
   mutate(CT = carb(24, var1=pCO2, var2=1720*1e-6,
@@ -897,7 +930,7 @@ df &lt;- df %&gt;%
                    gas=&quot;insitu&quot;)[,16]*1e6)</code></pre>
 </div>
 <div id="timeseries" class="section level2">
-<h2><span class="header-section-number">4.3</span> Timeseries</h2>
+<h2><span class="header-section-number">3.3</span> Timeseries</h2>
 <pre class="r"><code>FM_ts_mean &lt;- df %&gt;% 
   arrange(date) %&gt;% 
   group_by(ID, sensor) %&gt;% 
@@ -929,9 +962,9 @@ rm(FM_ts_mean, FM_ts_sd)</code></pre>
 </div>
 </div>
 <div id="ct-vs-temperature" class="section level1">
-<h1><span class="header-section-number">5</span> C<sub>T</sub> vs temperature</h1>
+<h1><span class="header-section-number">4</span> C<sub>T</sub> vs temperature</h1>
 <div id="sst-time-series" class="section level2">
-<h2><span class="header-section-number">5.1</span> SST time series</h2>
+<h2><span class="header-section-number">4.1</span> SST time series</h2>
 <pre class="r"><code>FM_ts %&gt;% 
   filter(parameter == &quot;tem&quot;) %&gt;% 
   ggplot()+
@@ -939,15 +972,15 @@ rm(FM_ts_mean, FM_ts_sd)</code></pre>
   geom_path(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
   geom_ribbon(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd), alpha=0.5)+
   geom_point(aes(x=date, y=mean, col=&quot;Finnmaid&quot;))+
-  geom_path(data = gt_2d_jun_aug, aes(x=date_time, y=SST, col=&quot;GETM, 3h&quot;))+
-  geom_path(data = gt_2d_jun_aug_daily, aes(x=date_time, y=SST, col=&quot;GETM, daily&quot;))+
+  geom_path(data = gt_2d, aes(x=date_time, y=SST, col=&quot;GETM, 3h&quot;))+
+  geom_path(data = gt_2d_daily, aes(x=date_time, y=SST, col=&quot;GETM, daily&quot;))+
   scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
   labs(x=&quot;&quot;, y=&quot;SST (°C)&quot;)+
   theme_bw()</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/plot_FM_gt_temp_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="dct-vs-dsst" class="section level2">
-<h2><span class="header-section-number">5.2</span> dC<sub>T</sub> vs dSST</h2>
+<h2><span class="header-section-number">4.2</span> dC<sub>T</sub> vs dSST</h2>
 <p>As primary production (negative changes in C<sub>T</sub>) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated.</p>
 <p>The following analysis is restricted to the BloomSail period.</p>
 <pre class="r"><code>CT_tem &lt;- FM_ts %&gt;%
@@ -959,7 +992,7 @@ rm(FM_ts_mean, FM_ts_sd)</code></pre>
   set_names(c(&quot;date_time&quot;, &quot;FM&quot;, &quot;CT&quot;))
 
 CT_tem &lt;- full_join(CT_tem,
-                    gt_2d_jun_aug_daily %&gt;% select(date_time, gt = SST))
+                    gt_2d_daily %&gt;% select(date_time, gt = SST))
 
 CT_tem &lt;- CT_tem %&gt;% 
   arrange(date_time) %&gt;%
@@ -995,9 +1028,9 @@ CT_tem %&gt;%
 </div>
 </div>
 <div id="ncp" class="section level1">
-<h1><span class="header-section-number">6</span> NCP</h1>
+<h1><span class="header-section-number">5</span> NCP</h1>
 <div id="mld-approach" class="section level2">
-<h2><span class="header-section-number">6.1</span> MLD approach</h2>
+<h2><span class="header-section-number">5.1</span> MLD approach</h2>
 <p>Use dCT/dtem from Finnmaid, MLD from GETM</p>
 <pre class="r"><code>NCP_MLD &lt;- FM_ts %&gt;%
   filter(date &gt; fixed_values$start,
@@ -1008,7 +1041,7 @@ CT_tem %&gt;%
   set_names(c(&quot;date_time&quot;, &quot;SST&quot;, &quot;CT&quot;))
 
 NCP_MLD &lt;- full_join(NCP_MLD,
-                     gt_2d_jun_aug_daily %&gt;% select(-c(SSS, SST, U_10)))
+                     gt_2d_daily %&gt;% select(-c(SSS, SST, U_10)))
 
 NCP_MLD &lt;- NCP_MLD %&gt;% 
   pivot_longer(cols = 4:8, values_to = &quot;MLD&quot;, names_to = &quot;Parameter&quot;) %&gt;% 
@@ -1036,7 +1069,7 @@ NCP_MLD %&gt;%
          NCP_cum = cumsum(replace_na(dNCP, 0))) %&gt;% 
   ungroup()</code></pre>
 <div id="incremental-and-cumulative-timeseries" class="section level3">
-<h3><span class="header-section-number">6.1.1</span> Incremental and cumulative timeseries</h3>
+<h3><span class="header-section-number">5.1.1</span> Incremental and cumulative timeseries</h3>
 <p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated.</p>
 <pre class="r"><code>p_iNCP &lt;- NCP_MLD %&gt;% 
   ggplot(aes(date_time, dNCP, fill= Parameter))+
@@ -1065,16 +1098,16 @@ p_iNCPcum &lt;-  NCP_MLD %&gt;%
 </div>
 </div>
 <div id="delta-t-appraoch" class="section level2">
-<h2><span class="header-section-number">6.2</span> delta T appraoch</h2>
+<h2><span class="header-section-number">5.2</span> delta T appraoch</h2>
 <pre class="r"><code>CT_tem &lt;- CT_tem %&gt;% 
   filter(obs == &quot;FM&quot;) %&gt;% 
   mutate(factor = dCT/dSST,
          factor = if_else(is.na(factor), 0, factor)) %&gt;% 
   select(date_time, factor)
 
-CT_tem &lt;- expand_grid(CT_tem, dep = unique(gt_3d_jun_aug$dep))
+CT_tem &lt;- expand_grid(CT_tem, dep = unique(gt_3d$dep))
 
-NCP_dT &lt;- full_join(gt_3d_jun_aug %&gt;% select(date_time, dep, temp), 
+NCP_dT &lt;- full_join(gt_3d %&gt;% select(date_time, dep, temp), 
                     CT_tem)
 
 NCP_dT &lt;- NCP_dT %&gt;% 
@@ -1100,7 +1133,7 @@ NCP_dT &lt;- NCP_dT %&gt;%
          cum_value = replace_na(diff_value, 0))</code></pre>
 </div>
 <div id="profiles-of-incremental-changes" class="section level2">
-<h2><span class="header-section-number">6.3</span> Profiles of incremental changes</h2>
+<h2><span class="header-section-number">5.3</span> Profiles of incremental changes</h2>
 <p>Changes of seawater parameters at each depth were reconstructed from one cruise day to the next and divided by the number of days inbetween.</p>
 <pre class="r"><code>NCP_dT %&gt;% 
   arrange(dep) %&gt;% 
@@ -1115,7 +1148,7 @@ NCP_dT &lt;- NCP_dT %&gt;%
 <p><img src="figure/Finnmaid+GETM.Rmd/incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="profiles-of-cumulative-changes" class="section level2">
-<h2><span class="header-section-number">6.4</span> Profiles of cumulative changes</h2>
+<h2><span class="header-section-number">5.4</span> Profiles of cumulative changes</h2>
 <p>Cumulative changes of seawater parameters were calculated at each depth relative to the first cruise day on July 5.</p>
 <pre class="r"><code>NCP_dT %&gt;% 
   arrange(dep) %&gt;% 
@@ -1162,11 +1195,9 @@ Running under: Windows 10 x64 (build 18363)
 Matrix products: default
 
 locale:
-[1] LC_COLLATE=English_United States.1252 
-[2] LC_CTYPE=English_United States.1252   
-[3] LC_MONETARY=English_United States.1252
-[4] LC_NUMERIC=C                          
-[5] LC_TIME=English_United States.1252    
+[1] LC_COLLATE=English_Germany.1252  LC_CTYPE=English_Germany.1252   
+[3] LC_MONETARY=English_Germany.1252 LC_NUMERIC=C                    
+[5] LC_TIME=English_Germany.1252    
 
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
