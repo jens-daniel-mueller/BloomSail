@@ -163,7 +163,7 @@ gt_3d <- gt_3d_long %>%
 ```{r plot_gt_profiles_salt_temp_rho}
 
 gt_3d_long <- gt_3d %>% 
-  pivot_longer(3:5, values_to = "value", names_to = "parameter")
+  pivot_longer(3:5, values_to = "value", names_to = "var")
 
 lab_dates <- pretty(gt_3d_long$date_time)
 
@@ -176,7 +176,7 @@ gt_3d_long %>%
   scale_color_viridis_c(breaks = as.numeric(lab_dates),
                         labels = lab_dates,
                         name="Date")+
-  facet_grid(~parameter, scales = "free_x")
+  facet_grid(~var, scales = "free_x")
 
 ```
 
@@ -390,11 +390,11 @@ Finnmaid data, including reconstructed data during LICOS operation failure.
 
 ```{r read_Finnmaid}
 
-df <-
+fm <-
  read_csv(here::here("Data/_summarized_data_files",
                       "Finnmaid.csv"))
 
-df <- df %>% 
+fm <- fm %>% 
   filter(Area == "BS",
          date > start_date,
          date < end_date) %>% 
@@ -411,48 +411,67 @@ Calculate based on fixed A~T~ and salinity mean values.
 
 ```{r CT_calculation}
 
-df <- df %>% 
-  mutate(CT = carb(24, var1=pCO2, var2=1720*1e-6,
-                   S=6.9, T=tem, k1k2="m10", kf="dg", ks="d",
-                   gas="insitu")[,16]*1e6)
+fm <- fm %>% 
+  mutate(CT = carb(24,
+                   var1=pCO2,
+                   var2=fixed_values$AT*1e-6,
+                   S=fixed_values$sal,
+                   T=tem,
+                   k1k2="m10", kf="dg", ks="d", gas="insitu")[,16]*1e6)
 
 ```
 
 ## Timeseries
 
+Calculate regional mean and sd values for each crossing of the area.
+
 ```{r timeseries_of_regional_averages}
 
-FM_ts_mean <- df %>% 
+FM_ID_mean <- fm %>% 
   arrange(date) %>% 
   group_by(ID, sensor) %>% 
   summarise_all(list(~mean(.)), na.rm=TRUE) %>%
   ungroup() %>% 
-  pivot_longer(4:8, values_to = "mean", names_to = "parameter")
+  pivot_longer(4:8, values_to = "mean", names_to = "var")
 
-FM_ts_sd <- df %>% 
+FM_ID_sd <- fm %>% 
   arrange(date) %>% 
   group_by(ID, sensor) %>% 
   summarise_all(list(~sd(.)), na.rm=TRUE) %>%
   ungroup() %>% 
-  pivot_longer(4:8, values_to = "sd", names_to = "parameter") %>% 
+  pivot_longer(4:8, values_to = "sd", names_to = "var") %>% 
   select(-date)
 
-FM_ts <- inner_join(FM_ts_mean, FM_ts_sd)
+FM_ID <- inner_join(FM_ID_mean, FM_ID_sd)
 
-rm(FM_ts_mean, FM_ts_sd)
+rm(FM_ID_mean, FM_ID_sd)
+
+```
+
+Read BloomSail data to fill observational gap of Finnmaid date in second half of June.
+
+```{r read_BloomSail_sensor_data}
+
+ts_profiles_ID_long <-
+  read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum.csv"))
+
+ts_profiles_ID_long_surface <- ts_profiles_ID_long %>% 
+  filter(dep == 3.5)
 
 ```
 
 
-```{r Plot_Finnmaid_crossings, fig.asp=1.5}
+```{r Finnmaid_BloomSail_time_series, fig.asp=1.5}
 
-FM_ts %>% 
+FM_ID %>% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
   geom_path(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
   geom_ribbon(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd), alpha=0.5)+
   geom_point(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd, col=sensor))+
-  facet_grid(parameter~., scales = "free_y")+
+  geom_point(data = ts_profiles_ID_long_surface,
+             aes(x=date_time_ID, y=value, col="BloomSail"))+
+  facet_grid(var~., scales = "free_y")+
   scale_color_brewer(palette = "Set1", direction=-1)+
   theme_bw()
 
@@ -465,8 +484,8 @@ FM_ts %>%
 
 ```{r plot_FM_gt_temp_timeseries}
 
-FM_ts %>% 
-  filter(parameter == "tem") %>% 
+FM_ID %>% 
+  filter(var == "tem") %>% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
   geom_path(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
@@ -488,12 +507,12 @@ The following analysis is restricted to the BloomSail period.
 
 ```{r CT_vs_temperature}
 
-CT_tem <- FM_ts %>%
+CT_tem <- FM_ID %>%
   filter(date > fixed_values$start,
          date < fixed_values$end) %>% 
-  filter(parameter %in% c("tem", "CT")) %>% 
-  select(date, parameter, mean) %>% 
-  pivot_wider(values_from = mean, names_from = parameter) %>% 
+  filter(var %in% c("tem", "CT")) %>% 
+  select(date, var, mean) %>% 
+  pivot_wider(values_from = mean, names_from = var) %>% 
   set_names(c("date_time", "FM", "CT"))
 
 CT_tem <- full_join(CT_tem,
@@ -541,37 +560,27 @@ Use dCT/dtem from Finnmaid, MLD from GETM
 
 ```{r NCP_MLD}
 
-NCP_MLD <- FM_ts %>%
+NCP_MLD <- FM_ID %>%
   filter(date > fixed_values$start,
          date < fixed_values$end) %>% 
-  filter(parameter %in% c("tem", "CT")) %>% 
-  select(date, parameter, mean) %>% 
-  pivot_wider(values_from = mean, names_from = parameter) %>% 
+  filter(var %in% c("tem", "CT")) %>% 
+  select(date, var, mean) %>% 
+  pivot_wider(values_from = mean, names_from = var) %>% 
   set_names(c("date_time", "SST", "CT"))
 
 NCP_MLD <- full_join(NCP_MLD,
                      gt_2d_daily %>% select(-c(SSS, SST, U_10)))
 
 NCP_MLD <- NCP_MLD %>% 
-  pivot_longer(cols = 4:8, values_to = "MLD", names_to = "Parameter") %>% 
+  pivot_longer(cols = 4:8, values_to = "MLD", names_to = "var") %>% 
   arrange(date_time) %>%
-  group_by(Parameter) %>% 
+  group_by(var) %>% 
   mutate(MLD = na.approx(MLD)) %>%
   ungroup()
 
-NCP_MLD %>% 
-  ggplot()+
-  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_line(aes(date_time, MLD, col=Parameter))+
-  geom_point(data = NCP_MLD %>% drop_na, aes(date_time, MLD, col=Parameter))+
-  scale_color_brewer(palette = "Set1")+
-  labs(x="", y="MLD (m)")+
-  theme_bw()
-
-
 NCP_MLD <- NCP_MLD %>% 
   drop_na() %>% 
-  group_by(Parameter) %>% 
+  group_by(var) %>% 
   arrange(date_time) %>% 
   mutate(dCT = CT - lag(CT),
          dSST = SST - lag(SST),
@@ -591,7 +600,7 @@ Total incremental and cumulative C~T~ changes inbetween cruise dates were calcul
 ```{r plot_integrated_NCP_timeseries, fig.asp=1.5}
 
 p_iNCP <- NCP_MLD %>% 
-  ggplot(aes(date_time, dNCP, fill= Parameter))+
+  ggplot(aes(date_time, dNCP, fill= var))+
   geom_hline(yintercept = 0)+
   geom_col(col="black", position = "dodge")+
   scale_y_continuous(breaks = seq(-100, 100, 0.2))+
@@ -599,12 +608,12 @@ p_iNCP <- NCP_MLD %>%
 
 p_iNCPcum <-  NCP_MLD %>% 
   ggplot(aes(date_time,  NCP_cum, 
-             fill= Parameter))+
+             fill= var))+
   geom_hline(yintercept = -0.4)+
   geom_area(position = "identity", col="black")+
   geom_hline(yintercept = 0)+
   scale_y_continuous(breaks = seq(-100, 100, 0.2))+
-  facet_grid(Parameter~., scales = "free_y", space = "free_y")+
+  facet_grid(var~., scales = "free_y", space = "free_y")+
   theme(strip.background = element_blank(),
         strip.text = element_blank())+
   labs(y="integrated, cumulative, directional CT changes [mol/m2]", x="date")
@@ -676,7 +685,7 @@ NCP_dT %>%
   geom_path()+
   scale_y_reverse()+
   #scale_color_viridis_d()+
-  #facet_wrap(~parameter, scales = "free_x")+
+  #facet_wrap(~var, scales = "free_x")+
   labs(x="Change of value inbetween cruises per day")
 
 

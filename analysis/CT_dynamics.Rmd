@@ -1559,6 +1559,7 @@ Should be identical for stored files and objectes in R environment
   - tb: tina 5 bottle
   - fm: finnmaid
   - og: ostergarnsholm tower
+  - gt: GETM (high-res huydographical model)
   - mp: bathymetric map
 
 - subsetting and modification levels
