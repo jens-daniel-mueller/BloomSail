@@ -33,10 +33,10 @@ theme_set(theme_bw())
 
 # Approach
 
-In order to test how (and how well) the depth-integrated NCP estimates can be reproduced if only surface CO2 data were available, the BloomSail observations were restricted to those made in surface water and two reconstruction approaches were tested:
+In order to test how (and how well) the depth-integrated C~T~ estimates can be reproduced if only surface CO2 data were available, the BloomSail observations were restricted to those made in surface water and two reconstruction approaches were tested:
 
 1. MLD: Integration of surface observation across the MLD, assuming homogenious vertical patterns
-2. Temperature: Vertical reconstruction of incremental CT changes based on profiles of incremental changes in temperature
+2. Temperature: Vertical reconstruction of incremental C~T~ changes based on profiles of incremental changes in temperature
 
 # Sensor data
 

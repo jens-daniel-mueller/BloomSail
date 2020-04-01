@@ -29,6 +29,12 @@ library(patchwork)
 library(zoo)
 ```
 
+
+```{r ggplot_theme, include = FALSE}
+theme_set(theme_bw())
+```
+
+
 ```{r subsetting_criteria}
 
 # route
@@ -52,13 +58,22 @@ fixed_values <-
 
 ```
 
-# GETM Data preparation
+# Approach
 
-## Salinity and temperature profiles
+In order to test how (and how well) the depth-integrated C~T~ estimates can be reproduced if only surface CO~2~ data from VOS Finnamaid and hydrographical GETM model date were available, two reconstruction approaches were tested:
 
-Mean salinity and temperature profiles within the BloomSail area were extracted from daily GETM transects beneath the Finnmaid track.
+1. MLD: Integration of surface observation across the MLD, assuming homogenious vertical patterns
+2. Temperature: Vertical reconstruction of incremental CT changes based on profiles of incremental changes in temperature
 
-```{r read_getm_3d_sal_tem, eval=FALSE}
+# GETM
+
+The following information refer to regional mean values modeled along the Finnmaid track east and within the BloomSail field work area (57.3 - 57.5 N). 
+
+## STD Profiles 
+
+Mean daily salinity and temperature profiles were extracted from 3d GETM data (vertically resolved transects).
+
+```{r read_gt_3d_sal_tem, eval=FALSE}
 
 nc <- nc_open(here::here("data/GETM", "Finnmaid.E.3d.2018.nc"))
 
@@ -118,26 +133,59 @@ rm(array, fillvalue)
 nc_close(nc)
 rm(nc)
 
-gt_3d_jun_aug <- gt_3d %>% 
+gt_3d <- gt_3d %>% 
   filter(date_time >= start_date & date_time <= end_date) %>% 
   group_by(dep,var,date_time ) %>% 
   summarise_all(list(value=~mean(.,na.rm=TRUE))) %>%
   ungroup()
 
-gt_3d_jun_aug %>% 
-  vroom_write((here::here("data/_summarized_data_files", file = "gt_3d_jun_aug_2018.csv")))
+gt_3d %>% 
+  vroom_write((here::here("data/_summarized_data_files", file = "gt_3d_long.csv")))
 
 
-rm(gt_3d, gt_3d_jun_aug, d1_deep, d1_shallow, i, lat, d, t, var_3d)
+rm(gt_3d, gt_3d, d1_deep, d1_shallow, i, lat, d, t, var_3d)
+
+```
+
+Seawater density was calculated according to TEOS-10.
+
+```{r calculate_density_gt_3d}
+
+gt_3d_long <- 
+  read_tsv((here::here("data/_summarized_data_files", file = "gt_3d_long.csv")))
+
+gt_3d <- gt_3d_long %>% 
+  pivot_wider(values_from = value, names_from = var) %>% 
+  mutate(rho = swSigma(salinity = salt, temperature = temp, pressure = dep/10))
+
+```
+
+```{r plot_gt_profiles_salt_temp_rho}
+
+gt_3d_long <- gt_3d %>% 
+  pivot_longer(3:5, values_to = "value", names_to = "parameter")
+
+lab_dates <- pretty(gt_3d_long$date_time)
+
+gt_3d_long %>% 
+  ggplot(aes(value, dep,
+             col=as.numeric(date_time),
+             group=as.factor(date_time)))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0))+
+  scale_color_viridis_c(breaks = as.numeric(lab_dates),
+                        labels = lab_dates,
+                        name="Date")+
+  facet_grid(~parameter, scales = "free_x")
 
 ```
 
 
 ## Mixed layer depth
 
-Regional mean mixed layer depth estimates based on sewater density and windspeed within the BloomSail area were extracted from 3h GETM surface data along the Finnmaid track.
+Mean mixed/mixing layer depth estimates based on sewater density and windspeed were extracted from 3h GETM surface data.
 
-```{r read_getm_2d_mld_wind, eval=FALSE}
+```{r read_gt_2d_mld_wind, eval=FALSE}
 
 nc_2d <- nc_open(here("data/GETM", "Finnmaid.E.2d.2018.nc"))
 #print(nc_2d)
@@ -193,43 +241,27 @@ gt_2d <- gt_2d %>%
 
 
 gt_2d %>% 
-  vroom_write((here::here("data/_summarized_data_files", file = "gt_2d_jun_aug_2018.csv")))
+  vroom_write((here::here("data/_summarized_data_files", file = "gt_2d.csv")))
 
 rm(t, var, gt_2d, lat)
 
 ```
 
-# Hydrography
+### Hovmoeller Plots
 
-## Read summary files
+```{r plot_hovmoeller_gt_salt_temp_rho}
 
-```{r read_gt_summary_files}
+gt_2d <- 
+  read_tsv((here::here("data/_summarized_data_files", file = "gt_2d.csv")))
 
-gt_3d_jun_aug <- 
-  read_tsv((here::here("data/_summarized_data_files", file = "gt_3d_jun_aug_2018.csv")))
-
-gt_2d_jun_aug <- 
-  read_tsv((here::here("data/_summarized_data_files", file = "gt_2d_jun_aug_2018.csv")))
-
-gt_3d_jun_aug <- gt_3d_jun_aug %>% 
-  pivot_wider(values_from = value, names_from = var) %>% 
-  mutate(rho = swSigma(salinity = salt, temperature = temp, pressure = dep/10))
-
-gt_2d_jun_aug_daily <- gt_2d_jun_aug %>% 
+gt_2d_daily <- gt_2d %>% 
   mutate(day = yday(date_time)) %>% 
   group_by(day) %>% 
   summarise_all(list(~mean(.,na.rm=TRUE))) %>%
   ungroup() %>% 
   select(-day)
 
-```
-
-
-## Hovmoeller Plots
-
-```{r plot_hovmoeller_gt_salt_temp_rho}
-
-p_sal <- gt_3d_jun_aug %>% 
+p_sal <- gt_3d %>% 
   ggplot()+
   geom_raster(aes(date_time, dep, fill=salt))+
   geom_vline(data=fixed_values, aes(xintercept = start))+
@@ -238,15 +270,14 @@ p_sal <- gt_3d_jun_aug %>%
   scale_y_reverse()+
   coord_cartesian(expand = 0)+
   labs(y="Depth [m]")+
-  theme_bw()+
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())+
-  geom_line(data= gt_2d_jun_aug_daily,
+  geom_line(data= gt_2d_daily,
             aes(x = date_time, y = mld_rho), color = "white")+
   scale_color_discrete(name = "Legend", labels = c("MLD Rho"))
 
 
-p_tem <- gt_3d_jun_aug %>% 
+p_tem <- gt_3d %>% 
   ggplot()+
   geom_raster(aes(date_time, dep, fill=temp))+
   geom_vline(data=fixed_values, aes(xintercept = start))+
@@ -255,14 +286,13 @@ p_tem <- gt_3d_jun_aug %>%
   scale_y_reverse()+
   coord_cartesian(expand = 0)+
   labs(y="Depth [m]", x="")+
-  theme_bw()+
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())+
-  geom_line(data= gt_2d_jun_aug_daily,
+  geom_line(data= gt_2d_daily,
             aes(x = date_time, y = mld_rho), color = "white")+
   scale_color_discrete(name = "Legend", labels = c("MLD Rho"))
 
-p_rho <- gt_3d_jun_aug %>% 
+p_rho <- gt_3d %>% 
   ggplot()+
   geom_raster(aes(date_time, dep, fill=rho))+
   geom_vline(data=fixed_values, aes(xintercept = start))+
@@ -271,9 +301,8 @@ p_rho <- gt_3d_jun_aug %>%
   scale_y_reverse()+
   coord_cartesian(expand = 0)+
   labs(y="Depth [m]", x="")+
-  theme_bw()+
   theme(axis.title.x = element_blank())+
-  geom_line(data= gt_2d_jun_aug_daily,
+  geom_line(data= gt_2d_daily,
             aes(x = date_time, y = mld_rho), color = "white")+
   scale_color_discrete(name = "Legend", labels = c("MLD Rho"))
 
@@ -283,41 +312,67 @@ rm(p_sal, p_tem, p_rho)
 
 ```
 
-## Profiles
+### Test calculation
 
-```{r plot_profiles_gt_salt_temp_rho}
+Mean mixed layer depth estimates were also calculated for a range of density threshold criteria, Rho lim, from sewater density based on daily mean GETM STD profiles.
 
-gt_3d_jun_aug_long <- gt_3d_jun_aug %>% 
-  pivot_longer(3:5, values_to = "value", names_to = "parameter")
-#
-lab_dates <- pretty(gt_3d_jun_aug_long$date_time)
+```{r calculate_MLD_gt_3d}
 
-gt_3d_jun_aug_long %>% 
-  ggplot(aes(value, dep,
-             col=as.numeric(date_time),
-             group=as.factor(date_time)))+
-  geom_path()+
-  scale_y_reverse(expand = c(0,0))+
-  scale_color_viridis_c(breaks = as.numeric(lab_dates),
-                        labels = lab_dates,
-                        name="Date")+
-  theme_bw()+
-  facet_grid(~parameter, scales = "free_x")
+gt_3d_MLD <- expand_grid(gt_3d, rho_lim = seq(0.1,0.5,0.1))
+
+gt_3d_MLD <- gt_3d_MLD %>% 
+  arrange(dep) %>% 
+  group_by(date_time, rho_lim) %>% 
+  mutate(d_rho = rho - first(rho)) %>% 
+  filter(d_rho > rho_lim) %>% 
+  summarise(MLD = min(dep)) %>% 
+  ungroup() %>% 
+  mutate(rho_lim = as.factor(rho_lim))
+
+```
+
+### Time series
+
+```{r gt_MLD_time_series}
+
+gt_2d_daily_long <- gt_2d_daily %>% 
+  pivot_longer(4:8, names_to = "var", values_to = "value")
+
+p_MLD_gt <- gt_2d_daily_long %>% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_hline(yintercept = 0)+
+  geom_line(aes(date_time, value, col=var))+
+  scale_y_reverse(limits = c(25,0))+
+  scale_color_brewer(palette = "Set1", name="GETM variable")+
+  labs(x="", y="MLD (m)")+
+  theme(axis.title.x = element_blank())
+
+p_MLD_recalc <- gt_3d_MLD %>% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_hline(yintercept = 0)+
+  geom_line(aes(date_time, MLD, col=rho_lim))+
+  scale_y_reverse(limits = c(25,0))+
+  scale_color_viridis_d(name="Rho lim")+
+  labs(x="", y="MLD (m)")
+
+p_MLD_gt / p_MLD_recalc
+
+rm(p_MLD_gt, p_MLD_recalc)
 
 ```
 
 
-# Metrology
+## Windspeed
 
-## Windspeeds
+```{r plot_gt_winspeed}
 
-```{r plot_winspeed}
-
-gt_2d_jun_aug %>% 
+gt_2d %>% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
   geom_line(aes(x= date_time, y = U_10, col="3-hourly"))+
-  geom_line(data = gt_2d_jun_aug_daily,
+  geom_line(data = gt_2d_daily,
             aes(x= date_time, y = U_10, col="Daily mean"))+
   labs(y="U (m/s)", x = "Date")+
   scale_color_brewer(palette = "Set1", name="", direction = -1)+
@@ -417,8 +472,8 @@ FM_ts %>%
   geom_path(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
   geom_ribbon(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd), alpha=0.5)+
   geom_point(aes(x=date, y=mean, col="Finnmaid"))+
-  geom_path(data = gt_2d_jun_aug, aes(x=date_time, y=SST, col="GETM, 3h"))+
-  geom_path(data = gt_2d_jun_aug_daily, aes(x=date_time, y=SST, col="GETM, daily"))+
+  geom_path(data = gt_2d, aes(x=date_time, y=SST, col="GETM, 3h"))+
+  geom_path(data = gt_2d_daily, aes(x=date_time, y=SST, col="GETM, daily"))+
   scale_color_brewer(palette = "Set1", name="")+
   labs(x="", y="SST (°C)")+
   theme_bw()
@@ -442,7 +497,7 @@ CT_tem <- FM_ts %>%
   set_names(c("date_time", "FM", "CT"))
 
 CT_tem <- full_join(CT_tem,
-                    gt_2d_jun_aug_daily %>% select(date_time, gt = SST))
+                    gt_2d_daily %>% select(date_time, gt = SST))
 
 CT_tem <- CT_tem %>% 
   arrange(date_time) %>%
@@ -495,7 +550,7 @@ NCP_MLD <- FM_ts %>%
   set_names(c("date_time", "SST", "CT"))
 
 NCP_MLD <- full_join(NCP_MLD,
-                     gt_2d_jun_aug_daily %>% select(-c(SSS, SST, U_10)))
+                     gt_2d_daily %>% select(-c(SSS, SST, U_10)))
 
 NCP_MLD <- NCP_MLD %>% 
   pivot_longer(cols = 4:8, values_to = "MLD", names_to = "Parameter") %>% 
@@ -572,9 +627,9 @@ CT_tem <- CT_tem %>%
          factor = if_else(is.na(factor), 0, factor)) %>% 
   select(date_time, factor)
 
-CT_tem <- expand_grid(CT_tem, dep = unique(gt_3d_jun_aug$dep))
+CT_tem <- expand_grid(CT_tem, dep = unique(gt_3d$dep))
 
-NCP_dT <- full_join(gt_3d_jun_aug %>% select(date_time, dep, temp), 
+NCP_dT <- full_join(gt_3d %>% select(date_time, dep, temp), 
                     CT_tem)
 
 NCP_dT <- NCP_dT %>% 
