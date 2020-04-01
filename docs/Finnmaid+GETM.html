@@ -554,10 +554,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec19920043d8af20fba341b95f03d041226357b98targetblankc199200a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c19920043d8af20fba341b95f03d041226357b98" target="_blank">c199200</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeccb509f9ca1f8cd490554a4a1e7a3382c1092cd3targetblankccb509fa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ccb509f9ca1f8cd490554a4a1e7a3382c1092cd3" target="_blank">ccb509f</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec19920043d8af20fba341b95f03d041226357b98targetblankc199200a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeccb509f9ca1f8cd490554a4a1e7a3382c1092cd3targetblankccb509fa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -600,7 +600,8 @@ library(here)
 library(seacarb)
 library(oce)
 library(patchwork)
-library(zoo)</code></pre>
+library(zoo)
+library(metR)</code></pre>
 <pre class="r"><code># route
 select_route &lt;- &quot;E&quot;
 
@@ -669,7 +670,7 @@ array[array == fillvalue$value] &lt;- NA
         mutate(lat = as.numeric(lat)) %&gt;%
         filter(lat &gt; low_lat, lat &lt; high_lat,
                dep &gt;= d1_shallow, dep &lt;= d1_deep) %&gt;%
-        #summarise_all(&quot;mean&quot;) %&gt;%
+        #summarise_all(&quot;value&quot;) %&gt;%
         mutate(var = var_3d,
                date_time=t[i]) %&gt;% 
         dplyr::select(date_time, dep, value, var) #%&gt;% 
@@ -935,14 +936,14 @@ fm &lt;- fm %&gt;%
 <div id="timeseries" class="section level2">
 <h2><span class="header-section-number">3.3</span> Timeseries</h2>
 <p>Calculate regional mean and sd values for each crossing of the area.</p>
-<pre class="r"><code>FM_ID_mean &lt;- fm %&gt;% 
+<pre class="r"><code>fm_ID_mean &lt;- fm %&gt;% 
   arrange(date) %&gt;% 
   group_by(ID, sensor) %&gt;% 
   summarise_all(list(~mean(.)), na.rm=TRUE) %&gt;%
   ungroup() %&gt;% 
-  pivot_longer(4:8, values_to = &quot;mean&quot;, names_to = &quot;var&quot;)
+  pivot_longer(4:8, values_to = &quot;value&quot;, names_to = &quot;var&quot;)
 
-FM_ID_sd &lt;- fm %&gt;% 
+fm_ID_sd &lt;- fm %&gt;% 
   arrange(date) %&gt;% 
   group_by(ID, sensor) %&gt;% 
   summarise_all(list(~sd(.)), na.rm=TRUE) %&gt;%
@@ -950,76 +951,163 @@ FM_ID_sd &lt;- fm %&gt;%
   pivot_longer(4:8, values_to = &quot;sd&quot;, names_to = &quot;var&quot;) %&gt;% 
   select(-date)
 
-FM_ID &lt;- inner_join(FM_ID_mean, FM_ID_sd)
+fm_ID &lt;- inner_join(fm_ID_mean, fm_ID_sd)
 
-rm(FM_ID_mean, FM_ID_sd)</code></pre>
+rm(fm_ID_mean, fm_ID_sd)</code></pre>
 <p>Read BloomSail data to fill observational gap of Finnmaid date in second half of June.</p>
 <pre class="r"><code>ts_profiles_ID_long &lt;-
   read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum.csv&quot;))
 
 ts_profiles_ID_long_surface &lt;- ts_profiles_ID_long %&gt;% 
-  filter(dep == 3.5)</code></pre>
-<pre class="r"><code>FM_ID %&gt;% 
+  filter(dep == 3.5) %&gt;% 
+  mutate(ID = as.factor(ID))</code></pre>
+<pre class="r"><code>fm_ID %&gt;% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_path(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
-  geom_ribbon(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd), alpha=0.5)+
-  geom_point(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd, col=sensor))+
+  geom_path(aes(x=date, y=value))+
+  geom_ribbon(aes(x=date, y=value, ymax=value+sd, ymin=value-sd), alpha=0.5)+
+  geom_point(aes(x=date, y=value, col=sensor))+
   geom_point(data = ts_profiles_ID_long_surface,
              aes(x=date_time_ID, y=value, col=&quot;BloomSail&quot;))+
+  geom_line(data = ts_profiles_ID_long_surface,
+             aes(x=date_time_ID, y=value, col=&quot;BloomSail&quot;))+
   facet_grid(var~., scales = &quot;free_y&quot;)+
-  scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
-  theme_bw()</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/Finnmaid_BloomSail_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+  scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/fm_ts_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="missing-observations" class="section level2">
+<h2><span class="header-section-number">3.4</span> Missing observations</h2>
+<p>The observational gaps in the Finnmaid SST and C<sub>T</sub> time series were filled with two BloomSail observations. The time series was restricted to the period where BloomSail observations are available.</p>
+<pre class="r"><code>ts_gap &lt;- ts_profiles_ID_long_surface %&gt;% 
+  filter(ID %in% c(&quot;180718&quot;, &quot;180723&quot;),
+         var %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
+  select(date = date_time_ID, ID, var, value = value) %&gt;% 
+  mutate(sensor = &quot;BloomSail&quot;)
+
+fm_ts_ID &lt;- full_join(fm_ID, ts_gap) %&gt;% 
+  arrange(date) %&gt;% 
+  select(-sd) %&gt;% 
+  filter(var %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
+  mutate(period = &quot;BloomSail&quot;,
+         period = if_else(date &lt; fixed_values$start, &quot;pre-BloomSail&quot;, period),
+         period = if_else(date &gt; fixed_values$end, &quot;post-BloomSail&quot;, period))
+
+fm_ts_ID %&gt;% 
+  ggplot()+
+  geom_rect(data = fixed_values,
+            aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_path(aes(date, value, col=period))+
+  geom_point(aes(date, value, col=period))+
+  facet_grid(var~., scales = &quot;free_y&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/fm_fill_gap_ts-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>fm_ts_ID &lt;- fm_ts_ID %&gt;% 
+  filter(period == &quot;BloomSail&quot;) %&gt;% 
+  select(-period)
+
+rm(fm_ID, fm, ts_gap, ts_profiles_ID_long_surface)</code></pre>
 </div>
 </div>
-<div id="ct-vs-temperature" class="section level1">
-<h1><span class="header-section-number">4</span> C<sub>T</sub> vs temperature</h1>
-<div id="sst-time-series" class="section level2">
-<h2><span class="header-section-number">4.1</span> SST time series</h2>
-<pre class="r"><code>FM_ID %&gt;% 
+<div id="ict" class="section level1">
+<h1><span class="header-section-number">4</span> iC<sub>T</sub></h1>
+<div id="mld-approach" class="section level2">
+<h2><span class="header-section-number">4.1</span> MLD approach</h2>
+<p>Use dCT from Finnmaid and MLD from GETM and calculate iC<sub>T</sub> as their product.</p>
+<pre class="r"><code>iCT_MLD &lt;- fm_ts_ID %&gt;%
+  select(date, var, value) %&gt;% 
+  pivot_wider(values_from = value, names_from = var) %&gt;% 
+  set_names(c(&quot;date_time&quot;, &quot;SST&quot;, &quot;CT&quot;))
+
+iCT_MLD &lt;- full_join(iCT_MLD,
+                     gt_2d_daily %&gt;% select(-c(SSS, SST, U_10)))
+
+iCT_MLD &lt;- iCT_MLD %&gt;% 
+  pivot_longer(cols = 4:8, values_to = &quot;MLD&quot;, names_to = &quot;var&quot;) %&gt;% 
+  arrange(date_time) %&gt;%
+  group_by(var) %&gt;% 
+  mutate(MLD = na.approx(MLD)) %&gt;%
+  ungroup()
+
+iCT_MLD &lt;- iCT_MLD %&gt;% 
+  drop_na() %&gt;% 
+  group_by(var) %&gt;% 
+  arrange(date_time) %&gt;% 
+  mutate(CT_diff = CT - lag(CT),
+         SST_diff = SST - lag(SST),
+         CT_i_diff = CT_diff * MLD / 1000,
+         CT_i_cum = cumsum(replace_na(CT_i_diff, 0))) %&gt;% 
+  ungroup()</code></pre>
+<div id="incremental-and-cumulative-timeseries" class="section level3">
+<h3><span class="header-section-number">4.1.1</span> Incremental and cumulative timeseries</h3>
+<p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated.</p>
+<pre class="r"><code>p_iCT &lt;- iCT_MLD %&gt;% 
+  ggplot(aes(date_time, CT_i_diff, fill= var))+
+  geom_hline(yintercept = 0)+
+  geom_col(col=&quot;black&quot;, position = &quot;dodge&quot;)+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  scale_fill_brewer(palette = &quot;Set1&quot;, name=&quot;GETM variable&quot;)+
+  labs(y=&quot;integrated CT changes [mol/m2]&quot;, x=&quot;date&quot;)
+
+p_iCTcum &lt;-  iCT_MLD %&gt;% 
+  ggplot(aes(date_time,  CT_i_cum, 
+             col= var))+
+  geom_hline(yintercept = 0)+
+  geom_line()+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;GETM variable&quot;)+
+  labs(y=&quot;integrated, cumulative CT changes [mol/m2]&quot;)
+
+
+p_iCT / p_iCTcum</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/plot_integrated_iCT_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(p_iCT, p_iCTcum)</code></pre>
+</div>
+</div>
+<div id="delta-t-appraoch" class="section level2">
+<h2><span class="header-section-number">4.2</span> delta T appraoch</h2>
+<p>As primary production (negative changes in C<sub>T</sub>) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated and will be used to reconstruct changes in CT throughout the water column.</p>
+<p>The following analysis is restricted to the BloomSail period.</p>
+<div id="sst-time-series" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> SST time series</h3>
+<pre class="r"><code>fm_ts_ID %&gt;% 
   filter(var == &quot;tem&quot;) %&gt;% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_path(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd))+
-  geom_ribbon(aes(x=date, y=mean, ymax=mean+sd, ymin=mean-sd), alpha=0.5)+
-  geom_point(aes(x=date, y=mean, col=&quot;Finnmaid&quot;))+
+  geom_path(aes(x=date, y=value))+
+  geom_point(aes(x=date, y=value, col=&quot;Finnmaid&quot;))+
   geom_path(data = gt_2d, aes(x=date_time, y=SST, col=&quot;GETM, 3h&quot;))+
   geom_path(data = gt_2d_daily, aes(x=date_time, y=SST, col=&quot;GETM, daily&quot;))+
   scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
-  labs(x=&quot;&quot;, y=&quot;SST (°C)&quot;)+
-  theme_bw()</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/plot_FM_gt_temp_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
+  labs(x=&quot;&quot;, y=&quot;SST (°C)&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/FM_gt_2d_temp_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="dct-vs-dsst" class="section level2">
-<h2><span class="header-section-number">4.2</span> dC<sub>T</sub> vs dSST</h2>
-<p>As primary production (negative changes in C<sub>T</sub>) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated.</p>
-<p>The following analysis is restricted to the BloomSail period.</p>
-<pre class="r"><code>CT_tem &lt;- FM_ID %&gt;%
-  filter(date &gt; fixed_values$start,
-         date &lt; fixed_values$end) %&gt;% 
+<div id="dct-vs-dsst" class="section level3">
+<h3><span class="header-section-number">4.2.2</span> dC<sub>T</sub> vs dSST</h3>
+<p>To investigate the change of surface C<sub>T</sub> with SST, we merge daily mean 2d GETM and Finnmaid data. GETM observations were linearly interpolated to match the time of Finnmaid observations.</p>
+<pre class="r"><code>CT_tem &lt;- fm_ts_ID %&gt;% 
   filter(var %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
-  select(date, var, mean) %&gt;% 
-  pivot_wider(values_from = mean, names_from = var) %&gt;% 
+  select(date, var, value) %&gt;% 
+  pivot_wider(values_from = value, names_from = var) %&gt;% 
   set_names(c(&quot;date_time&quot;, &quot;FM&quot;, &quot;CT&quot;))
 
 CT_tem &lt;- full_join(CT_tem,
                     gt_2d_daily %&gt;% select(date_time, gt = SST))
 
+
 CT_tem &lt;- CT_tem %&gt;% 
   arrange(date_time) %&gt;%
   mutate(gt = na.approx(gt)) %&gt;% 
-  drop_na()
-
-CT_tem &lt;- CT_tem %&gt;% 
+  drop_na() %&gt;% 
+  mutate(date = as.Date(date_time))</code></pre>
+<pre class="r"><code>CT_tem &lt;- CT_tem %&gt;% 
   pivot_longer(cols = c(FM, gt), values_to = &quot;SST&quot;, names_to = &quot;obs&quot;)
 
 CT_tem &lt;- CT_tem %&gt;% 
   group_by(obs) %&gt;% 
   arrange(date_time) %&gt;% 
-  mutate(dCT = CT - lag(CT),
-         dSST = SST - lag(SST),
-         sign = if_else(dCT &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;% 
+  mutate(CT_diff = CT - lag(CT),
+         SST_diff = SST - lag(SST),
+         sign = if_else(CT_diff &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;% 
   ungroup()
 
 
@@ -1029,160 +1117,168 @@ CT_tem %&gt;%
   ggplot()+
   geom_hline(yintercept = 0)+
   geom_vline(xintercept = 0)+
-  geom_smooth(aes(dSST, dCT), method = &quot;lm&quot;, se=FALSE)+
-  geom_point(aes(dSST, dCT, fill=as.numeric(date_time)), shape=21)+
+  geom_smooth(aes(SST_diff, CT_diff), method = &quot;lm&quot;, se=FALSE)+
+  geom_point(aes(SST_diff, CT_diff, fill=as.numeric(date_time)), shape=21)+
   scale_fill_viridis_c(breaks = as.numeric(lab_dates),
                         labels = lab_dates,
                         name=&quot;Date&quot;)+
   guides(fill = guide_legend(override.aes=list(shape=21)))+
   facet_wrap(~obs)</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/CT_vs_temperature-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="ncp" class="section level1">
-<h1><span class="header-section-number">5</span> NCP</h1>
-<div id="mld-approach" class="section level2">
-<h2><span class="header-section-number">5.1</span> MLD approach</h2>
-<p>Use dCT/dtem from Finnmaid, MLD from GETM</p>
-<pre class="r"><code>NCP_MLD &lt;- FM_ID %&gt;%
-  filter(date &gt; fixed_values$start,
-         date &lt; fixed_values$end) %&gt;% 
-  filter(var %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
-  select(date, var, mean) %&gt;% 
-  pivot_wider(values_from = mean, names_from = var) %&gt;% 
-  set_names(c(&quot;date_time&quot;, &quot;SST&quot;, &quot;CT&quot;))
-
-NCP_MLD &lt;- full_join(NCP_MLD,
-                     gt_2d_daily %&gt;% select(-c(SSS, SST, U_10)))
-
-NCP_MLD &lt;- NCP_MLD %&gt;% 
-  pivot_longer(cols = 4:8, values_to = &quot;MLD&quot;, names_to = &quot;var&quot;) %&gt;% 
-  arrange(date_time) %&gt;%
-  group_by(var) %&gt;% 
-  mutate(MLD = na.approx(MLD)) %&gt;%
-  ungroup()
-
-NCP_MLD &lt;- NCP_MLD %&gt;% 
-  drop_na() %&gt;% 
-  group_by(var) %&gt;% 
-  arrange(date_time) %&gt;% 
-  mutate(dCT = CT - lag(CT),
-         dSST = SST - lag(SST),
-         dNCP = dCT * MLD / 1000,
-         NCP_cum = cumsum(replace_na(dNCP, 0))) %&gt;% 
-  ungroup()</code></pre>
-<div id="incremental-and-cumulative-timeseries" class="section level3">
-<h3><span class="header-section-number">5.1.1</span> Incremental and cumulative timeseries</h3>
-<p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated.</p>
-<pre class="r"><code>p_iNCP &lt;- NCP_MLD %&gt;% 
-  ggplot(aes(date_time, dNCP, fill= var))+
-  geom_hline(yintercept = 0)+
-  geom_col(col=&quot;black&quot;, position = &quot;dodge&quot;)+
-  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
-  labs(y=&quot;integrated, directional CT changes [mol/m2]&quot;, x=&quot;date&quot;)
-
-p_iNCPcum &lt;-  NCP_MLD %&gt;% 
-  ggplot(aes(date_time,  NCP_cum, 
-             fill= var))+
-  geom_hline(yintercept = -0.4)+
-  geom_area(position = &quot;identity&quot;, col=&quot;black&quot;)+
-  geom_hline(yintercept = 0)+
-  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
-  facet_grid(var~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
-  theme(strip.background = element_blank(),
-        strip.text = element_blank())+
-  labs(y=&quot;integrated, cumulative, directional CT changes [mol/m2]&quot;, x=&quot;date&quot;)
-
-
-(p_iNCP / p_iNCPcum)+
-  plot_layout(guides = &#39;collect&#39;, heights = c(1, 2))</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/plot_integrated_NCP_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>rm(p_iNCP, p_iNCPcum)</code></pre>
-</div>
-</div>
-<div id="delta-t-appraoch" class="section level2">
-<h2><span class="header-section-number">5.2</span> delta T appraoch</h2>
+<p>The ratio of surface changes in CT with SST based on GETM SST was used.</p>
 <pre class="r"><code>CT_tem &lt;- CT_tem %&gt;% 
-  filter(obs == &quot;FM&quot;) %&gt;% 
-  mutate(factor = dCT/dSST,
-         factor = if_else(is.na(factor), 0, factor)) %&gt;% 
-  select(date_time, factor)
+  filter(obs == &quot;gt&quot;) %&gt;% 
+  mutate(factor = CT_diff/SST_diff,
+         factor = if_else(is.na(factor), 0, factor)) 
+
+# CT_tem %&gt;% 
+#   ggplot()+
+#   geom_hline(yintercept = 0)+
+#   geom_vline(xintercept = 0)+
+#   geom_smooth(aes(SST_diff, CT_diff), method = &quot;lm&quot;, se=FALSE)+
+#   geom_point(aes(SST_diff, CT_diff, fill=factor), shape=21)+
+#   scale_fill_viridis_c()
 
 CT_tem &lt;- expand_grid(CT_tem, dep = unique(gt_3d$dep))
 
-NCP_dT &lt;- full_join(gt_3d %&gt;% select(date_time, dep, temp), 
-                    CT_tem)
+fm_gt_3d &lt;- full_join(gt_3d %&gt;% select(date_time, dep, temp), 
+                    CT_tem %&gt;%  select(date_time, dep, factor))
 
-NCP_dT &lt;- NCP_dT %&gt;% 
-  arrange(dep, date_time) %&gt;% 
+fm_gt_3d &lt;- fm_gt_3d %&gt;% 
+  arrange(date_time) %&gt;% 
   group_by(dep) %&gt;% 
   mutate(temp = na.approx(temp)) %&gt;% 
   ungroup() %&gt;% 
   drop_na()
 
-NCP_dT &lt;- NCP_dT %&gt;% 
+fm_gt_3d &lt;- fm_gt_3d %&gt;% 
   group_by(dep) %&gt;% 
   arrange(date_time) %&gt;% 
-  mutate(dtem = temp - lag(temp)) %&gt;% 
+  mutate(tem_diff = temp - lag(temp)) %&gt;% 
   ungroup() %&gt;% 
-  mutate(diff_value = dtem * factor) %&gt;% 
-  select(-factor)</code></pre>
+  mutate(CT_diff = tem_diff * factor) %&gt;% 
+  select(-factor)
+
+# fm_gt_3d %&gt;% 
+#   ggplot(aes(tem_diff, CT_diff, col=date_time))+
+#   geom_point()</code></pre>
 <p>The reconstructed incremental changes are added up to derive cummulative C<sub>T</sub> changes throughout the water column.</p>
-<pre class="r"><code>NCP_dT &lt;- NCP_dT %&gt;% 
+<pre class="r"><code>fm_gt_3d &lt;- fm_gt_3d %&gt;% 
   group_by(dep) %&gt;% 
   arrange(date_time) %&gt;% 
-  mutate(diff_time  = as.numeric(date_time - lag(date_time)),
-         diff_value_daily = diff_value / diff_time,
-         cum_value = replace_na(diff_value, 0))</code></pre>
+  mutate(time_diff  = as.numeric(date_time - lag(date_time)),
+         CT_diff_daily = CT_diff / time_diff,
+         CT_cum = cumsum(replace_na(CT_diff, 0))) %&gt;% 
+  ungroup()</code></pre>
 </div>
-<div id="profiles-of-incremental-changes" class="section level2">
-<h2><span class="header-section-number">5.3</span> Profiles of incremental changes</h2>
+<div id="profiles-of-incremental-changes" class="section level3">
+<h3><span class="header-section-number">4.2.3</span> Profiles of incremental changes</h3>
 <p>Changes of seawater parameters at each depth were reconstructed from one cruise day to the next and divided by the number of days inbetween.</p>
-<pre class="r"><code>NCP_dT %&gt;% 
+<pre class="r"><code>fm_gt_3d %&gt;% 
   arrange(dep) %&gt;% 
-  ggplot(aes(diff_value_daily, dep, col=as.factor(date_time)))+
-  geom_vline(xintercept = 0)+
-  geom_point()+
-  geom_path()+
-  scale_y_reverse()+
-  #scale_color_viridis_d()+
-  #facet_wrap(~var, scales = &quot;free_x&quot;)+
-  labs(x=&quot;Change of value inbetween cruises per day&quot;)</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="profiles-of-cumulative-changes" class="section level2">
-<h2><span class="header-section-number">5.4</span> Profiles of cumulative changes</h2>
-<p>Cumulative changes of seawater parameters were calculated at each depth relative to the first cruise day on July 5.</p>
-<pre class="r"><code>NCP_dT %&gt;% 
-  arrange(dep) %&gt;% 
-  ggplot(aes(cum_value, dep, col=as.factor(date_time)))+
-  geom_vline(xintercept = 0)+
-  geom_point()+
-  geom_path()+
-  scale_y_reverse()+
-  #scale_color_viridis_d()+
-  labs(x=&quot;Cumulative change of value&quot;)</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/cumulative_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>Reconstructed cumulative positive and negative changes of seawater parameters were calculated separately at each depth relative to the first cruise day on July 5.</p>
-<pre class="r"><code>NCP_dT &lt;- NCP_dT %&gt;% 
-  mutate(sign = if_else(diff_value &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;% 
-  group_by(dep, sign) %&gt;%
-  arrange(date_time) %&gt;%
-  mutate(cum_value_sign = replace_na(diff_value, 0)) %&gt;% 
-  ungroup()
-
-NCP_dT %&gt;% 
-  arrange(dep) %&gt;% 
-  ggplot(aes(cum_value_sign, dep, col=as.factor(date_time)))+
+  ggplot(aes(CT_diff_daily, dep, col=as.factor(date_time)))+
   geom_vline(xintercept = 0)+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
   scale_color_viridis_d()+
-  scale_fill_viridis_d()+
-  facet_wrap(~sign, scales = &quot;free_x&quot;, ncol=4)+
-  labs(x=&quot;Cumulative directional change of value&quot;)</code></pre>
+  labs(x=&quot;Change of value inbetween cruises per day&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="profiles-of-cumulative-changes" class="section level3">
+<h3><span class="header-section-number">4.2.4</span> Profiles of cumulative changes</h3>
+<p>Cumulative changes of seawater parameters were calculated at each depth relative to the first cruise day on July 5.</p>
+<pre class="r"><code>fm_gt_3d %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(CT_cum, dep, col=as.factor(date_time)))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  labs(x=&quot;Cumulative change of value&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/cumulative_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="hovmoeller-daily-changes" class="section level3">
+<h3><span class="header-section-number">4.2.5</span> Hovmoeller daily changes</h3>
+<p>Hoevmoeller plots were generated for the reconstructed daily and cumulative changes in C<sub>T</sub>. Absolute values are not reproducible with this approach.</p>
+<pre class="r"><code>bin_CT &lt;- 20
+
+fm_gt_3d %&gt;%
+  filter(dep &lt; 26) %&gt;% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time, y=dep, z=CT_diff_daily),
+                    breaks = MakeBreaks(bin_CT),
+                    col=&quot;black&quot;)+
+  geom_point(aes(x=date_time, y=c(25)), size=3, shape=24, fill=&quot;white&quot;)+
+  scale_fill_divergent(breaks = MakeBreaks(bin_CT),
+                       guide = &quot;colorstrip&quot;,
+                       name=&quot;CT (µmol/kg)&quot;)+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y=&quot;Depth (m)&quot;)+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+rm(bin_CT)</code></pre>
+</div>
+<div id="hovmoeller-cumulative-changes" class="section level3">
+<h3><span class="header-section-number">4.2.6</span> Hovmoeller cumulative changes</h3>
+<pre class="r"><code>bin_CT &lt;- 30
+
+fm_gt_3d %&gt;%
+  filter(dep &lt; 26) %&gt;% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time, y=dep, z=CT_cum),
+                    breaks = MakeBreaks(bin_CT),
+                    col=&quot;black&quot;)+
+  geom_point(aes(x=date_time, y=c(25)), size=3, shape=24, fill=&quot;white&quot;)+
+  scale_fill_divergent(breaks = MakeBreaks(bin_CT),
+                       guide = &quot;colorstrip&quot;,
+                       name=&quot;CT (µmol/kg)&quot;)+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y=&quot;Depth (m)&quot;)+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+
+rm(bin_CT)</code></pre>
+</div>
+</div>
+<div id="ict-time-series" class="section level2">
+<h2><span class="header-section-number">4.3</span> iC<sub>T</sub> time series</h2>
+<p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated for the upper 10 m of the water body.</p>
+<pre class="r"><code>iCT_dT &lt;- fm_gt_3d %&gt;% 
+  filter(dep &lt; 10) %&gt;% 
+  group_by(date_time) %&gt;%
+  summarise(CT_i_diff = sum(CT_diff)/1000,
+            CT_i_cum = sum(CT_cum)/1000) %&gt;% 
+  ungroup()
+
+
+iCT_dT %&gt;% 
+  ggplot()+
+  #geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_col(aes(date_time, CT_i_diff),
+           position = &quot;dodge&quot;, alpha=0.3)+
+  geom_line(aes(date_time, CT_i_cum))+
+  scale_color_viridis_d(name=&quot;Depth limit (m)&quot;)+
+  scale_fill_viridis_d(name=&quot;Depth limit (m)&quot;)+
+  labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)+
+  theme_bw()</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/cumulative_directional_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="open-tasks-questions" class="section level1">
+<h1><span class="header-section-number">5</span> Open tasks / questions</h1>
+<ul>
+<li>Reference incremental changes to mean data and combine plots</li>
+<li>compare MLD GETM vs BloomSail</li>
+<li>plot hovmoeller for getm water mass age</li>
+</ul>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1206,30 +1302,40 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] zoo_1.8-6       patchwork_1.0.0 seacarb_3.2.12  oce_1.2-0      
- [5] gsw_1.0-5       testthat_2.3.1  here_0.1        lubridate_1.7.4
- [9] vroom_1.2.0     ncdf4_1.17      forcats_0.4.0   stringr_1.4.0  
-[13] dplyr_0.8.3     purrr_0.3.3     readr_1.3.1     tidyr_1.0.0    
-[17] tibble_2.1.3    ggplot2_3.3.0   tidyverse_1.3.0
+ [1] metR_0.5.0      zoo_1.8-6       patchwork_1.0.0 seacarb_3.2.12 
+ [5] oce_1.2-0       gsw_1.0-5       testthat_2.3.1  here_0.1       
+ [9] lubridate_1.7.4 vroom_1.2.0     ncdf4_1.17      forcats_0.4.0  
+[13] stringr_1.4.0   dplyr_0.8.3     purrr_0.3.3     readr_1.3.1    
+[17] tidyr_1.0.0     tibble_2.1.3    ggplot2_3.3.0   tidyverse_1.3.0
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.2         lattice_0.20-35    assertthat_0.2.1   zeallot_0.1.0     
- [5] rprojroot_1.3-2    digest_0.6.22      R6_2.4.0           cellranger_1.1.0  
- [9] backports_1.1.5    reprex_0.3.0       evaluate_0.14      httr_1.4.1        
-[13] pillar_1.4.2       rlang_0.4.5        readxl_1.3.1       rstudioapi_0.10   
-[17] Matrix_1.2-14      rmarkdown_2.0      labeling_0.3       bit_1.1-14        
-[21] munsell_0.5.0      broom_0.5.3        compiler_3.5.0     httpuv_1.5.2      
-[25] modelr_0.1.5       xfun_0.10          pkgconfig_2.0.3    mgcv_1.8-23       
-[29] htmltools_0.4.0    tidyselect_0.2.5   workflowr_1.6.0    viridisLite_0.3.0 
-[33] crayon_1.3.4       dbplyr_1.4.2       withr_2.1.2        later_1.0.0       
-[37] grid_3.5.0         nlme_3.1-137       jsonlite_1.6       gtable_0.3.0      
-[41] lifecycle_0.1.0    DBI_1.0.0          git2r_0.26.1       magrittr_1.5      
-[45] scales_1.0.0       cli_1.1.0          stringi_1.4.3      fs_1.3.1          
-[49] promises_1.1.0     xml2_1.2.2         ellipsis_0.3.0     generics_0.0.2    
-[53] vctrs_0.2.0        RColorBrewer_1.1-2 tools_3.5.0        bit64_0.9-7       
-[57] glue_1.3.1         hms_0.5.2          yaml_2.2.0         colorspace_1.4-1  
-[61] rvest_0.3.5        knitr_1.26         haven_2.2.0       </code></pre>
-</div>
+ [1] nlme_3.1-137         bitops_1.0-6         fs_1.3.1            
+ [4] bit64_0.9-7          RColorBrewer_1.1-2   httr_1.4.1          
+ [7] rprojroot_1.3-2      tools_3.5.0          backports_1.1.5     
+[10] R6_2.4.0             mgcv_1.8-23          DBI_1.0.0           
+[13] colorspace_1.4-1     withr_2.1.2          sp_1.3-2            
+[16] tidyselect_0.2.5     gridExtra_2.3        bit_1.1-14          
+[19] compiler_3.5.0       git2r_0.26.1         cli_1.1.0           
+[22] rvest_0.3.5          xml2_1.2.2           labeling_0.3        
+[25] scales_1.0.0         checkmate_1.9.4      digest_0.6.22       
+[28] foreign_0.8-70       rmarkdown_2.0        pkgconfig_2.0.3     
+[31] htmltools_0.4.0      dbplyr_1.4.2         maps_3.3.0          
+[34] rlang_0.4.5          readxl_1.3.1         rstudioapi_0.10     
+[37] generics_0.0.2       jsonlite_1.6         RCurl_1.95-4.12     
+[40] magrittr_1.5         Formula_1.2-3        dotCall64_1.0-0     
+[43] Matrix_1.2-14        Rcpp_1.0.2           munsell_0.5.0       
+[46] lifecycle_0.1.0      stringi_1.4.3        yaml_2.2.0          
+[49] plyr_1.8.4           grid_3.5.0           maptools_0.9-8      
+[52] formula.tools_1.7.1  promises_1.1.0       crayon_1.3.4        
+[55] lattice_0.20-35      haven_2.2.0          hms_0.5.2           
+[58] zeallot_0.1.0        knitr_1.26           pillar_1.4.2        
+[61] reprex_0.3.0         glue_1.3.1           evaluate_0.14       
+[64] data.table_1.12.6    modelr_0.1.5         operator.tools_1.6.3
+[67] vctrs_0.2.0          spam_2.3-0.2         httpuv_1.5.2        
+[70] cellranger_1.1.0     gtable_0.3.0         assertthat_0.2.1    
+[73] xfun_0.10            broom_0.5.3          later_1.0.0         
+[76] viridisLite_0.3.0    memoise_1.1.0        fields_9.9          
+[79] workflowr_1.6.0      ellipsis_0.3.0      </code></pre>
 </div>
 </div>
 
