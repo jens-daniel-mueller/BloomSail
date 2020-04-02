@@ -212,7 +212,7 @@ ts_gt_3d <- ts_gt_3d %>%
 ```
 
 
-```{r gt_ts_profiles_salt_temp_rho, fig.asp=1}
+```{r gt_ts_profiles_salt_temp_rho, fig.asp=0.8}
 
 ts_gt_3d_long <- ts_gt_3d %>% 
   pivot_longer(3:8, values_to = "value", names_to = c("var", "source"), names_sep = "_")
@@ -222,13 +222,13 @@ ts_gt_3d_long %>%
              col=date_time,
              group=date_time))+
   geom_path()+
-  scale_y_reverse(expand = c(0,0))+
+  scale_y_reverse(expand = c(0,0), name="Depth (m)")+
   scale_color_viridis_c(name="Date", trans = "time")+
   facet_grid(source~var, scales = "free_x")
 
 ```
 
-```{r gt_ts_profiles_diff_salt_temp_rho, fig.asp=1}
+```{r gt_ts_profiles_diff_salt_temp_rho, fig.asp=0.5}
 
 ts_gt_3d <- ts_gt_3d_long %>% 
   pivot_wider(values_from = "value", names_from = "source") %>% 
@@ -239,9 +239,10 @@ ts_gt_3d %>%
              col=date_time,
              group=date_time))+
   geom_path()+
-  scale_y_reverse(expand = c(0,0))+
+  scale_y_reverse(expand = c(0,0), name="Depth (m)")+
   scale_color_viridis_c(name="Date", trans = "time")+
-  facet_grid(.~var, scales = "free_x")
+  facet_grid(.~var, scales = "free_x")+
+  labs(x="Difference GETM (gt) - Bloomsail (ts)")
 
 rm(ts_gt_3d, ts_gt_3d_long, ts_profiles_ID)
 
