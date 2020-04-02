@@ -554,10 +554,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree57b77aff9eb07a3350732baf9f116a4e1af65082targetblank57b77afa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/57b77aff9eb07a3350732baf9f116a4e1af65082" target="_blank">57b77af</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea7ac65d318166a10fec6641b39dcae68ac881ef0targetblanka7ac65da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a7ac65d318166a10fec6641b39dcae68ac881ef0" target="_blank">a7ac65d</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree57b77aff9eb07a3350732baf9f116a4e1af65082targetblank57b77afa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea7ac65d318166a10fec6641b39dcae68ac881ef0targetblanka7ac65da" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -566,7 +566,6 @@ Great! You are using Git for version control. Tracking code development and conn
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
     Ignored:    data/Finnmaid_2018/
     Ignored:    data/GETM/
     Ignored:    data/Maps/
@@ -937,43 +936,61 @@ fm &lt;- fm %&gt;%
 <div id="timeseries" class="section level2">
 <h2><span class="header-section-number">3.3</span> Timeseries</h2>
 <p>Calculate regional mean and sd values for each crossing of the area.</p>
-<pre class="r"><code>fm_ID_mean &lt;- fm %&gt;% 
-  arrange(date) %&gt;% 
-  group_by(ID, sensor) %&gt;% 
-  summarise_all(list(~mean(.)), na.rm=TRUE) %&gt;%
+<pre class="r"><code>fm_ID &lt;- fm %&gt;% 
+  pivot_longer(c(pCO2, sal, tem, cO2, CT), values_to = &quot;value&quot;, names_to = &quot;var&quot;) %&gt;% 
+  group_by(ID) %&gt;% 
+  mutate(date = mean(date)) %&gt;%
   ungroup() %&gt;% 
-  pivot_longer(4:8, values_to = &quot;value&quot;, names_to = &quot;var&quot;)
-
-fm_ID_sd &lt;- fm %&gt;% 
-  arrange(date) %&gt;% 
-  group_by(ID, sensor) %&gt;% 
-  summarise_all(list(~sd(.)), na.rm=TRUE) %&gt;%
+  group_by(ID, date, sensor, var) %&gt;% 
+  summarise_all(list(~mean(.), ~sd(.), ~min(.), ~max(.)), na.rm=TRUE) %&gt;%
   ungroup() %&gt;% 
-  pivot_longer(4:8, values_to = &quot;sd&quot;, names_to = &quot;var&quot;) %&gt;% 
-  select(-date)
+  rename(value=mean)
 
-fm_ID &lt;- inner_join(fm_ID_mean, fm_ID_sd)
-
-rm(fm_ID_mean, fm_ID_sd)</code></pre>
+# fm_ID_mean &lt;- fm %&gt;% 
+#   arrange(date) %&gt;% 
+#   group_by(ID, sensor) %&gt;% 
+#   summarise_all(list(~mean(.)), na.rm=TRUE) %&gt;%
+#   ungroup() %&gt;% 
+#   pivot_longer(4:8, values_to = &quot;value&quot;, names_to = &quot;var&quot;)
+# 
+# fm_ID_sd &lt;- fm %&gt;% 
+#   arrange(date) %&gt;% 
+#   group_by(ID, sensor) %&gt;% 
+#   summarise_all(list(~sd(.)), na.rm=TRUE) %&gt;%
+#   ungroup() %&gt;% 
+#   pivot_longer(4:8, values_to = &quot;sd&quot;, names_to = &quot;var&quot;) %&gt;% 
+#   select(-date)
+# 
+# fm_ID &lt;- inner_join(fm_ID_mean, fm_ID_sd)
+# 
+# rm(fm_ID_mean, fm_ID_sd)</code></pre>
 <p>Read BloomSail data to fill observational gap of Finnmaid date in second half of June.</p>
 <pre class="r"><code>ts_profiles_ID_long &lt;-
   read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum.csv&quot;))
 
 ts_profiles_ID_long_surface &lt;- ts_profiles_ID_long %&gt;% 
-  filter(dep == 3.5) %&gt;% 
-  mutate(ID = as.factor(ID))</code></pre>
+  filter(dep &gt; 1, dep &lt; 5) %&gt;% 
+  mutate(ID = as.factor(ID)) %&gt;% 
+  select(-c(sign, value_cum_sign)) %&gt;% 
+  group_by(ID, date_time_ID, var) %&gt;% 
+  summarise_all(list(~mean(.)), na.rm = TRUE) %&gt;% 
+  ungroup()</code></pre>
 <pre class="r"><code>fm_ID %&gt;% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
   geom_path(aes(x=date, y=value))+
-  geom_ribbon(aes(x=date, y=value, ymax=value+sd, ymin=value-sd), alpha=0.5)+
+  #geom_ribbon(aes(x=date, y=value, ymax=max, ymin=min, fill=&quot;Finnmaid&quot;), alpha=0.3)+
+  geom_ribbon(aes(x=date, y=value, ymax=value+sd, ymin=value-sd, fill=&quot;Finnmaid&quot;), alpha=0.3)+
+  geom_ribbon(data = ts_profiles_ID_long_surface,
+             aes(x=date_time_ID, ymin=value-sd, ymax=value+sd, fill=&quot;BloomSail&quot;), alpha=0.3)+
   geom_point(aes(x=date, y=value, col=sensor))+
   geom_point(data = ts_profiles_ID_long_surface,
              aes(x=date_time_ID, y=value, col=&quot;BloomSail&quot;))+
   geom_line(data = ts_profiles_ID_long_surface,
              aes(x=date_time_ID, y=value, col=&quot;BloomSail&quot;))+
   facet_grid(var~., scales = &quot;free_y&quot;)+
-  scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)</code></pre>
+  scale_color_brewer(palette = &quot;Set1&quot;)+
+  scale_fill_brewer(palette = &quot;Set1&quot;, name=&quot;+/- SD&quot;)</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/fm_ts_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="missing-observations" class="section level2">

@@ -630,10 +630,10 @@ data/Finnmaid_2018/LGR
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree57b77aff9eb07a3350732baf9f116a4e1af65082targetblank57b77afa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/57b77aff9eb07a3350732baf9f116a4e1af65082" target="_blank">57b77af</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea7ac65d318166a10fec6641b39dcae68ac881ef0targetblanka7ac65da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a7ac65d318166a10fec6641b39dcae68ac881ef0" target="_blank">a7ac65d</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree57b77aff9eb07a3350732baf9f116a4e1af65082targetblank57b77afa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea7ac65d318166a10fec6641b39dcae68ac881ef0targetblanka7ac65da" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -649,6 +649,9 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
+
+Unstaged changes:
+    Modified:   analysis/Finnmaid+GETM.Rmd
 
 </code></pre>
 <p>
@@ -1399,8 +1402,8 @@ temp %&gt;%
 fm_bs &lt;- temp %&gt;% 
   filter(Area == &quot;BS&quot;)</code></pre>
 </div>
-<div id="interactive-map." class="section level1">
-<h1>Interactive map.</h1>
+<div id="interactive-map" class="section level1">
+<h1>Interactive map</h1>
 <pre class="r"><code>fm_bs &lt;-
   read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
                        &quot;Finnmaid.csv&quot;)) %&gt;% 
