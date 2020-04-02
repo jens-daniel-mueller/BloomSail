@@ -590,7 +590,7 @@ Use dCT from Finnmaid and MLD from GETM and calculate iC~T~ as their product.
 iCT_MLD <- fm_ts_ID %>%
   select(date, var, value) %>% 
   pivot_wider(values_from = value, names_from = var) %>% 
-  set_names(c("date_time", "SST", "CT"))
+  rename(date_time = date, SST = tem)
 
 iCT_MLD <- full_join(iCT_MLD,
                      gt_2d_daily %>% select(-c(SSS, SST, U_10)))
@@ -926,13 +926,7 @@ gt_2d %>%
 
 # Open tasks / questions
 
-- Re-read Finmmaid data in correct box including sd, min/max
-- Plot timeseries with errorbars for fm and ts, use ts in 1 - 5 m
-- Plot hovmoeller for GETM water mass age
-- Move GETM windspeed to end
-- Compare STD profiles and MLD: GETM vs BloomSail
 - Plot profiles for:
-  - GETM temperature at Finnmaid time stamps
   - GETM incremental temperature at Finnmaid time stamps
 - Plot hovmoeller for incremental changes in GETM temperature
 - Reference incremental changes to mean data and combine plots
