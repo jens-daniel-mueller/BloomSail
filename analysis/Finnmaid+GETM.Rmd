@@ -590,14 +590,16 @@ Use dCT from Finnmaid and MLD from GETM and calculate iC~T~ as their product.
 iCT_MLD <- fm_ts_ID %>%
   select(date, var, value) %>% 
   pivot_wider(values_from = value, names_from = var) %>% 
-  rename(date_time = date, SST = tem)
+  rename(date_time_ID = date, SST = tem)
 
 iCT_MLD <- full_join(iCT_MLD,
-                     gt_2d_daily %>% select(-c(SSS, SST, U_10)))
+                     gt_2d_daily %>% 
+                       select(-c(SSS, SST, U_10)) %>% 
+                       rename(date_time_ID = date_time))
 
 iCT_MLD <- iCT_MLD %>% 
   pivot_longer(cols = 4:8, values_to = "MLD", names_to = "var") %>% 
-  arrange(date_time) %>%
+  arrange(date_time_ID) %>%
   group_by(var) %>% 
   mutate(MLD = na.approx(MLD)) %>%
   ungroup()
@@ -605,13 +607,14 @@ iCT_MLD <- iCT_MLD %>%
 iCT_MLD <- iCT_MLD %>% 
   drop_na() %>% 
   group_by(var) %>% 
-  arrange(date_time) %>% 
-  mutate(CT_diff = CT - lag(CT),
+  arrange(date_time_ID) %>% 
+  mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
+         CT_diff = CT - lag(CT),
          SST_diff = SST - lag(SST),
          CT_i_diff = CT_diff * MLD / 1000,
          CT_i_cum = cumsum(replace_na(CT_i_diff, 0))) %>% 
   ungroup()
-
 
 ```
 
@@ -623,27 +626,19 @@ Total incremental and cumulative C~T~ changes inbetween cruise dates were calcul
 
 ```{r plot_integrated_iCT_timeseries, fig.asp=1.5}
 
-p_iCT <- iCT_MLD %>% 
-  ggplot(aes(date_time, CT_i_diff, fill= var))+
+iCT_MLD %>% 
+  ggplot()+
   geom_hline(yintercept = 0)+
-  geom_col(col="black", position = "dodge")+
+  geom_point(aes(date_time_ID,  0), shape=21)+
+  geom_col(aes(date_time_ID_ref, CT_i_diff, fill= var),
+           col="black", position = "dodge", alpha = 0.5)+
+  geom_line(aes(date_time_ID,  CT_i_cum, 
+             col= var))+
   scale_y_continuous(breaks = seq(-100, 100, 0.2))+
-  scale_fill_brewer(palette = "Set1", name="GETM variable")+
+  scale_fill_brewer(palette = "Set1", name="Incremental")+
+  scale_color_brewer(palette = "Set1", name="Cumulative")+
   labs(y="integrated CT changes [mol/m2]", x="date")
 
-p_iCTcum <-  iCT_MLD %>% 
-  ggplot(aes(date_time,  CT_i_cum, 
-             col= var))+
-  geom_hline(yintercept = 0)+
-  geom_line()+
-  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
-  scale_color_brewer(palette = "Set1", name="GETM variable")+
-  labs(y="integrated, cumulative CT changes [mol/m2]")
-
-
-p_iCT / p_iCTcum
-
-rm(p_iCT, p_iCTcum)
 ```
 
 
