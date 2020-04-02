@@ -554,10 +554,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree614ab28ace52b25e8c41050ce5e1cf7d882dfd5btargetblank614ab28a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/614ab28ace52b25e8c41050ce5e1cf7d882dfd5b" target="_blank">614ab28</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeee9f48e6d695e149bd1b9e4c65fc854dc5a6de75targetblankee9f48ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ee9f48e6d695e149bd1b9e4c65fc854dc5a6de75" target="_blank">ee9f48e</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree614ab28ace52b25e8c41050ce5e1cf7d882dfd5btargetblank614ab28a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeee9f48e6d695e149bd1b9e4c65fc854dc5a6de75targetblankee9f48ea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -724,12 +724,14 @@ gt_3d_long %&gt;%
 <p><img src="figure/Finnmaid+GETM.Rmd/gt_profiles_salt_temp_age_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
 <div id="comparison-bloomsail" class="section level3">
 <h3><span class="header-section-number">2.1.1</span> Comparison BloomSail</h3>
+<p>Vertical, 1m-gridded BloomSail CTD profiles were used for comparison with GETM results. Merging both data sets required the BloomSail profiles to be shifted upward by 0.5m. Note that neither sampling location nor time match exactly.</p>
 <pre class="r"><code>ts_profiles_ID &lt;-
   read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID.csv&quot;))
 
 ts_profiles_ID &lt;- ts_profiles_ID %&gt;% 
   mutate(rho = swSigma(salinity = sal, temperature = tem, pressure = dep/10),
          dep = dep - 0.5)</code></pre>
+<p>GETM results were linearly interpolated to the mean BloomSail time stamp.</p>
 <pre class="r"><code>ts_gt_3d &lt;- full_join(gt_3d %&gt;% select(date_time, dep, sal = salt, tem = temp, rho),
                       ts_profiles_ID %&gt;% select(date_time = date_time_ID,
                                                 dep, sal, tem, rho),
@@ -754,7 +756,12 @@ ts_gt_3d_long %&gt;%
   scale_y_reverse(expand = c(0,0), name=&quot;Depth (m)&quot;)+
   scale_color_viridis_c(name=&quot;Date&quot;, trans = &quot;time&quot;)+
   facet_grid(source~var, scales = &quot;free_x&quot;)</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/gt_ts_profiles_salt_temp_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="figure" style="text-align: center">
+<img src="figure/Finnmaid+GETM.Rmd/gt_ts_profiles_salt_temp_rho-1.png" alt="STD profiles modeled with GETM (upper panels, gt) and measured during BloomSail campaign (lower panels, ts)" width="672" />
+<p class="caption">
+STD profiles modeled with GETM (upper panels, gt) and measured during BloomSail campaign (lower panels, ts)
+</p>
+</div>
 <pre class="r"><code>ts_gt_3d &lt;- ts_gt_3d_long %&gt;% 
   pivot_wider(values_from = &quot;value&quot;, names_from = &quot;source&quot;) %&gt;% 
   mutate(value_diff = gt - ts)
@@ -763,6 +770,7 @@ ts_gt_3d %&gt;%
   ggplot(aes(value_diff, dep,
              col=date_time,
              group=date_time))+
+  geom_vline(xintercept = 0, col=&quot;red&quot;)+
   geom_path()+
   scale_y_reverse(expand = c(0,0), name=&quot;Depth (m)&quot;)+
   scale_color_viridis_c(name=&quot;Date&quot;, trans = &quot;time&quot;)+
@@ -1390,23 +1398,23 @@ loaded via a namespace (and not attached):
 [22] rvest_0.3.5          xml2_1.2.2           labeling_0.3        
 [25] scales_1.0.0         checkmate_1.9.4      digest_0.6.22       
 [28] foreign_0.8-70       rmarkdown_2.0        pkgconfig_2.0.3     
-[31] htmltools_0.4.0      dbplyr_1.4.2         maps_3.3.0          
-[34] rlang_0.4.5          readxl_1.3.1         rstudioapi_0.10     
-[37] generics_0.0.2       jsonlite_1.6         RCurl_1.95-4.12     
-[40] magrittr_1.5         Formula_1.2-3        dotCall64_1.0-0     
-[43] Matrix_1.2-14        Rcpp_1.0.2           munsell_0.5.0       
-[46] lifecycle_0.1.0      stringi_1.4.3        yaml_2.2.0          
-[49] plyr_1.8.4           grid_3.5.0           maptools_0.9-8      
-[52] formula.tools_1.7.1  promises_1.1.0       crayon_1.3.4        
-[55] lattice_0.20-35      haven_2.2.0          hms_0.5.2           
-[58] zeallot_0.1.0        knitr_1.26           pillar_1.4.2        
-[61] reprex_0.3.0         glue_1.3.1           evaluate_0.14       
-[64] data.table_1.12.6    modelr_0.1.5         operator.tools_1.6.3
-[67] vctrs_0.2.0          spam_2.3-0.2         httpuv_1.5.2        
-[70] cellranger_1.1.0     gtable_0.3.0         assertthat_0.2.1    
-[73] xfun_0.10            broom_0.5.3          later_1.0.0         
-[76] viridisLite_0.3.0    memoise_1.1.0        fields_9.9          
-[79] workflowr_1.6.0      ellipsis_0.3.0      </code></pre>
+[31] htmltools_0.4.0      highr_0.8            dbplyr_1.4.2        
+[34] maps_3.3.0           rlang_0.4.5          readxl_1.3.1        
+[37] rstudioapi_0.10      generics_0.0.2       jsonlite_1.6        
+[40] RCurl_1.95-4.12      magrittr_1.5         Formula_1.2-3       
+[43] dotCall64_1.0-0      Matrix_1.2-14        Rcpp_1.0.2          
+[46] munsell_0.5.0        lifecycle_0.1.0      stringi_1.4.3       
+[49] yaml_2.2.0           plyr_1.8.4           grid_3.5.0          
+[52] maptools_0.9-8       formula.tools_1.7.1  promises_1.1.0      
+[55] crayon_1.3.4         lattice_0.20-35      haven_2.2.0         
+[58] hms_0.5.2            zeallot_0.1.0        knitr_1.26          
+[61] pillar_1.4.2         reprex_0.3.0         glue_1.3.1          
+[64] evaluate_0.14        data.table_1.12.6    modelr_0.1.5        
+[67] operator.tools_1.6.3 vctrs_0.2.0          spam_2.3-0.2        
+[70] httpuv_1.5.2         cellranger_1.1.0     gtable_0.3.0        
+[73] assertthat_0.2.1     xfun_0.10            broom_0.5.3         
+[76] later_1.0.0          viridisLite_0.3.0    memoise_1.1.0       
+[79] fields_9.9           workflowr_1.6.0      ellipsis_0.3.0      </code></pre>
 </div>
 </div>
 
