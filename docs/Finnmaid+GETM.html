@@ -554,10 +554,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree093e4fd9aa0f7a4f77b11ecc02fde00773d4b97ctargetblank093e4fda"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/093e4fd9aa0f7a4f77b11ecc02fde00773d4b97c" target="_blank">093e4fd</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeba45c29ca8854c0598abb7745ce2f8d78a00137ftargetblankba45c29a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ba45c29ca8854c0598abb7745ce2f8d78a00137f" target="_blank">ba45c29</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree093e4fd9aa0f7a4f77b11ecc02fde00773d4b97ctargetblank093e4fda" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeba45c29ca8854c0598abb7745ce2f8d78a00137ftargetblankba45c29a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -1207,8 +1207,9 @@ fm_gt_3d &lt;- fm_gt_3d %&gt;%
 <pre class="r"><code>fm_gt_3d &lt;- fm_gt_3d %&gt;% 
   group_by(dep) %&gt;% 
   arrange(date_time_ID) %&gt;% 
-  mutate(time_diff  = as.numeric(date_time_ID - lag(date_time_ID)),
-         CT_diff_daily = CT_diff / time_diff,
+  mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
+         CT_diff_daily = CT_diff / date_time_ID_diff,
          CT_cum = cumsum(replace_na(CT_diff, 0))) %&gt;% 
   ungroup()</code></pre>
 </div>
@@ -1248,7 +1249,7 @@ fm_gt_3d &lt;- fm_gt_3d %&gt;%
 fm_gt_3d %&gt;%
   filter(dep &lt; 26) %&gt;% 
   ggplot()+
-  geom_contour_fill(aes(x=date_time_ID, y=dep, z=CT_diff_daily),
+  geom_contour_fill(aes(x=date_time_ID_ref, y=dep, z=CT_diff_daily),
                     breaks = MakeBreaks(bin_CT),
                     col=&quot;black&quot;)+
   geom_point(aes(x=date_time_ID, y=c(25)), size=3, shape=24, fill=&quot;white&quot;)+
@@ -1294,7 +1295,7 @@ rm(bin_CT)</code></pre>
 <p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated for the upper 10 m of the water body.</p>
 <pre class="r"><code>iCT_dT &lt;- fm_gt_3d %&gt;% 
   filter(dep &lt; 10) %&gt;% 
-  group_by(date_time_ID) %&gt;%
+  group_by(date_time_ID, date_time_ID_ref) %&gt;%
   summarise(CT_i_diff = sum(CT_diff)/1000,
             CT_i_cum = sum(CT_cum)/1000) %&gt;% 
   ungroup()
@@ -1302,8 +1303,9 @@ rm(bin_CT)</code></pre>
 
 iCT_dT %&gt;% 
   ggplot()+
-  #geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
-  geom_col(aes(date_time_ID, CT_i_diff),
+  geom_hline(yintercept = 0)+
+  geom_point(aes(date_time_ID,  0), shape=21)+
+  geom_col(aes(date_time_ID_ref, CT_i_diff),
            position = &quot;dodge&quot;, alpha=0.3)+
   geom_line(aes(date_time_ID, CT_i_cum))+
   scale_color_viridis_d(name=&quot;Depth limit (m)&quot;)+
