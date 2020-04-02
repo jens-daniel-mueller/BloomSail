@@ -554,10 +554,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea7ac65d318166a10fec6641b39dcae68ac881ef0targetblanka7ac65da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a7ac65d318166a10fec6641b39dcae68ac881ef0" target="_blank">a7ac65d</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec54fd0e8ea00e48da937879bf86de68befa93e99targetblankc54fd0ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c54fd0e8ea00e48da937879bf86de68befa93e99" target="_blank">c54fd0e</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea7ac65d318166a10fec6641b39dcae68ac881ef0targetblanka7ac65da" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec54fd0e8ea00e48da937879bf86de68befa93e99targetblankc54fd0ea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -611,7 +611,7 @@ high_lat &lt;- 57.5
 
 #depth range to subset GETM 3d files
 d1_shallow &lt;- 0
-d1_deep &lt;- 30
+d1_deep &lt;- 25
 
 # date limits
 start_date &lt;- &quot;2018-06-20&quot;
@@ -634,6 +634,7 @@ fixed_values &lt;-
 <h2><span class="header-section-number">2.1</span> STD Profiles</h2>
 <p>Mean daily salinity and temperature profiles were extracted from 3d GETM data (vertically resolved transects).</p>
 <pre class="r"><code>nc &lt;- nc_open(here::here(&quot;data/GETM&quot;, &quot;Finnmaid.E.3d.2018.nc&quot;))
+#print(nc$var)
 
 lat &lt;- ncvar_get(nc, &quot;latc&quot;)
 
@@ -645,7 +646,7 @@ rm(time_units)
 
 d &lt;- ncvar_get(nc, &quot;zax&quot;) # read depths vector
 
-for (var_3d in c(&quot;salt&quot;, &quot;temp&quot;)) {
+for (var_3d in c(&quot;salt&quot;, &quot;temp&quot;, &quot;SurfaceAge&quot;)) {
   
 array &lt;- ncvar_get(nc, var_3d) # store the data in a 3-dimensional array
 #dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
@@ -701,7 +702,7 @@ gt_3d %&gt;%
   vroom_write((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_3d_long.csv&quot;)))
 
 
-rm(gt_3d, gt_3d, d1_deep, d1_shallow, i, lat, d, t, var_3d)</code></pre>
+rm(gt_3d, d1_deep, d1_shallow, i, lat, d, t, var_3d)</code></pre>
 <p>Seawater density was calculated according to TEOS-10.</p>
 <pre class="r"><code>gt_3d_long &lt;- 
   read_tsv((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_3d_long.csv&quot;)))
@@ -710,7 +711,7 @@ gt_3d &lt;- gt_3d_long %&gt;%
   pivot_wider(values_from = value, names_from = var) %&gt;% 
   mutate(rho = swSigma(salinity = salt, temperature = temp, pressure = dep/10))</code></pre>
 <pre class="r"><code>gt_3d_long &lt;- gt_3d %&gt;% 
-  pivot_longer(3:5, values_to = &quot;value&quot;, names_to = &quot;var&quot;)
+  pivot_longer(c(salt, SurfaceAge, temp, rho), values_to = &quot;value&quot;, names_to = &quot;var&quot;)
 
 lab_dates &lt;- pretty(gt_3d_long$date_time)
 
@@ -810,8 +811,7 @@ p_sal &lt;- gt_3d %&gt;%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())+
   geom_line(data= gt_2d_daily,
-            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)+
-  scale_color_discrete(name = &quot;Legend&quot;, labels = c(&quot;MLD Rho&quot;))
+            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)
 
 
 p_tem &lt;- gt_3d %&gt;% 
@@ -826,8 +826,7 @@ p_tem &lt;- gt_3d %&gt;%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())+
   geom_line(data= gt_2d_daily,
-            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)+
-  scale_color_discrete(name = &quot;Legend&quot;, labels = c(&quot;MLD Rho&quot;))
+            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)
 
 p_rho &lt;- gt_3d %&gt;% 
   ggplot()+
@@ -840,11 +839,23 @@ p_rho &lt;- gt_3d %&gt;%
   labs(y=&quot;Depth [m]&quot;, x=&quot;&quot;)+
   theme(axis.title.x = element_blank())+
   geom_line(data= gt_2d_daily,
-            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)+
-  scale_color_discrete(name = &quot;Legend&quot;, labels = c(&quot;MLD Rho&quot;))
+            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)
 
-p_sal / p_tem / p_rho</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/plot_hovmoeller_gt_salt_temp_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
+p_age &lt;- gt_3d %&gt;% 
+  ggplot()+
+  geom_raster(aes(date_time, dep, fill=SurfaceAge))+
+  geom_vline(data=fixed_values, aes(xintercept = start))+
+  geom_vline(data=fixed_values, aes(xintercept = end))+
+  scale_fill_viridis_c(name=&quot;SurfaceAge (d)&quot;, direction = -1, trans = &quot;sqrt&quot;)+
+  scale_y_reverse()+
+  coord_cartesian(expand = 0)+
+  labs(y=&quot;Depth [m]&quot;, x=&quot;&quot;)+
+  theme(axis.title.x = element_blank())+
+  geom_line(data= gt_2d_daily,
+            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)
+
+p_sal / p_tem / p_rho / p_age</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/plot_hovmoeller_gt_salt_temp_rho_age-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(p_sal, p_tem, p_rho)</code></pre>
 </div>
 <div id="test-calculation" class="section level3">
@@ -964,7 +975,7 @@ fm &lt;- fm %&gt;%
 # fm_ID &lt;- inner_join(fm_ID_mean, fm_ID_sd)
 # 
 # rm(fm_ID_mean, fm_ID_sd)</code></pre>
-<p>Read BloomSail data to fill observational gap of Finnmaid date in second half of June.</p>
+<p>Read BloomSail profile data from 1-5m to fill observational gap of Finnmaid date in second half of June.</p>
 <pre class="r"><code>ts_profiles_ID_long &lt;-
   read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum.csv&quot;))
 
