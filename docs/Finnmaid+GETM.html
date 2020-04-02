@@ -554,10 +554,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeee9f48e6d695e149bd1b9e4c65fc854dc5a6de75targetblankee9f48ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ee9f48e6d695e149bd1b9e4c65fc854dc5a6de75" target="_blank">ee9f48e</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree62fb894ec9a47d1bfad320bdf8a60885e304de63targetblank62fb894a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/62fb894ec9a47d1bfad320bdf8a60885e304de63" target="_blank">62fb894</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeee9f48e6d695e149bd1b9e4c65fc854dc5a6de75targetblankee9f48ea" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree62fb894ec9a47d1bfad320bdf8a60885e304de63targetblank62fb894a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -1066,7 +1066,7 @@ rm(fm_ID, fm, ts_gap, ts_profiles_ID_long_surface)</code></pre>
 <pre class="r"><code>iCT_MLD &lt;- fm_ts_ID %&gt;%
   select(date, var, value) %&gt;% 
   pivot_wider(values_from = value, names_from = var) %&gt;% 
-  set_names(c(&quot;date_time&quot;, &quot;SST&quot;, &quot;CT&quot;))
+  rename(date_time = date, SST = tem)
 
 iCT_MLD &lt;- full_join(iCT_MLD,
                      gt_2d_daily %&gt;% select(-c(SSS, SST, U_10)))
@@ -1338,14 +1338,8 @@ iCT_dT %&gt;%
 <div id="open-tasks-questions" class="section level1">
 <h1><span class="header-section-number">6</span> Open tasks / questions</h1>
 <ul>
-<li>Re-read Finmmaid data in correct box including sd, min/max</li>
-<li>Plot timeseries with errorbars for fm and ts, use ts in 1 - 5 m</li>
-<li>Plot hovmoeller for GETM water mass age</li>
-<li>Move GETM windspeed to end</li>
-<li>Compare STD profiles and MLD: GETM vs BloomSail</li>
 <li>Plot profiles for:
 <ul>
-<li>GETM temperature at Finnmaid time stamps</li>
 <li>GETM incremental temperature at Finnmaid time stamps</li>
 </ul></li>
 <li>Plot hovmoeller for incremental changes in GETM temperature</li>
