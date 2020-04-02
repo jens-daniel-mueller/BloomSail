@@ -869,7 +869,7 @@ fm_bs <- temp %>%
 
 ```
 
-# Interactive map.
+# Interactive map
 
 ```{r map}
 

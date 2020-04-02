@@ -428,24 +428,34 @@ Calculate regional mean and sd values for each crossing of the area.
 
 ```{r timeseries_of_regional_averages}
 
-fm_ID_mean <- fm %>% 
-  arrange(date) %>% 
-  group_by(ID, sensor) %>% 
-  summarise_all(list(~mean(.)), na.rm=TRUE) %>%
+fm_ID <- fm %>% 
+  pivot_longer(c(pCO2, sal, tem, cO2, CT), values_to = "value", names_to = "var") %>% 
+  group_by(ID) %>% 
+  mutate(date = mean(date)) %>%
   ungroup() %>% 
-  pivot_longer(4:8, values_to = "value", names_to = "var")
-
-fm_ID_sd <- fm %>% 
-  arrange(date) %>% 
-  group_by(ID, sensor) %>% 
-  summarise_all(list(~sd(.)), na.rm=TRUE) %>%
+  group_by(ID, date, sensor, var) %>% 
+  summarise_all(list(~mean(.), ~sd(.), ~min(.), ~max(.)), na.rm=TRUE) %>%
   ungroup() %>% 
-  pivot_longer(4:8, values_to = "sd", names_to = "var") %>% 
-  select(-date)
+  rename(value=mean)
 
-fm_ID <- inner_join(fm_ID_mean, fm_ID_sd)
-
-rm(fm_ID_mean, fm_ID_sd)
+# fm_ID_mean <- fm %>% 
+#   arrange(date) %>% 
+#   group_by(ID, sensor) %>% 
+#   summarise_all(list(~mean(.)), na.rm=TRUE) %>%
+#   ungroup() %>% 
+#   pivot_longer(4:8, values_to = "value", names_to = "var")
+# 
+# fm_ID_sd <- fm %>% 
+#   arrange(date) %>% 
+#   group_by(ID, sensor) %>% 
+#   summarise_all(list(~sd(.)), na.rm=TRUE) %>%
+#   ungroup() %>% 
+#   pivot_longer(4:8, values_to = "sd", names_to = "var") %>% 
+#   select(-date)
+# 
+# fm_ID <- inner_join(fm_ID_mean, fm_ID_sd)
+# 
+# rm(fm_ID_mean, fm_ID_sd)
 
 ```
 
@@ -457,8 +467,12 @@ ts_profiles_ID_long <-
   read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum.csv"))
 
 ts_profiles_ID_long_surface <- ts_profiles_ID_long %>% 
-  filter(dep == 3.5) %>% 
-  mutate(ID = as.factor(ID))
+  filter(dep > 1, dep < 5) %>% 
+  mutate(ID = as.factor(ID)) %>% 
+  select(-c(sign, value_cum_sign)) %>% 
+  group_by(ID, date_time_ID, var) %>% 
+  summarise_all(list(~mean(.)), na.rm = TRUE) %>% 
+  ungroup()
 
 ```
 
@@ -468,14 +482,18 @@ fm_ID %>%
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
   geom_path(aes(x=date, y=value))+
-  geom_ribbon(aes(x=date, y=value, ymax=value+sd, ymin=value-sd), alpha=0.5)+
+  #geom_ribbon(aes(x=date, y=value, ymax=max, ymin=min, fill="Finnmaid"), alpha=0.3)+
+  geom_ribbon(aes(x=date, y=value, ymax=value+sd, ymin=value-sd, fill="Finnmaid"), alpha=0.3)+
+  geom_ribbon(data = ts_profiles_ID_long_surface,
+             aes(x=date_time_ID, ymin=value-sd, ymax=value+sd, fill="BloomSail"), alpha=0.3)+
   geom_point(aes(x=date, y=value, col=sensor))+
   geom_point(data = ts_profiles_ID_long_surface,
              aes(x=date_time_ID, y=value, col="BloomSail"))+
   geom_line(data = ts_profiles_ID_long_surface,
              aes(x=date_time_ID, y=value, col="BloomSail"))+
   facet_grid(var~., scales = "free_y")+
-  scale_color_brewer(palette = "Set1", direction=-1)
+  scale_color_brewer(palette = "Set1")+
+  scale_fill_brewer(palette = "Set1", name="+/- SD")
 
 ```
 
