@@ -764,8 +764,9 @@ The reconstructed incremental changes are added up to derive cummulative C~T~ ch
 fm_gt_3d <- fm_gt_3d %>% 
   group_by(dep) %>% 
   arrange(date_time_ID) %>% 
-  mutate(time_diff  = as.numeric(date_time_ID - lag(date_time_ID)),
-         CT_diff_daily = CT_diff / time_diff,
+  mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
+         CT_diff_daily = CT_diff / date_time_ID_diff,
          CT_cum = cumsum(replace_na(CT_diff, 0))) %>% 
   ungroup()
 
@@ -821,7 +822,7 @@ bin_CT <- 20
 fm_gt_3d %>%
   filter(dep < 26) %>% 
   ggplot()+
-  geom_contour_fill(aes(x=date_time_ID, y=dep, z=CT_diff_daily),
+  geom_contour_fill(aes(x=date_time_ID_ref, y=dep, z=CT_diff_daily),
                     breaks = MakeBreaks(bin_CT),
                     col="black")+
   geom_point(aes(x=date_time_ID, y=c(25)), size=3, shape=24, fill="white")+
@@ -876,7 +877,7 @@ Total incremental and cumulative C~T~ changes inbetween cruise dates were calcul
 
 iCT_dT <- fm_gt_3d %>% 
   filter(dep < 10) %>% 
-  group_by(date_time_ID) %>%
+  group_by(date_time_ID, date_time_ID_ref) %>%
   summarise(CT_i_diff = sum(CT_diff)/1000,
             CT_i_cum = sum(CT_cum)/1000) %>% 
   ungroup()
@@ -884,8 +885,9 @@ iCT_dT <- fm_gt_3d %>%
 
 iCT_dT %>% 
   ggplot()+
-  #geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
-  geom_col(aes(date_time_ID, CT_i_diff),
+  geom_hline(yintercept = 0)+
+  geom_point(aes(date_time_ID,  0), shape=21)+
+  geom_col(aes(date_time_ID_ref, CT_i_diff),
            position = "dodge", alpha=0.3)+
   geom_line(aes(date_time_ID, CT_i_cum))+
   scale_color_viridis_d(name="Depth limit (m)")+
