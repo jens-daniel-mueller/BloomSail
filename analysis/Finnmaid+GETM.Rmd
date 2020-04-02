@@ -180,6 +180,8 @@ gt_3d_long %>%
 
 ### Comparison BloomSail
 
+Vertical, 1m-gridded BloomSail CTD profiles were used for comparison with GETM results. Merging both data sets required the BloomSail profiles to be shifted upward by 0.5m. Note that neither sampling location nor time match exactly.
+
 ```{r read_ts}
 
 ts_profiles_ID <-
@@ -191,6 +193,7 @@ ts_profiles_ID <- ts_profiles_ID %>%
 
 ```
 
+GETM results were linearly interpolated to the mean BloomSail time stamp.
 
 ```{r merge_gt_ts_profiles}
 
@@ -212,7 +215,7 @@ ts_gt_3d <- ts_gt_3d %>%
 ```
 
 
-```{r gt_ts_profiles_salt_temp_rho, fig.asp=0.8}
+```{r gt_ts_profiles_salt_temp_rho, fig.asp=0.8, fig.cap="STD profiles modeled with GETM (upper panels, gt) and measured during BloomSail campaign (lower panels, ts)"}
 
 ts_gt_3d_long <- ts_gt_3d %>% 
   pivot_longer(3:8, values_to = "value", names_to = c("var", "source"), names_sep = "_")
@@ -238,6 +241,7 @@ ts_gt_3d %>%
   ggplot(aes(value_diff, dep,
              col=date_time,
              group=date_time))+
+  geom_vline(xintercept = 0, col="red")+
   geom_path()+
   scale_y_reverse(expand = c(0,0), name="Depth (m)")+
   scale_color_viridis_c(name="Date", trans = "time")+
