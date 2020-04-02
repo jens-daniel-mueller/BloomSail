@@ -47,7 +47,7 @@ high_lat <- 57.5
 
 #depth range to subset GETM 3d files
 d1_shallow <- 0
-d1_deep <- 30
+d1_deep <- 25
 
 # date limits
 start_date <- "2018-06-20"
@@ -77,6 +77,7 @@ Mean daily salinity and temperature profiles were extracted from 3d GETM data (v
 ```{r read_gt_3d_sal_tem, eval=FALSE}
 
 nc <- nc_open(here::here("data/GETM", "Finnmaid.E.3d.2018.nc"))
+#print(nc$var)
 
 lat <- ncvar_get(nc, "latc")
 
@@ -88,7 +89,7 @@ rm(time_units)
 
 d <- ncvar_get(nc, "zax") # read depths vector
 
-for (var_3d in c("salt", "temp")) {
+for (var_3d in c("salt", "temp", "SurfaceAge")) {
   
 array <- ncvar_get(nc, var_3d) # store the data in a 3-dimensional array
 #dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
@@ -144,7 +145,7 @@ gt_3d %>%
   vroom_write((here::here("data/_summarized_data_files", file = "gt_3d_long.csv")))
 
 
-rm(gt_3d, gt_3d, d1_deep, d1_shallow, i, lat, d, t, var_3d)
+rm(gt_3d, d1_deep, d1_shallow, i, lat, d, t, var_3d)
 
 ```
 
@@ -164,7 +165,7 @@ gt_3d <- gt_3d_long %>%
 ```{r plot_gt_profiles_salt_temp_rho}
 
 gt_3d_long <- gt_3d %>% 
-  pivot_longer(3:5, values_to = "value", names_to = "var")
+  pivot_longer(c(salt, SurfaceAge, temp, rho), values_to = "value", names_to = "var")
 
 lab_dates <- pretty(gt_3d_long$date_time)
 
@@ -250,7 +251,7 @@ rm(t, var, gt_2d, lat)
 
 ### Hovmoeller Plots
 
-```{r plot_hovmoeller_gt_salt_temp_rho}
+```{r plot_hovmoeller_gt_salt_temp_rho_age}
 
 gt_2d <- 
   read_tsv((here::here("data/_summarized_data_files", file = "gt_2d.csv")))
@@ -274,8 +275,7 @@ p_sal <- gt_3d %>%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())+
   geom_line(data= gt_2d_daily,
-            aes(x = date_time, y = mld_rho), color = "white")+
-  scale_color_discrete(name = "Legend", labels = c("MLD Rho"))
+            aes(x = date_time, y = mld_rho), color = "white")
 
 
 p_tem <- gt_3d %>% 
@@ -290,8 +290,7 @@ p_tem <- gt_3d %>%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())+
   geom_line(data= gt_2d_daily,
-            aes(x = date_time, y = mld_rho), color = "white")+
-  scale_color_discrete(name = "Legend", labels = c("MLD Rho"))
+            aes(x = date_time, y = mld_rho), color = "white")
 
 p_rho <- gt_3d %>% 
   ggplot()+
@@ -304,10 +303,22 @@ p_rho <- gt_3d %>%
   labs(y="Depth [m]", x="")+
   theme(axis.title.x = element_blank())+
   geom_line(data= gt_2d_daily,
-            aes(x = date_time, y = mld_rho), color = "white")+
-  scale_color_discrete(name = "Legend", labels = c("MLD Rho"))
+            aes(x = date_time, y = mld_rho), color = "white")
 
-p_sal / p_tem / p_rho
+p_age <- gt_3d %>% 
+  ggplot()+
+  geom_raster(aes(date_time, dep, fill=SurfaceAge))+
+  geom_vline(data=fixed_values, aes(xintercept = start))+
+  geom_vline(data=fixed_values, aes(xintercept = end))+
+  scale_fill_viridis_c(name="SurfaceAge (d)", direction = -1, trans = "sqrt")+
+  scale_y_reverse()+
+  coord_cartesian(expand = 0)+
+  labs(y="Depth [m]", x="")+
+  theme(axis.title.x = element_blank())+
+  geom_line(data= gt_2d_daily,
+            aes(x = date_time, y = mld_rho), color = "white")
+
+p_sal / p_tem / p_rho / p_age
 
 rm(p_sal, p_tem, p_rho)
 
@@ -459,7 +470,7 @@ fm_ID <- fm %>%
 
 ```
 
-Read BloomSail data to fill observational gap of Finnmaid date in second half of June.
+Read BloomSail profile data from 1-5m to fill observational gap of Finnmaid date in second half of June.
 
 ```{r read_BloomSail_sensor_data}
 
