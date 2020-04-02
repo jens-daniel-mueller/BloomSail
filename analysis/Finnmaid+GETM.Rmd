@@ -465,7 +465,8 @@ fm <- fm %>%
   select(-c(Lon, Lat, patm, Teq, xCO2, route, Area)) %>% 
   mutate(ID = as.factor(ID)) %>% 
   rename(tem=Tem,
-         sal=Sal)
+         sal=Sal,
+         date_time = date)
 
 ```
 
@@ -494,9 +495,10 @@ Calculate regional mean and sd values for each crossing of the area.
 fm_ID <- fm %>% 
   pivot_longer(c(pCO2, sal, tem, cO2, CT), values_to = "value", names_to = "var") %>% 
   group_by(ID) %>% 
-  mutate(date = mean(date)) %>%
+  mutate(date_time_ID = mean(date_time)) %>%
+  select(-date_time) %>% 
   ungroup() %>% 
-  group_by(ID, date, sensor, var) %>% 
+  group_by(ID, date_time_ID, sensor, var) %>% 
   summarise_all(list(~mean(.), ~sd(.), ~min(.), ~max(.)), na.rm=TRUE) %>%
   ungroup() %>% 
   rename(value=mean)
@@ -525,12 +527,12 @@ ts_profiles_ID_long_surface <- ts_profiles_ID_long %>%
 fm_ID %>% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_path(aes(x=date, y=value))+
-  #geom_ribbon(aes(x=date, y=value, ymax=max, ymin=min, fill="Finnmaid"), alpha=0.3)+
-  geom_ribbon(aes(x=date, y=value, ymax=value+sd, ymin=value-sd, fill="Finnmaid"), alpha=0.3)+
+  geom_path(aes(x=date_time_ID, y=value))+
+  #geom_ribbon(aes(x=date_time, y=value, ymax=max, ymin=min, fill="Finnmaid"), alpha=0.3)+
+  geom_ribbon(aes(x=date_time_ID, y=value, ymax=value+sd, ymin=value-sd, fill="Finnmaid"), alpha=0.3)+
   geom_ribbon(data = ts_profiles_ID_long_surface,
              aes(x=date_time_ID, ymin=value-sd, ymax=value+sd, fill="BloomSail"), alpha=0.3)+
-  geom_point(aes(x=date, y=value, col=sensor))+
+  geom_point(aes(x=date_time_ID, y=value, col=sensor))+
   geom_point(data = ts_profiles_ID_long_surface,
              aes(x=date_time_ID, y=value, col="BloomSail"))+
   geom_line(data = ts_profiles_ID_long_surface,
@@ -550,23 +552,23 @@ The observational gaps in the Finnmaid SST and C~T~ time series were filled with
 ts_gap <- ts_profiles_ID_long_surface %>% 
   filter(ID %in% c("180718", "180723"),
          var %in% c("tem", "CT")) %>% 
-  select(date = date_time_ID, ID, var, value = value) %>% 
+  select(date_time_ID, ID, var, value = value) %>% 
   mutate(sensor = "BloomSail")
 
 fm_ts_ID <- full_join(fm_ID, ts_gap) %>% 
-  arrange(date) %>% 
+  arrange(date_time_ID) %>% 
   select(-sd) %>% 
   filter(var %in% c("tem", "CT")) %>% 
   mutate(period = "BloomSail",
-         period = if_else(date < fixed_values$start, "pre-BloomSail", period),
-         period = if_else(date > fixed_values$end, "post-BloomSail", period))
+         period = if_else(date_time_ID < fixed_values$start, "pre-BloomSail", period),
+         period = if_else(date_time_ID > fixed_values$end, "post-BloomSail", period))
 
 fm_ts_ID %>% 
   ggplot()+
   geom_rect(data = fixed_values,
             aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_path(aes(date, value, col=period))+
-  geom_point(aes(date, value, col=period))+
+  geom_path(aes(date_time_ID, value, col=period))+
+  geom_point(aes(date_time_ID, value, col=period))+
   facet_grid(var~., scales = "free_y")+
   scale_color_brewer(palette = "Set1")
 
@@ -588,9 +590,9 @@ Use dCT from Finnmaid and MLD from GETM and calculate iC~T~ as their product.
 ```{r iCT_MLD}
 
 iCT_MLD <- fm_ts_ID %>%
-  select(date, var, value) %>% 
+  select(date_time_ID, var, value) %>% 
   pivot_wider(values_from = value, names_from = var) %>% 
-  rename(date_time_ID = date, SST = tem)
+  rename(SST = tem)
 
 iCT_MLD <- full_join(iCT_MLD,
                      gt_2d_daily %>% 
@@ -624,7 +626,7 @@ iCT_MLD <- iCT_MLD %>%
 Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated.
 
 
-```{r plot_integrated_iCT_timeseries, fig.asp=1.5}
+```{r plot_integrated_iCT_timeseries}
 
 iCT_MLD %>% 
   ggplot()+
@@ -656,8 +658,8 @@ fm_ts_ID %>%
   filter(var == "tem") %>% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_path(aes(x=date, y=value))+
-  geom_point(aes(x=date, y=value, col="Finnmaid"))+
+  geom_path(aes(x=date_time_ID, y=value))+
+  geom_point(aes(x=date_time_ID, y=value, col="Finnmaid"))+
   geom_path(data = gt_2d, aes(x=date_time, y=SST, col="GETM, 3h"))+
   geom_path(data = gt_2d_daily, aes(x=date_time, y=SST, col="GETM, daily"))+
   scale_color_brewer(palette = "Set1", name="")+
@@ -673,19 +675,18 @@ To investigate the change of surface C~T~ with SST, we merge daily mean 2d GETM 
 
 CT_tem <- fm_ts_ID %>% 
   filter(var %in% c("tem", "CT")) %>% 
-  select(date, var, value) %>% 
+  select(date_time_ID, var, value) %>% 
   pivot_wider(values_from = value, names_from = var) %>% 
-  set_names(c("date_time", "FM", "CT"))
+  rename(FM = tem)
 
 CT_tem <- full_join(CT_tem,
-                    gt_2d_daily %>% select(date_time, gt = SST))
+                    gt_2d_daily %>% select(date_time_ID = date_time, gt = SST))
 
 
 CT_tem <- CT_tem %>% 
-  arrange(date_time) %>%
+  arrange(date_time_ID) %>%
   mutate(gt = na.approx(gt)) %>% 
-  drop_na() %>% 
-  mutate(date = as.Date(date_time))
+  drop_na()
 
 ```
 
@@ -696,25 +697,19 @@ CT_tem <- CT_tem %>%
 
 CT_tem <- CT_tem %>% 
   group_by(obs) %>% 
-  arrange(date_time) %>% 
+  arrange(date_time_ID) %>% 
   mutate(CT_diff = CT - lag(CT),
          SST_diff = SST - lag(SST),
          sign = if_else(CT_diff < 0, "neg", "pos")) %>% 
   ungroup()
-
-
-lab_dates <- pretty(CT_tem$date_time)
 
 CT_tem %>% 
   ggplot()+
   geom_hline(yintercept = 0)+
   geom_vline(xintercept = 0)+
   geom_smooth(aes(SST_diff, CT_diff), method = "lm", se=FALSE)+
-  geom_point(aes(SST_diff, CT_diff, fill=as.numeric(date_time)), shape=21)+
-  scale_fill_viridis_c(breaks = as.numeric(lab_dates),
-                        labels = lab_dates,
-                        name="Date")+
-  guides(fill = guide_legend(override.aes=list(shape=21)))+
+  geom_point(aes(SST_diff, CT_diff, fill=date_time_ID), shape=21)+
+  scale_fill_viridis_c(trans = "time", name="Date")+
   facet_wrap(~obs)
 
 ```
@@ -738,11 +733,11 @@ CT_tem <- CT_tem %>%
 
 CT_tem <- expand_grid(CT_tem, dep = unique(gt_3d$dep))
 
-fm_gt_3d <- full_join(gt_3d %>% select(date_time, dep, temp), 
-                    CT_tem %>%  select(date_time, dep, factor))
+fm_gt_3d <- full_join(gt_3d %>% select(date_time_ID = date_time, dep, temp), 
+                      CT_tem %>%  select(date_time_ID, dep, factor))
 
 fm_gt_3d <- fm_gt_3d %>% 
-  arrange(date_time) %>% 
+  arrange(date_time_ID) %>% 
   group_by(dep) %>% 
   mutate(temp = na.approx(temp)) %>% 
   ungroup() %>% 
@@ -750,7 +745,7 @@ fm_gt_3d <- fm_gt_3d %>%
 
 fm_gt_3d <- fm_gt_3d %>% 
   group_by(dep) %>% 
-  arrange(date_time) %>% 
+  arrange(date_time_ID) %>% 
   mutate(tem_diff = temp - lag(temp)) %>% 
   ungroup() %>% 
   mutate(CT_diff = tem_diff * factor) %>% 
@@ -768,8 +763,8 @@ The reconstructed incremental changes are added up to derive cummulative C~T~ ch
 
 fm_gt_3d <- fm_gt_3d %>% 
   group_by(dep) %>% 
-  arrange(date_time) %>% 
-  mutate(time_diff  = as.numeric(date_time - lag(date_time)),
+  arrange(date_time_ID) %>% 
+  mutate(time_diff  = as.numeric(date_time_ID - lag(date_time_ID)),
          CT_diff_daily = CT_diff / time_diff,
          CT_cum = cumsum(replace_na(CT_diff, 0))) %>% 
   ungroup()
@@ -784,12 +779,12 @@ Changes of seawater parameters at each depth were reconstructed from one cruise 
 
 fm_gt_3d %>% 
   arrange(dep) %>% 
-  ggplot(aes(CT_diff_daily, dep, col=as.factor(date_time)))+
+  ggplot(aes(CT_diff_daily, dep, col=date_time_ID, group=date_time_ID))+
   geom_vline(xintercept = 0)+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
-  scale_color_viridis_d()+
+  scale_color_viridis_c(trans = "time")+
   labs(x="Change of value inbetween cruises per day")
 
 
@@ -803,12 +798,12 @@ Cumulative changes of seawater parameters were calculated at each depth relative
 
 fm_gt_3d %>% 
   arrange(dep) %>% 
-  ggplot(aes(CT_cum, dep, col=as.factor(date_time)))+
+  ggplot(aes(CT_cum, dep, col=date_time_ID, group=date_time_ID))+
   geom_vline(xintercept = 0)+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
-  scale_color_viridis_d()+
+  scale_color_viridis_c(trans = "time")+
   labs(x="Cumulative change of value")
 
 ```
@@ -826,10 +821,10 @@ bin_CT <- 20
 fm_gt_3d %>%
   filter(dep < 26) %>% 
   ggplot()+
-  geom_contour_fill(aes(x=date_time, y=dep, z=CT_diff_daily),
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=CT_diff_daily),
                     breaks = MakeBreaks(bin_CT),
                     col="black")+
-  geom_point(aes(x=date_time, y=c(25)), size=3, shape=24, fill="white")+
+  geom_point(aes(x=date_time_ID, y=c(25)), size=3, shape=24, fill="white")+
   scale_fill_divergent(breaks = MakeBreaks(bin_CT),
                        guide = "colorstrip",
                        name="CT (µmol/kg)")+
@@ -853,10 +848,10 @@ bin_CT <- 30
 fm_gt_3d %>%
   filter(dep < 26) %>% 
   ggplot()+
-  geom_contour_fill(aes(x=date_time, y=dep, z=CT_cum),
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=CT_cum),
                     breaks = MakeBreaks(bin_CT),
                     col="black")+
-  geom_point(aes(x=date_time, y=c(25)), size=3, shape=24, fill="white")+
+  geom_point(aes(x=date_time_ID, y=c(25)), size=3, shape=24, fill="white")+
   scale_fill_divergent(breaks = MakeBreaks(bin_CT),
                        guide = "colorstrip",
                        name="CT (µmol/kg)")+
@@ -881,7 +876,7 @@ Total incremental and cumulative C~T~ changes inbetween cruise dates were calcul
 
 iCT_dT <- fm_gt_3d %>% 
   filter(dep < 10) %>% 
-  group_by(date_time) %>%
+  group_by(date_time_ID) %>%
   summarise(CT_i_diff = sum(CT_diff)/1000,
             CT_i_cum = sum(CT_cum)/1000) %>% 
   ungroup()
@@ -890,9 +885,9 @@ iCT_dT <- fm_gt_3d %>%
 iCT_dT %>% 
   ggplot()+
   #geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
-  geom_col(aes(date_time, CT_i_diff),
+  geom_col(aes(date_time_ID, CT_i_diff),
            position = "dodge", alpha=0.3)+
-  geom_line(aes(date_time, CT_i_cum))+
+  geom_line(aes(date_time_ID, CT_i_cum))+
   scale_color_viridis_d(name="Depth limit (m)")+
   scale_fill_viridis_d(name="Depth limit (m)")+
   labs(y="iCT [mol/m2]", x="")+
