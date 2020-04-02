@@ -696,7 +696,7 @@ Bottle %>%
 
 # GPS Track
 
-First, we read the GPS track data.
+GPS track data were recorded.
 
 ```{r read_GPS, eval=FALSE}
 
@@ -752,40 +752,6 @@ track %>%
 
 ```
 
-And than create an interactive map.
-
-```{r map}
-
-track <- 
-  read_csv(here::here("Data/_summarized_data_files",
-                       "TinaV_Track.csv"))
-
-track_sub <- track %>%
-  slice(which(row_number() %% 20 == 1))
-
-rm(track)
-
-leaflet() %>% 
-  setView(lng = 20, lat = 57.3, zoom = 8) %>%
-  addLayersControl(baseGroups = c("Ocean Basemap",
-                                  "Satellite"),
-                   overlayGroups = c("Track"),
-                   options = layersControlOptions(collapsed = FALSE),
-                   position = 'topright') %>% 
-  addProviderTiles("Esri.WorldImagery", group = "Satellite") %>%
-  addProviderTiles(providers$Esri.OceanBasemap, group = "Ocean Basemap") %>%
-  addScaleBar(position = 'topright') %>%
-  addMeasure(
-    primaryLengthUnit = "kilometers",
-    secondaryLengthUnit = 'miles', 
-    primaryAreaUnit = "sqmeters",
-    secondaryAreaUnit="acres", 
-    position = 'topleft') %>% 
-  addPolylines(data = track_sub, ~lon, ~lat,
-               color = "red",
-               group = "Track") 
-
-```
 
 
 # Finnmaid
@@ -885,7 +851,7 @@ temp$Area <- with(temp,
                   ifelse(Lon>12 & Lon<12.6, "1.MEB",
                   ifelse(Lon>13.1 & Lon<14.3, "2.ARK",
                   ifelse(Lat>57.5 & Lat<58.5 & route %in% c("E", "G"), "4.EGS",
-                  ifelse(Lat>57.33 & Lat<57.5 & route %in% c("E"), "BS",
+                  ifelse(Lat>57.3 & Lat<57.5 & route %in% c("E"), "BS",
                   ifelse(Lat>56.8 & Lat<57.5 & route=="W", "3.WGS",
                   ifelse(Lat>58.5 & Lat<59 & Lon>20, "5.NGS",
                   ifelse(Lon>22 & Lon<24, "6.WGF",
@@ -898,10 +864,55 @@ temp %>%
   write_csv(here::here("Data/_summarized_data_files",
                        "Finnmaid.csv"))
 
-
+fm_bs <- temp %>% 
+  filter(Area == "BS")
 
 ```
 
+# Interactive map.
+
+```{r map}
+
+fm_bs <-
+  read_csv(here::here("Data/_summarized_data_files",
+                       "Finnmaid.csv")) %>% 
+  filter(Area == "BS")
+
+
+track <- 
+  read_csv(here::here("Data/_summarized_data_files",
+                       "TinaV_Track.csv"))
+
+track_sub <- track %>%
+  slice(which(row_number() %% 20 == 1))
+
+rm(track)
+
+leaflet() %>% 
+  setView(lng = 20, lat = 57.3, zoom = 8) %>%
+  addLayersControl(baseGroups = c("Ocean Basemap",
+                                  "Satellite"),
+                   overlayGroups = c("Track", "Finnmaid"),
+                   options = layersControlOptions(collapsed = FALSE),
+                   position = 'topright') %>% 
+  addProviderTiles("Esri.WorldImagery", group = "Satellite") %>%
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Ocean Basemap") %>%
+  addScaleBar(position = 'topright') %>%
+  addMeasure(
+    primaryLengthUnit = "kilometers",
+    secondaryLengthUnit = 'miles', 
+    primaryAreaUnit = "sqmeters",
+    secondaryAreaUnit="acres", 
+    position = 'topleft') %>% 
+  addCircles(data = fm_bs, ~Lon, ~Lat,
+               color = "white",
+               group = "Finnmaid") %>% 
+  addPolylines(data = track_sub, ~lon, ~lat,
+               color = "red",
+               group = "Track")
+
+
+```
 
 
 # Tasks / open questions

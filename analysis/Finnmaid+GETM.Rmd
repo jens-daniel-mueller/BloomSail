@@ -846,7 +846,20 @@ iCT_dT %>%
 
 # Open tasks / questions
 
+- Re-read Finmmaid data in correct box including sd, min/max
+- Plot timeseries with errorbars for fm and ts, use ts in 1 - 5 m
+- Plot hovmoeller for GETM water mass age
+- Move GETM windspeed to end
+- Compare STD profiles and MLD: GETM vs BloomSail
+- Plot profiles for:
+  - GETM temperature at Finnmaid time stamps
+  - GETM incremental temperature at Finnmaid time stamps
+- Plot hovmoeller for incremental changes in GETM temperature
 - Reference incremental changes to mean data and combine plots
-- compare MLD GETM vs BloomSail
-- plot hovmoeller for getm water mass age
+- Why do we see strong iCT change in delta T appraoch on day 2? Plot delta T, SST and factor
+- Can delta T approach be improved by:
+  - Smoothened timeseries
+  - Using a mean CT/SST factor
+  - Using the cumulative values at iCT min
+
 
