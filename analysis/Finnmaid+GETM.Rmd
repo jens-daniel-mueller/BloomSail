@@ -74,7 +74,7 @@ The following information refer to regional mean values modeled along the Finnma
 
 Mean daily salinity and temperature profiles were extracted from 3d GETM data (vertically resolved transects).
 
-```{r read_gt_3d_sal_tem, eval=FALSE}
+```{r read_gt_3d_sal_tem_age, eval=FALSE}
 
 nc <- nc_open(here::here("data/GETM", "Finnmaid.E.3d.2018.nc"))
 #print(nc$var)
@@ -151,7 +151,7 @@ rm(gt_3d, d1_deep, d1_shallow, i, lat, d, t, var_3d)
 
 Seawater density was calculated according to TEOS-10.
 
-```{r calculate_density_gt_3d}
+```{r calculate_rho_gt_3d}
 
 gt_3d_long <- 
   read_tsv((here::here("data/_summarized_data_files", file = "gt_3d_long.csv")))
@@ -162,7 +162,7 @@ gt_3d <- gt_3d_long %>%
 
 ```
 
-```{r plot_gt_profiles_salt_temp_rho, fig.asp=1}
+```{r gt_profiles_salt_temp_age_rho, fig.asp=1}
 
 gt_3d_long <- gt_3d %>% 
   pivot_longer(c(salt, SurfaceAge, temp, rho), values_to = "value", names_to = "var")
@@ -178,6 +178,74 @@ gt_3d_long %>%
 
 ```
 
+### Comparison BloomSail
+
+```{r read_ts}
+
+ts_profiles_ID <-
+  read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID.csv"))
+
+ts_profiles_ID <- ts_profiles_ID %>% 
+  mutate(rho = swSigma(salinity = sal, temperature = tem, pressure = dep/10),
+         dep = dep - 0.5)
+
+```
+
+
+```{r merge_gt_ts_profiles}
+
+
+ts_gt_3d <- full_join(gt_3d %>% select(date_time, dep, sal = salt, tem = temp, rho),
+                      ts_profiles_ID %>% select(date_time = date_time_ID,
+                                                dep, sal, tem, rho),
+                      by = c("date_time", "dep"), suffix=c("_gt", "_ts"))
+
+ts_gt_3d <- ts_gt_3d %>% 
+  arrange(date_time) %>% 
+  group_by(dep) %>% 
+  mutate(tem_gt = na.approx(tem_gt),
+         sal_gt = na.approx(sal_gt),
+         rho_gt = na.approx(rho_gt)) %>% 
+  ungroup() %>% 
+  drop_na()
+
+```
+
+
+```{r gt_ts_profiles_salt_temp_rho, fig.asp=1}
+
+ts_gt_3d_long <- ts_gt_3d %>% 
+  pivot_longer(3:8, values_to = "value", names_to = c("var", "source"), names_sep = "_")
+
+ts_gt_3d_long %>% 
+  ggplot(aes(value, dep,
+             col=date_time,
+             group=date_time))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0))+
+  scale_color_viridis_c(name="Date", trans = "time")+
+  facet_grid(source~var, scales = "free_x")
+
+```
+
+```{r gt_ts_profiles_diff_salt_temp_rho, fig.asp=1}
+
+ts_gt_3d <- ts_gt_3d_long %>% 
+  pivot_wider(values_from = "value", names_from = "source") %>% 
+  mutate(value_diff = gt - ts)
+
+ts_gt_3d %>% 
+  ggplot(aes(value_diff, dep,
+             col=date_time,
+             group=date_time))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0))+
+  scale_color_viridis_c(name="Date", trans = "time")+
+  facet_grid(.~var, scales = "free_x")
+
+rm(ts_gt_3d, ts_gt_3d_long, ts_profiles_ID)
+
+```
 
 ## Mixed layer depth
 
@@ -428,30 +496,11 @@ fm_ID <- fm %>%
   ungroup() %>% 
   rename(value=mean)
 
-# fm_ID_mean <- fm %>% 
-#   arrange(date) %>% 
-#   group_by(ID, sensor) %>% 
-#   summarise_all(list(~mean(.)), na.rm=TRUE) %>%
-#   ungroup() %>% 
-#   pivot_longer(4:8, values_to = "value", names_to = "var")
-# 
-# fm_ID_sd <- fm %>% 
-#   arrange(date) %>% 
-#   group_by(ID, sensor) %>% 
-#   summarise_all(list(~sd(.)), na.rm=TRUE) %>%
-#   ungroup() %>% 
-#   pivot_longer(4:8, values_to = "sd", names_to = "var") %>% 
-#   select(-date)
-# 
-# fm_ID <- inner_join(fm_ID_mean, fm_ID_sd)
-# 
-# rm(fm_ID_mean, fm_ID_sd)
-
 ```
 
 Read BloomSail profile data from 1-5m to fill observational gap of Finnmaid date in second half of June.
 
-```{r read_BloomSail_sensor_data}
+```{r ts_surface_time_series}
 
 ts_profiles_ID_long <-
   read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum.csv"))
