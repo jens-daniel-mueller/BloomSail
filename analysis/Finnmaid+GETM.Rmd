@@ -162,7 +162,7 @@ gt_3d <- gt_3d_long %>%
 
 ```
 
-```{r plot_gt_profiles_salt_temp_rho}
+```{r plot_gt_profiles_salt_temp_rho, fig.asp=1}
 
 gt_3d_long <- gt_3d %>% 
   pivot_longer(c(salt, SurfaceAge, temp, rho), values_to = "value", names_to = "var")
