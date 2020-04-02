@@ -372,23 +372,6 @@ rm(p_MLD_gt, p_MLD_recalc)
 ```
 
 
-## Windspeed
-
-```{r plot_gt_winspeed}
-
-gt_2d %>% 
-  ggplot()+
-  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_line(aes(x= date_time, y = U_10, col="3-hourly"))+
-  geom_line(data = gt_2d_daily,
-            aes(x= date_time, y = U_10, col="Daily mean"))+
-  labs(y="U (m/s)", x = "Date")+
-  scale_color_brewer(palette = "Set1", name="", direction = -1)+
-  theme_bw()
-
-```
-
-
 
 # Finnmaid
 
@@ -868,6 +851,24 @@ iCT_dT %>%
 
 
 ```
+
+
+# GETM Windspeed
+
+```{r plot_gt_winspeed}
+
+gt_2d %>% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_line(aes(x= date_time, y = U_10, col="3-hourly"))+
+  geom_line(data = gt_2d_daily,
+            aes(x= date_time, y = U_10, col="Daily mean"))+
+  labs(y="U (m/s)", x = "Date")+
+  scale_color_brewer(palette = "Set1", name="", direction = -1)+
+  theme_bw()
+
+```
+
 
 # Open tasks / questions
 
