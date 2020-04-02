@@ -167,18 +167,14 @@ gt_3d <- gt_3d_long %>%
 gt_3d_long <- gt_3d %>% 
   pivot_longer(c(salt, SurfaceAge, temp, rho), values_to = "value", names_to = "var")
 
-lab_dates <- pretty(gt_3d_long$date_time)
-
 gt_3d_long %>% 
   ggplot(aes(value, dep,
-             col=as.numeric(date_time),
-             group=as.factor(date_time)))+
+             col=date_time,
+             group=date_time))+
   geom_path()+
   scale_y_reverse(expand = c(0,0))+
-  scale_color_viridis_c(breaks = as.numeric(lab_dates),
-                        labels = lab_dates,
-                        name="Date")+
-  facet_grid(~var, scales = "free_x")
+  scale_color_viridis_c(name="Date", trans = "time")+
+  facet_wrap(~var, scales = "free_x", ncol = 2)
 
 ```
 
@@ -251,7 +247,7 @@ rm(t, var, gt_2d, lat)
 
 ### Hovmoeller Plots
 
-```{r plot_hovmoeller_gt_salt_temp_rho_age}
+```{r gt_hovmoeller_salt_temp_rho_age, fig.asp=1.1}
 
 gt_2d <- 
   read_tsv((here::here("data/_summarized_data_files", file = "gt_2d.csv")))
