@@ -554,10 +554,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreed4f6d3439253c0f358b3a9907f9324631e5d6abetargetblankd4f6d34a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/d4f6d3439253c0f358b3a9907f9324631e5d6abe" target="_blank">d4f6d34</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree093e4fd9aa0f7a4f77b11ecc02fde00773d4b97ctargetblank093e4fda"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/093e4fd9aa0f7a4f77b11ecc02fde00773d4b97c" target="_blank">093e4fd</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreed4f6d3439253c0f358b3a9907f9324631e5d6abetargetblankd4f6d34a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree093e4fd9aa0f7a4f77b11ecc02fde00773d4b97ctargetblank093e4fda" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -971,7 +971,8 @@ fm &lt;- fm %&gt;%
   select(-c(Lon, Lat, patm, Teq, xCO2, route, Area)) %&gt;% 
   mutate(ID = as.factor(ID)) %&gt;% 
   rename(tem=Tem,
-         sal=Sal)</code></pre>
+         sal=Sal,
+         date_time = date)</code></pre>
 </div>
 <div id="ct-calculation" class="section level2">
 <h2><span class="header-section-number">3.2</span> C<sub>T</sub> calculation</h2>
@@ -990,9 +991,10 @@ fm &lt;- fm %&gt;%
 <pre class="r"><code>fm_ID &lt;- fm %&gt;% 
   pivot_longer(c(pCO2, sal, tem, cO2, CT), values_to = &quot;value&quot;, names_to = &quot;var&quot;) %&gt;% 
   group_by(ID) %&gt;% 
-  mutate(date = mean(date)) %&gt;%
+  mutate(date_time_ID = mean(date_time)) %&gt;%
+  select(-date_time) %&gt;% 
   ungroup() %&gt;% 
-  group_by(ID, date, sensor, var) %&gt;% 
+  group_by(ID, date_time_ID, sensor, var) %&gt;% 
   summarise_all(list(~mean(.), ~sd(.), ~min(.), ~max(.)), na.rm=TRUE) %&gt;%
   ungroup() %&gt;% 
   rename(value=mean)</code></pre>
@@ -1010,12 +1012,12 @@ ts_profiles_ID_long_surface &lt;- ts_profiles_ID_long %&gt;%
 <pre class="r"><code>fm_ID %&gt;% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_path(aes(x=date, y=value))+
-  #geom_ribbon(aes(x=date, y=value, ymax=max, ymin=min, fill=&quot;Finnmaid&quot;), alpha=0.3)+
-  geom_ribbon(aes(x=date, y=value, ymax=value+sd, ymin=value-sd, fill=&quot;Finnmaid&quot;), alpha=0.3)+
+  geom_path(aes(x=date_time_ID, y=value))+
+  #geom_ribbon(aes(x=date_time, y=value, ymax=max, ymin=min, fill=&quot;Finnmaid&quot;), alpha=0.3)+
+  geom_ribbon(aes(x=date_time_ID, y=value, ymax=value+sd, ymin=value-sd, fill=&quot;Finnmaid&quot;), alpha=0.3)+
   geom_ribbon(data = ts_profiles_ID_long_surface,
              aes(x=date_time_ID, ymin=value-sd, ymax=value+sd, fill=&quot;BloomSail&quot;), alpha=0.3)+
-  geom_point(aes(x=date, y=value, col=sensor))+
+  geom_point(aes(x=date_time_ID, y=value, col=sensor))+
   geom_point(data = ts_profiles_ID_long_surface,
              aes(x=date_time_ID, y=value, col=&quot;BloomSail&quot;))+
   geom_line(data = ts_profiles_ID_long_surface,
@@ -1031,23 +1033,23 @@ ts_profiles_ID_long_surface &lt;- ts_profiles_ID_long %&gt;%
 <pre class="r"><code>ts_gap &lt;- ts_profiles_ID_long_surface %&gt;% 
   filter(ID %in% c(&quot;180718&quot;, &quot;180723&quot;),
          var %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
-  select(date = date_time_ID, ID, var, value = value) %&gt;% 
+  select(date_time_ID, ID, var, value = value) %&gt;% 
   mutate(sensor = &quot;BloomSail&quot;)
 
 fm_ts_ID &lt;- full_join(fm_ID, ts_gap) %&gt;% 
-  arrange(date) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
   select(-sd) %&gt;% 
   filter(var %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
   mutate(period = &quot;BloomSail&quot;,
-         period = if_else(date &lt; fixed_values$start, &quot;pre-BloomSail&quot;, period),
-         period = if_else(date &gt; fixed_values$end, &quot;post-BloomSail&quot;, period))
+         period = if_else(date_time_ID &lt; fixed_values$start, &quot;pre-BloomSail&quot;, period),
+         period = if_else(date_time_ID &gt; fixed_values$end, &quot;post-BloomSail&quot;, period))
 
 fm_ts_ID %&gt;% 
   ggplot()+
   geom_rect(data = fixed_values,
             aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_path(aes(date, value, col=period))+
-  geom_point(aes(date, value, col=period))+
+  geom_path(aes(date_time_ID, value, col=period))+
+  geom_point(aes(date_time_ID, value, col=period))+
   facet_grid(var~., scales = &quot;free_y&quot;)+
   scale_color_brewer(palette = &quot;Set1&quot;)</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/fm_fill_gap_ts-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -1064,9 +1066,9 @@ rm(fm_ID, fm, ts_gap, ts_profiles_ID_long_surface)</code></pre>
 <h2><span class="header-section-number">4.1</span> MLD approach</h2>
 <p>Use dCT from Finnmaid and MLD from GETM and calculate iC<sub>T</sub> as their product.</p>
 <pre class="r"><code>iCT_MLD &lt;- fm_ts_ID %&gt;%
-  select(date, var, value) %&gt;% 
+  select(date_time_ID, var, value) %&gt;% 
   pivot_wider(values_from = value, names_from = var) %&gt;% 
-  rename(date_time_ID = date, SST = tem)
+  rename(SST = tem)
 
 iCT_MLD &lt;- full_join(iCT_MLD,
                      gt_2d_daily %&gt;% 
@@ -1119,8 +1121,8 @@ iCT_MLD &lt;- iCT_MLD %&gt;%
   filter(var == &quot;tem&quot;) %&gt;% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_path(aes(x=date, y=value))+
-  geom_point(aes(x=date, y=value, col=&quot;Finnmaid&quot;))+
+  geom_path(aes(x=date_time_ID, y=value))+
+  geom_point(aes(x=date_time_ID, y=value, col=&quot;Finnmaid&quot;))+
   geom_path(data = gt_2d, aes(x=date_time, y=SST, col=&quot;GETM, 3h&quot;))+
   geom_path(data = gt_2d_daily, aes(x=date_time, y=SST, col=&quot;GETM, daily&quot;))+
   scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
@@ -1132,43 +1134,36 @@ iCT_MLD &lt;- iCT_MLD %&gt;%
 <p>To investigate the change of surface C<sub>T</sub> with SST, we merge daily mean 2d GETM and Finnmaid data. GETM observations were linearly interpolated to match the time of Finnmaid observations.</p>
 <pre class="r"><code>CT_tem &lt;- fm_ts_ID %&gt;% 
   filter(var %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
-  select(date, var, value) %&gt;% 
+  select(date_time_ID, var, value) %&gt;% 
   pivot_wider(values_from = value, names_from = var) %&gt;% 
-  set_names(c(&quot;date_time&quot;, &quot;FM&quot;, &quot;CT&quot;))
+  rename(FM = tem)
 
 CT_tem &lt;- full_join(CT_tem,
-                    gt_2d_daily %&gt;% select(date_time, gt = SST))
+                    gt_2d_daily %&gt;% select(date_time_ID = date_time, gt = SST))
 
 
 CT_tem &lt;- CT_tem %&gt;% 
-  arrange(date_time) %&gt;%
+  arrange(date_time_ID) %&gt;%
   mutate(gt = na.approx(gt)) %&gt;% 
-  drop_na() %&gt;% 
-  mutate(date = as.Date(date_time))</code></pre>
+  drop_na()</code></pre>
 <pre class="r"><code>CT_tem &lt;- CT_tem %&gt;% 
   pivot_longer(cols = c(FM, gt), values_to = &quot;SST&quot;, names_to = &quot;obs&quot;)
 
 CT_tem &lt;- CT_tem %&gt;% 
   group_by(obs) %&gt;% 
-  arrange(date_time) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
   mutate(CT_diff = CT - lag(CT),
          SST_diff = SST - lag(SST),
          sign = if_else(CT_diff &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;% 
   ungroup()
-
-
-lab_dates &lt;- pretty(CT_tem$date_time)
 
 CT_tem %&gt;% 
   ggplot()+
   geom_hline(yintercept = 0)+
   geom_vline(xintercept = 0)+
   geom_smooth(aes(SST_diff, CT_diff), method = &quot;lm&quot;, se=FALSE)+
-  geom_point(aes(SST_diff, CT_diff, fill=as.numeric(date_time)), shape=21)+
-  scale_fill_viridis_c(breaks = as.numeric(lab_dates),
-                        labels = lab_dates,
-                        name=&quot;Date&quot;)+
-  guides(fill = guide_legend(override.aes=list(shape=21)))+
+  geom_point(aes(SST_diff, CT_diff, fill=date_time_ID), shape=21)+
+  scale_fill_viridis_c(trans = &quot;time&quot;, name=&quot;Date&quot;)+
   facet_wrap(~obs)</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/CT_vs_temperature-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>The ratio of surface changes in CT with SST based on GETM SST was used.</p>
@@ -1187,11 +1182,11 @@ CT_tem %&gt;%
 
 CT_tem &lt;- expand_grid(CT_tem, dep = unique(gt_3d$dep))
 
-fm_gt_3d &lt;- full_join(gt_3d %&gt;% select(date_time, dep, temp), 
-                    CT_tem %&gt;%  select(date_time, dep, factor))
+fm_gt_3d &lt;- full_join(gt_3d %&gt;% select(date_time_ID = date_time, dep, temp), 
+                      CT_tem %&gt;%  select(date_time_ID, dep, factor))
 
 fm_gt_3d &lt;- fm_gt_3d %&gt;% 
-  arrange(date_time) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
   group_by(dep) %&gt;% 
   mutate(temp = na.approx(temp)) %&gt;% 
   ungroup() %&gt;% 
@@ -1199,7 +1194,7 @@ fm_gt_3d &lt;- fm_gt_3d %&gt;%
 
 fm_gt_3d &lt;- fm_gt_3d %&gt;% 
   group_by(dep) %&gt;% 
-  arrange(date_time) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
   mutate(tem_diff = temp - lag(temp)) %&gt;% 
   ungroup() %&gt;% 
   mutate(CT_diff = tem_diff * factor) %&gt;% 
@@ -1211,8 +1206,8 @@ fm_gt_3d &lt;- fm_gt_3d %&gt;%
 <p>The reconstructed incremental changes are added up to derive cummulative C<sub>T</sub> changes throughout the water column.</p>
 <pre class="r"><code>fm_gt_3d &lt;- fm_gt_3d %&gt;% 
   group_by(dep) %&gt;% 
-  arrange(date_time) %&gt;% 
-  mutate(time_diff  = as.numeric(date_time - lag(date_time)),
+  arrange(date_time_ID) %&gt;% 
+  mutate(time_diff  = as.numeric(date_time_ID - lag(date_time_ID)),
          CT_diff_daily = CT_diff / time_diff,
          CT_cum = cumsum(replace_na(CT_diff, 0))) %&gt;% 
   ungroup()</code></pre>
@@ -1222,12 +1217,12 @@ fm_gt_3d &lt;- fm_gt_3d %&gt;%
 <p>Changes of seawater parameters at each depth were reconstructed from one cruise day to the next and divided by the number of days inbetween.</p>
 <pre class="r"><code>fm_gt_3d %&gt;% 
   arrange(dep) %&gt;% 
-  ggplot(aes(CT_diff_daily, dep, col=as.factor(date_time)))+
+  ggplot(aes(CT_diff_daily, dep, col=date_time_ID, group=date_time_ID))+
   geom_vline(xintercept = 0)+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
-  scale_color_viridis_d()+
+  scale_color_viridis_c(trans = &quot;time&quot;)+
   labs(x=&quot;Change of value inbetween cruises per day&quot;)</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
@@ -1236,12 +1231,12 @@ fm_gt_3d &lt;- fm_gt_3d %&gt;%
 <p>Cumulative changes of seawater parameters were calculated at each depth relative to the first cruise day on July 5.</p>
 <pre class="r"><code>fm_gt_3d %&gt;% 
   arrange(dep) %&gt;% 
-  ggplot(aes(CT_cum, dep, col=as.factor(date_time)))+
+  ggplot(aes(CT_cum, dep, col=date_time_ID, group=date_time_ID))+
   geom_vline(xintercept = 0)+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
-  scale_color_viridis_d()+
+  scale_color_viridis_c(trans = &quot;time&quot;)+
   labs(x=&quot;Cumulative change of value&quot;)</code></pre>
 <p><img src="figure/Finnmaid+GETM.Rmd/cumulative_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
@@ -1253,10 +1248,10 @@ fm_gt_3d &lt;- fm_gt_3d %&gt;%
 fm_gt_3d %&gt;%
   filter(dep &lt; 26) %&gt;% 
   ggplot()+
-  geom_contour_fill(aes(x=date_time, y=dep, z=CT_diff_daily),
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=CT_diff_daily),
                     breaks = MakeBreaks(bin_CT),
                     col=&quot;black&quot;)+
-  geom_point(aes(x=date_time, y=c(25)), size=3, shape=24, fill=&quot;white&quot;)+
+  geom_point(aes(x=date_time_ID, y=c(25)), size=3, shape=24, fill=&quot;white&quot;)+
   scale_fill_divergent(breaks = MakeBreaks(bin_CT),
                        guide = &quot;colorstrip&quot;,
                        name=&quot;CT (µmol/kg)&quot;)+
@@ -1276,10 +1271,10 @@ rm(bin_CT)</code></pre>
 fm_gt_3d %&gt;%
   filter(dep &lt; 26) %&gt;% 
   ggplot()+
-  geom_contour_fill(aes(x=date_time, y=dep, z=CT_cum),
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=CT_cum),
                     breaks = MakeBreaks(bin_CT),
                     col=&quot;black&quot;)+
-  geom_point(aes(x=date_time, y=c(25)), size=3, shape=24, fill=&quot;white&quot;)+
+  geom_point(aes(x=date_time_ID, y=c(25)), size=3, shape=24, fill=&quot;white&quot;)+
   scale_fill_divergent(breaks = MakeBreaks(bin_CT),
                        guide = &quot;colorstrip&quot;,
                        name=&quot;CT (µmol/kg)&quot;)+
@@ -1299,7 +1294,7 @@ rm(bin_CT)</code></pre>
 <p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated for the upper 10 m of the water body.</p>
 <pre class="r"><code>iCT_dT &lt;- fm_gt_3d %&gt;% 
   filter(dep &lt; 10) %&gt;% 
-  group_by(date_time) %&gt;%
+  group_by(date_time_ID) %&gt;%
   summarise(CT_i_diff = sum(CT_diff)/1000,
             CT_i_cum = sum(CT_cum)/1000) %&gt;% 
   ungroup()
@@ -1308,9 +1303,9 @@ rm(bin_CT)</code></pre>
 iCT_dT %&gt;% 
   ggplot()+
   #geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
-  geom_col(aes(date_time, CT_i_diff),
+  geom_col(aes(date_time_ID, CT_i_diff),
            position = &quot;dodge&quot;, alpha=0.3)+
-  geom_line(aes(date_time, CT_i_cum))+
+  geom_line(aes(date_time_ID, CT_i_cum))+
   scale_color_viridis_d(name=&quot;Depth limit (m)&quot;)+
   scale_fill_viridis_d(name=&quot;Depth limit (m)&quot;)+
   labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)+
