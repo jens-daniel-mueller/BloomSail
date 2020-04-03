@@ -812,7 +812,7 @@ fm_gt_3d <- full_join(gt_3d %>% select(date_time_ID = date_time, dep, temp),
 
 ```
 
-```{r interpolate_gt_to_fm, eval=FALSE}
+```{r interpolate_gt_to_fm}
 
 fm_gt_3d <- fm_gt_3d %>% 
   arrange(date_time_ID) %>% 
