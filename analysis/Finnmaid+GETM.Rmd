@@ -28,6 +28,7 @@ library(oce)
 library(patchwork)
 library(zoo)
 library(metR)
+library(tibbletime)
 ```
 
 
@@ -682,6 +683,10 @@ CT_tem <- fm_ts_ID %>%
 CT_tem <- full_join(CT_tem,
                     gt_2d_daily %>% select(date_time_ID = date_time, gt = SST))
 
+```
+
+
+```{r interpolate_gt_2d_to_fm, eval=FALSE}
 
 CT_tem <- CT_tem %>% 
   arrange(date_time_ID) %>%
@@ -689,6 +694,57 @@ CT_tem <- CT_tem %>%
   drop_na()
 
 ```
+
+
+```{r interpolate_fm_to_gt_2d_running_mean}
+
+CT_tem <- CT_tem %>% 
+  arrange(date_time_ID) %>%
+  mutate(CT = na.approx(CT, na.rm = FALSE),
+         FM = na.approx(FM, na.rm = FALSE)) %>% 
+  drop_na()
+
+rolling_mean <- rollify(~mean(.x, na.rm = TRUE), window = 3)
+
+CT_tem <- CT_tem %>% 
+  mutate(CT_rm = rolling_mean(CT) %>% lead(n = 1),
+         FM_rm = rolling_mean(FM) %>% lead(n = 1),
+         gt_rm = rolling_mean(gt) %>% lead(n = 1))
+
+```
+
+
+```{r FM_gt_2d_temp_timeseries_running_mean}
+
+p_SST <- CT_tem %>% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_point(aes(date_time_ID, FM, col="FM"))+
+  geom_path(aes(date_time_ID, FM_rm, col="FM"))+
+  geom_point(aes(date_time_ID, gt, col="gt"))+
+  geom_path(aes(date_time_ID, gt_rm, col="gt"))+
+  scale_color_brewer(palette = "Set1", name="")+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+p_CT <- CT_tem %>% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_point(aes(date_time_ID, CT, col="FM"))+
+  geom_path(aes(date_time_ID, CT_rm, col="FM"))+
+  scale_color_brewer(palette = "Set1", name="")+
+  theme(axis.title.x = element_blank())
+
+p_SST / p_CT
+
+CT_tem <- CT_tem %>% 
+  select(-c(CT, FM, gt)) %>% 
+  rename(CT = CT_rm,
+         FM = FM_rm,
+         gt = gt_rm)
+
+```
+
 
 ```{r CT_vs_temperature}
 
@@ -712,29 +768,51 @@ CT_tem %>%
   scale_fill_viridis_c(trans = "time", name="Date")+
   facet_wrap(~obs)
 
+CT_tem <- CT_tem %>% 
+  group_by(obs) %>% 
+  mutate(factor = CT_diff/SST_diff,
+         factor = if_else(is.na(factor), 0, factor)) %>% 
+  ungroup()
+
+
 ```
+
+Time series of incremental changes in CT and SST help to identify measurement days during which changes in both parameters deviate from the expected correlation (factor).
+
+```{r CT_tem_diff_time_series}
+
+
+CT_tem_long <- CT_tem %>% 
+  pivot_longer(c(CT_diff, SST_diff, factor), values_to = "value", names_to = "var")#
+
+CT_tem_long %>% 
+  ggplot(aes(date_time_ID, value, col=obs))+
+  geom_hline(yintercept = 0)+
+  geom_point()+
+  geom_line()+
+  scale_color_brewer(palette = "Set1")+
+  facet_grid(var~., scales = "free_y")+
+  theme(axis.title.x = element_blank())
+
+```
+
 
 The ratio of surface changes in CT with SST based on GETM SST was used.
 
-```{r reconctruction_CT_incremental_changes_profiles}
+```{r merge_gt_3d_CT-tem}
 
 CT_tem <- CT_tem %>% 
-  filter(obs == "gt") %>% 
-  mutate(factor = CT_diff/SST_diff,
-         factor = if_else(is.na(factor), 0, factor)) 
-
-# CT_tem %>% 
-#   ggplot()+
-#   geom_hline(yintercept = 0)+
-#   geom_vline(xintercept = 0)+
-#   geom_smooth(aes(SST_diff, CT_diff), method = "lm", se=FALSE)+
-#   geom_point(aes(SST_diff, CT_diff, fill=factor), shape=21)+
-#   scale_fill_viridis_c()
+  filter(obs == "gt")
 
 CT_tem <- expand_grid(CT_tem, dep = unique(gt_3d$dep))
 
 fm_gt_3d <- full_join(gt_3d %>% select(date_time_ID = date_time, dep, temp), 
                       CT_tem %>%  select(date_time_ID, dep, factor))
+
+
+```
+
+```{r interpolate_gt_to_fm, eval=FALSE}
 
 fm_gt_3d <- fm_gt_3d %>% 
   arrange(date_time_ID) %>% 
@@ -743,6 +821,12 @@ fm_gt_3d <- fm_gt_3d %>%
   ungroup() %>% 
   drop_na()
 
+
+```
+
+
+
+```{r reconstruct_incremental_CT_profiles_changes}
 fm_gt_3d <- fm_gt_3d %>% 
   group_by(dep) %>% 
   arrange(date_time_ID) %>% 
@@ -750,12 +834,9 @@ fm_gt_3d <- fm_gt_3d %>%
   ungroup() %>% 
   mutate(CT_diff = tem_diff * factor) %>% 
   select(-factor)
-
-# fm_gt_3d %>% 
-#   ggplot(aes(tem_diff, CT_diff, col=date_time))+
-#   geom_point()
-
 ```
+
+
 
 The reconstructed incremental changes are added up to derive cummulative C~T~ changes throughout the water column.
 
@@ -817,7 +898,7 @@ Hoevmoeller plots were generated for the reconstructed daily and cumulative chan
 
 ```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature. Note: Daily changes are currently plotted against the day when they were observed compared to the previous transect, although plotting against the mean date would be more plausible.", fig.asp=0.5, eval=FALSE}
 
-bin_CT <- 20
+bin_CT <- 10
 
 fm_gt_3d %>%
   filter(dep < 26) %>% 
@@ -918,14 +999,13 @@ gt_2d %>%
 
 # Open tasks / questions
 
-- Plot profiles for:
-  - GETM incremental temperature at Finnmaid time stamps
-- Plot hovmoeller for incremental changes in GETM temperature
-- Reference incremental changes to mean data and combine plots
 - Why do we see strong iCT change in delta T appraoch on day 2? Plot delta T, SST and factor
+
 - Can delta T approach be improved by:
   - Smoothened timeseries
   - Using a mean CT/SST factor
   - Using the cumulative values at iCT min
+  
+- Plot incremental changes in GETM temperature: hovmoeller and profiles
 
 
