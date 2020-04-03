@@ -999,8 +999,6 @@ gt_2d %>%
 
 # Open tasks / questions
 
-- Why do we see strong iCT change in delta T appraoch on day 2? Plot delta T, SST and factor
-
 - Can delta T approach be improved by:
   - Smoothened timeseries
   - Using a mean CT/SST factor
