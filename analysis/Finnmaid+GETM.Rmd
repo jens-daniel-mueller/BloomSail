@@ -857,7 +857,7 @@ fm_gt_3d <- fm_gt_3d %>%
 
 Changes of seawater parameters at each depth were reconstructed from one cruise day to the next and divided by the number of days inbetween.
 
-```{r incremental_changes_profiles}
+```{r CT_incremental_changes_profiles}
 
 fm_gt_3d %>% 
   arrange(dep) %>% 
@@ -867,7 +867,22 @@ fm_gt_3d %>%
   geom_path()+
   scale_y_reverse()+
   scale_color_viridis_c(trans = "time")+
-  labs(x="Change of value inbetween cruises per day")
+  labs(x="Change of CT inbetween cruises per day")
+
+
+```
+
+```{r tem_incremental_changes_profiles}
+
+fm_gt_3d %>% 
+  arrange(dep) %>% 
+  ggplot(aes(tem_diff, dep, col=date_time_ID, group=date_time_ID))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_c(trans = "time")+
+  labs(x="Change of temperature inbetween cruises per day")
 
 
 ```
@@ -876,7 +891,7 @@ fm_gt_3d %>%
 
 Cumulative changes of seawater parameters were calculated at each depth relative to the first cruise day on July 5.
 
-```{r cumulative_changes_profiles}
+```{r CT_cumulative_changes_profiles}
 
 fm_gt_3d %>% 
   arrange(dep) %>% 
@@ -886,17 +901,42 @@ fm_gt_3d %>%
   geom_path()+
   scale_y_reverse()+
   scale_color_viridis_c(trans = "time")+
-  labs(x="Cumulative change of value")
+  labs(x="Cumulative change of CT")
 
 ```
-
 
 ### Hovmoeller daily changes
 
 Hoevmoeller plots were generated for the reconstructed daily and cumulative changes in C~T~. Absolute values are not reproducible with this approach.
 
 
-```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature. Note: Daily changes are currently plotted against the day when they were observed compared to the previous transect, although plotting against the mean date would be more plausible.", fig.asp=0.5, eval=FALSE}
+```{r tem_hovmoeller_daily, fig.cap="Hovmoeller plots of modelled daily changes in temperature.", fig.asp=0.5, eval=FALSE}
+
+bin_tem <- 0.25
+
+fm_gt_3d %>%
+  filter(dep < 26) %>% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID_ref, y=dep, z=tem_diff),
+                    breaks = MakeBreaks(bin_tem),
+                    col="black")+
+  geom_point(aes(x=date_time_ID, y=c(25)), size=3, shape=24, fill="white")+
+  scale_fill_divergent(breaks = MakeBreaks(bin_tem),
+                       guide = "colorstrip",
+                       name="Tem (°C)")+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y="Depth (m)")+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+rm(bin_tem)
+
+```
+
+
+```{r CT_hovmoeller_daily, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~.", fig.asp=0.5, eval=FALSE}
 
 bin_CT <- 10
 
@@ -923,7 +963,7 @@ rm(bin_CT)
 
 ### Hovmoeller cumulative changes
 
-```{r plot_hovmoeller_cum, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature.", fig.asp=0.5, eval=FALSE}
+```{r plot_hovmoeller_cum, fig.cap="Hovmoeller plots of cumulative reconstructed changes in C~T~.", fig.asp=0.5, eval=FALSE}
 
 bin_CT <- 30
 
@@ -1000,10 +1040,6 @@ gt_2d %>%
 # Open tasks / questions
 
 - Can delta T approach be improved by:
-  - Smoothened timeseries
-  - Using a mean CT/SST factor
+  - Using a mean CT/SST factor -> not meaningful, because it assumes steady relation between dCT and dT
   - Using the cumulative values at iCT min
-  
-- Plot incremental changes in GETM temperature: hovmoeller and profiles
-
-
+- Plot cumulative changes in GETM temperature: Profile + Hovmoeller
