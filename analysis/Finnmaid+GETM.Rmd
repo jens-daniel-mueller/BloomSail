@@ -802,7 +802,7 @@ The ratio of surface changes in CT with SST based on GETM SST was used.
 ```{r merge_gt_3d_CT-tem}
 
 CT_tem <- CT_tem %>% 
-  filter(obs == "gt")
+  filter(obs == "FM")
 
 CT_tem <- expand_grid(CT_tem, dep = unique(gt_3d$dep))
 
