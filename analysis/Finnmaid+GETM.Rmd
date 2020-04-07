@@ -896,7 +896,7 @@ fm_gt_3d %>%
 Hoevmoeller plots were generated for the reconstructed daily and cumulative changes in C~T~. Absolute values are not reproducible with this approach.
 
 
-```{r tem_hovmoeller_daily, fig.cap="Hovmoeller plots of modelled daily changes in temperature.", fig.asp=0.5, eval=FALSE}
+```{r tem_hovmoeller_daily, fig.cap="Hovmoeller plots of modelled daily changes in temperature.", fig.asp=0.5}
 
 bin_tem <- 0.25
 
@@ -922,7 +922,7 @@ rm(bin_tem)
 ```
 
 
-```{r CT_hovmoeller_daily, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~.", fig.asp=0.5, eval=FALSE}
+```{r CT_hovmoeller_daily, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~.", fig.asp=0.5}
 
 bin_CT <- 10
 
@@ -949,7 +949,7 @@ rm(bin_CT)
 
 ### Hovmoeller cumulative changes
 
-```{r plot_hovmoeller_cum, fig.cap="Hovmoeller plots of cumulative reconstructed changes in C~T~.", fig.asp=0.5, eval=FALSE}
+```{r plot_hovmoeller_cum, fig.cap="Hovmoeller plots of cumulative reconstructed changes in C~T~.", fig.asp=0.5}
 
 bin_CT <- 30
 
