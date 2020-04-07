@@ -28,7 +28,6 @@ library(oce)
 library(patchwork)
 library(zoo)
 library(metR)
-library(tibbletime)
 ```
 
 
@@ -659,10 +658,12 @@ fm_ts_ID %>%
   filter(var == "tem") %>% 
   ggplot()+
   geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_path(aes(x=date_time_ID, y=value))+
+  geom_path(aes(x=date_time_ID, y=value, col="Finnmaid"))+
   geom_point(aes(x=date_time_ID, y=value, col="Finnmaid"))+
-  geom_path(data = gt_2d, aes(x=date_time, y=SST, col="GETM, 3h"))+
-  geom_path(data = gt_2d_daily, aes(x=date_time, y=SST, col="GETM, daily"))+
+  geom_path(data = gt_2d, aes(x=date_time, y=SST, col="GETM 2d, 3h"))+
+  geom_path(data = gt_2d_daily, aes(x=date_time, y=SST, col="GETM 2d, daily"))+
+  geom_path(data = gt_3d %>% filter(dep == 3),
+            aes(x=date_time, y=temp, col="GETM 3d, 3m"))+
   scale_color_brewer(palette = "Set1", name="")+
   labs(x="", y="SST (°C)")
 
@@ -672,31 +673,37 @@ fm_ts_ID %>%
 
 To investigate the change of surface C~T~ with SST, we merge daily mean 2d GETM and Finnmaid data. GETM observations were linearly interpolated to match the time of Finnmaid observations.
 
-```{r fm_gt_2d_merge}
 
-CT_tem <- fm_ts_ID %>% 
-  filter(var %in% c("tem", "CT")) %>% 
+```{r merge_gt_3d_fm}
+
+
+fm_ts_ID_wide <- fm_ts_ID %>% 
+  filter(var %in% c("CT")) %>% 
   select(date_time_ID, var, value) %>% 
-  pivot_wider(values_from = value, names_from = var) %>% 
-  rename(FM = tem)
+  pivot_wider(values_from = value, names_from = var)
 
-CT_tem <- full_join(CT_tem,
-                    gt_2d_daily %>% select(date_time_ID = date_time, gt = SST))
+fm_gt_3d <- expand_grid(fm_ts_ID_wide, dep = unique(gt_3d$dep))
+rm(fm_ts_ID_wide)
+
+fm_gt_3d <- full_join(gt_3d %>% select(date_time_ID = date_time, dep, tem = temp), 
+                      fm_gt_3d)
+
+```
+
+```{r interpolate_gt_3d_to_fm}
+
+fm_gt_3d <- fm_gt_3d %>% 
+  arrange(date_time_ID) %>% 
+  group_by(dep) %>% 
+  mutate(tem = approxfun(date_time_ID, tem)(date_time_ID)) %>% 
+  ungroup() %>% 
+  arrange(dep) %>% 
+  filter(!is.na(CT))
 
 ```
 
 
-```{r interpolate_gt_2d_to_fm, eval=FALSE}
-
-CT_tem <- CT_tem %>% 
-  arrange(date_time_ID) %>%
-  mutate(gt = na.approx(gt)) %>% 
-  drop_na()
-
-```
-
-
-```{r interpolate_fm_to_gt_2d_running_mean}
+```{r interpolate_fm_to_gt_2d_running_mean, eval=FALSE}
 
 CT_tem <- CT_tem %>% 
   arrange(date_time_ID) %>%
@@ -714,7 +721,7 @@ CT_tem <- CT_tem %>%
 ```
 
 
-```{r FM_gt_2d_temp_timeseries_running_mean}
+```{r FM_gt_2d_temp_timeseries_running_mean, eval=FALSE}
 
 p_SST <- CT_tem %>% 
   ggplot()+
@@ -748,16 +755,13 @@ CT_tem <- CT_tem %>%
 
 ```{r CT_vs_temperature}
 
-CT_tem <- CT_tem %>% 
-  pivot_longer(cols = c(FM, gt), values_to = "SST", names_to = "obs")
-
-CT_tem <- CT_tem %>% 
-  group_by(obs) %>% 
+CT_tem <- fm_gt_3d %>% 
+  filter(dep == 3) %>% 
   arrange(date_time_ID) %>% 
   mutate(CT_diff = CT - lag(CT),
-         SST_diff = SST - lag(SST),
-         sign = if_else(CT_diff < 0, "neg", "pos")) %>% 
-  ungroup()
+         SST_diff = tem - lag(tem)) %>% 
+  select(-tem)
+
 
 CT_tem %>% 
   ggplot()+
@@ -765,15 +769,11 @@ CT_tem %>%
   geom_vline(xintercept = 0)+
   geom_smooth(aes(SST_diff, CT_diff), method = "lm", se=FALSE)+
   geom_point(aes(SST_diff, CT_diff, fill=date_time_ID), shape=21)+
-  scale_fill_viridis_c(trans = "time", name="Date")+
-  facet_wrap(~obs)
+  scale_fill_viridis_c(trans = "time", name="Date")
 
 CT_tem <- CT_tem %>% 
-  group_by(obs) %>% 
   mutate(factor = CT_diff/SST_diff,
-         factor = if_else(is.na(factor), 0, factor)) %>% 
-  ungroup()
-
+         factor = if_else(is.na(factor), 0, factor))
 
 ```
 
@@ -781,12 +781,11 @@ Time series of incremental changes in CT and SST help to identify measurement da
 
 ```{r CT_tem_diff_time_series}
 
-
 CT_tem_long <- CT_tem %>% 
   pivot_longer(c(CT_diff, SST_diff, factor), values_to = "value", names_to = "var")#
 
 CT_tem_long %>% 
-  ggplot(aes(date_time_ID, value, col=obs))+
+  ggplot(aes(date_time_ID, value))+
   geom_hline(yintercept = 0)+
   geom_point()+
   geom_line()+
@@ -801,39 +800,26 @@ The ratio of surface changes in CT with SST based on GETM SST was used.
 
 ```{r merge_gt_3d_CT-tem}
 
-CT_tem <- CT_tem %>% 
-  filter(obs == "FM")
+CT_tem <- expand_grid(CT_tem %>% select(date_time_ID, factor),
+                      dep = unique(fm_gt_3d$dep))
 
-CT_tem <- expand_grid(CT_tem, dep = unique(gt_3d$dep))
-
-fm_gt_3d <- full_join(gt_3d %>% select(date_time_ID = date_time, dep, temp), 
+fm_gt_3d <- full_join(fm_gt_3d %>% select(date_time_ID, dep, tem), 
                       CT_tem %>%  select(date_time_ID, dep, factor))
 
 
 ```
 
-```{r interpolate_gt_to_fm}
-
-fm_gt_3d <- fm_gt_3d %>% 
-  arrange(date_time_ID) %>% 
-  group_by(dep) %>% 
-  mutate(temp = na.approx(temp)) %>% 
-  ungroup() %>% 
-  drop_na()
-
-
-```
-
-
 
 ```{r reconstruct_incremental_CT_profiles_changes}
+
 fm_gt_3d <- fm_gt_3d %>% 
   group_by(dep) %>% 
   arrange(date_time_ID) %>% 
-  mutate(tem_diff = temp - lag(temp)) %>% 
+  mutate(tem_diff = tem - lag(tem)) %>% 
   ungroup() %>% 
   mutate(CT_diff = tem_diff * factor) %>% 
   select(-factor)
+
 ```
 
 
@@ -941,12 +927,12 @@ rm(bin_tem)
 bin_CT <- 10
 
 fm_gt_3d %>%
-  filter(dep < 26) %>% 
+  filter(dep < 15) %>% 
   ggplot()+
   geom_contour_fill(aes(x=date_time_ID_ref, y=dep, z=CT_diff_daily),
                     breaks = MakeBreaks(bin_CT),
                     col="black")+
-  geom_point(aes(x=date_time_ID, y=c(25)), size=3, shape=24, fill="white")+
+  geom_point(aes(x=date_time_ID, y=c(14)), size=3, shape=24, fill="white")+
   scale_fill_divergent(breaks = MakeBreaks(bin_CT),
                        guide = "colorstrip",
                        name="CT (µmol/kg)")+
@@ -968,12 +954,12 @@ rm(bin_CT)
 bin_CT <- 30
 
 fm_gt_3d %>%
-  filter(dep < 26) %>% 
+  filter(dep < 15) %>% 
   ggplot()+
   geom_contour_fill(aes(x=date_time_ID, y=dep, z=CT_cum),
                     breaks = MakeBreaks(bin_CT),
                     col="black")+
-  geom_point(aes(x=date_time_ID, y=c(25)), size=3, shape=24, fill="white")+
+  geom_point(aes(x=date_time_ID, y=c(14)), size=3, shape=24, fill="white")+
   scale_fill_divergent(breaks = MakeBreaks(bin_CT),
                        guide = "colorstrip",
                        name="CT (µmol/kg)")+
