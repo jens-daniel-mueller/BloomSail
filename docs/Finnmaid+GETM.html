@@ -439,7 +439,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Finnmaid and GETM</h1>
 <h4 class="author">Jens Daniel Müller und Lara Sophie Burchardt</h4>
-<h4 class="date">07 April, 2020</h4>
+<h4 class="date">09 April, 2020</h4>
 
 </div>
 
@@ -464,7 +464,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-04-07
+<strong>Last updated:</strong> 2020-04-09
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -555,16 +555,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb72d86decfbc0c0447f20cfe2d39df62fa6eb2ectargetblankb72d86da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b72d86decfbc0c0447f20cfe2d39df62fa6eb2ec" target="_blank">b72d86d</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4e9464ff3c7386d062b38db754d5a06b425d8866targetblank4e9464fa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/4e9464ff3c7386d062b38db754d5a06b425d8866" target="_blank">4e9464f</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb72d86decfbc0c0447f20cfe2d39df62fa6eb2ectargetblankb72d86da" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4e9464ff3c7386d062b38db754d5a06b425d8866targetblank4e9464fa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b72d86decfbc0c0447f20cfe2d39df62fa6eb2ec" target="_blank">b72d86d</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/4e9464ff3c7386d062b38db754d5a06b425d8866" target="_blank">4e9464f</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -618,6 +618,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/4e9464ff3c7386d062b38db754d5a06b425d8866/analysis/Finnmaid+GETM.Rmd" target="_blank">4e9464f</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-09
+</td>
+<td>
+corrected na approx function
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/7ba778ce3f9e36a711c4aee2af919fde47c395ed/docs/Finnmaid+GETM.html" target="_blank">7ba778c</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1980,9 +2014,9 @@ ts_profiles_ID &lt;- ts_profiles_ID %&gt;%
 ts_gt_3d &lt;- ts_gt_3d %&gt;% 
   arrange(date_time) %&gt;% 
   group_by(dep) %&gt;% 
-  mutate(tem_gt = na.approx(tem_gt),
-         sal_gt = na.approx(sal_gt),
-         rho_gt = na.approx(rho_gt)) %&gt;% 
+  mutate(tem_gt = approxfun(date_time, tem_gt)(date_time),
+         sal_gt = approxfun(date_time, sal_gt)(date_time),
+         rho_gt = approxfun(date_time, rho_gt)(date_time)) %&gt;% 
   ungroup() %&gt;% 
   drop_na()</code></pre>
 <pre class="r"><code>ts_gt_3d_long &lt;- ts_gt_3d %&gt;% 
@@ -2661,8 +2695,8 @@ iCT_dT %&gt;%
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.5.0 (2018-04-23)
-Platform: x86_64-w64-mingw32/x64 (64-bit)
+<pre><code>R version 3.6.3 (2020-02-29)
+Platform: i386-w64-mingw32/i386 (32-bit)
 Running under: Windows 10 x64 (build 18363)
 
 Matrix products: default
@@ -2678,29 +2712,30 @@ attached base packages:
 other attached packages:
  [1] metR_0.6.0      zoo_1.8-7       patchwork_1.0.0 seacarb_3.2.13 
  [5] oce_1.2-0       gsw_1.0-5       testthat_2.3.2  here_0.1       
- [9] lubridate_1.7.8 vroom_1.2.0     ncdf4_1.17      forcats_0.5.0  
+ [9] lubridate_1.7.4 vroom_1.2.0     ncdf4_1.17      forcats_0.5.0  
 [13] stringr_1.4.0   dplyr_0.8.5     purrr_0.3.3     readr_1.3.1    
 [17] tidyr_1.0.2     tibble_3.0.0    ggplot2_3.3.0   tidyverse_1.3.0
+[21] workflowr_1.6.1
 
 loaded via a namespace (and not attached):
- [1] nlme_3.1-137       fs_1.4.1           bit64_0.9-7        RColorBrewer_1.1-2
- [5] httr_1.4.1         rprojroot_1.3-2    tools_3.5.0        backports_1.1.5   
- [9] R6_2.4.0           DBI_1.0.0          mgcv_1.8-23        colorspace_1.4-1  
-[13] withr_2.1.2        sp_1.3-2           tidyselect_0.2.5   bit_1.1-14        
-[17] compiler_3.5.0     git2r_0.26.1       cli_1.1.0          rvest_0.3.5       
-[21] xml2_1.2.2         labeling_0.3       scales_1.0.0       checkmate_1.9.4   
-[25] digest_0.6.22      rmarkdown_2.1      pkgconfig_2.0.3    htmltools_0.4.0   
-[29] dbplyr_1.4.2       highr_0.8          rlang_0.4.5        readxl_1.3.1      
-[33] rstudioapi_0.10    generics_0.0.2     jsonlite_1.6       magrittr_1.5      
-[37] Matrix_1.2-14      Rcpp_1.0.2         munsell_0.5.0      lifecycle_0.2.0   
-[41] stringi_1.4.3      whisker_0.4        yaml_2.2.0         plyr_1.8.4        
-[45] grid_3.5.0         promises_1.1.0     crayon_1.3.4       lattice_0.20-35   
-[49] haven_2.2.0        hms_0.5.2          knitr_1.28         pillar_1.4.3      
-[53] reprex_0.3.0       glue_1.3.1         evaluate_0.14      data.table_1.12.6 
-[57] modelr_0.1.5       vctrs_0.2.4        httpuv_1.5.2       cellranger_1.1.0  
-[61] gtable_0.3.0       assertthat_0.2.1   xfun_0.10          broom_0.5.3       
-[65] later_1.0.0        viridisLite_0.3.0  memoise_1.1.0      workflowr_1.6.1   
-[69] ellipsis_0.3.0    </code></pre>
+ [1] Rcpp_1.0.4         whisker_0.4        knitr_1.28         xml2_1.3.0        
+ [5] magrittr_1.5       splines_3.6.3      hms_0.5.3          rvest_0.3.5       
+ [9] tidyselect_1.0.0   bit_1.1-15.2       viridisLite_0.3.0  colorspace_1.4-1  
+[13] lattice_0.20-41    R6_2.4.1           rlang_0.4.5        fansi_0.4.1       
+[17] broom_0.5.5        xfun_0.12          dbplyr_1.4.2       modelr_0.1.6      
+[21] withr_2.1.2        git2r_0.26.1       ellipsis_0.3.0     htmltools_0.4.0   
+[25] assertthat_0.2.1   bit64_0.9-7        rprojroot_1.3-2    digest_0.6.25     
+[29] lifecycle_0.2.0    Matrix_1.2-18      haven_2.2.0        rmarkdown_2.1     
+[33] sp_1.4-1           compiler_3.6.3     cellranger_1.1.0   pillar_1.4.3      
+[37] scales_1.1.0       backports_1.1.5    generics_0.0.2     jsonlite_1.6.1    
+[41] httpuv_1.5.2       pkgconfig_2.0.3    rstudioapi_0.11    munsell_0.5.0     
+[45] plyr_1.8.6         highr_0.8          httr_1.4.1         tools_3.6.3       
+[49] grid_3.6.3         nlme_3.1-145       data.table_1.12.8  gtable_0.3.0      
+[53] checkmate_2.0.0    mgcv_1.8-31        DBI_1.1.0          cli_2.0.2         
+[57] readxl_1.3.1       yaml_2.2.1         crayon_1.3.4       RColorBrewer_1.1-2
+[61] farver_2.0.3       later_1.0.0        promises_1.1.0     fs_1.4.0          
+[65] vctrs_0.2.4        memoise_1.1.0      glue_1.3.2         evaluate_0.14     
+[69] labeling_0.3       reprex_0.3.0       stringi_1.4.6     </code></pre>
 </div>
 </div>
 

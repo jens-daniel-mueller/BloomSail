@@ -30,6 +30,14 @@
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
   pre:not([class]) {
@@ -417,13 +425,6 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-<!-- Add a small amount of space between sections. -->
-<style type="text/css">
-div.section {
-  padding-top: 12px;
-}
-</style>
-
 <div class="fluid-row" id="header">
 
 <div class="btn-group pull-right">
@@ -438,7 +439,7 @@ div.section {
 
 <h1 class="title toc-ignore">CT dynamics</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">01 April, 2020</h4>
+<h4 class="date">09 April, 2020</h4>
 
 </div>
 
@@ -463,7 +464,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-04-01
+<strong>Last updated:</strong> 2020-04-09
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -473,7 +474,7 @@ div.section {
 </p>
 <p>
 This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
-  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.1). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
 </p>
 <hr>
 </div>
@@ -554,19 +555,24 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec19920043d8af20fba341b95f03d041226357b98targetblankc199200a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c19920043d8af20fba341b95f03d041226357b98" target="_blank">c199200</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4e9464ff3c7386d062b38db754d5a06b425d8866targetblank4e9464fa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/4e9464ff3c7386d062b38db754d5a06b425d8866" target="_blank">4e9464f</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec19920043d8af20fba341b95f03d041226357b98targetblankc199200a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4e9464ff3c7386d062b38db754d5a06b425d8866targetblank4e9464fa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
-Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/4e9464ff3c7386d062b38db754d5a06b425d8866" target="_blank">4e9464f</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 </p>
 <pre><code>
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
     Ignored:    data/Finnmaid_2018/
     Ignored:    data/GETM/
     Ignored:    data/Maps/
@@ -586,9 +592,1565 @@ Note that any generated files, e.g. HTML, png, CSS, etc., are not included in t
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/CT_dynamics.Rmd</code>) and HTML (<code>docs/CT_dynamics.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/4e9464ff3c7386d062b38db754d5a06b425d8866/analysis/CT_dynamics.Rmd" target="_blank">4e9464f</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-09
+</td>
+<td>
+corrected na approx function
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/849e990c802b7288a30d35ddd8e803b81c681480/docs/CT_dynamics.html" target="_blank">849e990</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/c19920043d8af20fba341b95f03d041226357b98/analysis/CT_dynamics.Rmd" target="_blank">c199200</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+included BloomSail data to Finnmaid analysis
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/f4a27b8babb6df2ea809b0fbbfaa4987a2a4dcdf/docs/CT_dynamics.html" target="_blank">f4a27b8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b1613b7e3a6370169a2dc8f71712490041f68d6b/analysis/CT_dynamics.Rmd" target="_blank">b1613b7</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+re-calculated MLD, renamed objects and structured site
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/63029949691d73f2c6ec43cb4849d6ff73b7c3f8/docs/CT_dynamics.html" target="_blank">6302994</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-31
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/50ab3132ac3d100b160b350184b6febcc85a06b4/analysis/CT_dynamics.Rmd" target="_blank">50ab313</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-31
+</td>
+<td>
+implemented temperature reconstruction
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/a6c4c2246be92faaecf4654e92031ba76875c4f0/docs/CT_dynamics.html" target="_blank">a6c4c22</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/d8120b3711f19badd9ed062c1b3fdcd217a2ed72/analysis/CT_dynamics.Rmd" target="_blank">d8120b3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+reconstruction BloomSail surface started, merging MLD and DT approach
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/80c78b3d07120ece6b7f4fc1439fcd4cd8a13047/docs/CT_dynamics.html" target="_blank">80c78b3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/70dbfbe25a92084921ae393709a3f03069f53fa6/docs/CT_dynamics.html" target="_blank">70dbfbe</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/e69d1f0afd490a2e3c0b8716dca249be812f9f13/analysis/CT_dynamics.Rmd" target="_blank">e69d1f0</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+cleaned object names
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/431a56ae0c11308094cdc55a15b78ab1443bb5b1/docs/CT_dynamics.html" target="_blank">431a56a</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/9edf20d32135ee888b86c770785c3696772d5fdd/analysis/CT_dynamics.Rmd" target="_blank">9edf20d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+flux and mixing correction revised
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/f8ad4ff8800167add22f9c2cf3d4f69d1c32b4cc/docs/CT_dynamics.html" target="_blank">f8ad4ff</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/265e5681d14897630d2bbf560d06891c80dd3d99/analysis/CT_dynamics.Rmd" target="_blank">265e568</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+NCP calculation finished
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/2ade511a2f7fe4c9bf87eb66701aada5e1774154/docs/CT_dynamics.html" target="_blank">2ade511</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/858e01f5776c965dd20f7ae6008da2b269bcf128/analysis/CT_dynamics.Rmd" target="_blank">858e01f</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+iCT flux correction applied
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/a22daa8c81f426c754cb15d0fecd5a8793609a12/docs/CT_dynamics.html" target="_blank">a22daa8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/9118b70d2f47849ea02ad8df2e412e1edc5ad86b/analysis/CT_dynamics.Rmd" target="_blank">9118b70</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+iCT flux correction applied
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/2d358fbb2a81947ea445c1367b7e1c0e3e1a7530/docs/CT_dynamics.html" target="_blank">2d358fb</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/d17a2b06c2430db13cd486c9ce2d483c3d463fbd/analysis/CT_dynamics.Rmd" target="_blank">d17a2b0</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+Added air sea CO2 fluxes
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/43da055499dab728480c7ab03319f121f8665a36/docs/CT_dynamics.html" target="_blank">43da055</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/6afdea92f2343ffc0fbe807140fd231c72a9cd2c/analysis/CT_dynamics.Rmd" target="_blank">6afdea9</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+selected iCT time series for NCP
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/1d7eebc81c76c6eb91b29e1dc3b349fb4e26200f/docs/CT_dynamics.html" target="_blank">1d7eebc</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/4d734a11f166c9f07c733acad56b119cb6829650/analysis/CT_dynamics.Rmd" target="_blank">4d734a1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Started NCP estimation
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/57e3e73d8f8a0cb21871d9bd70bfe52f31b4e4c4/docs/CT_dynamics.html" target="_blank">57e3e73</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/275b061655e694097b87ad096c94c20b2adeda4f/analysis/CT_dynamics.Rmd" target="_blank">275b061</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+renamed NCP correctly als iCT
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/30d5b105b6e1f27addeb7837b0dcebb0f014586d/docs/CT_dynamics.html" target="_blank">30d5b10</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/0405651e6dbd09a4261302305427fe2ca581858f/analysis/CT_dynamics.Rmd" target="_blank">0405651</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Restructure MLD iCT chapter
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/90633b8a87411e42ecbc860a48948734a81bddd7/docs/CT_dynamics.html" target="_blank">90633b8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/baa81d650bf047ec7f0de93d9174bed72b43c9e8/analysis/CT_dynamics.Rmd" target="_blank">baa81d6</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+heigth surface timeseries reduced
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/f139cbddc8173726d461424aecf0dbd4f41d4965/docs/CT_dynamics.html" target="_blank">f139cbd</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/1b8a11e0d3313acb5605ca1e75e43cdd4cd3cebf/analysis/CT_dynamics.Rmd" target="_blank">1b8a11e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+restructured NCP chapter, and renamed as iCT
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/c2b128eab63ca2fa102b3ecd4f4cb724165300e2/docs/CT_dynamics.html" target="_blank">c2b128e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/6ec40053315daf32c77244b81cd6cf7b2f685b02/analysis/CT_dynamics.Rmd" target="_blank">6ec4005</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+added interpretation notes
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/63909fca5a07c36b517c377c136115a359a40b9f/docs/CT_dynamics.html" target="_blank">63909fc</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/069600ca34c89c1211863d53c3eed2cdfde07b3b/analysis/CT_dynamics.Rmd" target="_blank">069600c</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+theme_bw
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/5011448d17bfcebb5b0c60b646ee7e43d7db0bd9/docs/CT_dynamics.html" target="_blank">5011448</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/69ec53ec5dae4d28e4393547df9ee9ad7185ed0b/analysis/CT_dynamics.Rmd" target="_blank">69ec53e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Comparison iCT estimates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/b6e6117af22337943055ebc34fb257eeb5e0d5f0/docs/CT_dynamics.html" target="_blank">b6e6117</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-25
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/07690b6bd17c5c82870a77d664d89a0d0f2045bd/analysis/CT_dynamics.Rmd" target="_blank">07690b6</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-25
+</td>
+<td>
+NCP MLD approach implmented
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/a667be11d6abb5cbd0eee9f8a0d665f72c98648d/docs/CT_dynamics.html" target="_blank">a667be1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-25
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/93800e0f6c25ea8f8229817b5b81fbd876dc2013/analysis/CT_dynamics.Rmd" target="_blank">93800e0</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-25
+</td>
+<td>
+NCP MLD approach implmented
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/b8d7014efe10cf76f3ffee0fce3566ab422338eb/docs/CT_dynamics.html" target="_blank">b8d7014</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-25
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/a13c901e29c94a69f6fff76b26644981315be5da/analysis/CT_dynamics.Rmd" target="_blank">a13c901</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-25
+</td>
+<td>
+NCP fixed depth, new variable names, ref dates introduced
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/b589daf2d4684078e78505e419cc74f6c9150eaf/docs/CT_dynamics.html" target="_blank">b589daf</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/90979bb6e9dffdb4a479e001c7b37e55fb1ecb71/analysis/CT_dynamics.Rmd" target="_blank">90979bb</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+nameing convention and NCP approaches list
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/d0d5c9e78d11a3f1c45f907d4f5322aa6cbee96b/docs/CT_dynamics.html" target="_blank">d0d5c9e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/1e2508a27700db15a1bd63f1249151f6987c72a2/analysis/CT_dynamics.Rmd" target="_blank">1e2508a</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+harmonized starting dates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/5f8ca30413bdc1d8c5801af85b2a25df410b1679/docs/CT_dynamics.html" target="_blank">5f8ca30</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/2a20453c53374316875a94d6205aba67e40d1c0c/docs/CT_dynamics.html" target="_blank">2a20453</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/473ab254bb02b26272128615869c13ec93dd3757/docs/CT_dynamics.html" target="_blank">473ab25</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/e9d33a7cbb885a4fe8ac30b7c3d0accdd942ac7d/docs/CT_dynamics.html" target="_blank">e9d33a7</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/ff79dbeb300e91cfed05ff14aa9ad345cb7dd5bb/analysis/CT_dynamics.Rmd" target="_blank">ff79dbe</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+remoced errorbars in ts plot
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/47663534b0227a76ef3be42bfb53c0a20b3a4c5f/docs/CT_dynamics.html" target="_blank">4766353</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/0d90486bf4dfa8339efd75a5224abea71f1db69a/analysis/CT_dynamics.Rmd" target="_blank">0d90486</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+Hovmoeller daily changes
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/592f3b5862012ddde86efdf01f0301033bb853b0/docs/CT_dynamics.html" target="_blank">592f3b5</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/41032797a46fd1e178236fb6a2e4450f94b62aa0/analysis/CT_dynamics.Rmd" target="_blank">4103279</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+CT: removed coastal, added errorbars and hovmoeller
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/81f022e95ee153ba75842f692a332afe4e406fb1/docs/CT_dynamics.html" target="_blank">81f022e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/18a74d14ec3e923effb13018cf042cf20871bcdd/docs/CT_dynamics.html" target="_blank">18a74d1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b839b18eba6c6ad74e6b2279bf2e82c08b1fc3e9/analysis/CT_dynamics.Rmd" target="_blank">b839b18</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+CT vs tem changes implemented
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/1e39d852ca29ac741ac5ab66ff24d9940d88c5be/docs/CT_dynamics.html" target="_blank">1e39d85</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/2105236d1e024a2e726740e361d735b20779f58d/docs/CT_dynamics.html" target="_blank">2105236</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/48580973699ae00abeee9db83727608756dedc6c/docs/CT_dynamics.html" target="_blank">4858097</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f0233c2acf0591b32e7618e7a7abb16b70ac053d/analysis/CT_dynamics.Rmd" target="_blank">f0233c2</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+MLD and NCP penetration depth
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/05b9bdcd29216e144c4b602f9ce0884cbf1d0011/docs/CT_dynamics.html" target="_blank">05b9bdc</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/943cd6bdc51aa87ad2665a3bc2d3dd2ff11f0c02/docs/CT_dynamics.html" target="_blank">943cd6b</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/859c4a4613eb27eb92eac182cf99feaf23395f66/analysis/CT_dynamics.Rmd" target="_blank">859c4a4</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+corrected gas exchange calculation
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/26bc407d35c8438fecc2256c6d954140826f9c5b/docs/CT_dynamics.html" target="_blank">26bc407</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/7be14e4602989f5ef3a242398c3095758f7c5986/analysis/CT_dynamics.Rmd" target="_blank">7be14e4</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+corrected CT cum timeseries, used exact mean dates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/cb196d8d4650bccce7e13a6a31157461007b616b/docs/CT_dynamics.html" target="_blank">cb196d8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/7c1033668ce8f47beb2e66f616b27e27b660a9d5/analysis/CT_dynamics.Rmd" target="_blank">7c10336</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+corrected CT cum timeseries, used exact mean dates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/0202742595c4e9482f9e250a573f5ef6ace1714a/docs/CT_dynamics.html" target="_blank">0202742</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/7508d11f4fccfd0d097517ced6c6099987ce11ab/docs/CT_dynamics.html" target="_blank">7508d11</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/53ee4237eb15531731c101f8b3f2e428de66f4b4/analysis/CT_dynamics.Rmd" target="_blank">53ee423</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-16
+</td>
+<td>
+gas exchange calculation completed
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/9f0c30bf22a23587f83631d8476bb619faa1f853/docs/CT_dynamics.html" target="_blank">9f0c30b</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/1c60add64efcdfc7f5ec763160413c2c115f7c17/analysis/CT_dynamics.Rmd" target="_blank">1c60add</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-16
+</td>
+<td>
+incremental CT changes timeseries + raw pCO2 profiles plotted
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/4150817f54ef5ad28f54d3b4ecf902726f2aa6fc/docs/CT_dynamics.html" target="_blank">4150817</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/94e12d80cb05305d4f25d6ddc7adeccb008997cd/analysis/CT_dynamics.Rmd" target="_blank">94e12d8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-13
+</td>
+<td>
+final cleaning
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/443d9a170ce3c59e4517155a4d4f878a291c48be/docs/CT_dynamics.html" target="_blank">443d9a1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/39b841d766f959c5a6b80198d430c662d28478fa/analysis/CT_dynamics.Rmd" target="_blank">39b841d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-13
+</td>
+<td>
+all profiles pdfs included
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/ff22d6fd8eaadbe18ef49978965995b480906545/docs/CT_dynamics.html" target="_blank">ff22d6f</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f49ce78698e59e99df795845d046524cb24ccbdc/analysis/CT_dynamics.Rmd" target="_blank">f49ce78</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-13
+</td>
+<td>
+cumulative changes per depth
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/e40435947d68cd78c9f8ccbf1eba5ffdd35bf8c7/docs/CT_dynamics.html" target="_blank">e404359</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/e9725fe16a74f1f90ff8ddc9ed68c9d8b9bd4bbc/analysis/CT_dynamics.Rmd" target="_blank">e9725fe</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-12
+</td>
+<td>
+Clean CT dynamics
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/8e83afde0b15d6a39c248fc0aa52c4a3d915a6e2/docs/CT_dynamics.html" target="_blank">8e83afd</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/3c17c460052669b58cdfd0c53619e2576e211667/analysis/CT_dynamics.Rmd" target="_blank">3c17c46</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-12
+</td>
+<td>
+update CT cynamics
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/a3ddea46fcdb378f7ca31d1e2bab6cfe8bf19b96/docs/CT_dynamics.html" target="_blank">a3ddea4</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/97355faca4e68a0f8d4ecc285fe10322c57365fc/analysis/CT_dynamics.Rmd" target="_blank">97355fa</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-12
+</td>
+<td>
+CT calculations and plots
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -1791,11 +3353,11 @@ ts_og_long %&gt;%
 <p>k = coeff * U^2 * (660/Sc)^0.5</p>
 <p>Units used here are:</p>
 <ul>
-<li>dpCO<sub>2</sub>: µatm</li>
-<li>K0: mol atm-1 kg-1</li>
+<li><p>dpCO<sub>2</sub>: µatm</p></li>
+<li><p>K0: mol atm-1 kg-1</p></li>
 <li><p>dCO<sub>2</sub>: µmol kg-1</p></li>
 <li><p>wind speed U: m s-1</p></li>
-<li>coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2</li>
+<li><p>coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2</p></li>
 <li><p>gas transfer velocities k: cm hr-1 (= 60<em>60</em>100 m s-1)</p></li>
 <li><p>air sea CO<sub>2</sub> flux F: mol m–2 d–1</p></li>
 <li><p>conversion between the unit of k * dCO2 and F requires a factor of 10-5 * 24</p></li>
@@ -2050,11 +3612,15 @@ iCT_10_flux_mix_diff %&gt;%
 <div id="open-tasks-questions" class="section level1">
 <h1><span class="header-section-number">9</span> Open tasks / questions</h1>
 <ul>
-<li>is the CT correction for mixing and fluxes between the last cruises correct?</li>
 <li>clean and harmonize chunk labeling (label: plot, 1 plot per chunk, etc)</li>
 <li>included removed stations in map and coverage plot</li>
-<li>Significance of changes in AT for calculated CT changes</li>
+<li>Significance of changes in AT for calculated CT changes
+<ul>
+<li>Calculate AT-S ratios, reconstruct AT profiles, calculate true CT profiles, normalize CT profiles to mean AT</li>
+</ul></li>
 <li>Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)</li>
+<li>Introduce errorbars for iCT time series (-&gt; large errorbar after CT increase expected)</li>
+<li>demostrate strong permanent thermocline at around 25 m</li>
 </ul>
 <br>
 <p>
@@ -2064,8 +3630,8 @@ iCT_10_flux_mix_diff %&gt;%
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.5.0 (2018-04-23)
-Platform: x86_64-w64-mingw32/x64 (64-bit)
+<pre><code>R version 3.6.3 (2020-02-29)
+Platform: i386-w64-mingw32/i386 (32-bit)
 Running under: Windows 10 x64 (build 18363)
 
 Matrix products: default
@@ -2079,40 +3645,31 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] zoo_1.8-6       lubridate_1.7.4 scico_1.1.0     metR_0.5.0     
- [5] marelac_2.1.9   shape_1.4.4     seacarb_3.2.12  oce_1.2-0      
- [9] gsw_1.0-5       testthat_2.3.1  patchwork_1.0.0 forcats_0.4.0  
-[13] stringr_1.4.0   dplyr_0.8.3     purrr_0.3.3     readr_1.3.1    
-[17] tidyr_1.0.0     tibble_2.1.3    ggplot2_3.3.0   tidyverse_1.3.0
+ [1] zoo_1.8-7       lubridate_1.7.4 scico_1.1.0     metR_0.6.0     
+ [5] marelac_2.1.10  shape_1.4.4     seacarb_3.2.13  oce_1.2-0      
+ [9] gsw_1.0-5       testthat_2.3.2  patchwork_1.0.0 forcats_0.5.0  
+[13] stringr_1.4.0   dplyr_0.8.5     purrr_0.3.3     readr_1.3.1    
+[17] tidyr_1.0.2     tibble_3.0.0    ggplot2_3.3.0   tidyverse_1.3.0
+[21] workflowr_1.6.1
 
 loaded via a namespace (and not attached):
- [1] nlme_3.1-137         bitops_1.0-6         fs_1.3.1            
- [4] RColorBrewer_1.1-2   httr_1.4.1           rprojroot_1.3-2     
- [7] tools_3.5.0          backports_1.1.5      R6_2.4.0            
-[10] DBI_1.0.0            colorspace_1.4-1     withr_2.1.2         
-[13] sp_1.3-2             tidyselect_0.2.5     gridExtra_2.3       
-[16] compiler_3.5.0       git2r_0.26.1         cli_1.1.0           
-[19] rvest_0.3.5          xml2_1.2.2           labeling_0.3        
-[22] scales_1.0.0         checkmate_1.9.4      digest_0.6.22       
-[25] foreign_0.8-70       rmarkdown_2.0        pkgconfig_2.0.3     
-[28] htmltools_0.4.0      highr_0.8            dbplyr_1.4.2        
-[31] maps_3.3.0           rlang_0.4.5          readxl_1.3.1        
-[34] rstudioapi_0.10      generics_0.0.2       jsonlite_1.6        
-[37] RCurl_1.95-4.12      magrittr_1.5         Formula_1.2-3       
-[40] dotCall64_1.0-0      Matrix_1.2-14        Rcpp_1.0.2          
-[43] munsell_0.5.0        lifecycle_0.1.0      stringi_1.4.3       
-[46] yaml_2.2.0           plyr_1.8.4           grid_3.5.0          
-[49] maptools_0.9-8       formula.tools_1.7.1  promises_1.1.0      
-[52] crayon_1.3.4         lattice_0.20-35      haven_2.2.0         
-[55] hms_0.5.2            zeallot_0.1.0        knitr_1.26          
-[58] pillar_1.4.2         reprex_0.3.0         glue_1.3.1          
-[61] evaluate_0.14        data.table_1.12.6    modelr_0.1.5        
-[64] operator.tools_1.6.3 vctrs_0.2.0          spam_2.3-0.2        
-[67] httpuv_1.5.2         cellranger_1.1.0     gtable_0.3.0        
-[70] assertthat_0.2.1     xfun_0.10            broom_0.5.3         
-[73] later_1.0.0          viridisLite_0.3.0    memoise_1.1.0       
-[76] fields_9.9           workflowr_1.6.0      ellipsis_0.3.0      
-[79] here_0.1            </code></pre>
+ [1] Rcpp_1.0.4         whisker_0.4        knitr_1.28         xml2_1.3.0        
+ [5] magrittr_1.5       hms_0.5.3          rvest_0.3.5        tidyselect_1.0.0  
+ [9] viridisLite_0.3.0  here_0.1           colorspace_1.4-1   lattice_0.20-41   
+[13] R6_2.4.1           rlang_0.4.5        fansi_0.4.1        broom_0.5.5       
+[17] xfun_0.12          dbplyr_1.4.2       modelr_0.1.6       withr_2.1.2       
+[21] git2r_0.26.1       ellipsis_0.3.0     htmltools_0.4.0    assertthat_0.2.1  
+[25] rprojroot_1.3-2    digest_0.6.25      lifecycle_0.2.0    haven_2.2.0       
+[29] rmarkdown_2.1      sp_1.4-1           compiler_3.6.3     cellranger_1.1.0  
+[33] pillar_1.4.3       scales_1.1.0       backports_1.1.5    generics_0.0.2    
+[37] jsonlite_1.6.1     httpuv_1.5.2       pkgconfig_2.0.3    rstudioapi_0.11   
+[41] munsell_0.5.0      plyr_1.8.6         highr_0.8          httr_1.4.1        
+[45] tools_3.6.3        grid_3.6.3         nlme_3.1-145       data.table_1.12.8 
+[49] gtable_0.3.0       checkmate_2.0.0    DBI_1.1.0          cli_2.0.2         
+[53] readxl_1.3.1       yaml_2.2.1         crayon_1.3.4       farver_2.0.3      
+[57] RColorBrewer_1.1-2 later_1.0.0        promises_1.1.0     fs_1.4.0          
+[61] vctrs_0.2.4        memoise_1.1.0      glue_1.3.2         evaluate_0.14     
+[65] labeling_0.3       reprex_0.3.0       stringi_1.4.6     </code></pre>
 </div>
 </div>
 
