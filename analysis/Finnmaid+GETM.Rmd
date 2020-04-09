@@ -206,9 +206,9 @@ ts_gt_3d <- full_join(gt_3d %>% select(date_time, dep, sal = salt, tem = temp, r
 ts_gt_3d <- ts_gt_3d %>% 
   arrange(date_time) %>% 
   group_by(dep) %>% 
-  mutate(tem_gt = na.approx(tem_gt),
-         sal_gt = na.approx(sal_gt),
-         rho_gt = na.approx(rho_gt)) %>% 
+  mutate(tem_gt = approxfun(date_time, tem_gt)(date_time),
+         sal_gt = approxfun(date_time, sal_gt)(date_time),
+         rho_gt = approxfun(date_time, rho_gt)(date_time)) %>% 
   ungroup() %>% 
   drop_na()
 

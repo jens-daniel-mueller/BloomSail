@@ -1613,8 +1613,10 @@ Should be identical for stored files and objectes in R environment
 
 # Open tasks / questions
 
-- is the CT correction for mixing and fluxes between the last cruises correct?
 - clean and harmonize chunk labeling (label: plot, 1 plot per chunk, etc)
 - included removed stations in map and coverage plot
 - Significance of changes in AT for calculated CT changes
+  - Calculate AT-S ratios, reconstruct AT profiles, calculate true CT profiles, normalize CT profiles to mean AT
 - Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)
+- Introduce errorbars for iCT time series (-> large errorbar after CT increase expected)
+- demostrate strong permanent thermocline at around 25 m
