@@ -439,7 +439,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Finnmaid and GETM</h1>
 <h4 class="author">Jens Daniel Müller und Lara Sophie Burchardt</h4>
-<h4 class="date">09 April, 2020</h4>
+<h4 class="date">14 April, 2020</h4>
 
 </div>
 
@@ -464,7 +464,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-04-09
+<strong>Last updated:</strong> 2020-04-14
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -555,16 +555,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4e9464ff3c7386d062b38db754d5a06b425d8866targetblank4e9464fa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/4e9464ff3c7386d062b38db754d5a06b425d8866" target="_blank">4e9464f</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee7c8528004158524b1ddf66c659426bcdce53060targetblanke7c8528a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/e7c8528004158524b1ddf66c659426bcdce53060" target="_blank">e7c8528</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4e9464ff3c7386d062b38db754d5a06b425d8866targetblank4e9464fa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee7c8528004158524b1ddf66c659426bcdce53060targetblanke7c8528a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/4e9464ff3c7386d062b38db754d5a06b425d8866" target="_blank">4e9464f</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/e7c8528004158524b1ddf66c659426bcdce53060" target="_blank">e7c8528</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -580,6 +580,7 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
+    Ignored:    output/Plots/Figures_publication/
 
 </code></pre>
 <p>
@@ -618,6 +619,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/e7c8528004158524b1ddf66c659426bcdce53060/analysis/Finnmaid+GETM.Rmd" target="_blank">e7c8528</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-14
+</td>
+<td>
+Temp penetration depth GETM
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/48631ee007743f3618c0fa74ed4c24e3b82c4098/docs/Finnmaid+GETM.html" target="_blank">48631ee</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2637,6 +2672,32 @@ Hovmoeller plots of cumulative reconstructed changes in C<sub>T</sub>.
 </p>
 </div>
 <pre class="r"><code>rm(bin_CT)</code></pre>
+</div>
+<div id="heat-penetration-depth" class="section level3">
+<h3><span class="header-section-number">4.2.7</span> Heat penetration depth</h3>
+<p>As an alternative approach to the integration over the MLD or the reconstruction of C<sub>T</sub> profiles, we can estimate the mean penetration depth of the warming signal, which was defined the surface change in temperature devided by the integrated change in seawater temperature across depth.</p>
+<pre class="r"><code>tem_diff_surface &lt;- fm_gt_3d %&gt;% 
+  filter(dep == 3) %&gt;% 
+  select(date_time_ID, tem_diff_surface=tem_diff)
+
+fm_gt_3d &lt;- full_join(fm_gt_3d, tem_diff_surface) 
+rm(tem_diff_surface)
+
+tem_depth &lt;- fm_gt_3d %&gt;%
+  filter(dep &lt; 18) %&gt;% 
+  group_by(date_time_ID) %&gt;% 
+  summarise(tem_diff_int = sum(tem_diff),
+            tem_diff_surface = mean(tem_diff_surface),
+            tem_depth = tem_diff_int/tem_diff_surface) %&gt;% 
+  ungroup()
+
+tem_depth %&gt;% 
+  ggplot(aes(date_time_ID, tem_depth))+
+  geom_hline(yintercept = 0)+
+  geom_line()+
+  geom_point()+
+  scale_y_reverse()</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/heat_penetration_depth-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="ict-time-series" class="section level2">
