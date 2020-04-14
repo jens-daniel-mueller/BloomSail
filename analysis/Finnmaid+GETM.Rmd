@@ -976,6 +976,37 @@ rm(bin_CT)
 ```
 
 
+### Heat penetration depth
+
+As an alternative approach to the integration over the MLD or the reconstruction of C~T~ profiles, we can estimate the mean penetration depth of the warming signal, which was defined the surface change in temperature devided by the integrated change in seawater temperature across depth.
+
+```{r heat_penetration_depth}
+
+tem_diff_surface <- fm_gt_3d %>% 
+  filter(dep == 3) %>% 
+  select(date_time_ID, tem_diff_surface=tem_diff)
+
+fm_gt_3d <- full_join(fm_gt_3d, tem_diff_surface) 
+rm(tem_diff_surface)
+
+tem_depth <- fm_gt_3d %>%
+  filter(dep < 18) %>% 
+  group_by(date_time_ID) %>% 
+  summarise(tem_diff_int = sum(tem_diff),
+            tem_diff_surface = mean(tem_diff_surface),
+            tem_depth = tem_diff_int/tem_diff_surface) %>% 
+  ungroup()
+
+tem_depth %>% 
+  ggplot(aes(date_time_ID, tem_depth))+
+  geom_hline(yintercept = 0)+
+  geom_line()+
+  geom_point()+
+  scale_y_reverse()
+
+```
+
+
 ## iC~T~ time series
 
 Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated for the upper 10 m of the water body.
