@@ -347,7 +347,7 @@ rm(bin_CT)
 
 As an alternative approach to the integration over the MLD or the reconstruction of C~T~ profiles, we can estimate the mean penetration depth of the warming signal, which was defined the surface change in temperature devided by the integrated change in seawater temperature across depth.
 
-```{r heat_penetration_depth, eval=FALSE}
+```{r heat_penetration_depth}
 
 tem_diff_surface <- ts_profiles_ID %>% 
   filter(dep == 3.5) %>% 
