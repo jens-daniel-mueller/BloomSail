@@ -201,6 +201,7 @@ ts_profiles_ID_diff %>%
 
 ```
 
+
 ## Reconstruction of C~T~ dynamics
 
 The ratio of the incremental change of C~T~ with temperature at the seasurface was applied to calculate the C~T~ in other water depth based on the known change in temperature.
@@ -288,7 +289,7 @@ Hoevmoeller plots were generated for the reconstructed daily and cumulative chan
 
 ### Daily changes
 
-```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature. Note: Daily changes are currently plotted against the day when they were observed compared to the previous transect, although plotting against the mean date would be more plausible.", fig.asp=0.5, eval=FALSE}
+```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature. Note: Daily changes are currently plotted against the day when they were observed compared to the previous transect, although plotting against the mean date would be more plausible.", fig.asp=0.5}
 
 bin_CT <- 2.5
 
@@ -315,7 +316,7 @@ rm(bin_CT)
 
 ### Cumulative changes
 
-```{r plot_hovmoeller_cum, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature.", fig.asp=0.5, eval=FALSE}
+```{r plot_hovmoeller_cum, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature.", fig.asp=0.5}
 
 bin_CT <- 20
 
@@ -340,6 +341,40 @@ ts_profiles_ID_long %>%
 rm(bin_CT)
 
 ```
+
+
+## Heat penetration depth
+
+As an alternative approach to the integration over the MLD or the reconstruction of C~T~ profiles, we can estimate the mean penetration depth of the warming signal, which was defined the surface change in temperature devided by the integrated change in seawater temperature across depth.
+
+```{r heat_penetration_depth, eval=FALSE}
+
+tem_diff_surface <- ts_profiles_ID %>% 
+  filter(dep == 3.5) %>% 
+  select(ID, tem_diff_surface=tem_diff)
+
+ts_profiles_ID <- full_join(ts_profiles_ID, tem_diff_surface) 
+rm(tem_diff_surface)
+
+tem_depth <- ts_profiles_ID %>%
+  filter(dep < 18) %>% 
+  group_by(ID, date_time_ID) %>% 
+  summarise(tem_diff_int = sum(tem_diff),
+            tem_diff_surface = mean(tem_diff_surface),
+            tem_depth = tem_diff_int/tem_diff_surface) %>% 
+  ungroup()
+
+tem_depth %>% 
+  ggplot(aes(date_time_ID, tem_depth))+
+  geom_hline(yintercept = 0)+
+  geom_line()+
+  geom_point()+
+  scale_y_reverse()
+
+```
+
+
+
 
 ## iC~T~ time series
 

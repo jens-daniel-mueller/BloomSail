@@ -922,3 +922,5 @@ leaflet() %>%
 - Include information about HydroC calibration results and raw data correction by Contros
 
 - Check results from field response time experiment (high zeroing frequency)
+
+- check interpolation method na.approx
