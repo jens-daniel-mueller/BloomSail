@@ -255,7 +255,7 @@ ts_gt_3d %>%
 
 As an alternative approach to the integration over the MLD or the reconstruction of C~T~ profiles, we can estimate the mean penetration depth of the warming signal, which was defined the surface change in temperature devided by the integrated change in seawater temperature across depth.
 
-```{r heat_penetration_depth_comparison}
+```{r heat_penetration_depth_comparison, fig.asp=0.5}
 
 tem_diff_surface <- ts_gt_3d_long %>% 
   filter(dep < 6,
@@ -291,6 +291,18 @@ tem_depth <- ts_gt_3d_long %>%
             tem_diff_surface = mean(tem_diff_surface),
             tem_depth = tem_diff_int/tem_diff_surface) %>% 
   ungroup()
+
+tem_depth %>% 
+  ggplot(aes(date_time_ID, tem_diff_surface, col=source))+
+  geom_hline(yintercept = 0)+
+  geom_line()+
+  geom_point()
+
+tem_depth %>% 
+  ggplot(aes(date_time_ID, tem_diff_int, col=source))+
+  geom_hline(yintercept = 0)+
+  geom_line()+
+  geom_point()
 
 tem_depth %>% 
   ggplot(aes(date_time_ID, tem_depth, col=source))+
