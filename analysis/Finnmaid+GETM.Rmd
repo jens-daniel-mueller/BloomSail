@@ -248,9 +248,61 @@ ts_gt_3d %>%
   facet_grid(.~var, scales = "free_x")+
   labs(x="Difference GETM (gt) - Bloomsail (ts)")
 
+
+```
+
+### Heat penetration depth
+
+As an alternative approach to the integration over the MLD or the reconstruction of C~T~ profiles, we can estimate the mean penetration depth of the warming signal, which was defined the surface change in temperature devided by the integrated change in seawater temperature across depth.
+
+```{r heat_penetration_depth_comparison}
+
+tem_diff_surface <- ts_gt_3d_long %>% 
+  filter(dep < 6,
+         var=="tem") %>% 
+  select(date_time_ID = date_time, source, tem=value) %>% 
+  group_by(date_time_ID, source) %>% 
+  summarise_all(mean, na.rm=TRUE) %>% 
+  ungroup() 
+
+tem_diff_surface <- tem_diff_surface %>% 
+  group_by(source) %>% 
+  arrange(date_time_ID) %>% 
+  mutate(tem_diff_surface = tem - lag(tem)) %>% 
+  ungroup() %>% 
+  select(-tem)
+
+ts_gt_3d_long <- ts_gt_3d_long %>% 
+  filter(var=="tem") %>% 
+  select(date_time_ID = date_time, source, dep, tem=value) %>% 
+  group_by(source, dep) %>% 
+  arrange(date_time_ID) %>% 
+  mutate(tem_diff = tem - lag(tem)) %>% 
+  ungroup() %>% 
+  select(-tem)
+
+ts_gt_3d_long <- full_join(ts_gt_3d_long, tem_diff_surface) 
+rm(tem_diff_surface)
+
+tem_depth <- ts_gt_3d_long %>%
+  filter(dep < 18) %>% 
+  group_by(date_time_ID, source) %>% 
+  summarise(tem_diff_int = sum(tem_diff),
+            tem_diff_surface = mean(tem_diff_surface),
+            tem_depth = tem_diff_int/tem_diff_surface) %>% 
+  ungroup()
+
+tem_depth %>% 
+  ggplot(aes(date_time_ID, tem_depth, col=source))+
+  geom_hline(yintercept = 0)+
+  geom_line()+
+  geom_point()+
+  scale_y_reverse()
+
 rm(ts_gt_3d, ts_gt_3d_long, ts_profiles_ID)
 
 ```
+
 
 ## Mixed layer depth
 
@@ -983,8 +1035,11 @@ As an alternative approach to the integration over the MLD or the reconstruction
 ```{r heat_penetration_depth}
 
 tem_diff_surface <- fm_gt_3d %>% 
-  filter(dep == 3) %>% 
-  select(date_time_ID, tem_diff_surface=tem_diff)
+  filter(dep < 6) %>% 
+  select(date_time_ID, tem_diff_surface=tem_diff) %>% 
+  group_by(date_time_ID) %>% 
+  summarise_all(mean, na.rm=TRUE) %>% 
+  ungroup()
 
 fm_gt_3d <- full_join(fm_gt_3d, tem_diff_surface) 
 rm(tem_diff_surface)
