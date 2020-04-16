@@ -555,16 +555,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree86b08338ce4b5cf30f94b7de6151b246f55633edtargetblank86b0833a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/86b08338ce4b5cf30f94b7de6151b246f55633ed" target="_blank">86b0833</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree13436a3a40979b2ba31ce1361c0268ede87699eatargetblank13436a3a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/13436a3a40979b2ba31ce1361c0268ede87699ea" target="_blank">13436a3</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree86b08338ce4b5cf30f94b7de6151b246f55633edtargetblank86b0833a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree13436a3a40979b2ba31ce1361c0268ede87699eatargetblank13436a3a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/86b08338ce4b5cf30f94b7de6151b246f55633ed" target="_blank">86b0833</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/13436a3a40979b2ba31ce1361c0268ede87699ea" target="_blank">13436a3</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -619,6 +619,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/13436a3a40979b2ba31ce1361c0268ede87699ea/analysis/CT_dynamics.Rmd" target="_blank">13436a3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-16
+</td>
+<td>
+worked on map
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/5e8f8e1b77e1b7e3f546e5d44f37de9003b914bd/docs/CT_dynamics.html" target="_blank">5e8f8e1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2378,13 +2412,27 @@ ts_profiles &lt;- inner_join(cruise_dates, ts_profiles)</code></pre>
 </div>
 <div id="station-map" class="section level2">
 <h2><span class="header-section-number">1.2</span> Station map</h2>
-<pre class="r"><code>map &lt;- read_csv(here::here(&quot;data/Maps&quot;,&quot;Bathymetry_Gotland_east_small.csv&quot;))
+<pre class="r"><code>lat_lo &lt;- 57.25
+lat_hi &lt;- 57.6
+lon_lo &lt;- 18.6
+lon_hi &lt;- 19.7
 
-# ggplot()+
-#   geom_contour_fill(data=map, aes(x=lon, y=lat, z=-elev), na.fill = TRUE)+
-#   coord_quickmap(expand = 0, xlim = c(18.7, 19.9), ylim = c(57.25,57.6))+
-#   theme_bw()+
-#   theme(legend.position=&quot;bottom&quot;)
+map &lt;- read_csv(here::here(&quot;data/Maps&quot;,&quot;Bathymetry_Gotland_east_small.csv&quot;)) %&gt;% 
+  filter(lat &lt; lat_hi, lat &gt; lat_lo,
+         lon &lt; lon_hi, lon &gt; lon_lo)
+
+map_low_res &lt;- map %&gt;% 
+  mutate(lat = cut(lat,
+                   breaks = seq(57,58,0.01),
+                   labels = seq(57.005,57.995,0.01)),
+         lon = cut(lon,
+                   breaks = seq(18,22,0.01),
+                   labels = seq(18.005,21.995,0.01))) %&gt;% 
+  group_by(lat,lon) %&gt;% 
+  summarise_all(mean, na.rm=TRUE) %&gt;% 
+  ungroup() %&gt;% 
+  mutate(lat = as.numeric(as.character(lat)),
+         lon = as.numeric(as.character(lon)))
 
 ts_profiles %&gt;% 
   group_by(station) %&gt;% 
@@ -2392,19 +2440,25 @@ ts_profiles %&gt;%
             lon = mean(lon)) %&gt;% 
   ungroup() %&gt;% 
   ggplot()+
-  geom_raster(data=map, aes(lon, lat, fill=-elev))+
-  scale_fill_scico(palette = &quot;oslo&quot;, na.value = &quot;grey&quot;, 
-                   name=&quot;Depth [m]&quot;, direction = -1)+
+  geom_contour_fill(data = map_low_res,
+                    aes(x=lon, y=lat, z=-elev),
+                    na.fill = TRUE,
+                    breaks = seq(0,300,20))+
+  geom_raster(data=map %&gt;% filter(is.na(elev)),
+              aes(lon, lat), fill=&quot;black&quot;)+
   geom_label(aes(lon, lat, label=station))+
-  coord_quickmap(expand = 0, xlim = c(18.7, 19.9), ylim = c(57.25,57.6))+
-  theme_bw()</code></pre>
+  coord_quickmap(expand = 0)+
+  scale_fill_scico(palette = &quot;oslo&quot;, na.value = &quot;grey&quot;,
+                   name=&quot;Depth [m]&quot;, direction = -1,
+                   breaks = seq(0,160,20),
+                   guide = &quot;colorstrip&quot;)</code></pre>
 <div class="figure" style="text-align: center">
 <img src="figure/CT_dynamics.Rmd/map-1.png" alt="Location of stations sampled between the east coast of Gotland and Gotland deep." width="672" />
 <p class="caption">
 Location of stations sampled between the east coast of Gotland and Gotland deep.
 </p>
 </div>
-<pre class="r"><code>rm(map)</code></pre>
+<pre class="r"><code>rm(map, map_low_res, lat_hi, lat_lo, lon_hi, lon_lo)</code></pre>
 </div>
 <div id="data-coverage" class="section level2">
 <h2><span class="header-section-number">1.3</span> Data coverage</h2>
