@@ -1138,8 +1138,8 @@ iCT %>%
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
   geom_line(aes(date_time_ID, CT_i_cum,
                 group=group), col="grey")+
-  geom_line(data = iCT_fixed_dep %>% filter(dep_i==10, sign=="total"),
-            aes(date_time_ID, CT_i_cum, col="10m - total"))+
+  geom_line(data = iCT_fixed_dep %>% filter(dep_i==12, sign=="total"),
+            aes(date_time_ID, CT_i_cum, col="12m - total"))+
   geom_line(data = iCT_MLD %>% filter(rho_lim == 0.1),
             aes(date_time_ID, CT_i_cum, col="MLD - 0.1"))+
   scale_color_brewer(palette = "Set1", name="")+
@@ -1178,15 +1178,12 @@ ts_profiles_ID_long_180723 <- ts_profiles_ID_long %>%
 
 p_ts_profiles_ID_long <- ts_profiles_ID_long_180723 %>% 
   arrange(dep) %>% 
-  ggplot(aes(value_cum, dep, col="total"))+
+  ggplot(aes(value_cum, dep))+
   geom_vline(xintercept = 0)+
-  geom_hline(yintercept = 10, col="red")+
-  geom_path(aes(value_cum_sign, dep, col="directional"))+
-  geom_point(aes(value_cum_sign, dep, col="directional"))+
+  geom_hline(yintercept = 12, col="red")+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
-  scale_color_brewer(palette = "Set1", name="estimate")+
   labs(x="Cumulative change of CT on July 23 (180723)")+
   theme(legend.position = "left")
 
@@ -1200,7 +1197,7 @@ ts_profiles_ID_long_180723_dep <- ts_profiles_ID_long_180723 %>%
 
 p_ts_profiles_ID_long_rel <- ts_profiles_ID_long_180723_dep %>% 
   ggplot(aes(value_cum_i_rel, dep))+
-  geom_hline(yintercept = 10, col="red")+
+  geom_hline(yintercept = 12, col="red")+
   geom_vline(xintercept = 90)+
   geom_point()+
   geom_line()+
@@ -1230,11 +1227,10 @@ p_ts_profiles_ID_long <- ts_profiles_ID_long_180723 %>%
   arrange(dep) %>% 
   ggplot(aes(value_cum, dep))+
   geom_vline(xintercept = 0)+
-  geom_hline(yintercept = 10, col="red")+
+  geom_hline(yintercept = 12, col="red")+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
-  scale_color_brewer(palette = "Set1", name="estimate")+
   labs(x="Cumulative change of Temp on July 23")+
   theme(legend.position = "left")
 
@@ -1248,7 +1244,7 @@ ts_profiles_ID_long_180723_dep <- ts_profiles_ID_long_180723 %>%
 
 p_ts_profiles_ID_long_rel <- ts_profiles_ID_long_180723_dep %>% 
   ggplot(aes(value_cum_i_rel, dep))+
-  geom_hline(yintercept = 10, col="red")+
+  geom_hline(yintercept = 12, col="red")+
   geom_vline(xintercept = 90)+
   geom_point()+
   geom_line()+
@@ -1486,7 +1482,7 @@ During the last cruise, deeper mixing up to 17m water depth was observed, result
 
 # extract CT data for fixed depth approach, depth limit 10m
 iCT_10 <- iCT_fixed_dep %>% 
-  filter(dep_i == 10, sign=="total") %>% 
+  filter(dep_i == 12, sign=="total") %>% 
   select(-c(sign, dep_i))
 
 rm(iCT_fixed_dep)
@@ -1500,7 +1496,7 @@ date_180806 <- unique(iCT_10$date_time)[7]
 # calculate cumulative air-sea fluxes affecting 0-10m
 ts_og_flux <- ts_og %>% 
   mutate(flux_scale = if_else(date_time > date_180806,
-                              10/17 * flux_scale,
+                              12/17 * flux_scale,
                               flux_scale)) %>%
   group_by(freq, k_para) %>% 
   arrange(date_time) %>% 
@@ -1512,7 +1508,7 @@ ts_og_flux <- ts_og %>%
 # calculate cumulative air-sea fluxes affecting 10-17m
 ts_og_flux_dep <- ts_og %>% 
   filter(date_time > date_180806) %>% 
-  mutate(flux_scale = 7/17 * flux_scale) %>%
+  mutate(flux_scale = 5/17 * flux_scale) %>%
   group_by(freq, k_para) %>% 
   arrange(date_time) %>% 
   mutate(flux_cum = cumsum(flux_scale)) %>% 
@@ -1545,7 +1541,7 @@ iCT_10_mix <- ts_profiles_ID_long %>%
   filter(ID == "180815",
          var == "CT",
          dep < 17,
-         dep > 10) %>% 
+         dep > 12) %>% 
   group_by(ID, date_time_ID,
            date_time_ID_ref) %>% 
   summarise(value_diff = sum(value_diff)/1000 + min(ts_og_flux_dep$flux_cum)) %>% 
