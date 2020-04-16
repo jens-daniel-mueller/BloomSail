@@ -555,16 +555,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree95380d40ec83160a891d58702984f8c8525e088dtargetblank95380d4a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/95380d40ec83160a891d58702984f8c8525e088d" target="_blank">95380d4</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree86b08338ce4b5cf30f94b7de6151b246f55633edtargetblank86b0833a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/86b08338ce4b5cf30f94b7de6151b246f55633ed" target="_blank">86b0833</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree95380d40ec83160a891d58702984f8c8525e088dtargetblank95380d4a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree86b08338ce4b5cf30f94b7de6151b246f55633edtargetblank86b0833a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/95380d40ec83160a891d58702984f8c8525e088d" target="_blank">95380d4</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/86b08338ce4b5cf30f94b7de6151b246f55633ed" target="_blank">86b0833</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -619,6 +619,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/86b08338ce4b5cf30f94b7de6151b246f55633ed/analysis/CT_dynamics.Rmd" target="_blank">86b0833</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-16
+</td>
+<td>
+New fixed integration depth 12m
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/4ac8782d8e24e48c182026fab886bc02a01dd0c6/docs/CT_dynamics.html" target="_blank">4ac8782</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -3215,8 +3249,8 @@ iCT %&gt;%
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
   geom_line(aes(date_time_ID, CT_i_cum,
                 group=group), col=&quot;grey&quot;)+
-  geom_line(data = iCT_fixed_dep %&gt;% filter(dep_i==10, sign==&quot;total&quot;),
-            aes(date_time_ID, CT_i_cum, col=&quot;10m - total&quot;))+
+  geom_line(data = iCT_fixed_dep %&gt;% filter(dep_i==12, sign==&quot;total&quot;),
+            aes(date_time_ID, CT_i_cum, col=&quot;12m - total&quot;))+
   geom_line(data = iCT_MLD %&gt;% filter(rho_lim == 0.1),
             aes(date_time_ID, CT_i_cum, col=&quot;MLD - 0.1&quot;))+
   scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
@@ -3255,15 +3289,12 @@ iCT %&gt;%
 
 p_ts_profiles_ID_long &lt;- ts_profiles_ID_long_180723 %&gt;% 
   arrange(dep) %&gt;% 
-  ggplot(aes(value_cum, dep, col=&quot;total&quot;))+
+  ggplot(aes(value_cum, dep))+
   geom_vline(xintercept = 0)+
-  geom_hline(yintercept = 10, col=&quot;red&quot;)+
-  geom_path(aes(value_cum_sign, dep, col=&quot;directional&quot;))+
-  geom_point(aes(value_cum_sign, dep, col=&quot;directional&quot;))+
+  geom_hline(yintercept = 12, col=&quot;red&quot;)+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
-  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;estimate&quot;)+
   labs(x=&quot;Cumulative change of CT on July 23 (180723)&quot;)+
   theme(legend.position = &quot;left&quot;)
 
@@ -3277,7 +3308,7 @@ ts_profiles_ID_long_180723_dep &lt;- ts_profiles_ID_long_180723 %&gt;%
 
 p_ts_profiles_ID_long_rel &lt;- ts_profiles_ID_long_180723_dep %&gt;% 
   ggplot(aes(value_cum_i_rel, dep))+
-  geom_hline(yintercept = 10, col=&quot;red&quot;)+
+  geom_hline(yintercept = 12, col=&quot;red&quot;)+
   geom_vline(xintercept = 90)+
   geom_point()+
   geom_line()+
@@ -3300,11 +3331,10 @@ p_ts_profiles_ID_long &lt;- ts_profiles_ID_long_180723 %&gt;%
   arrange(dep) %&gt;% 
   ggplot(aes(value_cum, dep))+
   geom_vline(xintercept = 0)+
-  geom_hline(yintercept = 10, col=&quot;red&quot;)+
+  geom_hline(yintercept = 12, col=&quot;red&quot;)+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
-  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;estimate&quot;)+
   labs(x=&quot;Cumulative change of Temp on July 23&quot;)+
   theme(legend.position = &quot;left&quot;)
 
@@ -3318,7 +3348,7 @@ ts_profiles_ID_long_180723_dep &lt;- ts_profiles_ID_long_180723 %&gt;%
 
 p_ts_profiles_ID_long_rel &lt;- ts_profiles_ID_long_180723_dep %&gt;% 
   ggplot(aes(value_cum_i_rel, dep))+
-  geom_hline(yintercept = 10, col=&quot;red&quot;)+
+  geom_hline(yintercept = 12, col=&quot;red&quot;)+
   geom_vline(xintercept = 90)+
   geom_point()+
   geom_line()+
@@ -3506,7 +3536,7 @@ ts_og %&gt;%
 <p>During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased CT values at 0-10 m and a decrease of CT in 10-17m. The loss of CT in 10-17m can be assumed to be entirely cause by mixing with low-CT surface water. Some CT loss is balanced through CT input attributable to the air-sea flux. Therefore, the observed loss, corrected for 7m/MLD-share of the air-sea-flux, was added to the integrated CT changes in 0-10m.</p>
 <pre class="r"><code># extract CT data for fixed depth approach, depth limit 10m
 iCT_10 &lt;- iCT_fixed_dep %&gt;% 
-  filter(dep_i == 10, sign==&quot;total&quot;) %&gt;% 
+  filter(dep_i == 12, sign==&quot;total&quot;) %&gt;% 
   select(-c(sign, dep_i))
 
 rm(iCT_fixed_dep)
@@ -3520,7 +3550,7 @@ date_180806 &lt;- unique(iCT_10$date_time)[7]
 # calculate cumulative air-sea fluxes affecting 0-10m
 ts_og_flux &lt;- ts_og %&gt;% 
   mutate(flux_scale = if_else(date_time &gt; date_180806,
-                              10/17 * flux_scale,
+                              12/17 * flux_scale,
                               flux_scale)) %&gt;%
   group_by(freq, k_para) %&gt;% 
   arrange(date_time) %&gt;% 
@@ -3532,7 +3562,7 @@ ts_og_flux &lt;- ts_og %&gt;%
 # calculate cumulative air-sea fluxes affecting 10-17m
 ts_og_flux_dep &lt;- ts_og %&gt;% 
   filter(date_time &gt; date_180806) %&gt;% 
-  mutate(flux_scale = 7/17 * flux_scale) %&gt;%
+  mutate(flux_scale = 5/17 * flux_scale) %&gt;%
   group_by(freq, k_para) %&gt;% 
   arrange(date_time) %&gt;% 
   mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
@@ -3565,7 +3595,7 @@ iCT_10_mix &lt;- ts_profiles_ID_long %&gt;%
   filter(ID == &quot;180815&quot;,
          var == &quot;CT&quot;,
          dep &lt; 17,
-         dep &gt; 10) %&gt;% 
+         dep &gt; 12) %&gt;% 
   group_by(ID, date_time_ID,
            date_time_ID_ref) %&gt;% 
   summarise(value_diff = sum(value_diff)/1000 + min(ts_og_flux_dep$flux_cum)) %&gt;% 
