@@ -177,18 +177,31 @@ ts_profiles <- inner_join(cruise_dates, ts_profiles)
 
 ```
 
-
 ## Station map
 
 ```{r map, fig.cap="Location of stations sampled between the east coast of Gotland and Gotland deep."}
 
-map <- read_csv(here::here("data/Maps","Bathymetry_Gotland_east_small.csv"))
+lat_lo <- 57.25
+lat_hi <- 57.6
+lon_lo <- 18.6
+lon_hi <- 19.7
 
-# ggplot()+
-#   geom_contour_fill(data=map, aes(x=lon, y=lat, z=-elev), na.fill = TRUE)+
-#   coord_quickmap(expand = 0, xlim = c(18.7, 19.9), ylim = c(57.25,57.6))+
-#   theme_bw()+
-#   theme(legend.position="bottom")
+map <- read_csv(here::here("data/Maps","Bathymetry_Gotland_east_small.csv")) %>% 
+  filter(lat < lat_hi, lat > lat_lo,
+         lon < lon_hi, lon > lon_lo)
+
+map_low_res <- map %>% 
+  mutate(lat = cut(lat,
+                   breaks = seq(57,58,0.01),
+                   labels = seq(57.005,57.995,0.01)),
+         lon = cut(lon,
+                   breaks = seq(18,22,0.01),
+                   labels = seq(18.005,21.995,0.01))) %>% 
+  group_by(lat,lon) %>% 
+  summarise_all(mean, na.rm=TRUE) %>% 
+  ungroup() %>% 
+  mutate(lat = as.numeric(as.character(lat)),
+         lon = as.numeric(as.character(lon)))
 
 ts_profiles %>% 
   group_by(station) %>% 
@@ -196,16 +209,26 @@ ts_profiles %>%
             lon = mean(lon)) %>% 
   ungroup() %>% 
   ggplot()+
-  geom_raster(data=map, aes(lon, lat, fill=-elev))+
-  scale_fill_scico(palette = "oslo", na.value = "grey", 
-                   name="Depth [m]", direction = -1)+
+  geom_contour_fill(data = map_low_res,
+                    aes(x=lon, y=lat, z=-elev),
+                    na.fill = TRUE,
+                    breaks = seq(0,300,20))+
+  geom_raster(data=map %>% filter(is.na(elev)),
+              aes(lon, lat), fill="black")+
   geom_label(aes(lon, lat, label=station))+
-  coord_quickmap(expand = 0, xlim = c(18.7, 19.9), ylim = c(57.25,57.6))+
-  theme_bw()
+  coord_quickmap(expand = 0)+
+  scale_fill_scico(palette = "oslo", na.value = "grey",
+                   name="Depth [m]", direction = -1,
+                   breaks = seq(0,160,20),
+                   guide = "colorstrip")
 
-rm(map)
+rm(map, map_low_res, lat_hi, lat_lo, lon_hi, lon_lo)
 
 ```
+
+
+
+
 
 ## Data coverage
 
