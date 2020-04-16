@@ -871,9 +871,9 @@ iCT_grid_total <- ts_profiles_ID_long %>%
   expand_grid(sign = c("total"))
 
 # dep_i <- 10
-rm(iCT, dep_i)
+#rm(iCT, dep_i)
 
-for (dep_i in seq(5,20,5)) {
+for (dep_i in seq(9,13,1)) {
 
 
 iCT_sign_temp <- ts_profiles_ID_long %>% 
@@ -1046,9 +1046,11 @@ ts_profiles_ID_hydro %>%
 
 MLD %>% 
   ggplot(aes(date_time_ID, MLD, col=as.factor(rho_lim)))+
+  geom_hline(yintercept = 0)+
   geom_point()+
   geom_path()+
   scale_color_brewer(palette = "Set1", name= "Rho limit")+
+  scale_y_reverse()+
   labs(x="")
 
 ```
@@ -1204,7 +1206,55 @@ p_ts_profiles_ID_long_rel <- ts_profiles_ID_long_180723_dep %>%
   geom_line()+
   scale_y_reverse(limits = c(25,0))+
   scale_x_continuous(breaks = seq(0,100,10))+
-  labs(y = "Depth (m)", x = "Relative contribution to ts_profiles_ID_long on July 23")+
+  labs(y = "Depth (m)", x = "Relative contribution on July 23")+
+  theme_bw()
+
+p_ts_profiles_ID_long + p_ts_profiles_ID_long_rel
+
+rm(ts_profiles_ID_long_180723,
+   ts_profiles_ID_long_180723_dep,
+   p_ts_profiles_ID_long,
+   p_ts_profiles_ID_long_rel)
+
+```
+
+
+
+```{r iCT_tem_distribution_180723}
+
+ts_profiles_ID_long_180723 <- ts_profiles_ID_long %>% 
+  filter(ID == 180723,
+         var == "tem")
+
+p_ts_profiles_ID_long <- ts_profiles_ID_long_180723 %>% 
+  arrange(dep) %>% 
+  ggplot(aes(value_cum, dep))+
+  geom_vline(xintercept = 0)+
+  geom_hline(yintercept = 10, col="red")+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_brewer(palette = "Set1", name="estimate")+
+  labs(x="Cumulative change of Temp on July 23")+
+  theme(legend.position = "left")
+
+ts_profiles_ID_long_180723_dep <- ts_profiles_ID_long_180723 %>% 
+  select(dep, value_cum) %>% 
+  filter(value_cum > 0) %>%
+  arrange(dep) %>% 
+  mutate(value_cum_i = sum(value_cum),
+         value_cum_dep = cumsum(value_cum),
+         value_cum_i_rel = value_cum_dep/value_cum_i*100)
+
+p_ts_profiles_ID_long_rel <- ts_profiles_ID_long_180723_dep %>% 
+  ggplot(aes(value_cum_i_rel, dep))+
+  geom_hline(yintercept = 10, col="red")+
+  geom_vline(xintercept = 90)+
+  geom_point()+
+  geom_line()+
+  scale_y_reverse(limits = c(25,0))+
+  scale_x_continuous(breaks = seq(0,100,10))+
+  labs(y = "Depth (m)", x = "Relative contribution on July 23")+
   theme_bw()
 
 p_ts_profiles_ID_long + p_ts_profiles_ID_long_rel
