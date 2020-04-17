@@ -555,16 +555,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreed0eb2644355bb7b41143893bca88c6f947efdd1atargetblankd0eb264a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/d0eb2644355bb7b41143893bca88c6f947efdd1a" target="_blank">d0eb264</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree2edd18d81b2b89dbb9eedfdb2060fb1179698890targetblank2edd18da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/2edd18d81b2b89dbb9eedfdb2060fb1179698890" target="_blank">2edd18d</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreed0eb2644355bb7b41143893bca88c6f947efdd1atargetblankd0eb264a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree2edd18d81b2b89dbb9eedfdb2060fb1179698890targetblank2edd18da" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/d0eb2644355bb7b41143893bca88c6f947efdd1a" target="_blank">d0eb264</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/2edd18d81b2b89dbb9eedfdb2060fb1179698890" target="_blank">2edd18d</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -619,6 +619,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/2edd18d81b2b89dbb9eedfdb2060fb1179698890/analysis/CT_dynamics.Rmd" target="_blank">2edd18d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-17
+</td>
+<td>
+included bottle CT AT from 180723
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/bf6384a0821cf0bb9b270a45dfe99ba98ac77c0c/docs/CT_dynamics.html" target="_blank">bf6384a</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2535,7 +2569,8 @@ Spatio-temporal data coverage, indicated as station visits over time. ID (color)
 tb &lt;- tb %&gt;% 
   filter(station %in% c(&quot;P07&quot;, &quot;P10&quot;)) %&gt;% 
   select(-pH_Mosley) %&gt;% 
-  mutate(CT_AT_ratio = CT/AT)
+  mutate(CT_AT_ratio = CT/AT,
+         ID = if_else(ID == &quot;180722&quot;, &quot;180723&quot;, ID))
 
 tb &lt;- inner_join(tb, cruise_dates)</code></pre>
 <div id="vertical-profiles" class="section level2">
@@ -2557,8 +2592,9 @@ tb_long %&gt;%
 </div>
 <div id="surface-time-series" class="section level2">
 <h2><span class="header-section-number">2.2</span> Surface time series</h2>
+<p>0-10m</p>
 <pre class="r"><code>tb_surface &lt;- tb_long %&gt;% 
-  filter(dep&lt;10) %&gt;% 
+  filter(dep&lt;11) %&gt;% 
   group_by(ID, date_time_ID, var, station) %&gt;% 
   summarise(value = mean(value, na.rm = TRUE)) %&gt;% 
   ungroup()
@@ -2580,14 +2616,14 @@ tb_surface %&gt;%
 Time series of bottle data. Shown are mean values of samples collected at water depths &lt; 10m (usually collected at 0 and 5 m).
 </p>
 </div>
-<pre class="r"><code>AT_mean &lt;- tb_surface %&gt;% 
-  filter(var == &quot;AT&quot;) %&gt;% 
-  summarise(AT = mean(value, na.rm = TRUE)) %&gt;%
+<pre class="r"><code>AT_mean &lt;- tb %&gt;% 
+  filter(dep &lt;= 20) %&gt;% 
+  summarise(AT = mean(AT, na.rm = TRUE)) %&gt;%
   pull()
 
 tb_surface %&gt;% 
   filter(var == &quot;CT_AT_ratio&quot;) %&gt;% 
-  ggplot(aes(lubridate::ymd(ID), value*AT_mean, col=station))+
+  ggplot(aes(date_time_ID, value*AT_mean, col=station))+
   geom_point()+
   geom_path()+
   scale_fill_viridis_d()+
@@ -2604,13 +2640,12 @@ CT timeseries, derived by multiplying the CT-AT-ratio with mean AT
 <div id="mean-alkalinity" class="section level2">
 <h2><span class="header-section-number">2.3</span> Mean alkalinity</h2>
 <p>In order to derive C<sub>T</sub> from measured pCO<sub>2</sub> profiles, the mean alkalinity in the upper 20 m and both stations was calculated as:</p>
-<pre class="r"><code>AT_mean &lt;- tb %&gt;% 
+<pre class="r"><code>AT_mean</code></pre>
+<pre><code>[1] 1718.872</code></pre>
+<pre class="r"><code>AT_sd &lt;- tb %&gt;% 
   filter(dep &lt;= 20) %&gt;% 
-  summarise(AT = mean(AT, na.rm = TRUE)) %&gt;%
-  pull()
-
-AT_mean</code></pre>
-<pre><code>[1] 1717.08</code></pre>
+  summarise(AT = sd(AT, na.rm = TRUE)) %&gt;%
+  pull()</code></pre>
 <p>Likewise, the mean salinity amounts to:</p>
 <pre class="r"><code>sal_mean &lt;- tb %&gt;% 
   filter(dep &lt;= 20) %&gt;% 
@@ -2618,7 +2653,7 @@ AT_mean</code></pre>
   pull()
 
 sal_mean</code></pre>
-<pre><code>[1] 6.894127</code></pre>
+<pre><code>[1] 6.907083</code></pre>
 <pre class="r"><code>bind_cols(start = min(ts_profiles$date_time), 
           end = max(ts_profiles$date_time),
           AT = AT_mean,
@@ -3825,6 +3860,7 @@ iCT_10_flux_mix_diff %&gt;%
 <li>Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)</li>
 <li>Introduce errorbars for iCT time series (-&gt; large errorbar after CT increase expected)</li>
 <li>demostrate strong permanent thermocline at around 25 m</li>
+<li>discrete samples: use exact sampling dates</li>
 </ul>
 <br>
 <p>
