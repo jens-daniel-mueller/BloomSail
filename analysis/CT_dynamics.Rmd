@@ -272,7 +272,8 @@ tb <-
 tb <- tb %>% 
   filter(station %in% c("P07", "P10")) %>% 
   select(-pH_Mosley) %>% 
-  mutate(CT_AT_ratio = CT/AT)
+  mutate(CT_AT_ratio = CT/AT,
+         ID = if_else(ID == "180722", "180723", ID))
 
 tb <- inner_join(tb, cruise_dates)
 
@@ -302,10 +303,12 @@ Important notes:
 
 ## Surface time series
 
+0-10m
+
 ```{r plot_bottle_CO2_surface_timeseries, fig.cap="Time series of bottle data. Shown are mean values of samples collected at water depths < 10m (usually collected at 0 and 5 m).", fig.asp=1.2}
 
 tb_surface <- tb_long %>% 
-  filter(dep<10) %>% 
+  filter(dep<11) %>% 
   group_by(ID, date_time_ID, var, station) %>% 
   summarise(value = mean(value, na.rm = TRUE)) %>% 
   ungroup()
@@ -327,14 +330,14 @@ tb_surface %>%
 
 ```{r plot_bottle_CT_surface_timeseries, fig.cap="CT timeseries, derived by multiplying the CT-AT-ratio with mean AT", fig.asp=0.4}
 
-AT_mean <- tb_surface %>% 
-  filter(var == "AT") %>% 
-  summarise(AT = mean(value, na.rm = TRUE)) %>%
+AT_mean <- tb %>% 
+  filter(dep <= 20) %>% 
+  summarise(AT = mean(AT, na.rm = TRUE)) %>%
   pull()
 
 tb_surface %>% 
   filter(var == "CT_AT_ratio") %>% 
-  ggplot(aes(lubridate::ymd(ID), value*AT_mean, col=station))+
+  ggplot(aes(date_time_ID, value*AT_mean, col=station))+
   geom_point()+
   geom_path()+
   scale_fill_viridis_d()+
@@ -353,12 +356,13 @@ In order to derive C~T~ from measured pCO~2~ profiles, the mean alkalinity in th
 
 ```{r bottle_AT}
 
-AT_mean <- tb %>% 
+AT_mean
+
+AT_sd <- tb %>% 
   filter(dep <= 20) %>% 
-  summarise(AT = mean(AT, na.rm = TRUE)) %>%
+  summarise(AT = sd(AT, na.rm = TRUE)) %>%
   pull()
 
-AT_mean
 
 ```
 
@@ -1697,3 +1701,4 @@ Should be identical for stored files and objectes in R environment
 - Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)
 - Introduce errorbars for iCT time series (-> large errorbar after CT increase expected)
 - demostrate strong permanent thermocline at around 25 m
+- discrete samples: use exact sampling dates
