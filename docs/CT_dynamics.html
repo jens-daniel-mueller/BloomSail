@@ -555,16 +555,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeacc1379ee212f7183dd0d67b7ed6bbdc12d89f54targetblankacc1379a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/acc1379ee212f7183dd0d67b7ed6bbdc12d89f54" target="_blank">acc1379</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree864596a3a778f994d0e158ae5429a43d4800a9abtargetblank864596aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/864596a3a778f994d0e158ae5429a43d4800a9ab" target="_blank">864596a</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeacc1379ee212f7183dd0d67b7ed6bbdc12d89f54targetblankacc1379a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree864596a3a778f994d0e158ae5429a43d4800a9abtargetblank864596aa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/acc1379ee212f7183dd0d67b7ed6bbdc12d89f54" target="_blank">acc1379</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/864596a3a778f994d0e158ae5429a43d4800a9ab" target="_blank">864596a</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -619,6 +619,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/864596a3a778f994d0e158ae5429a43d4800a9ab/analysis/CT_dynamics.Rmd" target="_blank">864596a</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-17
+</td>
+<td>
+plotted all profiles
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/4054ba16afa82d2581d4620256741ddac0d2419c/docs/CT_dynamics.html" target="_blank">4054ba1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2722,8 +2756,55 @@ rm(sal_mean, AT_mean)
 ts_profiles %&gt;% 
   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles.csv&quot;))</code></pre>
 </div>
+<div id="plot-all-profiles" class="section level2">
+<h2><span class="header-section-number">3.2</span> Plot all profiles</h2>
+<pre class="r"><code>date_labels &lt;- ymd(unique(ts_profiles$ID))
+
+
+ts_profiles &lt;-  ts_profiles %&gt;% 
+  arrange(date_time_ID)
+
+p_tem &lt;- 
+  ts_profiles %&gt;% 
+  ggplot(aes(tem, dep, col=ID, group = interaction(ID, station)))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0), limits = c(25,0))+
+  labs(x = &quot;Temperature (\u00B0C)&quot;,
+       y = &quot;Depth (m)&quot;)+
+  scale_color_viridis_d(labels = date_labels,
+                        guide = FALSE)
+
+p_pCO2 &lt;- 
+  ts_profiles %&gt;% 
+  ggplot(aes(pCO2, dep, col=ID, group = interaction(ID, station)))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0), limits = c(25,0))+
+  labs(x = expression(pCO[2]~(µatm)))+
+  scale_color_viridis_d(labels = date_labels,
+                        guide = FALSE)+
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank())
+
+p_CT &lt;- 
+  ts_profiles %&gt;% 
+  ggplot(aes(CT, dep, col=ID, group = interaction(ID, station)))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0), limits = c(25,0))+
+  labs(x = expression(nC[T]~(µmol~kg^{-1})))+
+  scale_color_viridis_d(labels = date_labels)+
+  theme(legend.title = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank())
+
+p_tem + p_pCO2 + p_CT</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/profiles_all_by_date-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(here::here(&quot;output/Plots/Figures_publication/article&quot;, &quot;profiles_all.pdf&quot;),
+       width = 180, height = 80, dpi = 300, units = &quot;mm&quot;)</code></pre>
+</div>
 <div id="mean-profiles" class="section level2">
-<h2><span class="header-section-number">3.2</span> Mean profiles</h2>
+<h2><span class="header-section-number">3.3</span> Mean profiles</h2>
 <p>Mean vertical profiles were calculated for each cruise day (ID).</p>
 <pre class="r"><code>ts_profiles_ID_mean &lt;- ts_profiles %&gt;% 
   select(-c(station,lat, lon, pCO2_raw, date_time)) %&gt;% 
@@ -2790,7 +2871,7 @@ Mean vertical profiles per cruise day across all stations plotted indivdually. R
 </ul>
 </div>
 <div id="individual-profiles" class="section level2">
-<h2><span class="header-section-number">3.3</span> Individual profiles</h2>
+<h2><span class="header-section-number">3.4</span> Individual profiles</h2>
 <p>C<sub>T</sub>, pCO<sub>2</sub>, S, and T profiles were plotted individually <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/ts_profiles_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a> and grouped by ID <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/ts_profiles_ID_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a>. The later gives an idea of the differences between stations at one point in time.</p>
 <pre class="r"><code>pdf(file=here::here(&quot;output/Plots/CT_dynamics&quot;,
     &quot;ts_profiles_pCO2_tem_sal_CT.pdf&quot;), onefile = TRUE, width = 9, height = 5)
@@ -2914,7 +2995,7 @@ dev.off()
 rm(i_ID, ts_profiles_long)</code></pre>
 </div>
 <div id="profiles-of-incremental-changes" class="section level2">
-<h2><span class="header-section-number">3.4</span> Profiles of incremental changes</h2>
+<h2><span class="header-section-number">3.5</span> Profiles of incremental changes</h2>
 <p>Changes of seawater vars at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.</p>
 <pre class="r"><code>ts_profiles_ID_long &lt;- ts_profiles_ID_long %&gt;%
     group_by(var, dep) %&gt;%
@@ -2940,7 +3021,7 @@ ts_profiles_ID_long %&gt;%
 <p><img src="figure/CT_dynamics.Rmd/incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="profiles-of-cumulative-changes" class="section level2">
-<h2><span class="header-section-number">3.5</span> Profiles of cumulative changes</h2>
+<h2><span class="header-section-number">3.6</span> Profiles of cumulative changes</h2>
 <p>Cumulative changes of seawater vars were calculated at each depth relative to the first cruise day on July 5.</p>
 <pre class="r"><code>ts_profiles_ID_long %&gt;% 
   arrange(dep) %&gt;% 
