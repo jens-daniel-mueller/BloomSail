@@ -352,7 +352,7 @@ Important notes:
 
 ## Mean alkalinity
 
-In order to derive C~T~ from measured pCO~2~ profiles, the mean alkalinity in the upper 20 m and both stations was calculated as:
+In order to derive C~T~ from measured pCO~2~ profiles, the alkalinity mean + sd in the upper 20 m and both stations was calculated as:
 
 ```{r bottle_AT}
 
@@ -363,6 +363,8 @@ AT_sd <- tb %>%
   summarise(AT = sd(AT, na.rm = TRUE)) %>%
   pull()
 
+AT_sd
+rm(AT_sd)
 
 ```
 
