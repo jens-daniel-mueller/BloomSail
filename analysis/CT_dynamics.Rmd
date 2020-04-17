@@ -78,10 +78,19 @@ ts_profiles <- ts %>%
          Flush == "0",
          Zero == "0",
          !ID %in% c("180616","180820"),
-         !(station %in% c("PX1", "PX2", "P14", "P13", "P01"))) %>% 
+         !(station %in% c("PX1", "PX2"))) %>% 
   select(date_time, ID, station, lat, lon, dep, sal, tem, pCO2_raw = pCO2, pCO2 = pCO2_RT_mean, duration)
 
 
+stations <- ts_profiles %>% 
+  group_by(station) %>% 
+  summarise(lat = mean(lat),
+            lon = mean(lon)) %>% 
+  ungroup()
+
+
+ts_profiles <- ts_profiles %>% 
+  filter(!(station %in% c("P14", "P13", "P01")))
 # Assign meta information
 
 ts_profiles <- ts_profiles %>% 
@@ -203,19 +212,18 @@ map_low_res <- map %>%
   mutate(lat = as.numeric(as.character(lat)),
          lon = as.numeric(as.character(lon)))
 
-ts_profiles %>% 
-  group_by(station) %>% 
-  summarise(lat = mean(lat),
-            lon = mean(lon)) %>% 
-  ungroup() %>% 
-  ggplot()+
+
+ggplot()+
   geom_contour_fill(data = map_low_res,
                     aes(x=lon, y=lat, z=-elev),
                     na.fill = TRUE,
                     breaks = seq(0,300,20))+
   geom_raster(data=map %>% filter(is.na(elev)),
               aes(lon, lat), fill="black")+
-  geom_label(aes(lon, lat, label=station))+
+  geom_label(data = stations %>% filter(!(station %in% c("P14", "P13", "P01"))),
+             aes(lon, lat, label=station), col="red")+
+  geom_label(data = stations %>% filter(station %in% c("P14", "P13", "P01")),
+             aes(lon, lat, label=station), col="grey")+
   coord_quickmap(expand = 0)+
   scale_fill_scico(palette = "oslo", na.value = "grey",
                    name="Depth [m]", direction = -1,
