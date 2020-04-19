@@ -177,9 +177,9 @@ ts_profiles <- ts_profiles %>%
 
 cruise_dates <- ts_profiles %>% 
   group_by(ID) %>% 
-  summarise(date_time_ID = mean(date_time)) %>% 
+  summarise(date_time_ID = mean(date_time),
+            date_ID = format(as.Date(date_time_ID), "%b %d")) %>% 
   ungroup()
-
 
 # inner_join remove P14 observations lacking date_time_ID 
 ts_profiles <- inner_join(cruise_dates, ts_profiles)
@@ -235,9 +235,6 @@ rm(map, map_low_res, lat_hi, lat_lo, lon_hi, lon_lo)
 ```
 
 
-
-
-
 ## Data coverage
 
 ```{r data_coverage, fig.cap="Spatio-temporal data coverage, indicated as station visits over time. ID (color) refers to the starting date of the cruise, except for P14, which was visited twice during each cruise."}
@@ -291,15 +288,16 @@ tb_long %>%
   geom_path(aes(col=ID))+
   geom_point(aes(fill=ID), shape=21)+
   scale_y_reverse()+
-  scale_fill_viridis_d()+
-  scale_color_viridis_d()+
+  scale_fill_viridis_d(labels = cruise_dates$date_ID)+
+  scale_color_viridis_d(labels = cruise_dates$date_ID)+
   facet_grid(station~var, scales = "free_x")+
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        legend.title = element_blank())
 
 ```
 
 Important notes:
-- Spatio-temporal variation of AT is small, which jusitfies conversion of pCO~2~ to C~T~ based on a fixed mean AT - On July 30 we see a drop in surface salinity, associated with a rise in A~T~, clearly pointing at exchange of water masses, presumably later 
+- Spatio-temporal variation of AT is small, which jusitfies conversion of pCO~2~ to C~T~ based on a fixed mean AT - On July 31 we see a drop in surface salinity, associated with a rise in A~T~, clearly pointing at exchange of water masses, presumably later 
 
 ## Surface time series
 
@@ -425,41 +423,36 @@ ts_profiles %>%
 
 ```{r profiles_all_by_date}
 
-date_labels <- ymd(unique(ts_profiles$ID))
-
-
 ts_profiles <-  ts_profiles %>% 
   arrange(date_time_ID)
 
 p_tem <- 
   ts_profiles %>% 
-  ggplot(aes(tem, dep, col=ID, group = interaction(ID, station)))+
+  ggplot(aes(tem, dep, col=ID, group = interaction(station, ID)))+
   geom_path()+
-  scale_y_reverse(expand = c(0,0), limits = c(25,0))+
+  scale_y_reverse(expand = c(0,0))+
   labs(x = "Temperature (\u00B0C)",
        y = "Depth (m)")+
-  scale_color_viridis_d(labels = date_labels,
-                        guide = FALSE)
+  scale_color_viridis_d(guide = FALSE)
 
 p_pCO2 <- 
   ts_profiles %>% 
-  ggplot(aes(pCO2, dep, col=ID, group = interaction(ID, station)))+
+  ggplot(aes(pCO2, dep, col=ID, group = interaction(station, ID)))+
   geom_path()+
-  scale_y_reverse(expand = c(0,0), limits = c(25,0))+
+  scale_y_reverse(expand = c(0,0))+
   labs(x = expression(pCO[2]~(µatm)))+
-  scale_color_viridis_d(labels = date_labels,
-                        guide = FALSE)+
+  scale_color_viridis_d(guide = FALSE)+
   theme(axis.text.y = element_blank(),
         axis.title.y = element_blank(),
         axis.ticks.y = element_blank())
 
 p_CT <- 
   ts_profiles %>% 
-  ggplot(aes(CT, dep, col=ID, group = interaction(ID, station)))+
+  ggplot(aes(CT, dep, col=ID, group = interaction(station, ID)))+
   geom_path()+
-  scale_y_reverse(expand = c(0,0), limits = c(25,0))+
+  scale_y_reverse(expand = c(0,0))+
   labs(x = expression(nC[T]~(µmol~kg^{-1})))+
-  scale_color_viridis_d(labels = date_labels)+
+  scale_color_viridis_d(labels = cruise_dates$date_ID)+
   theme(legend.title = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
@@ -469,6 +462,9 @@ p_tem + p_pCO2 + p_CT
 
 ggsave(here::here("output/Plots/Figures_publication/article", "profiles_all.pdf"),
        width = 180, height = 80, dpi = 300, units = "mm")
+
+
+rm( p_tem, p_pCO2, p_CT)
 
 ```
 
@@ -493,10 +489,10 @@ ts_profiles_ID_sd <- ts_profiles %>%
   ungroup()
 
 ts_profiles_ID_sd_long <- ts_profiles_ID_sd %>% 
-  pivot_longer(4:7, names_to = "var", values_to = "sd")
+  pivot_longer(sal:CT, names_to = "var", values_to = "sd")
   
 ts_profiles_ID_mean_long <- ts_profiles_ID_mean %>% 
-  pivot_longer(4:7, names_to = "var", values_to = "value")
+  pivot_longer(sal:CT, names_to = "var", values_to = "value")
   
 ts_profiles_ID_long <- inner_join(ts_profiles_ID_mean_long, ts_profiles_ID_sd_long)
 
@@ -644,7 +640,7 @@ rm(i_ID, i_station, ts_profiles_highres)
 
 ts_profiles_long <- ts_profiles %>%
   select(-c(lat, lon, pCO2_raw)) %>% 
-  pivot_longer(6:9, values_to = "value", names_to = "var")
+  pivot_longer(sal:CT, values_to = "value", names_to = "var")
 
 
 pdf(file=here::here("output/Plots/CT_dynamics",
@@ -730,6 +726,7 @@ ts_profiles_ID_long %>%
 
 ```
 
+
 Important notes:
 
 - Salinity in the upper 10m decreases by >0.1 on June 30, and returns to average conditions already on Aug 02.
@@ -763,7 +760,6 @@ ts_profiles_ID_long %>%
 
 ```
 
-
 # Timeseries
 
 ## Timeseries depth intervals
@@ -795,28 +791,29 @@ rm(ts_profiles_ID_long_grid)
 
 ```{r plot_hovmoeller_absolut, fig.cap="Hovmoeller plots of absolute changes in C~T~ and temperature."}
 
-bin_CT <- 20
+bin_CT <- 30
 
-CT_hov <- ts_profiles_ID_long %>% 
+p_CT_hov <- ts_profiles_ID_long %>% 
   filter(var == "CT") %>% 
   ggplot()+
   geom_contour_fill(aes(x=date_time_ID, y=dep, z=value),
                     breaks = MakeBreaks(bin_CT),
                     col="black")+
   geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill="white")+
-  scale_fill_viridis_c(breaks = MakeBreaks(bin_CT),
-                       guide = "colorstrip",
-                       name="CT (µmol/kg)")+
+  scale_fill_scico(breaks = MakeBreaks(bin_CT),
+                   guide = "colorstrip",
+                   name="CT (µmol/kg)",
+                   palette = "davos", direction = -1)+
   scale_y_reverse()+
   theme_bw()+
   labs(y="Depth (m)")+
   coord_cartesian(expand = 0)+
   theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+        legend.position = "left")
 
 bin_Tem <- 2
 
-Tem_hov <- ts_profiles_ID_long %>% 
+p_tem_hov <- ts_profiles_ID_long %>% 
   filter(var == "tem") %>% 
   ggplot()+
   geom_contour_fill(aes(x=date_time_ID, y=dep, z=value),
@@ -828,13 +825,112 @@ Tem_hov <- ts_profiles_ID_long %>%
                        name="Tem (°C)",
                        option = "inferno")+
   scale_y_reverse()+
+  labs(y="Depth (m)")+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        legend.position = "left")
+
+p_CT_hov / p_tem_hov
+
+rm(p_CT_hov, bin_CT, p_tem_hov, bin_Tem)
+
+```
+
+
+```{r pub_fig_CT_tem_hov_abs_profiles_cum, include=FALSE}
+
+bin_CT <- 30
+
+p_CT_hov <- ts_profiles_ID_long %>% 
+  filter(var == "CT") %>% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=value),
+                    breaks = MakeBreaks(bin_CT),
+                    col="black")+
+  geom_vline(aes(xintercept = date_time_ID), col="white", linetype = "1f")+
+  scale_fill_scico(breaks = MakeBreaks(bin_CT),
+                   guide = "colorstrip",
+                   name= expression(nC[T]~(µmol~kg^{-1})),
+                   palette = "davos", direction = -1)+
+  scale_y_reverse(sec.axis = dup_axis())+
+  scale_x_datetime(breaks = "week",
+                   date_labels = "%b %d")+
   theme_bw()+
-  labs(x="",y="Depth (m)")+
-  coord_cartesian(expand = 0)
+  labs(y="Depth (m)")+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.title.y.right = element_blank(),
+        axis.text.y.right = element_blank(),
+        legend.position = "left")
 
-CT_hov / Tem_hov
+bin_Tem <- 2
 
-rm(CT_hov, bin_CT, Tem_hov, bin_Tem)
+p_tem_hov <- ts_profiles_ID_long %>% 
+  filter(var == "tem") %>% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=value),
+                    breaks = MakeBreaks(bin_Tem),
+                    col="black")+
+  geom_vline(aes(xintercept = date_time_ID), col="white", linetype = "1f")+
+  scale_fill_viridis_c(breaks = MakeBreaks(bin_Tem),
+                       guide = "colorstrip",
+                       name="Temperature (\u00B0C)",
+                       option = "inferno")+
+  scale_y_reverse(sec.axis = dup_axis())+
+  scale_x_datetime(breaks = "week",
+                   date_labels = "%b %d")+
+  labs(y="Depth (m)")+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.title.y.right = element_blank(),
+        axis.text.y.right = element_blank(),
+        legend.position = "left")
+
+  
+p_CT_ID_cum <- 
+  ts_profiles_ID_long %>%
+  filter(var == "CT") %>% 
+  ggplot(aes(value_cum, dep, col=ID, fill=ID))+
+  geom_path()+
+  geom_point(shape=21, col="black")+
+  scale_y_reverse(expand = c(0,0),
+                  position = "right",
+                  sec.axis = dup_axis())+
+  labs(x = expression(nC[T]~cumulative~changes~(µmol~kg^{-1})),
+       y = "Depth (m)")+
+  scale_color_viridis_d(labels = cruise_dates$date_ID)+
+  scale_fill_viridis_d(labels = cruise_dates$date_ID)+
+  theme(legend.position = "top",
+        axis.title.y.left = element_blank(),
+        axis.text.y.left = element_blank(),
+        legend.title = element_blank())
+
+
+p_tem_ID_cum <- 
+  ts_profiles_ID_long %>%
+  filter(var == "tem") %>% 
+  ggplot(aes(value_cum, dep, col=ID, fill=ID))+
+  geom_path()+
+  geom_point(shape=21, col="black")+
+  scale_y_reverse(expand = c(0,0),
+                  position = "right",
+                  sec.axis = dup_axis())+
+  labs(x = "Temperature cumulative changes (\u00B0C)",
+       y = "Depth (m)")+
+  scale_color_viridis_d(labels = cruise_dates$date_ID, guide = FALSE)+
+  scale_fill_viridis_d(labels = cruise_dates$date_ID, guide = FALSE)+
+  theme(axis.title.y.left = element_blank(),
+        axis.text.y.left = element_blank())
+
+
+p_CT_hov + p_CT_ID_cum +
+p_tem_hov + p_tem_ID_cum +
+  plot_layout(widths = c(2, 1))
+
+ggsave(here::here("output/Plots/Figures_publication/article", "Hov_abs_profiles_cum.pdf"),
+       width = 300, height = 190, dpi = 300, units = "mm")
+
+rm(p_CT_hov, bin_CT, p_tem_hov, bin_Tem)
 
 ```
 
@@ -1057,22 +1153,22 @@ ts_profiles <- ts_profiles %>%
 
 ts_profiles_ID_mean_hydro <- ts_profiles %>% 
   select(-c(station,lat, lon, pCO2_raw, pCO2, CT, date_time)) %>% 
-  group_by(ID, date_time_ID, dep) %>% 
+  group_by(ID, date_time_ID, date_ID, dep) %>% 
   summarise_all(list(mean), na.rm=TRUE) %>% 
   ungroup()
 
 ts_profiles_ID_sd_hydro <- ts_profiles %>% 
   select(-c(station,lat, lon, pCO2_raw, pCO2, CT, date_time)) %>% 
-  group_by(ID, date_time_ID, dep) %>% 
+  group_by(ID, date_time_ID, date_ID, dep) %>% 
   summarise_all(list(sd), na.rm=TRUE) %>% 
   ungroup()
 
 
 ts_profiles_ID_sd_hydro_long <- ts_profiles_ID_sd_hydro %>% 
-  pivot_longer(4:6, names_to = "var", values_to = "sd")
+  pivot_longer(sal:rho, names_to = "var", values_to = "sd")
   
 ts_profiles_ID_mean_hydro_long <- ts_profiles_ID_mean_hydro %>% 
-  pivot_longer(4:6, names_to = "var", values_to = "value")
+  pivot_longer(sal:rho, names_to = "var", values_to = "value")
   
 ts_profiles_ID_hydro_long <- inner_join(ts_profiles_ID_mean_hydro_long, ts_profiles_ID_sd_hydro_long)
 ts_profiles_ID_hydro <- ts_profiles_ID_mean_hydro
@@ -1354,36 +1450,71 @@ rm(ts_profiles_ID_long_180723,
 
 ## Air-Sea CO~2~ flux
 
+### Surface water data
 
-### pCO~2~ water
-
-The cruise mean pCO~2~ recorded in profiling-mode (stations only) and depths < 3m was used for gas exchange calcualtions.
+The cruise mean pCO~2~ recorded in profiling-mode (stations only) and depths < 6m was used for gas exchange calcualtions.
 
 ```{r read_Tina-V_Sensor_data, fig.asp=0.5}
 
-ts_profiles_surface <- ts_profiles %>% 
-  filter(dep < 3) %>% 
-  select(date_time_ID, ID, tem, pCO2_water = pCO2)
+ts_profiles_surface_long <- ts_profiles %>% 
+  filter(dep < 6) %>% 
+  select(date_time = date_time_ID, ID, tem, pCO2_water = pCO2, CT) %>% 
+  pivot_longer(tem:CT, values_to = "value", names_to = "var")
 
-ts_profiles_surface_ID <- ts_profiles_surface %>% 
-  group_by(ID) %>% 
-  summarise_all(mean) %>% 
-  ungroup() %>% 
-  select(-ID, date_time = date_time_ID)
+ts_profiles_surface_long_ID <- ts_profiles_surface_long %>% 
+  group_by(ID, date_time, var) %>% 
+  summarise_all(list(~mean(.), ~sd(.), ~min(.), ~max(.))) %>% 
+  ungroup()
 
-ts_profiles_surface_ID %>% 
-  ggplot(aes(date_time, pCO2_water, col="Cruise mean"))+
-  geom_point(data=ts_profiles_surface,
-             aes(date_time_ID, pCO2_water, col="observed"))+
-  geom_path()+
-  geom_point()+
-  scale_color_brewer(palette = "Set1", name="")+
-  theme(axis.title.x = element_blank())
+p_pCO2_surf <- ts_profiles_surface_long_ID %>%
+  filter(var == "pCO2_water") %>% 
+  ggplot(aes(x=date_time))+
+  geom_ribbon(aes(ymin=mean-sd, ymax=mean+sd), alpha=0.2)+
+  geom_path(aes(y=mean))+
+  geom_point(aes(y=mean))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = "week",
+                   sec.axis = dup_axis())+
+  labs(y = expression(atop(pCO[2],
+                           (mu*atm))))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+p_tem_surf <- ts_profiles_surface_long_ID %>%
+  filter(var == "tem") %>% 
+  ggplot(aes(x=date_time))+
+  geom_ribbon(aes(ymin=mean-sd, ymax=mean+sd), alpha=0.2)+
+  geom_path(aes(y=mean))+
+  geom_point(aes(y=mean))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = "week",
+                   sec.axis = dup_axis())+
+  labs(y = "temperature \n (\u00B0C)")+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+p_CT_surf <- ts_profiles_surface_long_ID %>%
+  filter(var == "CT") %>% 
+  ggplot(aes(x=date_time))+
+  geom_ribbon(aes(ymin=mean-sd, ymax=mean+sd), alpha=0.2)+
+  geom_path(aes(y=mean))+
+  geom_point(aes(y=mean))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = "week",
+                   sec.axis = dup_axis())+
+  labs(y = expression(atop(nC[T],
+                           (mu*mol~kg^{-1}))))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+
+p_pCO2_surf + p_tem_surf + p_CT_surf + 
+  plot_layout(ncol = 1)
 
 #rm(ts_profiles_surface)
 
-start <- min(ts_profiles_surface_ID$date_time)
-end   <- max(ts_profiles_surface_ID$date_time)
+start <- min(ts_profiles_surface_long_ID$date_time)
+end   <- max(ts_profiles_surface_long_ID$date_time)
 
 ```
 
@@ -1413,8 +1544,7 @@ og <- og %>%
 rm(end, start)
 
 og <- og %>% 
-  mutate(freq = "30 min") %>% 
-  select(date_time, freq, pCO2_atm = "CO2 12m [ppm]", wind = "WS 12m [m/s]")
+  select(date_time, pCO2_atm = "CO2 12m [ppm]", wind = "WS 12m [m/s]")
 
 
 ```
@@ -1425,6 +1555,11 @@ Data sets for atmospheric and seawater observations were merged and interpolated
 
 ```{r join_interpolate_wind_water_data}
 
+ts_profiles_surface_ID <- ts_profiles_surface_long_ID %>% 
+  filter(var %in% c("pCO2_water", "tem")) %>% 
+  select(date_time:mean) %>% 
+  pivot_wider(names_from = "var", values_from = "mean")
+
 ts_og <- full_join(og, ts_profiles_surface_ID) %>% 
   arrange(date_time)
 
@@ -1434,17 +1569,7 @@ ts_og <- ts_og %>%
          wind = na.approx(wind, rule = 2)) %>% 
   filter(!is.na(pCO2_atm))
 
-ts_og_daily <- ts_og %>% 
-  mutate(day = yday(date_time)) %>% 
-  group_by(day) %>% 
-  summarise_all(mean, na.rm = TRUE) %>% 
-  ungroup() %>% 
-  select(-day) %>% 
-  mutate(freq = "daily")
-
-ts_og <- bind_rows(ts_og, ts_og_daily)
-
-rm(ts_profiles_surface, ts_profiles_surface_ID, og, ts_og_daily)
+rm(ts_profiles_surface_ID, og)
 
 
 ```
@@ -1453,14 +1578,36 @@ rm(ts_profiles_surface, ts_profiles_surface_ID, og, ts_og_daily)
 ```{r plot_wind_Ostergarn_tower}
 
 ts_og_long <- ts_og %>% 
-  gather("parameter", "value", 3:6)
+  pivot_longer("pCO2_atm":"tem",
+               names_to = "var",
+               values_to = "value")
 
-ts_og_long %>% 
-  ggplot(aes(date_time, value, col=freq))+
-  geom_line()+
-  facet_grid(parameter~., scales = "free_y")+
-  scale_color_brewer(palette = "Set1", direction = -1)+
-  theme(axis.title.x = element_blank())
+p_pCO2_atm <- ts_og_long %>%
+  filter(var == "pCO2_atm") %>% 
+  ggplot(aes(x=date_time))+
+  geom_path(aes(y=value))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = "week",
+                   sec.axis = dup_axis())+
+  labs(y = expression(atop(pCO["2,atm"],
+                           (mu*atm))))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+p_wind <- ts_og_long %>%
+  filter(var == "wind") %>% 
+  ggplot(aes(x=date_time))+
+  geom_path(aes(y=value))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = "week",
+                   sec.axis = dup_axis())+
+  labs(y = expression(atop(windspeed,
+                           (m~s^{-1}))))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+p_pCO2_atm + p_wind +
+  plot_layout(ncol = 1)
 
 ```
 
@@ -1501,16 +1648,16 @@ Sc_W14 <- function(tem) {
 ts_og <- ts_og %>% 
   mutate(dpCO2 = pCO2_water - pCO2_atm,
          dCO2  = dpCO2 * K0(S=6.92, T=tem),
-         W92 = gas_transfer(t = tem, u10 = wind, species = "CO2",
-                              method = "Wanninkhof1")* 60^2 * 100,
+         # W92 = gas_transfer(t = tem, u10 = wind, species = "CO2",
+         #                      method = "Wanninkhof1")* 60^2 * 100,
          #k_SM18 = 0.24 * wind^2 * ((1943-119.6*tem + 3.488*tem^2 - 0.0417*tem^3) / 660)^(-0.5),
-         W14 = 0.251 * wind^2 * (Sc_W14(tem)/660)^(-0.5)) %>% 
-  pivot_longer(9:10, names_to = "k_para", values_to = "k_value")
+         k = 0.251 * wind^2 * (Sc_W14(tem)/660)^(-0.5))
+  # pivot_longer(9:10, names_to = "k_para", values_to = "k_value")
 
 # calculate flux F [mol m–2 d–1]
 
 ts_og <- ts_og %>% 
-  mutate(flux_daily = k_value*dCO2*1e-5*24) 
+  mutate(flux_daily = k*dCO2*1e-5*24) 
 
 rm(Sc_W14)
 
@@ -1520,39 +1667,52 @@ rm(Sc_W14)
 
 ```{r flux_air_sea_daily_CO2, fig.asp=0.3}
 
-ts_og %>% 
-  ggplot(aes(date_time, flux_daily, col=k_para))+
-  geom_line()+
-  labs(y="F (mol m-2 d-1)")+
-  scale_color_brewer(palette = "Set1")+
-  facet_wrap(~freq)+
-  theme(axis.title.x = element_blank())
-
+p_flux_daily <- ts_og %>%
+  ggplot(aes(x=date_time))+
+  geom_path(aes(y=flux_daily))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = "week",
+                   sec.axis = dup_axis())+
+  labs(y = expression(atop(flux[daily],
+                           (mol~m^{-2}~d^{-1}))))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
 
 ```
 
 ### Cumulative Fluxes
 
-
 ```{r flux_air_sea_cumulative_CO2, fig.asp=0.3}
 # scale flux to time interval
 
 ts_og <- ts_og %>% 
-  mutate(scale = if_else(freq == "daily", 1, 24*2)) %>% 
+  mutate(scale = 24*2) %>% 
   mutate(flux_scale = flux_daily / scale) %>% 
-  group_by(freq, k_para) %>% 
+  #group_by(freq, k_para) %>% 
   arrange(date_time) %>% 
   mutate(flux_cum = cumsum(flux_scale)) %>% 
   ungroup()
 
-ts_og %>% 
-  ggplot(aes(date_time, flux_cum, col=k_para, linetype=freq))+
-  geom_line()+
-  labs(y="F (mol m-2)")+
-  scale_color_brewer(palette = "Set1")+
-  theme(axis.title.x = element_blank())
+p_flux_cum <- ts_og %>%
+  ggplot(aes(x=date_time))+
+  geom_path(aes(y=flux_cum))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = "week",
+                   sec.axis = dup_axis())+
+  labs(y = expression(atop(flux[cum],
+                           (mol~m^{-2}))))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
 
 ```
+
+```{r plot_flux_time_series}
+
+p_pCO2_surf + p_tem_surf + p_CT_surf + p_pCO2_atm + p_wind + p_flux_daily + p_flux_cum +
+  plot_layout(ncol = 1)
+
+```
+
 
 ## iC~T~ correction
 
@@ -1588,22 +1748,16 @@ ts_og_flux <- ts_og %>%
   mutate(flux_scale = if_else(date_time > date_180806,
                               12/17 * flux_scale,
                               flux_scale)) %>%
-  group_by(freq, k_para) %>% 
   arrange(date_time) %>% 
   mutate(flux_cum = cumsum(flux_scale)) %>% 
-  ungroup() %>% 
-  filter(k_para == "W14", freq =="30 min") %>% 
   select(date_time, flux_cum)
 
 # calculate cumulative air-sea fluxes affecting 10-17m
 ts_og_flux_dep <- ts_og %>% 
   filter(date_time > date_180806) %>% 
   mutate(flux_scale = 5/17 * flux_scale) %>%
-  group_by(freq, k_para) %>% 
   arrange(date_time) %>% 
   mutate(flux_cum = cumsum(flux_scale)) %>% 
-  ungroup() %>% 
-  filter(k_para == "W14", freq =="30 min") %>% 
   select(date_time, flux_cum)
 
 iCT_10_flux <- full_join(iCT_10, ts_og_flux) %>% 
@@ -1660,7 +1814,7 @@ iCT_10_flux_mix <- iCT_10_flux_mix %>%
          CT_i_flux_mix_cum = CT_i_flux_cum + mix_cum)
 
   
-iCT_10_flux_mix %>% 
+p_iCT <- iCT_10_flux_mix %>% 
   arrange(date_time) %>% 
   ggplot()+
   geom_col(data = iCT_10_flux_mix_diff,
@@ -1672,11 +1826,20 @@ iCT_10_flux_mix %>%
   geom_line(aes(date_time, CT_i_cum, col="observed"))+
   geom_line(aes(date_time, CT_i_flux_mix_cum, col="mixing + flux corrected"))+
   geom_line(aes(date_time, CT_i_flux_cum, col="flux corrected"))+
-  scale_fill_brewer(palette = "Set1", name="Incremental")+
-  scale_color_brewer(palette = "Set1", name="Cumulative")+
-  labs(y="integrated CT [mol/m2]")+
-  theme(axis.title.x = element_blank())
+  scale_x_datetime(date_breaks = "week",
+                   date_labels = "%b %d",
+                   sec.axis = dup_axis())+
+  scale_fill_brewer(palette = "Set1", name="incremental changes")+
+  scale_color_brewer(palette = "Set1", name="cumulative changes")+
+  labs(y=expression(atop(integrated~nC[T],
+                         (mol~m^{-2}))))+
+  guides(guide_colourbar(order = 1))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x.top = element_blank(),
+        legend.position = "bottom",
+        legend.direction = "vertical")
 
+p_iCT
 
 iCT_10_flux_mix %>%
   write_csv(here::here("Data/_merged_data_files", "ts_NCP_cum.csv"))
@@ -1685,6 +1848,23 @@ iCT_10_flux_mix_diff %>%
   write_csv(here::here("Data/_merged_data_files", "ts_NCP_inc.csv"))
 
 ```
+
+
+
+```{r plot_iCT_time_series, eval=FALSE}
+
+p_pCO2_surf + p_tem_surf + p_CT_surf + 
+  p_pCO2_atm + p_wind + p_flux_daily + p_flux_cum + 
+  p_iCT +
+  plot_layout(ncol = 1,
+              heights = c(rep(1,7), 3))
+
+ggsave(here::here("output/Plots/Figures_publication/article", "atm_water_timeseries.pdf"),
+       width = 120, height = 250, dpi = 300, units = "mm")
+
+```
+
+
 
 # Nomenclature of objectes
 
