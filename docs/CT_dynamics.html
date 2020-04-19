@@ -1,0 +1,4253 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Jens Daniel Müller" />
+
+
+<title>CT dynamics</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">BloomSail</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Data base
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="read-in.html">Read-in</a>
+    </li>
+    <li>
+      <a href="merging_interpolation.html">Mergind and interpolation</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="response_time.html">Response time</a>
+</li>
+<li>
+  <a href="CT_dynamics.html">CT dynamics</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    NCP reconstruction
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="BloomSail_surface.html">BloomSail surface observations</a>
+    </li>
+    <li>
+      <a href="Finnmaid+GETM.html">Finnmaid + GETM</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/jens-daniel-mueller/BloomSail">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+<li>
+  <a href="https://jens-daniel-mueller.github.io/">
+    <span class="fa fa-home"></span>
+     
+    Jens' homepage
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">CT dynamics</h1>
+<h4 class="author">Jens Daniel Müller</h4>
+<h4 class="date">19 April, 2020</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2020-04-19
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>BloomSail/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.1). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20191021code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20191021)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20191021code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20191021)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef8fcf50113d19f26f0a6bde854a8d84f6c979fa6targetblankf8fcf50a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f8fcf50113d19f26f0a6bde854a8d84f6c979fa6" target="_blank">f8fcf50</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef8fcf50113d19f26f0a6bde854a8d84f6c979fa6targetblankf8fcf50a" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f8fcf50113d19f26f0a6bde854a8d84f6c979fa6" target="_blank">f8fcf50</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
+    Ignored:    data/Finnmaid_2018/
+    Ignored:    data/GETM/
+    Ignored:    data/Maps/
+    Ignored:    data/Ostergarnsholm/
+    Ignored:    data/TinaV/
+    Ignored:    data/_merged_data_files/
+    Ignored:    data/_summarized_data_files/
+
+Untracked files:
+    Untracked:  output/Plots/Figures_publication/
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/CT_dynamics.Rmd</code>) and HTML (<code>docs/CT_dynamics.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f8fcf50113d19f26f0a6bde854a8d84f6c979fa6/analysis/CT_dynamics.Rmd" target="_blank">f8fcf50</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-19
+</td>
+<td>
+created pub figures for time series
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/f8fcf50113d19f26f0a6bde854a8d84f6c979fa6/docs/CT_dynamics.html" target="_blank">f8fcf50</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-19
+</td>
+<td>
+created pub figures for time series
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/6810175e8bc8a47d1fda5726d0d82565c3af8534/docs/CT_dynamics.html" target="_blank">6810175</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/864596a3a778f994d0e158ae5429a43d4800a9ab/analysis/CT_dynamics.Rmd" target="_blank">864596a</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-17
+</td>
+<td>
+plotted all profiles
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/4054ba16afa82d2581d4620256741ddac0d2419c/docs/CT_dynamics.html" target="_blank">4054ba1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/acc1379ee212f7183dd0d67b7ed6bbdc12d89f54/analysis/CT_dynamics.Rmd" target="_blank">acc1379</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-17
+</td>
+<td>
+calculate AT sd
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/729b4c66780ab40faa12a4d73e605019e0127c28/docs/CT_dynamics.html" target="_blank">729b4c6</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/2edd18d81b2b89dbb9eedfdb2060fb1179698890/analysis/CT_dynamics.Rmd" target="_blank">2edd18d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-17
+</td>
+<td>
+included bottle CT AT from 180723
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/bf6384a0821cf0bb9b270a45dfe99ba98ac77c0c/docs/CT_dynamics.html" target="_blank">bf6384a</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/d0eb2644355bb7b41143893bca88c6f947efdd1a/analysis/CT_dynamics.Rmd" target="_blank">d0eb264</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-17
+</td>
+<td>
+all stations on map
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/cc2baf3da73b40869897f4bffa1c1c94a4ac64d0/docs/CT_dynamics.html" target="_blank">cc2baf3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/13436a3a40979b2ba31ce1361c0268ede87699ea/analysis/CT_dynamics.Rmd" target="_blank">13436a3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-16
+</td>
+<td>
+worked on map
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/5e8f8e1b77e1b7e3f546e5d44f37de9003b914bd/docs/CT_dynamics.html" target="_blank">5e8f8e1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/86b08338ce4b5cf30f94b7de6151b246f55633ed/analysis/CT_dynamics.Rmd" target="_blank">86b0833</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-16
+</td>
+<td>
+New fixed integration depth 12m
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/4ac8782d8e24e48c182026fab886bc02a01dd0c6/docs/CT_dynamics.html" target="_blank">4ac8782</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/95380d40ec83160a891d58702984f8c8525e088d/analysis/CT_dynamics.Rmd" target="_blank">95380d4</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-16
+</td>
+<td>
+Cumulative temperature distribution on July 23
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/48631ee007743f3618c0fa74ed4c24e3b82c4098/docs/CT_dynamics.html" target="_blank">48631ee</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/4e9464ff3c7386d062b38db754d5a06b425d8866/analysis/CT_dynamics.Rmd" target="_blank">4e9464f</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-09
+</td>
+<td>
+corrected na approx function
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/849e990c802b7288a30d35ddd8e803b81c681480/docs/CT_dynamics.html" target="_blank">849e990</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/c19920043d8af20fba341b95f03d041226357b98/analysis/CT_dynamics.Rmd" target="_blank">c199200</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+included BloomSail data to Finnmaid analysis
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/f4a27b8babb6df2ea809b0fbbfaa4987a2a4dcdf/docs/CT_dynamics.html" target="_blank">f4a27b8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b1613b7e3a6370169a2dc8f71712490041f68d6b/analysis/CT_dynamics.Rmd" target="_blank">b1613b7</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+re-calculated MLD, renamed objects and structured site
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/63029949691d73f2c6ec43cb4849d6ff73b7c3f8/docs/CT_dynamics.html" target="_blank">6302994</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-31
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/50ab3132ac3d100b160b350184b6febcc85a06b4/analysis/CT_dynamics.Rmd" target="_blank">50ab313</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-31
+</td>
+<td>
+implemented temperature reconstruction
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/a6c4c2246be92faaecf4654e92031ba76875c4f0/docs/CT_dynamics.html" target="_blank">a6c4c22</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/d8120b3711f19badd9ed062c1b3fdcd217a2ed72/analysis/CT_dynamics.Rmd" target="_blank">d8120b3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+reconstruction BloomSail surface started, merging MLD and DT approach
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/80c78b3d07120ece6b7f4fc1439fcd4cd8a13047/docs/CT_dynamics.html" target="_blank">80c78b3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/70dbfbe25a92084921ae393709a3f03069f53fa6/docs/CT_dynamics.html" target="_blank">70dbfbe</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/e69d1f0afd490a2e3c0b8716dca249be812f9f13/analysis/CT_dynamics.Rmd" target="_blank">e69d1f0</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+cleaned object names
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/431a56ae0c11308094cdc55a15b78ab1443bb5b1/docs/CT_dynamics.html" target="_blank">431a56a</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/9edf20d32135ee888b86c770785c3696772d5fdd/analysis/CT_dynamics.Rmd" target="_blank">9edf20d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+flux and mixing correction revised
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/f8ad4ff8800167add22f9c2cf3d4f69d1c32b4cc/docs/CT_dynamics.html" target="_blank">f8ad4ff</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/265e5681d14897630d2bbf560d06891c80dd3d99/analysis/CT_dynamics.Rmd" target="_blank">265e568</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+NCP calculation finished
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/2ade511a2f7fe4c9bf87eb66701aada5e1774154/docs/CT_dynamics.html" target="_blank">2ade511</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/858e01f5776c965dd20f7ae6008da2b269bcf128/analysis/CT_dynamics.Rmd" target="_blank">858e01f</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+iCT flux correction applied
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/a22daa8c81f426c754cb15d0fecd5a8793609a12/docs/CT_dynamics.html" target="_blank">a22daa8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/9118b70d2f47849ea02ad8df2e412e1edc5ad86b/analysis/CT_dynamics.Rmd" target="_blank">9118b70</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+iCT flux correction applied
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/2d358fbb2a81947ea445c1367b7e1c0e3e1a7530/docs/CT_dynamics.html" target="_blank">2d358fb</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/d17a2b06c2430db13cd486c9ce2d483c3d463fbd/analysis/CT_dynamics.Rmd" target="_blank">d17a2b0</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+Added air sea CO2 fluxes
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/43da055499dab728480c7ab03319f121f8665a36/docs/CT_dynamics.html" target="_blank">43da055</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/6afdea92f2343ffc0fbe807140fd231c72a9cd2c/analysis/CT_dynamics.Rmd" target="_blank">6afdea9</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+selected iCT time series for NCP
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/1d7eebc81c76c6eb91b29e1dc3b349fb4e26200f/docs/CT_dynamics.html" target="_blank">1d7eebc</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/4d734a11f166c9f07c733acad56b119cb6829650/analysis/CT_dynamics.Rmd" target="_blank">4d734a1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Started NCP estimation
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/57e3e73d8f8a0cb21871d9bd70bfe52f31b4e4c4/docs/CT_dynamics.html" target="_blank">57e3e73</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/275b061655e694097b87ad096c94c20b2adeda4f/analysis/CT_dynamics.Rmd" target="_blank">275b061</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+renamed NCP correctly als iCT
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/30d5b105b6e1f27addeb7837b0dcebb0f014586d/docs/CT_dynamics.html" target="_blank">30d5b10</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/0405651e6dbd09a4261302305427fe2ca581858f/analysis/CT_dynamics.Rmd" target="_blank">0405651</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Restructure MLD iCT chapter
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/90633b8a87411e42ecbc860a48948734a81bddd7/docs/CT_dynamics.html" target="_blank">90633b8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/baa81d650bf047ec7f0de93d9174bed72b43c9e8/analysis/CT_dynamics.Rmd" target="_blank">baa81d6</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+heigth surface timeseries reduced
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/f139cbddc8173726d461424aecf0dbd4f41d4965/docs/CT_dynamics.html" target="_blank">f139cbd</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/1b8a11e0d3313acb5605ca1e75e43cdd4cd3cebf/analysis/CT_dynamics.Rmd" target="_blank">1b8a11e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+restructured NCP chapter, and renamed as iCT
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/c2b128eab63ca2fa102b3ecd4f4cb724165300e2/docs/CT_dynamics.html" target="_blank">c2b128e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/6ec40053315daf32c77244b81cd6cf7b2f685b02/analysis/CT_dynamics.Rmd" target="_blank">6ec4005</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+added interpretation notes
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/63909fca5a07c36b517c377c136115a359a40b9f/docs/CT_dynamics.html" target="_blank">63909fc</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/069600ca34c89c1211863d53c3eed2cdfde07b3b/analysis/CT_dynamics.Rmd" target="_blank">069600c</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+theme_bw
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/5011448d17bfcebb5b0c60b646ee7e43d7db0bd9/docs/CT_dynamics.html" target="_blank">5011448</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/69ec53ec5dae4d28e4393547df9ee9ad7185ed0b/analysis/CT_dynamics.Rmd" target="_blank">69ec53e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-26
+</td>
+<td>
+Comparison iCT estimates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/b6e6117af22337943055ebc34fb257eeb5e0d5f0/docs/CT_dynamics.html" target="_blank">b6e6117</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-25
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/07690b6bd17c5c82870a77d664d89a0d0f2045bd/analysis/CT_dynamics.Rmd" target="_blank">07690b6</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-25
+</td>
+<td>
+NCP MLD approach implmented
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/a667be11d6abb5cbd0eee9f8a0d665f72c98648d/docs/CT_dynamics.html" target="_blank">a667be1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-25
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/93800e0f6c25ea8f8229817b5b81fbd876dc2013/analysis/CT_dynamics.Rmd" target="_blank">93800e0</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-25
+</td>
+<td>
+NCP MLD approach implmented
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/b8d7014efe10cf76f3ffee0fce3566ab422338eb/docs/CT_dynamics.html" target="_blank">b8d7014</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-25
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/a13c901e29c94a69f6fff76b26644981315be5da/analysis/CT_dynamics.Rmd" target="_blank">a13c901</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-25
+</td>
+<td>
+NCP fixed depth, new variable names, ref dates introduced
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/b589daf2d4684078e78505e419cc74f6c9150eaf/docs/CT_dynamics.html" target="_blank">b589daf</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/90979bb6e9dffdb4a479e001c7b37e55fb1ecb71/analysis/CT_dynamics.Rmd" target="_blank">90979bb</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+nameing convention and NCP approaches list
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/d0d5c9e78d11a3f1c45f907d4f5322aa6cbee96b/docs/CT_dynamics.html" target="_blank">d0d5c9e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/1e2508a27700db15a1bd63f1249151f6987c72a2/analysis/CT_dynamics.Rmd" target="_blank">1e2508a</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+harmonized starting dates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/5f8ca30413bdc1d8c5801af85b2a25df410b1679/docs/CT_dynamics.html" target="_blank">5f8ca30</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/2a20453c53374316875a94d6205aba67e40d1c0c/docs/CT_dynamics.html" target="_blank">2a20453</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/473ab254bb02b26272128615869c13ec93dd3757/docs/CT_dynamics.html" target="_blank">473ab25</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/e9d33a7cbb885a4fe8ac30b7c3d0accdd942ac7d/docs/CT_dynamics.html" target="_blank">e9d33a7</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/ff79dbeb300e91cfed05ff14aa9ad345cb7dd5bb/analysis/CT_dynamics.Rmd" target="_blank">ff79dbe</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+remoced errorbars in ts plot
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/47663534b0227a76ef3be42bfb53c0a20b3a4c5f/docs/CT_dynamics.html" target="_blank">4766353</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/0d90486bf4dfa8339efd75a5224abea71f1db69a/analysis/CT_dynamics.Rmd" target="_blank">0d90486</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+Hovmoeller daily changes
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/592f3b5862012ddde86efdf01f0301033bb853b0/docs/CT_dynamics.html" target="_blank">592f3b5</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/41032797a46fd1e178236fb6a2e4450f94b62aa0/analysis/CT_dynamics.Rmd" target="_blank">4103279</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+CT: removed coastal, added errorbars and hovmoeller
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/81f022e95ee153ba75842f692a332afe4e406fb1/docs/CT_dynamics.html" target="_blank">81f022e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/18a74d14ec3e923effb13018cf042cf20871bcdd/docs/CT_dynamics.html" target="_blank">18a74d1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b839b18eba6c6ad74e6b2279bf2e82c08b1fc3e9/analysis/CT_dynamics.Rmd" target="_blank">b839b18</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+CT vs tem changes implemented
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/1e39d852ca29ac741ac5ab66ff24d9940d88c5be/docs/CT_dynamics.html" target="_blank">1e39d85</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/2105236d1e024a2e726740e361d735b20779f58d/docs/CT_dynamics.html" target="_blank">2105236</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/48580973699ae00abeee9db83727608756dedc6c/docs/CT_dynamics.html" target="_blank">4858097</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f0233c2acf0591b32e7618e7a7abb16b70ac053d/analysis/CT_dynamics.Rmd" target="_blank">f0233c2</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-18
+</td>
+<td>
+MLD and NCP penetration depth
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/05b9bdcd29216e144c4b602f9ce0884cbf1d0011/docs/CT_dynamics.html" target="_blank">05b9bdc</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/943cd6bdc51aa87ad2665a3bc2d3dd2ff11f0c02/docs/CT_dynamics.html" target="_blank">943cd6b</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/859c4a4613eb27eb92eac182cf99feaf23395f66/analysis/CT_dynamics.Rmd" target="_blank">859c4a4</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+corrected gas exchange calculation
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/26bc407d35c8438fecc2256c6d954140826f9c5b/docs/CT_dynamics.html" target="_blank">26bc407</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/7be14e4602989f5ef3a242398c3095758f7c5986/analysis/CT_dynamics.Rmd" target="_blank">7be14e4</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+corrected CT cum timeseries, used exact mean dates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/cb196d8d4650bccce7e13a6a31157461007b616b/docs/CT_dynamics.html" target="_blank">cb196d8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/7c1033668ce8f47beb2e66f616b27e27b660a9d5/analysis/CT_dynamics.Rmd" target="_blank">7c10336</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-17
+</td>
+<td>
+corrected CT cum timeseries, used exact mean dates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/0202742595c4e9482f9e250a573f5ef6ace1714a/docs/CT_dynamics.html" target="_blank">0202742</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/7508d11f4fccfd0d097517ced6c6099987ce11ab/docs/CT_dynamics.html" target="_blank">7508d11</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/53ee4237eb15531731c101f8b3f2e428de66f4b4/analysis/CT_dynamics.Rmd" target="_blank">53ee423</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-16
+</td>
+<td>
+gas exchange calculation completed
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/9f0c30bf22a23587f83631d8476bb619faa1f853/docs/CT_dynamics.html" target="_blank">9f0c30b</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/1c60add64efcdfc7f5ec763160413c2c115f7c17/analysis/CT_dynamics.Rmd" target="_blank">1c60add</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-16
+</td>
+<td>
+incremental CT changes timeseries + raw pCO2 profiles plotted
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/4150817f54ef5ad28f54d3b4ecf902726f2aa6fc/docs/CT_dynamics.html" target="_blank">4150817</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/94e12d80cb05305d4f25d6ddc7adeccb008997cd/analysis/CT_dynamics.Rmd" target="_blank">94e12d8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-13
+</td>
+<td>
+final cleaning
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/443d9a170ce3c59e4517155a4d4f878a291c48be/docs/CT_dynamics.html" target="_blank">443d9a1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/39b841d766f959c5a6b80198d430c662d28478fa/analysis/CT_dynamics.Rmd" target="_blank">39b841d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-13
+</td>
+<td>
+all profiles pdfs included
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/ff22d6fd8eaadbe18ef49978965995b480906545/docs/CT_dynamics.html" target="_blank">ff22d6f</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f49ce78698e59e99df795845d046524cb24ccbdc/analysis/CT_dynamics.Rmd" target="_blank">f49ce78</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-13
+</td>
+<td>
+cumulative changes per depth
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/e40435947d68cd78c9f8ccbf1eba5ffdd35bf8c7/docs/CT_dynamics.html" target="_blank">e404359</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/e9725fe16a74f1f90ff8ddc9ed68c9d8b9bd4bbc/analysis/CT_dynamics.Rmd" target="_blank">e9725fe</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-12
+</td>
+<td>
+Clean CT dynamics
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/8e83afde0b15d6a39c248fc0aa52c4a3d915a6e2/docs/CT_dynamics.html" target="_blank">8e83afd</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/3c17c460052669b58cdfd0c53619e2576e211667/analysis/CT_dynamics.Rmd" target="_blank">3c17c46</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-12
+</td>
+<td>
+update CT cynamics
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/a3ddea46fcdb378f7ca31d1e2bab6cfe8bf19b96/docs/CT_dynamics.html" target="_blank">a3ddea4</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/97355faca4e68a0f8d4ecc285fe10322c57365fc/analysis/CT_dynamics.Rmd" target="_blank">97355fa</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-12
+</td>
+<td>
+CT calculations and plots
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(tidyverse)
+library(patchwork)
+library(seacarb)
+library(marelac)
+library(metR)
+library(scico)
+library(lubridate)
+library(zoo)</code></pre>
+<div id="sensor-data" class="section level1">
+<h1><span class="header-section-number">1</span> Sensor data</h1>
+<p>Profile data are prepared by:</p>
+<ul>
+<li>Ignoring those made on June 16 (pCO2 sensor not in operation)</li>
+<li>Removing HydroC Flush and Zeroing periods</li>
+<li>Selecting only continous downcast periods</li>
+<li>Gridding profiles to 1m depth intervals</li>
+<li>Discarding profiles with 3 or more observation missing within upper 20m</li>
+<li>assigning mean date_time_ID value to all profiles belonging to one cruise</li>
+<li>discarding “coastal” station P01, P13, P14</li>
+<li>Restricting profiles to upper 25m</li>
+</ul>
+<p>Please note that:</p>
+<ul>
+<li>The label ID represents the start date of the cruise (“YYMMDD”), not the exact mean sampling date</li>
+</ul>
+<div id="pco2-profile-overview" class="section level2">
+<h2><span class="header-section-number">1.1</span> pCO<sub>2</sub> profile overview</h2>
+<pre class="r"><code>ts &lt;-
+ read_csv(here::here(&quot;data/_merged_data_files&quot;,
+                      &quot;BloomSail_CTD_HydroC_track_RT.csv&quot;),
+               col_types = cols(ID = col_character(),
+                                pCO2_analog = col_double(),
+                                pCO2 = col_double(),
+                                Zero = col_character(),
+                                Flush = col_character(),
+                                mixing = col_character(),
+                                Zero_ID = col_integer(),
+                                deployment = col_integer(),
+                                lon = col_double(),
+                                lat = col_double(),
+                                pCO2_RT = col_double()))
+
+
+# Filter relevant rows and columns
+
+ts_profiles &lt;- ts %&gt;% 
+  filter(type == &quot;P&quot;,
+         Flush == &quot;0&quot;,
+         Zero == &quot;0&quot;,
+         !ID %in% c(&quot;180616&quot;,&quot;180820&quot;),
+         !(station %in% c(&quot;PX1&quot;, &quot;PX2&quot;))) %&gt;% 
+  select(date_time, ID, station, lat, lon, dep, sal, tem, pCO2_raw = pCO2, pCO2 = pCO2_RT_mean, duration)
+
+
+stations &lt;- ts_profiles %&gt;% 
+  group_by(station) %&gt;% 
+  summarise(lat = mean(lat),
+            lon = mean(lon)) %&gt;% 
+  ungroup()
+
+
+ts_profiles &lt;- ts_profiles %&gt;% 
+  filter(!(station %in% c(&quot;P14&quot;, &quot;P13&quot;, &quot;P01&quot;)))
+# Assign meta information
+
+ts_profiles &lt;- ts_profiles %&gt;% 
+  group_by(ID, station) %&gt;% 
+  mutate(duration = as.numeric(date_time - min(date_time))) %&gt;%
+  arrange(date_time) %&gt;% 
+  ungroup()
+
+meta &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
+                          &quot;Tina_V_Sensor_meta.csv&quot;),
+                 col_types = cols(ID = col_character()))
+
+meta &lt;- meta %&gt;% 
+    filter(!ID %in% c(&quot;180616&quot;,&quot;180820&quot;),
+           !(station %in% c(&quot;PX1&quot;, &quot;PX2&quot;, &quot;P14&quot;, &quot;P13&quot;, &quot;P01&quot;)))
+
+ts_profiles &lt;- full_join(ts_profiles, meta)
+rm(meta)
+
+
+# creating descriptive variables
+ts_profiles &lt;- ts_profiles %&gt;% 
+  mutate(phase = &quot;standby&quot;,
+         phase = if_else(duration &gt;= start &amp; duration &lt; down &amp; !is.na(down) &amp; !is.na(start),
+                         &quot;down&quot;, phase),
+         phase = if_else(duration &gt;= down  &amp; duration &lt; lift &amp; !is.na(lift) &amp; !is.na(down ),
+                         &quot;low&quot;,  phase),
+         phase = if_else(duration &gt;= lift  &amp; duration &lt; up   &amp; !is.na(up  ) &amp; !is.na(lift  ),
+                         &quot;mid&quot;,  phase),
+         phase = if_else(duration &gt;= up    &amp; duration &lt; end  &amp; !is.na(end ) &amp; !is.na(up   ),
+                         &quot;up&quot;,   phase))
+
+ts_profiles &lt;- ts_profiles %&gt;% 
+  select(-c(start, down, lift, up, end, comment, p_type, duration))
+
+
+# select downcasst only
+ts_profiles &lt;- ts_profiles %&gt;% 
+  filter(phase == &quot;down&quot;) %&gt;% 
+  select(-phase)
+
+
+
+# ts_profiles_highres &lt;- ts_profiles
+
+# grid observation to 1m depth intervals
+ts_profiles &lt;- ts_profiles %&gt;% 
+  mutate(dep_grid = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1))))) %&gt;% 
+  group_by(ID, station, dep_grid) %&gt;%
+  summarise_all(&quot;mean&quot;, na.rm = TRUE) %&gt;% 
+  ungroup() %&gt;% 
+  select(-dep, dep=dep_grid)
+
+# subset complete profiles
+profiles_in &lt;- ts_profiles %&gt;% 
+  filter(dep &lt; 20) %&gt;% 
+  group_by(ID, station) %&gt;% 
+  summarise(nr = n()) %&gt;% 
+  mutate(select = if_else(nr &gt; 18 | station == &quot;P14&quot;, &quot;in&quot;, &quot;out&quot;)) %&gt;% 
+  select(-nr) %&gt;% 
+  ungroup()
+
+ts_profiles &lt;- full_join(ts_profiles, profiles_in)
+rm(profiles_in)
+
+ts_profiles %&gt;% 
+  arrange(date_time) %&gt;% 
+  ggplot(aes(pCO2, dep, col=select))+
+  geom_hline(yintercept = 25)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_x_continuous(breaks = c(0, 600), labels = c(0, 600))+
+  scale_color_brewer(palette = &quot;Set1&quot;, direction = -1)+
+  coord_cartesian(xlim = c(0,600))+
+  facet_grid(ID~station)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/read_prepare_sensor_data-1.png" alt="Overview pCO2 profiles at stations (P02-P12) and cruise dates (ID). y-axis restricted to displayed range." width="672" />
+<p class="caption">
+Overview pCO2 profiles at stations (P02-P12) and cruise dates (ID). y-axis restricted to displayed range.
+</p>
+</div>
+<pre class="r"><code>ts_profiles &lt;- ts_profiles %&gt;%
+  filter(select == &quot;in&quot;) %&gt;%
+  select(-select) %&gt;% 
+  filter(dep &lt; 25)
+
+# assign mean date_time stamp
+
+cruise_dates &lt;- ts_profiles %&gt;% 
+  group_by(ID) %&gt;% 
+  summarise(date_time_ID = mean(date_time),
+            date_ID = format(as.Date(date_time_ID), &quot;%b %d&quot;)) %&gt;% 
+  ungroup()
+
+# inner_join remove P14 observations lacking date_time_ID 
+ts_profiles &lt;- inner_join(cruise_dates, ts_profiles)</code></pre>
+</div>
+<div id="station-map" class="section level2">
+<h2><span class="header-section-number">1.2</span> Station map</h2>
+<pre class="r"><code>lat_lo &lt;- 57.25
+lat_hi &lt;- 57.6
+lon_lo &lt;- 18.6
+lon_hi &lt;- 19.7
+
+map &lt;- read_csv(here::here(&quot;data/Maps&quot;,&quot;Bathymetry_Gotland_east_small.csv&quot;)) %&gt;% 
+  filter(lat &lt; lat_hi, lat &gt; lat_lo,
+         lon &lt; lon_hi, lon &gt; lon_lo)
+
+map_low_res &lt;- map %&gt;% 
+  mutate(lat = cut(lat,
+                   breaks = seq(57,58,0.01),
+                   labels = seq(57.005,57.995,0.01)),
+         lon = cut(lon,
+                   breaks = seq(18,22,0.01),
+                   labels = seq(18.005,21.995,0.01))) %&gt;% 
+  group_by(lat,lon) %&gt;% 
+  summarise_all(mean, na.rm=TRUE) %&gt;% 
+  ungroup() %&gt;% 
+  mutate(lat = as.numeric(as.character(lat)),
+         lon = as.numeric(as.character(lon)))
+
+
+ggplot()+
+  geom_contour_fill(data = map_low_res,
+                    aes(x=lon, y=lat, z=-elev),
+                    na.fill = TRUE,
+                    breaks = seq(0,300,20))+
+  geom_raster(data=map %&gt;% filter(is.na(elev)),
+              aes(lon, lat), fill=&quot;black&quot;)+
+  geom_label(data = stations %&gt;% filter(!(station %in% c(&quot;P14&quot;, &quot;P13&quot;, &quot;P01&quot;))),
+             aes(lon, lat, label=station), col=&quot;red&quot;)+
+  geom_label(data = stations %&gt;% filter(station %in% c(&quot;P14&quot;, &quot;P13&quot;, &quot;P01&quot;)),
+             aes(lon, lat, label=station), col=&quot;grey&quot;)+
+  coord_quickmap(expand = 0)+
+  scale_fill_scico(palette = &quot;oslo&quot;, na.value = &quot;grey&quot;,
+                   name=&quot;Depth [m]&quot;, direction = -1,
+                   breaks = seq(0,160,20),
+                   guide = &quot;colorstrip&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/map-1.png" alt="Location of stations sampled between the east coast of Gotland and Gotland deep." width="672" />
+<p class="caption">
+Location of stations sampled between the east coast of Gotland and Gotland deep.
+</p>
+</div>
+<pre class="r"><code>rm(map, map_low_res, lat_hi, lat_lo, lon_hi, lon_lo)</code></pre>
+</div>
+<div id="data-coverage" class="section level2">
+<h2><span class="header-section-number">1.3</span> Data coverage</h2>
+<pre class="r"><code>cover &lt;- ts_profiles %&gt;% 
+  group_by(ID, station) %&gt;% 
+  summarise(date = mean(date_time),
+            date_time_ID = mean(date_time_ID)) %&gt;% 
+  ungroup()
+
+cover %&gt;% 
+  ggplot(aes(date, station, fill=ID))+
+  geom_vline(aes(xintercept = date_time_ID, col=ID))+
+  geom_point(shape=21)+
+  scale_color_viridis_d()+
+  scale_fill_viridis_d()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/data_coverage-1.png" alt="Spatio-temporal data coverage, indicated as station visits over time. ID (color) refers to the starting date of the cruise, except for P14, which was visited twice during each cruise." width="672" />
+<p class="caption">
+Spatio-temporal data coverage, indicated as station visits over time. ID (color) refers to the starting date of the cruise, except for P14, which was visited twice during each cruise.
+</p>
+</div>
+<pre class="r"><code>rm(cover)</code></pre>
+</div>
+</div>
+<div id="bottle-ct-and-at" class="section level1">
+<h1><span class="header-section-number">2</span> Bottle C<sub>T</sub> and A<sub>T</sub></h1>
+<p>At stations P07 and P10 discrete samples for lab measurments of C<sub>T</sub> and A<sub>T</sub> were collected. Please note that - in contrast to the pCO<sub>2</sub> profiles - samples were taken on June 16, but removed here for harmonization of results.</p>
+<pre class="r"><code>tb &lt;-
+  read_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;Tina_V_Bottle_CO2_lab.csv&quot;),
+           col_types = cols(ID = col_character()))
+
+tb &lt;- tb %&gt;% 
+  filter(station %in% c(&quot;P07&quot;, &quot;P10&quot;)) %&gt;% 
+  select(-pH_Mosley) %&gt;% 
+  mutate(CT_AT_ratio = CT/AT,
+         ID = if_else(ID == &quot;180722&quot;, &quot;180723&quot;, ID))
+
+tb &lt;- inner_join(tb, cruise_dates)</code></pre>
+<div id="vertical-profiles" class="section level2">
+<h2><span class="header-section-number">2.1</span> Vertical profiles</h2>
+<pre class="r"><code>tb_long &lt;- tb %&gt;% 
+  pivot_longer(4:7, names_to = &quot;var&quot;, values_to = &quot;value&quot;)
+
+tb_long %&gt;% 
+  ggplot(aes(value, dep))+
+  geom_path(aes(col=ID))+
+  geom_point(aes(fill=ID), shape=21)+
+  scale_y_reverse()+
+  scale_fill_viridis_d(labels = cruise_dates$date_ID)+
+  scale_color_viridis_d(labels = cruise_dates$date_ID)+
+  facet_grid(station~var, scales = &quot;free_x&quot;)+
+  theme(legend.position = &quot;bottom&quot;,
+        legend.title = element_blank())</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/plot_bottle_CO2_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Important notes: - Spatio-temporal variation of AT is small, which jusitfies conversion of pCO<sub>2</sub> to C<sub>T</sub> based on a fixed mean AT - On July 31 we see a drop in surface salinity, associated with a rise in A<sub>T</sub>, clearly pointing at exchange of water masses, presumably later</p>
+</div>
+<div id="surface-time-series" class="section level2">
+<h2><span class="header-section-number">2.2</span> Surface time series</h2>
+<p>0-10m</p>
+<pre class="r"><code>tb_surface &lt;- tb_long %&gt;% 
+  filter(dep&lt;11) %&gt;% 
+  group_by(ID, date_time_ID, var, station) %&gt;% 
+  summarise(value = mean(value, na.rm = TRUE)) %&gt;% 
+  ungroup()
+
+rm(tb_long)
+
+tb_surface %&gt;% 
+  ggplot(aes(date_time_ID, value, col=station))+
+  #geom_point(aes(lubridate::ymd(ID), value, col=station))+
+  geom_point()+
+  geom_path()+
+  scale_fill_viridis_d()+
+  scale_color_brewer(palette = &quot;Set1&quot;)+
+  facet_grid(var~., scales = &quot;free_y&quot;)+
+  labs(x=&quot;Mean transect date&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_bottle_CO2_surface_timeseries-1.png" alt="Time series of bottle data. Shown are mean values of samples collected at water depths &lt; 10m (usually collected at 0 and 5 m)." width="672" />
+<p class="caption">
+Time series of bottle data. Shown are mean values of samples collected at water depths &lt; 10m (usually collected at 0 and 5 m).
+</p>
+</div>
+<pre class="r"><code>AT_mean &lt;- tb %&gt;% 
+  filter(dep &lt;= 20) %&gt;% 
+  summarise(AT = mean(AT, na.rm = TRUE)) %&gt;%
+  pull()
+
+tb_surface %&gt;% 
+  filter(var == &quot;CT_AT_ratio&quot;) %&gt;% 
+  ggplot(aes(date_time_ID, value*AT_mean, col=station))+
+  geom_point()+
+  geom_path()+
+  scale_fill_viridis_d()+
+  scale_color_brewer(palette = &quot;Set1&quot;)+
+  labs(x=&quot;Mean transect date&quot;, y=&quot;CT-AT-ratio * mean AT&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_bottle_CT_surface_timeseries-1.png" alt="CT timeseries, derived by multiplying the CT-AT-ratio with mean AT" width="672" />
+<p class="caption">
+CT timeseries, derived by multiplying the CT-AT-ratio with mean AT
+</p>
+</div>
+<p>Important notes: - C<sub>T</sub> drop and temporal patterns observed in the C<sub>T</sub>/A<sub>T</sub> time series agrees well with those found in the C<sub>T</sub> time series derived from pCO<sub>2</sub> measurements</p>
+</div>
+<div id="mean-alkalinity" class="section level2">
+<h2><span class="header-section-number">2.3</span> Mean alkalinity</h2>
+<p>In order to derive C<sub>T</sub> from measured pCO<sub>2</sub> profiles, the alkalinity mean + sd in the upper 20 m and both stations was calculated as:</p>
+<pre class="r"><code>AT_mean</code></pre>
+<pre><code>[1] 1718.872</code></pre>
+<pre class="r"><code>AT_sd &lt;- tb %&gt;% 
+  filter(dep &lt;= 20) %&gt;% 
+  summarise(AT = sd(AT, na.rm = TRUE)) %&gt;%
+  pull()
+
+AT_sd</code></pre>
+<pre><code>[1] 26.23092</code></pre>
+<pre class="r"><code>rm(AT_sd)</code></pre>
+<p>Likewise, the mean salinity amounts to:</p>
+<pre class="r"><code>sal_mean &lt;- tb %&gt;% 
+  filter(dep &lt;= 20) %&gt;% 
+  summarise(sal = mean(sal, na.rm = TRUE)) %&gt;%
+  pull()
+
+sal_mean</code></pre>
+<pre><code>[1] 6.907083</code></pre>
+<pre class="r"><code>bind_cols(start = min(ts_profiles$date_time), 
+          end = max(ts_profiles$date_time),
+          AT = AT_mean,
+          sal = sal_mean) %&gt;% 
+  write_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;tb_fix.csv&quot;))
+
+rm(tb, tb_surface)</code></pre>
+</div>
+</div>
+<div id="ct-profiles" class="section level1">
+<h1><span class="header-section-number">3</span> C<sub>T</sub> profiles</h1>
+<div id="calculation-from-pco2" class="section level2">
+<h2><span class="header-section-number">3.1</span> Calculation from pCO<sub>2</sub></h2>
+<p>C<sub>T</sub> profiles were calculated from sensor pCO<sub>2</sub> and T profiles, and constant salinity and alkalinity values. Note that the impact of fixed vs. measured salinity has only a negligible impact on C<sub>T</sub> profiles.</p>
+<pre class="r"><code>ts_profiles &lt;- ts_profiles %&gt;% 
+  drop_na()
+
+ts_profiles &lt;- ts_profiles %&gt;% 
+  filter(pCO2 &gt; 0)
+
+ts_profiles &lt;- ts_profiles %&gt;% 
+  mutate(CT = carb(24, var1=pCO2, var2=1720*1e-6,
+                   S=sal_mean, T=tem, P=dep/10, k1k2=&quot;m10&quot;, kf=&quot;dg&quot;, ks=&quot;d&quot;,
+                   gas=&quot;insitu&quot;)[,16]*1e6)
+
+rm(sal_mean, AT_mean)
+
+ts_profiles %&gt;% 
+  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles.csv&quot;))</code></pre>
+</div>
+<div id="plot-all-profiles" class="section level2">
+<h2><span class="header-section-number">3.2</span> Plot all profiles</h2>
+<pre class="r"><code>ts_profiles &lt;-  ts_profiles %&gt;% 
+  arrange(date_time_ID)
+
+p_tem &lt;- 
+  ts_profiles %&gt;% 
+  ggplot(aes(tem, dep, col=ID, group = interaction(station, ID)))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0))+
+  labs(x = &quot;Temperature (\u00B0C)&quot;,
+       y = &quot;Depth (m)&quot;)+
+  scale_color_viridis_d(guide = FALSE)
+
+p_pCO2 &lt;- 
+  ts_profiles %&gt;% 
+  ggplot(aes(pCO2, dep, col=ID, group = interaction(station, ID)))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0))+
+  labs(x = expression(pCO[2]~(µatm)))+
+  scale_color_viridis_d(guide = FALSE)+
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank())
+
+p_CT &lt;- 
+  ts_profiles %&gt;% 
+  ggplot(aes(CT, dep, col=ID, group = interaction(station, ID)))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0))+
+  labs(x = expression(nC[T]~(µmol~kg^{-1})))+
+  scale_color_viridis_d(labels = cruise_dates$date_ID)+
+  theme(legend.title = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank())
+
+p_tem + p_pCO2 + p_CT</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/profiles_all_by_date-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(here::here(&quot;output/Plots/Figures_publication/article&quot;, &quot;profiles_all.pdf&quot;),
+       width = 180, height = 80, dpi = 300, units = &quot;mm&quot;)
+
+
+rm( p_tem, p_pCO2, p_CT)</code></pre>
+</div>
+<div id="mean-profiles" class="section level2">
+<h2><span class="header-section-number">3.3</span> Mean profiles</h2>
+<p>Mean vertical profiles were calculated for each cruise day (ID).</p>
+<pre class="r"><code>ts_profiles_ID_mean &lt;- ts_profiles %&gt;% 
+  select(-c(station,lat, lon, pCO2_raw, date_time)) %&gt;% 
+  group_by(ID, date_time_ID, dep) %&gt;% 
+  summarise_all(list(mean), na.rm=TRUE) %&gt;% 
+  ungroup()
+
+ts_profiles_ID_sd &lt;- ts_profiles %&gt;% 
+  select(-c(station,lat, lon, pCO2_raw, date_time)) %&gt;% 
+  group_by(ID, date_time_ID, dep) %&gt;% 
+  summarise_all(list(sd), na.rm=TRUE) %&gt;% 
+  ungroup()
+
+ts_profiles_ID_sd_long &lt;- ts_profiles_ID_sd %&gt;% 
+  pivot_longer(sal:CT, names_to = &quot;var&quot;, values_to = &quot;sd&quot;)
+  
+ts_profiles_ID_mean_long &lt;- ts_profiles_ID_mean %&gt;% 
+  pivot_longer(sal:CT, names_to = &quot;var&quot;, values_to = &quot;value&quot;)
+  
+ts_profiles_ID_long &lt;- inner_join(ts_profiles_ID_mean_long, ts_profiles_ID_sd_long)
+
+ts_profiles_ID_mean %&gt;% 
+  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID.csv&quot;))
+
+rm(ts_profiles_ID_sd_long, ts_profiles_ID_sd, ts_profiles_ID_mean_long, ts_profiles_ID_mean)
+
+ts_profiles_ID_long %&gt;% 
+  ggplot(aes(value, dep, col=ID))+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  facet_wrap(~var, scales = &quot;free_x&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_CT_profiles_all-1.png" alt="Mean vertical profiles per cruise day across all stations." width="672" />
+<p class="caption">
+Mean vertical profiles per cruise day across all stations.
+</p>
+</div>
+<pre class="r"><code>all &lt;- ts_profiles_ID_long %&gt;% 
+  filter(var %in% c(&quot;CT&quot;, &quot;tem&quot;)) %&gt;% 
+  rename(group = ID)
+
+ts_profiles_ID_long %&gt;% 
+  filter(var %in% c(&quot;CT&quot;, &quot;tem&quot;)) %&gt;% 
+  ggplot()+
+  geom_path(data=all, aes(value, dep, group=group))+
+  geom_ribbon(aes(xmin = value-sd, xmax=value+sd, y=dep, fill=ID), alpha=0.5)+
+  geom_path(aes(value, dep, col=ID))+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  scale_fill_viridis_d()+
+  facet_grid(ID~var, scales = &quot;free_x&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_CT_profiles_individual-1.png" alt="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect." width="672" />
+<p class="caption">
+Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.
+</p>
+</div>
+<pre class="r"><code>rm(all)</code></pre>
+<p>Important notes:</p>
+<ul>
+<li>the standard deviation of C<sub>T</sub> in the upper 10m increases on June 30.</li>
+</ul>
+</div>
+<div id="individual-profiles" class="section level2">
+<h2><span class="header-section-number">3.4</span> Individual profiles</h2>
+<p>C<sub>T</sub>, pCO<sub>2</sub>, S, and T profiles were plotted individually <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/ts_profiles_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a> and grouped by ID <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/ts_profiles_ID_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a>. The later gives an idea of the differences between stations at one point in time.</p>
+<pre class="r"><code>pdf(file=here::here(&quot;output/Plots/CT_dynamics&quot;,
+    &quot;ts_profiles_pCO2_tem_sal_CT.pdf&quot;), onefile = TRUE, width = 9, height = 5)
+
+for(i_ID in unique(ts_profiles$ID)){
+  for(i_station in unique(ts_profiles$station)){
+
+    if (nrow(ts_profiles %&gt;% filter(ID == i_ID, station == i_station)) &gt; 0){
+      
+      
+      # i_ID      &lt;-      unique(ts_profiles$ID)[1]
+      # i_station &lt;- unique(ts_profiles$station)[1]
+
+      p_pCO2 &lt;- 
+        ts_profiles %&gt;%
+        arrange(date_time) %&gt;% 
+        filter(ID == i_ID,
+               station == i_station) %&gt;%
+        ggplot(aes(pCO2, dep, col=&quot;grid_RT&quot;))+
+        geom_point(data = ts_profiles_highres %&gt;% arrange(date_time) %&gt;% filter(ID == i_ID, station == i_station),
+                   aes(pCO2_raw, dep, col=&quot;raw&quot;))+
+        geom_point(data = ts_profiles_highres %&gt;% arrange(date_time) %&gt;% filter(ID == i_ID, station == i_station),
+                   aes(pCO2, dep, col=&quot;raw_RT&quot;))+
+        geom_point(aes(pCO2_raw, dep, col=&quot;grid&quot;))+
+        geom_point()+
+        geom_path()+
+        scale_y_reverse()+
+        scale_color_brewer(palette = &quot;Set1&quot;)+
+        labs(y=&quot;Depth [m]&quot;, x=&quot;pCO2 [µatm]&quot;, title = str_c(i_ID,&quot; | &quot;,i_station))+
+        coord_cartesian(xlim = c(0,200), ylim = c(30,0))+
+        theme_bw()+
+        theme(legend.position = &quot;left&quot;)
+      
+      p_tem &lt;- 
+        ts_profiles %&gt;%
+        arrange(date_time) %&gt;% 
+        filter(ID == i_ID,
+               station == i_station) %&gt;%
+        ggplot(aes(tem, dep))+
+        geom_point()+
+        geom_path()+
+        scale_y_reverse()+
+        labs(y=&quot;Depth [m]&quot;, x=&quot;Tem [°C]&quot;)+
+        coord_cartesian(xlim = c(14,26), ylim = c(30,0))+
+        theme_bw()
+      
+      p_sal &lt;- 
+        ts_profiles %&gt;%
+        arrange(date_time) %&gt;% 
+        filter(ID == i_ID,
+               station == i_station) %&gt;%
+        ggplot(aes(sal, dep))+
+        geom_point()+
+        geom_path()+
+        scale_y_reverse()+
+        labs(y=&quot;Depth [m]&quot;, x=&quot;Tem [°C]&quot;)+
+        coord_cartesian(xlim = c(6.5,7.5), ylim = c(30,0))+
+        theme_bw()
+      
+      p_CT &lt;- 
+        ts_profiles %&gt;%
+        arrange(date_time) %&gt;% 
+        filter(ID == i_ID,
+               station == i_station) %&gt;%
+        ggplot(aes(CT, dep))+
+        geom_point()+
+        geom_path()+
+        scale_y_reverse()+
+        labs(y=&quot;Depth [m]&quot;, x=&quot;CT* [µmol/kg]&quot;)+
+        coord_cartesian(xlim = c(1400,1700), ylim = c(30,0))+
+        theme_bw()
+      
+
+      print(
+            p_pCO2 + p_tem + p_sal + p_CT
+            )
+      
+      rm(p_pCO2, p_sal, p_tem, p_CT)
+
+      
+    }
+  }
+}
+
+dev.off()
+
+rm(i_ID, i_station, ts_profiles_highres)</code></pre>
+<pre class="r"><code>ts_profiles_long &lt;- ts_profiles %&gt;%
+  select(-c(lat, lon, pCO2_raw)) %&gt;% 
+  pivot_longer(sal:CT, values_to = &quot;value&quot;, names_to = &quot;var&quot;)
+
+
+pdf(file=here::here(&quot;output/Plots/CT_dynamics&quot;,
+    &quot;ts_profiles_ID_pCO2_tem_sal_CT.pdf&quot;), onefile = TRUE, width = 9, height = 5)
+
+for(i_ID in unique(ts_profiles$ID)){
+
+  #i_ID &lt;- unique(ts_profiles$ID)[1]
+  
+  sub_ts_profiles_long &lt;- ts_profiles_long %&gt;% 
+        arrange(date_time) %&gt;% 
+        filter(ID == i_ID)
+ 
+  print(
+  
+  sub_ts_profiles_long %&gt;% 
+    ggplot()+
+    geom_path(data = ts_profiles_long, aes(value, dep, group=interaction(station, ID)), col=&quot;grey&quot;)+
+    geom_path(aes(value, dep, col=station))+
+    scale_y_reverse()+
+    labs(y=&quot;Depth [m]&quot;, title = str_c(&quot;ID: &quot;, i_ID))+
+    theme_bw()+
+    facet_wrap(~var, scales = &quot;free_x&quot;)
+   
+  )  
+  rm(sub_ts_profiles_long)
+}
+
+dev.off()
+
+rm(i_ID, ts_profiles_long)</code></pre>
+</div>
+<div id="profiles-of-incremental-changes" class="section level2">
+<h2><span class="header-section-number">3.5</span> Profiles of incremental changes</h2>
+<p>Changes of seawater vars at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.</p>
+<pre class="r"><code>ts_profiles_ID_long &lt;- ts_profiles_ID_long %&gt;%
+    group_by(var, dep) %&gt;%
+    arrange(date_time_ID) %&gt;%
+    mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+           date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
+           value_diff = value     - lag(value, default = first(value)),
+           value_diff_daily = value_diff / date_time_ID_diff,
+           value_cum = cumsum(value_diff)) %&gt;% 
+  ungroup()
+
+
+ts_profiles_ID_long %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(value_diff_daily, dep, col=ID))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  facet_wrap(~var, scales = &quot;free_x&quot;)+
+  labs(x=&quot;Change of value inbetween cruises per day&quot;)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="profiles-of-cumulative-changes" class="section level2">
+<h2><span class="header-section-number">3.6</span> Profiles of cumulative changes</h2>
+<p>Cumulative changes of seawater vars were calculated at each depth relative to the first cruise day on July 5.</p>
+<pre class="r"><code>ts_profiles_ID_long %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(value_cum, dep, col=ID))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  facet_wrap(~var, scales = &quot;free_x&quot;)+
+  labs(x=&quot;Cumulative change of value&quot;)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/cumulative_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Important notes:</p>
+<ul>
+<li>Salinity in the upper 10m decreases by &gt;0.1 on June 30, and returns to average conditions already on Aug 02.</li>
+</ul>
+<p>Cumulative positive and negative changes of seawater vars were calculated separately at each depth relative to the first cruise day on July 5.</p>
+<pre class="r"><code>ts_profiles_ID_long &lt;- ts_profiles_ID_long %&gt;% 
+  mutate(sign = if_else(value_diff &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;% 
+  group_by(var, dep, sign) %&gt;%
+  arrange(date_time_ID) %&gt;%
+  mutate(value_cum_sign = cumsum(value_diff)) %&gt;% 
+  ungroup()
+
+ts_profiles_ID_long %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(value_cum_sign, dep, col=ID))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  scale_fill_viridis_d()+
+  facet_wrap(~interaction(sign, var), scales = &quot;free_x&quot;, ncol=4)+
+  labs(x=&quot;Cumulative directional change of value&quot;)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/cumulative_directional_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ts_profiles_ID_long %&gt;%
+  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum.csv&quot;))</code></pre>
+</div>
+</div>
+<div id="timeseries" class="section level1">
+<h1><span class="header-section-number">4</span> Timeseries</h1>
+<div id="timeseries-depth-intervals" class="section level2">
+<h2><span class="header-section-number">4.1</span> Timeseries depth intervals</h2>
+<p>Mean seawater parameters were calculated for 5m depth intervals.</p>
+<pre class="r"><code>ts_profiles_ID_long_grid &lt;- ts_profiles_ID_long %&gt;% 
+  mutate(dep = cut(dep, seq(0,30,5))) %&gt;% 
+  group_by(ID, date_time_ID, dep, var)  %&gt;% 
+  summarise_all(list(mean), na.rm=TRUE) 
+
+ts_profiles_ID_long_grid %&gt;% 
+  ggplot(aes(date_time_ID, value, col=as.factor(dep)))+
+  geom_path()+
+  #geom_errorbar(aes(date_time_ID, ymax=value+sd, ymin=value-sd, col=as.factor(dep)))+
+  geom_point()+
+  scale_color_viridis_d(name=&quot;Depth [m]&quot;)+
+  facet_wrap(~var, scales = &quot;free_y&quot;, ncol=1)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/observed_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(ts_profiles_ID_long_grid)</code></pre>
+</div>
+<div id="hovmoeller-plots" class="section level2">
+<h2><span class="header-section-number">4.2</span> Hovmoeller plots</h2>
+<div id="absolute-values" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> Absolute values</h3>
+<pre class="r"><code>bin_CT &lt;- 30
+
+p_CT_hov &lt;- ts_profiles_ID_long %&gt;% 
+  filter(var == &quot;CT&quot;) %&gt;% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=value),
+                    breaks = MakeBreaks(bin_CT),
+                    col=&quot;black&quot;)+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill=&quot;white&quot;)+
+  scale_fill_scico(breaks = MakeBreaks(bin_CT),
+                   guide = &quot;colorstrip&quot;,
+                   name=&quot;CT (µmol/kg)&quot;,
+                   palette = &quot;davos&quot;, direction = -1)+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y=&quot;Depth (m)&quot;)+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        legend.position = &quot;left&quot;)
+
+bin_Tem &lt;- 2
+
+p_tem_hov &lt;- ts_profiles_ID_long %&gt;% 
+  filter(var == &quot;tem&quot;) %&gt;% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=value),
+                    breaks = MakeBreaks(bin_Tem),
+                    col=&quot;black&quot;)+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill=&quot;white&quot;)+
+  scale_fill_viridis_c(breaks = MakeBreaks(bin_Tem),
+                       guide = &quot;colorstrip&quot;,
+                       name=&quot;Tem (°C)&quot;,
+                       option = &quot;inferno&quot;)+
+  scale_y_reverse()+
+  labs(y=&quot;Depth (m)&quot;)+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        legend.position = &quot;left&quot;)
+
+p_CT_hov / p_tem_hov</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_hovmoeller_absolut-1.png" alt="Hovmoeller plots of absolute changes in C~T~ and temperature." width="672" />
+<p class="caption">
+Hovmoeller plots of absolute changes in C<sub>T</sub> and temperature.
+</p>
+</div>
+<pre class="r"><code>rm(p_CT_hov, bin_CT, p_tem_hov, bin_Tem)</code></pre>
+</div>
+<div id="incremental-changes" class="section level3">
+<h3><span class="header-section-number">4.2.2</span> Incremental changes</h3>
+<pre class="r"><code>bin_CT &lt;- 2.5
+
+CT_hov &lt;- ts_profiles_ID_long %&gt;% 
+  filter(var == &quot;CT&quot;) %&gt;% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID_ref, y=dep, z=value_diff_daily),
+                    breaks = MakeBreaks(bin_CT),
+                    col=&quot;black&quot;)+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill=&quot;white&quot;)+
+  scale_fill_divergent(breaks = MakeBreaks(bin_CT),
+                       guide = &quot;colorstrip&quot;,
+                       name=&quot;CT (µmol/kg)&quot;)+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y=&quot;Depth (m)&quot;)+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+bin_Tem &lt;- 0.1
+
+Tem_hov &lt;- ts_profiles_ID_long %&gt;% 
+  filter(var == &quot;tem&quot;) %&gt;% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID_ref, y=dep, z=value_diff_daily),
+                    breaks = MakeBreaks(bin_Tem),
+                    col=&quot;black&quot;)+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill=&quot;white&quot;)+
+  scale_fill_divergent(breaks = MakeBreaks(bin_Tem),
+                       guide = &quot;colorstrip&quot;,
+                       name=&quot;Tem (°C)&quot;)+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(x=&quot;&quot;,y=&quot;Depth (m)&quot;)+
+  coord_cartesian(expand = 0)
+
+CT_hov / Tem_hov</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_hovmoeller_daily-1.png" alt="Hovmoeller plots of daily changes in C~T~ and temperature. Note that calculated  value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period." width="672" />
+<p class="caption">
+Hovmoeller plots of daily changes in C<sub>T</sub> and temperature. Note that calculated value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period.
+</p>
+</div>
+<pre class="r"><code>rm(CT_hov, bin_CT, Tem_hov, bin_Tem)</code></pre>
+</div>
+<div id="cumulative-changes" class="section level3">
+<h3><span class="header-section-number">4.2.3</span> Cumulative changes</h3>
+<pre class="r"><code>bin_CT &lt;- 20
+
+CT_hov &lt;- ts_profiles_ID_long %&gt;% 
+  filter(var == &quot;CT&quot;) %&gt;% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=value_cum),
+                    breaks = MakeBreaks(bin_CT),
+                    col=&quot;black&quot;)+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill=&quot;white&quot;)+
+  scale_fill_divergent(breaks = MakeBreaks(bin_CT),
+                       guide = &quot;colorstrip&quot;,
+                       name=&quot;CT (µmol/kg)&quot;)+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y=&quot;Depth (m)&quot;)+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+bin_Tem &lt;- 2
+
+Tem_hov &lt;- ts_profiles_ID_long %&gt;% 
+  filter(var == &quot;tem&quot;) %&gt;% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=value_cum),
+                    breaks = MakeBreaks(bin_Tem),
+                    col=&quot;black&quot;)+
+  geom_point(aes(x=date_time_ID, y=c(24.5)), size=3, shape=24, fill=&quot;white&quot;)+
+  scale_fill_divergent(breaks = MakeBreaks(bin_Tem),
+                       guide = &quot;colorstrip&quot;,
+                       name=&quot;Tem (°C)&quot;)+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(x=&quot;&quot;,y=&quot;Depth (m)&quot;)+
+  coord_cartesian(expand = 0)
+
+CT_hov / Tem_hov</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_hovmoeller_cumulative-1.png" alt="Hovmoeller plots of cumulative changes in C~T~ and temperature." width="672" />
+<p class="caption">
+Hovmoeller plots of cumulative changes in C<sub>T</sub> and temperature.
+</p>
+</div>
+<pre class="r"><code>rm(CT_hov, bin_CT, Tem_hov, bin_Tem)</code></pre>
+</div>
+</div>
+</div>
+<div id="depth-integration-ct" class="section level1">
+<h1><span class="header-section-number">5</span> Depth-integration C<sub>T</sub></h1>
+<p>A critical first step for the determination of net community production (NCP) is the integration of observed changes in C<sub>T</sub> over depth to derive iC<sub>T</sub>. Two approaches were tested:</p>
+<ul>
+<li>Integration of changes in CT over a predefined, fixed water depth</li>
+<li>Integration of changes in CT over a mixed layer depth (MLD)</li>
+</ul>
+<p>Both aproaches deliver depth-integrated, incremental changes of C<sub>T</sub> inbetween cruise dates. Those were summed up to derive a trajectory of cummulative iC<sub>T</sub> changes.</p>
+<div id="fixed-depths-approach" class="section level2">
+<h2><span class="header-section-number">5.1</span> Fixed depths approach</h2>
+<p>Incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were integrated across the water colums down to predefined depth limits. This was done separately for observed positive/negative changes in C<sub>T</sub>, as well as for the total observed changes.</p>
+<pre class="r"><code>iCT_grid_sign &lt;- ts_profiles_ID_long %&gt;% 
+  select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
+  unique() %&gt;% 
+  expand_grid(sign = c(&quot;pos&quot;, &quot;neg&quot;))
+
+iCT_grid_total &lt;- ts_profiles_ID_long %&gt;% 
+  select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
+  unique() %&gt;% 
+  expand_grid(sign = c(&quot;total&quot;))
+
+# dep_i &lt;- 10
+#rm(iCT, dep_i)
+
+for (dep_i in seq(9,13,1)) {
+
+
+iCT_sign_temp &lt;- ts_profiles_ID_long %&gt;% 
+  filter(var == &quot;CT&quot;, dep &lt; dep_i) %&gt;% 
+  mutate(sign = if_else(ID == &quot;180705&quot; &amp; dep == 0.5, &quot;neg&quot;, sign)) %&gt;% 
+  group_by(ID, date_time_ID, date_time_ID_ref, sign) %&gt;% 
+  summarise(CT_i_diff = sum(value_diff)/1000) %&gt;% 
+  ungroup()
+
+iCT_sign_temp &lt;- iCT_sign_temp %&gt;% 
+  group_by(sign) %&gt;%
+  arrange(date_time_ID) %&gt;% 
+  mutate(CT_i_cum = cumsum(CT_i_diff)) %&gt;% 
+  ungroup()
+
+iCT_sign_temp &lt;- full_join(iCT_sign_temp, iCT_grid_sign) %&gt;% 
+  arrange(sign, date_time_ID) %&gt;% 
+  fill(CT_i_cum)
+
+
+iCT_total_temp &lt;- ts_profiles_ID_long %&gt;% 
+  filter(var == &quot;CT&quot;, dep &lt; dep_i) %&gt;% 
+  group_by(ID, date_time_ID, date_time_ID_ref) %&gt;% 
+  summarise(CT_i_diff = sum(value_diff)/1000) %&gt;% 
+  ungroup()
+
+iCT_total_temp &lt;- iCT_total_temp %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  mutate(CT_i_cum = cumsum(CT_i_diff)) %&gt;% 
+  ungroup() %&gt;% 
+  mutate(sign = &quot;total&quot;)
+
+iCT_total_temp &lt;- full_join(iCT_total_temp, iCT_grid_total) %&gt;% 
+  arrange(sign, date_time_ID) %&gt;% 
+  fill(CT_i_cum)
+
+iCT_temp &lt;- bind_rows(iCT_sign_temp, iCT_total_temp) %&gt;% 
+    mutate(dep_i = dep_i)
+
+
+if (exists(&quot;iCT&quot;)) {
+  iCT &lt;- bind_rows(iCT, iCT_temp)
+  } else {iCT &lt;- iCT_temp}
+
+rm(iCT_temp, iCT_sign_temp, iCT_total_temp)
+
+}
+
+rm(iCT_grid_sign, iCT_grid_total)
+
+iCT &lt;- iCT %&gt;% 
+  mutate(dep_i = as.factor(dep_i))
+
+iCT %&gt;% 
+  ggplot()+
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_col(aes(date_time_ID_ref, CT_i_diff, fill=dep_i),
+           position = &quot;dodge&quot;, alpha=0.3)+
+  geom_line(aes(date_time_ID, CT_i_cum, col=dep_i))+
+  scale_color_viridis_d(name=&quot;Depth limit (m)&quot;)+
+  scale_fill_viridis_d(name=&quot;Depth limit (m)&quot;)+
+  labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)+
+  facet_grid(sign~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
+  theme_bw()</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/integrated_iCT_fixed_depth-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>iCT_fixed_dep &lt;- iCT
+rm(iCT, dep_i)
+# iCT %&gt;%
+#   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;iCT_dep_limits.csv&quot;))</code></pre>
+</div>
+<div id="mld-approach" class="section level2">
+<h2><span class="header-section-number">5.2</span> MLD approach</h2>
+<p>As an alternative to fixed depth levels, vertical integration as low as the mixed layer depth was tested.</p>
+<div id="density-calculation" class="section level3">
+<h3><span class="header-section-number">5.2.1</span> Density Calculation</h3>
+<p>Seawater density Rho was determined from S, T, and p according to TEOS-10.</p>
+<pre class="r"><code>ts_profiles &lt;- ts_profiles %&gt;% 
+  mutate(rho = swSigma(salinity = sal, temperature = tem, pressure = dep/10))</code></pre>
+</div>
+<div id="density-profiles" class="section level3">
+<h3><span class="header-section-number">5.2.2</span> Density profiles</h3>
+<pre class="r"><code>ts_profiles_ID_mean_hydro &lt;- ts_profiles %&gt;% 
+  select(-c(station,lat, lon, pCO2_raw, pCO2, CT, date_time)) %&gt;% 
+  group_by(ID, date_time_ID, date_ID, dep) %&gt;% 
+  summarise_all(list(mean), na.rm=TRUE) %&gt;% 
+  ungroup()
+
+ts_profiles_ID_sd_hydro &lt;- ts_profiles %&gt;% 
+  select(-c(station,lat, lon, pCO2_raw, pCO2, CT, date_time)) %&gt;% 
+  group_by(ID, date_time_ID, date_ID, dep) %&gt;% 
+  summarise_all(list(sd), na.rm=TRUE) %&gt;% 
+  ungroup()
+
+
+ts_profiles_ID_sd_hydro_long &lt;- ts_profiles_ID_sd_hydro %&gt;% 
+  pivot_longer(sal:rho, names_to = &quot;var&quot;, values_to = &quot;sd&quot;)
+  
+ts_profiles_ID_mean_hydro_long &lt;- ts_profiles_ID_mean_hydro %&gt;% 
+  pivot_longer(sal:rho, names_to = &quot;var&quot;, values_to = &quot;value&quot;)
+  
+ts_profiles_ID_hydro_long &lt;- inner_join(ts_profiles_ID_mean_hydro_long, ts_profiles_ID_sd_hydro_long)
+ts_profiles_ID_hydro &lt;- ts_profiles_ID_mean_hydro
+
+rm(ts_profiles_ID_mean_hydro_long,
+   ts_profiles_ID_mean_hydro,
+   ts_profiles_ID_sd_hydro_long,
+   ts_profiles_ID_sd_hydro)
+
+ts_profiles_ID_hydro_long %&gt;% 
+  ggplot(aes(value, dep, col=ID))+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_d()+
+  facet_wrap(~var, scales = &quot;free_x&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_hydrographical_profiles_all-1.png" alt="Mean vertical profiles per cruise day across all stations." width="672" />
+<p class="caption">
+Mean vertical profiles per cruise day across all stations.
+</p>
+</div>
+</div>
+<div id="mld-calculation" class="section level3">
+<h3><span class="header-section-number">5.2.3</span> MLD calculation</h3>
+<p>Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria</p>
+<pre class="r"><code># density criterion
+
+ts_profiles_ID_hydro &lt;- expand_grid(ts_profiles_ID_hydro, rho_lim = c(0.1,0.2,0.5))
+
+MLD &lt;- ts_profiles_ID_hydro  %&gt;% 
+  arrange(dep) %&gt;% 
+  group_by(ID, date_time_ID, rho_lim) %&gt;% 
+  mutate(d_rho = rho - first(rho)) %&gt;% 
+  filter(d_rho &gt; rho_lim) %&gt;% 
+  summarise(MLD = min(dep)) %&gt;% 
+  ungroup()</code></pre>
+</div>
+<div id="daily-density-profiles" class="section level3">
+<h3><span class="header-section-number">5.2.4</span> Daily density profiles</h3>
+<pre class="r"><code>ts_profiles_ID_hydro &lt;- 
+  full_join(ts_profiles_ID_hydro, MLD)
+
+ts_profiles_ID_hydro %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(rho, dep))+
+  geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_brewer(palette = &quot;Set1&quot;, name= &quot;Rho limit&quot;)+
+  facet_wrap(~ID)+
+  theme_bw()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/CT_dynamics.Rmd/plot_density_profiles-1.png" alt="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD" width="672" />
+<p class="caption">
+Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD
+</p>
+</div>
+</div>
+<div id="mld-timeseries" class="section level3">
+<h3><span class="header-section-number">5.2.5</span> MLD timeseries</h3>
+<pre class="r"><code>MLD %&gt;% 
+  ggplot(aes(date_time_ID, MLD, col=as.factor(rho_lim)))+
+  geom_hline(yintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_color_brewer(palette = &quot;Set1&quot;, name= &quot;Rho limit&quot;)+
+  scale_y_reverse()+
+  labs(x=&quot;&quot;)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/plot_MLD_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="ict-calculation" class="section level3">
+<h3><span class="header-section-number">5.2.6</span> iCT calculation</h3>
+<pre class="r"><code># iCT_grid_sign &lt;- ts_profiles_ID_long %&gt;% 
+#   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
+#   unique() %&gt;% 
+#   expand_grid(sign = c(&quot;pos&quot;, &quot;neg&quot;))
+# 
+# iCT_grid_total &lt;- ts_profiles_ID_long %&gt;% 
+#   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
+#   unique() %&gt;% 
+#   expand_grid(sign = c(&quot;total&quot;))
+
+
+iCT &lt;- ts_profiles_ID_long %&gt;% 
+  filter(var == &quot;CT&quot;)
+
+iCT &lt;- full_join(iCT, MLD)
+
+iCT %&gt;%
+    write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum_MLD.csv&quot;))
+
+iCT &lt;- iCT %&gt;% 
+  filter(dep &lt;= MLD)
+
+iCT &lt;- iCT %&gt;% 
+  group_by(ID, date_time_ID, date_time_ID_ref, rho_lim) %&gt;% 
+  summarise(CT_i_diff = sum(value_diff)/1000) %&gt;% 
+  ungroup()
+
+iCT &lt;- iCT %&gt;% 
+  group_by(rho_lim) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  mutate(CT_i_cum = cumsum(CT_i_diff)) %&gt;% 
+  ungroup()
+
+# iCT_total_temp &lt;- full_join(iCT_total_temp, iCT_grid_total) %&gt;% 
+#   arrange(sign, date_time_ID) %&gt;% 
+#   fill(CT_i_cum)
+
+iCT &lt;- iCT %&gt;% 
+  mutate(rho_lim = as.factor(rho_lim))
+
+iCT %&gt;% 
+  ggplot()+
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_col(aes(date_time_ID_ref, CT_i_diff, fill=rho_lim),
+           position = &quot;dodge&quot;, alpha=0.3)+
+  geom_line(aes(date_time_ID, CT_i_cum, col=rho_lim))+
+  scale_color_viridis_d(name=&quot;Rho limit&quot;)+
+  scale_fill_viridis_d(name=&quot;Rho limit&quot;)+
+  labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)+
+  #facet_grid(sign~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
+  theme_bw()</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/integrated_iCT_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>iCT_MLD &lt;- iCT
+rm(iCT, MLD)
+
+# iCT %&gt;%
+#   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;iCT_dep_limits.csv&quot;))</code></pre>
+</div>
+</div>
+<div id="comparison-of-approaches" class="section level2">
+<h2><span class="header-section-number">5.3</span> Comparison of approaches</h2>
+<p>In the following, all cummulative iC<sub>T</sub> trajectories are displayed. Highlighted are those obtained for the fixed depth approach with 10 m limit, and the MLD approach with a high density threshold of 0.5 kg/m3.</p>
+<pre class="r"><code>iCT &lt;- full_join(iCT_fixed_dep, iCT_MLD)
+
+iCT &lt;- iCT %&gt;% 
+  mutate(group = paste(as.character(sign), as.character(dep_i), as.character(rho_lim)))
+
+iCT %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_line(aes(date_time_ID, CT_i_cum,
+                group=group), col=&quot;grey&quot;)+
+  geom_line(data = iCT_fixed_dep %&gt;% filter(dep_i==12, sign==&quot;total&quot;),
+            aes(date_time_ID, CT_i_cum, col=&quot;12m - total&quot;))+
+  geom_line(data = iCT_MLD %&gt;% filter(rho_lim == 0.1),
+            aes(date_time_ID, CT_i_cum, col=&quot;MLD - 0.1&quot;))+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
+  labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/comparing_iCT_estimates-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(iCT, iCT_MLD)</code></pre>
+</div>
+</div>
+<div id="ncp-determination" class="section level1">
+<h1><span class="header-section-number">6</span> NCP determination</h1>
+<p>In order to derive an estimate of the net community production NCP (which is equivalent to the formed organic matter that can be exported from the investigated surface layer), two steps are required:</p>
+<ul>
+<li>decision about the most appropiate iC<sub>T</sub> trajectory</li>
+<li>correction of quantifyable CO<sub>2</sub> fluxes in and out of the investigated water volume during the period of interest, this includes:
+<ul>
+<li>Air-sea CO<sub>2</sub> fluxes</li>
+<li>CO<sub>2</sub> fluxes due to vertical mixing</li>
+<li>CO<sub>2</sub> fluxes due to lateral transport of water masses (not corrected here)</li>
+</ul></li>
+</ul>
+<div id="best-ict-estimate" class="section level2">
+<h2><span class="header-section-number">6.1</span> Best iC<sub>T</sub> estimate</h2>
+<p>The cummulative iC<sub>T</sub> trajectory determined by integration of C<sub>T</sub> to a fixed water depth of 10 m was used for NCP calculation for the following reasons:</p>
+<ul>
+<li>During the first productivity pulse that lasted until July 23:
+<ul>
+<li>more than 90% of iC<sub>T</sub> changes were located within the upper 10m</li>
+<li>no positive iC<sub>T</sub> changes were located within the upper 10m</li>
+</ul></li>
+<li>Deeper (fixed() layers were affected by iC<sub>T</sub> changes</li>
+<li>MLD were too shallow to cover all observed negative C<sub>T</sub> changes</li>
+</ul>
+<pre class="r"><code>ts_profiles_ID_long_180723 &lt;- ts_profiles_ID_long %&gt;% 
+  filter(ID == 180723,
+         var == &quot;CT&quot;)
+
+p_ts_profiles_ID_long &lt;- ts_profiles_ID_long_180723 %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(value_cum, dep))+
+  geom_vline(xintercept = 0)+
+  geom_hline(yintercept = 12, col=&quot;red&quot;)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  labs(x=&quot;Cumulative change of CT on July 23 (180723)&quot;)+
+  theme(legend.position = &quot;left&quot;)
+
+ts_profiles_ID_long_180723_dep &lt;- ts_profiles_ID_long_180723 %&gt;% 
+  select(dep, value_cum) %&gt;% 
+  filter(value_cum &lt; 0) %&gt;%
+  arrange(dep) %&gt;% 
+  mutate(value_cum_i = sum(value_cum),
+         value_cum_dep = cumsum(value_cum),
+         value_cum_i_rel = value_cum_dep/value_cum_i*100)
+
+p_ts_profiles_ID_long_rel &lt;- ts_profiles_ID_long_180723_dep %&gt;% 
+  ggplot(aes(value_cum_i_rel, dep))+
+  geom_hline(yintercept = 12, col=&quot;red&quot;)+
+  geom_vline(xintercept = 90)+
+  geom_point()+
+  geom_line()+
+  scale_y_reverse(limits = c(25,0))+
+  scale_x_continuous(breaks = seq(0,100,10))+
+  labs(y = &quot;Depth (m)&quot;, x = &quot;Relative contribution on July 23&quot;)+
+  theme_bw()
+
+p_ts_profiles_ID_long + p_ts_profiles_ID_long_rel</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/iCT_depth_distribution_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(ts_profiles_ID_long_180723,
+   ts_profiles_ID_long_180723_dep,
+   p_ts_profiles_ID_long,
+   p_ts_profiles_ID_long_rel)</code></pre>
+<pre class="r"><code>ts_profiles_ID_long_180723 &lt;- ts_profiles_ID_long %&gt;% 
+  filter(ID == 180723,
+         var == &quot;tem&quot;)
+
+p_ts_profiles_ID_long &lt;- ts_profiles_ID_long_180723 %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(value_cum, dep))+
+  geom_vline(xintercept = 0)+
+  geom_hline(yintercept = 12, col=&quot;red&quot;)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  labs(x=&quot;Cumulative change of Temp on July 23&quot;)+
+  theme(legend.position = &quot;left&quot;)
+
+ts_profiles_ID_long_180723_dep &lt;- ts_profiles_ID_long_180723 %&gt;% 
+  select(dep, value_cum) %&gt;% 
+  filter(value_cum &gt; 0) %&gt;%
+  arrange(dep) %&gt;% 
+  mutate(value_cum_i = sum(value_cum),
+         value_cum_dep = cumsum(value_cum),
+         value_cum_i_rel = value_cum_dep/value_cum_i*100)
+
+p_ts_profiles_ID_long_rel &lt;- ts_profiles_ID_long_180723_dep %&gt;% 
+  ggplot(aes(value_cum_i_rel, dep))+
+  geom_hline(yintercept = 12, col=&quot;red&quot;)+
+  geom_vline(xintercept = 90)+
+  geom_point()+
+  geom_line()+
+  scale_y_reverse(limits = c(25,0))+
+  scale_x_continuous(breaks = seq(0,100,10))+
+  labs(y = &quot;Depth (m)&quot;, x = &quot;Relative contribution on July 23&quot;)+
+  theme_bw()
+
+p_ts_profiles_ID_long + p_ts_profiles_ID_long_rel</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/iCT_tem_distribution_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(ts_profiles_ID_long_180723,
+   ts_profiles_ID_long_180723_dep,
+   p_ts_profiles_ID_long,
+   p_ts_profiles_ID_long_rel)</code></pre>
+</div>
+<div id="air-sea-co2-flux" class="section level2">
+<h2><span class="header-section-number">6.2</span> Air-Sea CO<sub>2</sub> flux</h2>
+<div id="surface-water-data" class="section level3">
+<h3><span class="header-section-number">6.2.1</span> Surface water data</h3>
+<p>The cruise mean pCO<sub>2</sub> recorded in profiling-mode (stations only) and depths &lt; 6m was used for gas exchange calcualtions.</p>
+<pre class="r"><code>ts_profiles_surface_long &lt;- ts_profiles %&gt;% 
+  filter(dep &lt; 6) %&gt;% 
+  select(date_time = date_time_ID, ID, tem, pCO2_water = pCO2, CT) %&gt;% 
+  pivot_longer(tem:CT, values_to = &quot;value&quot;, names_to = &quot;var&quot;)
+
+ts_profiles_surface_long_ID &lt;- ts_profiles_surface_long %&gt;% 
+  group_by(ID, date_time, var) %&gt;% 
+  summarise_all(list(~mean(.), ~sd(.), ~min(.), ~max(.))) %&gt;% 
+  ungroup()
+
+p_pCO2_surf &lt;- ts_profiles_surface_long_ID %&gt;%
+  filter(var == &quot;pCO2_water&quot;) %&gt;% 
+  ggplot(aes(x=date_time))+
+  geom_ribbon(aes(ymin=mean-sd, ymax=mean+sd), alpha=0.2)+
+  geom_path(aes(y=mean))+
+  geom_point(aes(y=mean))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = &quot;week&quot;,
+                   sec.axis = dup_axis())+
+  labs(y = expression(atop(pCO[2],
+                           (mu*atm))))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+p_tem_surf &lt;- ts_profiles_surface_long_ID %&gt;%
+  filter(var == &quot;tem&quot;) %&gt;% 
+  ggplot(aes(x=date_time))+
+  geom_ribbon(aes(ymin=mean-sd, ymax=mean+sd), alpha=0.2)+
+  geom_path(aes(y=mean))+
+  geom_point(aes(y=mean))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = &quot;week&quot;,
+                   sec.axis = dup_axis())+
+  labs(y = &quot;temperature \n (\u00B0C)&quot;)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+p_CT_surf &lt;- ts_profiles_surface_long_ID %&gt;%
+  filter(var == &quot;CT&quot;) %&gt;% 
+  ggplot(aes(x=date_time))+
+  geom_ribbon(aes(ymin=mean-sd, ymax=mean+sd), alpha=0.2)+
+  geom_path(aes(y=mean))+
+  geom_point(aes(y=mean))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = &quot;week&quot;,
+                   sec.axis = dup_axis())+
+  labs(y = expression(atop(nC[T],
+                           (mu*mol~kg^{-1}))))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+
+p_pCO2_surf + p_tem_surf + p_CT_surf + 
+  plot_layout(ncol = 1)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/read_Tina-V_Sensor_data-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#rm(ts_profiles_surface)
+
+start &lt;- min(ts_profiles_surface_long_ID$date_time)
+end   &lt;- max(ts_profiles_surface_long_ID$date_time)</code></pre>
+</div>
+<div id="wind-and-atm.-pco2" class="section level3">
+<h3><span class="header-section-number">6.2.2</span> Wind and atm. pCO<sub>2</sub></h3>
+<p>Metrological data were recorded on the flux tower located on Ostergarnsholm island.</p>
+<pre class="r"><code>og &lt;- read_delim(here::here(&quot;Data/Ostergarnsholm/Tower&quot;, &quot;Oes_Jens_atm_water_June_to_August_2018.csv&quot;),
+                 delim = &quot;;&quot;               )
+
+og &lt;- og %&gt;%
+  mutate(date_time = ymd_hms( paste(paste(year, month, day, sep = &quot;/&quot;),
+                                          paste(hour, min, sec, sep = &quot;:&quot;)))) %&gt;% 
+  select(&quot;date_time&quot;,
+         &quot;CO2 12m [ppm]&quot;,
+         &quot;w_c [ppm m/s]&quot;,
+         &quot;WS 12m [m/s]&quot;,
+         &quot;WD 12m [degrees]&quot;,
+         &quot;T 12m [degrees C]&quot;,
+         &quot;RIS [W/m^2]&quot;
+         ) %&gt;% 
+  filter(date_time &gt; start,
+         date_time &lt; end)
+
+rm(end, start)
+
+og &lt;- og %&gt;% 
+  select(date_time, pCO2_atm = &quot;CO2 12m [ppm]&quot;, wind = &quot;WS 12m [m/s]&quot;)</code></pre>
+</div>
+<div id="time-series-plots" class="section level3">
+<h3><span class="header-section-number">6.2.3</span> Time series plots</h3>
+<p>Data sets for atmospheric and seawater observations were merged and interpolated to a common time stamp.</p>
+<pre class="r"><code>ts_profiles_surface_ID &lt;- ts_profiles_surface_long_ID %&gt;% 
+  filter(var %in% c(&quot;pCO2_water&quot;, &quot;tem&quot;)) %&gt;% 
+  select(date_time:mean) %&gt;% 
+  pivot_wider(names_from = &quot;var&quot;, values_from = &quot;mean&quot;)
+
+ts_og &lt;- full_join(og, ts_profiles_surface_ID) %&gt;% 
+  arrange(date_time)
+
+ts_og &lt;- ts_og %&gt;% 
+  mutate(pCO2_water = na.approx(pCO2_water, rule = 2),
+         tem = na.approx(tem, rule = 2),
+         wind = na.approx(wind, rule = 2)) %&gt;% 
+  filter(!is.na(pCO2_atm))
+
+rm(ts_profiles_surface_ID, og)</code></pre>
+<pre class="r"><code>ts_og_long &lt;- ts_og %&gt;% 
+  pivot_longer(&quot;pCO2_atm&quot;:&quot;tem&quot;,
+               names_to = &quot;var&quot;,
+               values_to = &quot;value&quot;)
+
+p_pCO2_atm &lt;- ts_og_long %&gt;%
+  filter(var == &quot;pCO2_atm&quot;) %&gt;% 
+  ggplot(aes(x=date_time))+
+  geom_path(aes(y=value))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = &quot;week&quot;,
+                   sec.axis = dup_axis())+
+  labs(y = expression(atop(pCO[&quot;2,atm&quot;],
+                           (mu*atm))))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+p_wind &lt;- ts_og_long %&gt;%
+  filter(var == &quot;wind&quot;) %&gt;% 
+  ggplot(aes(x=date_time))+
+  geom_path(aes(y=value))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = &quot;week&quot;,
+                   sec.axis = dup_axis())+
+  labs(y = expression(atop(windspeed,
+                           (m~s^{-1}))))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+p_pCO2_atm + p_wind +
+  plot_layout(ncol = 1)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/plot_wind_Ostergarn_tower-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="flux-calculation" class="section level3">
+<h3><span class="header-section-number">6.2.4</span> Flux calculation</h3>
+<p>F = k * dCO2</p>
+<p>with</p>
+<p>dCO2 = K0 * dpCO2 and</p>
+<p>k = coeff * U^2 * (660/Sc)^0.5</p>
+<p>Units used here are:</p>
+<ul>
+<li><p>dpCO<sub>2</sub>: µatm</p></li>
+<li><p>K0: mol atm-1 kg-1</p></li>
+<li><p>dCO<sub>2</sub>: µmol kg-1</p></li>
+<li><p>wind speed U: m s-1</p></li>
+<li><p>coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2</p></li>
+<li><p>gas transfer velocities k: cm hr-1 (= 60<em>60</em>100 m s-1)</p></li>
+<li><p>air sea CO<sub>2</sub> flux F: mol m–2 d–1</p></li>
+<li><p>conversion between the unit of k * dCO2 and F requires a factor of 10-5 * 24</p></li>
+</ul>
+<pre class="r"><code>Sc_W14 &lt;- function(tem) {
+  2116.8 - 136.25 * tem + 4.7353 * tem^2 - 0.092307 * tem^3 + 0.0007555 * tem^4
+}
+
+# Sc_W14(20)
+
+ts_og &lt;- ts_og %&gt;% 
+  mutate(dpCO2 = pCO2_water - pCO2_atm,
+         dCO2  = dpCO2 * K0(S=6.92, T=tem),
+         # W92 = gas_transfer(t = tem, u10 = wind, species = &quot;CO2&quot;,
+         #                      method = &quot;Wanninkhof1&quot;)* 60^2 * 100,
+         #k_SM18 = 0.24 * wind^2 * ((1943-119.6*tem + 3.488*tem^2 - 0.0417*tem^3) / 660)^(-0.5),
+         k = 0.251 * wind^2 * (Sc_W14(tem)/660)^(-0.5))
+  # pivot_longer(9:10, names_to = &quot;k_para&quot;, values_to = &quot;k_value&quot;)
+
+# calculate flux F [mol m–2 d–1]
+
+ts_og &lt;- ts_og %&gt;% 
+  mutate(flux_daily = k*dCO2*1e-5*24) 
+
+rm(Sc_W14)</code></pre>
+</div>
+<div id="daily-fluxes" class="section level3">
+<h3><span class="header-section-number">6.2.5</span> Daily fluxes</h3>
+<pre class="r"><code>p_flux_daily &lt;- ts_og %&gt;%
+  ggplot(aes(x=date_time))+
+  geom_path(aes(y=flux_daily))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = &quot;week&quot;,
+                   sec.axis = dup_axis())+
+  labs(y = expression(atop(flux[daily],
+                           (mol~m^{-2}~d^{-1}))))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())</code></pre>
+</div>
+<div id="cumulative-fluxes" class="section level3">
+<h3><span class="header-section-number">6.2.6</span> Cumulative Fluxes</h3>
+<pre class="r"><code># scale flux to time interval
+
+ts_og &lt;- ts_og %&gt;% 
+  mutate(scale = 24*2) %&gt;% 
+  mutate(flux_scale = flux_daily / scale) %&gt;% 
+  #group_by(freq, k_para) %&gt;% 
+  arrange(date_time) %&gt;% 
+  mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
+  ungroup()
+
+p_flux_cum &lt;- ts_og %&gt;%
+  ggplot(aes(x=date_time))+
+  geom_path(aes(y=flux_cum))+
+  scale_fill_discrete(guide=FALSE)+
+  scale_x_datetime(date_breaks = &quot;week&quot;,
+                   sec.axis = dup_axis())+
+  labs(y = expression(atop(flux[cum],
+                           (mol~m^{-2}))))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())</code></pre>
+<pre class="r"><code>p_pCO2_surf + p_tem_surf + p_CT_surf + p_pCO2_atm + p_wind + p_flux_daily + p_flux_cum +
+  plot_layout(ncol = 1)</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/plot_flux_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="ict-correction" class="section level2">
+<h2><span class="header-section-number">6.3</span> iC<sub>T</sub> correction</h2>
+<p>The cumulative iCT time series obtained through integration across the upper 10m of the water column was used for further calculations of NCP.</p>
+<p>Correction of iCT for air-sea CO2 fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014).</p>
+<p>To derive an integrated NCP estimated, the observed change in iCT must be corrected for the air-sea flux of CO2. iCT was determined for the upper 10m of the water column. The MLD was always shallower 10m, except for the last cruise day. Therefore:</p>
+<ul>
+<li>Cumulative air-sea fluxes can be added completely to iCT before Aug 7.</li>
+<li>Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO2 flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD</li>
+</ul>
+<p>During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased CT values at 0-10 m and a decrease of CT in 10-17m. The loss of CT in 10-17m can be assumed to be entirely cause by mixing with low-CT surface water. Some CT loss is balanced through CT input attributable to the air-sea flux. Therefore, the observed loss, corrected for 7m/MLD-share of the air-sea-flux, was added to the integrated CT changes in 0-10m.</p>
+<pre class="r"><code># extract CT data for fixed depth approach, depth limit 10m
+iCT_10 &lt;- iCT_fixed_dep %&gt;% 
+  filter(dep_i == 12, sign==&quot;total&quot;) %&gt;% 
+  select(-c(sign, dep_i))
+
+rm(iCT_fixed_dep)
+
+iCT_10 &lt;- iCT_10 %&gt;%
+  select(ID, date_time = date_time_ID, date_time_ID_ref, CT_i_diff, CT_i_cum)
+
+# date of the second last cruise
+date_180806 &lt;- unique(iCT_10$date_time)[7]
+
+# calculate cumulative air-sea fluxes affecting 0-10m
+ts_og_flux &lt;- ts_og %&gt;% 
+  mutate(flux_scale = if_else(date_time &gt; date_180806,
+                              12/17 * flux_scale,
+                              flux_scale)) %&gt;%
+  arrange(date_time) %&gt;% 
+  mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
+  select(date_time, flux_cum)
+
+# calculate cumulative air-sea fluxes affecting 10-17m
+ts_og_flux_dep &lt;- ts_og %&gt;% 
+  filter(date_time &gt; date_180806) %&gt;% 
+  mutate(flux_scale = 5/17 * flux_scale) %&gt;%
+  arrange(date_time) %&gt;% 
+  mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
+  select(date_time, flux_cum)
+
+iCT_10_flux &lt;- full_join(iCT_10, ts_og_flux) %&gt;% 
+  arrange(date_time)
+
+rm(ts_og_flux, iCT_10, ts_og_long, ts_og)
+
+
+# linear interpolation of cumulative changes to frequency of the flux estimates estimates 
+iCT_10_flux &lt;- iCT_10_flux %&gt;% 
+  mutate(CT_i_cum = na.approx(CT_i_cum, rule = 2),
+         flux_cum = na.approx(flux_cum, rule = 2),
+         CT_i_flux_cum = CT_i_cum + flux_cum)
+
+# calculate cumulative fluxes inbetween cruises 
+iCT_10_flux_diff &lt;- iCT_10_flux %&gt;% 
+  filter(!is.na(date_time_ID_ref)) %&gt;% 
+  mutate(flux_diff = flux_cum - lag(flux_cum, default = 0)) %&gt;% 
+  select(date_time_ID_ref, observed=CT_i_diff, flux=flux_diff) %&gt;% 
+  pivot_longer(cols = 2:3, names_to = &quot;var&quot;, values_to = &quot;value_diff&quot;)
+
+
+# calculate mixing with deep waters, corrected for air sea fluxes
+iCT_10_mix &lt;- ts_profiles_ID_long %&gt;% 
+  filter(ID == &quot;180815&quot;,
+         var == &quot;CT&quot;,
+         dep &lt; 17,
+         dep &gt; 12) %&gt;% 
+  group_by(ID, date_time_ID,
+           date_time_ID_ref) %&gt;% 
+  summarise(value_diff = sum(value_diff)/1000 + min(ts_og_flux_dep$flux_cum)) %&gt;% 
+  ungroup()
+
+rm(ts_og_flux_dep)
+
+iCT_10_mix_diff &lt;- iCT_10_mix %&gt;% 
+  select(date_time_ID_ref, value_diff) %&gt;% 
+  mutate(var=&quot;mixing&quot;)
+
+iCT_10_flux_mix_diff &lt;- 
+  full_join(iCT_10_flux_diff, iCT_10_mix_diff)
+
+iCT_10_flux_mix &lt;-
+  full_join(iCT_10_flux,
+            iCT_10_mix %&gt;% rename(mix_cum = value_diff))
+
+rm(iCT_10_mix, iCT_10_mix_diff, iCT_10_flux, iCT_10_flux_diff, date_180806)
+
+iCT_10_flux_mix &lt;- iCT_10_flux_mix %&gt;% 
+  arrange(date_time) %&gt;% 
+  fill(ID) %&gt;% 
+  mutate(mix_cum = if_else(ID %in% c(&quot;180806&quot;, 180815), mix_cum, 0),
+         mix_cum = na.approx(mix_cum),
+         CT_i_flux_mix_cum = CT_i_flux_cum + mix_cum)
+
+  
+p_iCT &lt;- iCT_10_flux_mix %&gt;% 
+  arrange(date_time) %&gt;% 
+  ggplot()+
+  geom_col(data = iCT_10_flux_mix_diff,
+           aes(date_time_ID_ref, value_diff, fill=var),
+           position = position_dodge2(preserve = &quot;single&quot;),
+           alpha=0.5)+
+  geom_hline(yintercept = 0)+
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_line(aes(date_time, CT_i_cum, col=&quot;observed&quot;))+
+  geom_line(aes(date_time, CT_i_flux_mix_cum, col=&quot;mixing + flux corrected&quot;))+
+  geom_line(aes(date_time, CT_i_flux_cum, col=&quot;flux corrected&quot;))+
+  scale_x_datetime(date_breaks = &quot;week&quot;,
+                   date_labels = &quot;%b %d&quot;,
+                   sec.axis = dup_axis())+
+  scale_fill_brewer(palette = &quot;Set1&quot;, name=&quot;incremental changes&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;cumulative changes&quot;)+
+  labs(y=expression(atop(integrated~nC[T],
+                         (mol~m^{-2}))))+
+  guides(guide_colourbar(order = 1))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x.top = element_blank(),
+        legend.position = &quot;bottom&quot;,
+        legend.direction = &quot;vertical&quot;)
+
+p_iCT</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/iCT_correction-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>iCT_10_flux_mix %&gt;%
+  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_NCP_cum.csv&quot;))
+
+iCT_10_flux_mix_diff %&gt;%
+  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_NCP_inc.csv&quot;))</code></pre>
+<pre class="r"><code>p_pCO2_surf + p_tem_surf + p_CT_surf + 
+  p_pCO2_atm + p_wind + p_flux_daily + p_flux_cum + 
+  p_iCT +
+  plot_layout(ncol = 1,
+              heights = c(rep(1,7), 3))
+
+ggsave(here::here(&quot;output/Plots/Figures_publication/article&quot;, &quot;atm_water_timeseries.pdf&quot;),
+       width = 120, height = 250, dpi = 300, units = &quot;mm&quot;)</code></pre>
+</div>
+</div>
+<div id="nomenclature-of-objectes" class="section level1">
+<h1><span class="header-section-number">7</span> Nomenclature of objectes</h1>
+<p>Should be identical for stored files and objectes in R environment</p>
+<ul>
+<li>source
+<ul>
+<li>ts: tina 5 sensor</li>
+<li>tb: tina 5 bottle</li>
+<li>fm: finnmaid</li>
+<li>og: ostergarnsholm tower</li>
+<li>gt: GETM (high-res huydographical model)</li>
+<li>mp: bathymetric map</li>
+</ul></li>
+<li>subsetting and modification levels
+<ul>
+<li>profiles vs surface: operation mode tina 5</li>
+<li>ID: mean values for cruise (reduced temporal resolution)</li>
+<li>daily: daily mean values</li>
+<li>long: data stored in long format (all observations in only 2 columns “var” and “value”)</li>
+<li>fix: constant, unique values such as long-term means, starting dates, etc</li>
+<li>iCT: includes cumulative numbers as iCT estimates</li>
+<li>NCP: includes cumulative numbers as NCP estimates</li>
+<li>CT_tem: data subset to analyse changes of CT with tem</li>
+<li>3d vs 2d: surface vs depth resolved GETM data</li>
+</ul></li>
+</ul>
+</div>
+<div id="nomenclature-of-variables" class="section level1">
+<h1><span class="header-section-number">8</span> Nomenclature of variables</h1>
+<ul>
+<li>Descriptive variables
+<ul>
+<li>date</li>
+<li>date_time</li>
+<li>date_time_ID: mean date of cruise</li>
+<li>date_time_ID_diff: time differences in between cruises</li>
+<li>date_time_ID_ref: mean date in between cruises corresponding to observed incremental changes</li>
+<li>station</li>
+<li>ID: character identifying starting date of cruise as YYMMDD</li>
+<li>dep: 1m depth intervals</li>
+<li>lat</li>
+<li>lon</li>
+</ul></li>
+<li>Observed variables: column names, or identifier in column “var” for long-format tables
+<ul>
+<li>pCO2</li>
+<li>sal</li>
+<li>tem</li>
+<li>CT</li>
+<li>U10: wind speed at 10m</li>
+<li>mld: mixed or mixing layer depth</li>
+</ul></li>
+<li>Variable name extension
+<ul>
+<li>mean</li>
+<li>sd</li>
+<li>min</li>
+<li>max</li>
+<li>int: interpolated value</li>
+<li>grid: value gridded to a coarser resolution</li>
+<li>diff: difference to previous value</li>
+<li>diff_daily: difference to previous value divided by number of days</li>
+<li>i: intergrated over depth</li>
+<li>cum: cumulative value over time</li>
+<li>sign: identifier for pos. or neg. differences</li>
+</ul></li>
+<li>p_XXX: ggplot object</li>
+</ul>
+</div>
+<div id="open-tasks-questions" class="section level1">
+<h1><span class="header-section-number">9</span> Open tasks / questions</h1>
+<ul>
+<li>clean and harmonize chunk labeling (label: plot, 1 plot per chunk, etc)</li>
+<li>included removed stations in map and coverage plot</li>
+<li>Significance of changes in AT for calculated CT changes
+<ul>
+<li>Calculate AT-S ratios, reconstruct AT profiles, calculate true CT profiles, normalize CT profiles to mean AT</li>
+</ul></li>
+<li>Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)</li>
+<li>Introduce errorbars for iCT time series (-&gt; large errorbar after CT increase expected)</li>
+<li>demostrate strong permanent thermocline at around 25 m</li>
+<li>discrete samples: use exact sampling dates</li>
+</ul>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.3 (2020-02-29)
+Platform: i386-w64-mingw32/i386 (32-bit)
+Running under: Windows 10 x64 (build 18363)
+
+Matrix products: default
+
+locale:
+[1] LC_COLLATE=English_Germany.1252  LC_CTYPE=English_Germany.1252   
+[3] LC_MONETARY=English_Germany.1252 LC_NUMERIC=C                    
+[5] LC_TIME=English_Germany.1252    
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] zoo_1.8-7       lubridate_1.7.4 scico_1.1.0     metR_0.6.0     
+ [5] marelac_2.1.10  shape_1.4.4     seacarb_3.2.13  oce_1.2-0      
+ [9] gsw_1.0-5       testthat_2.3.2  patchwork_1.0.0 forcats_0.5.0  
+[13] stringr_1.4.0   dplyr_0.8.5     purrr_0.3.3     readr_1.3.1    
+[17] tidyr_1.0.2     tibble_3.0.0    ggplot2_3.3.0   tidyverse_1.3.0
+[21] workflowr_1.6.1
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.4         whisker_0.4        knitr_1.28         xml2_1.3.0        
+ [5] magrittr_1.5       hms_0.5.3          rvest_0.3.5        tidyselect_1.0.0  
+ [9] viridisLite_0.3.0  here_0.1           colorspace_1.4-1   lattice_0.20-41   
+[13] R6_2.4.1           rlang_0.4.5        fansi_0.4.1        broom_0.5.5       
+[17] xfun_0.12          dbplyr_1.4.2       modelr_0.1.6       withr_2.1.2       
+[21] git2r_0.26.1       ellipsis_0.3.0     htmltools_0.4.0    assertthat_0.2.1  
+[25] rprojroot_1.3-2    digest_0.6.25      lifecycle_0.2.0    haven_2.2.0       
+[29] rmarkdown_2.1      sp_1.4-1           compiler_3.6.3     cellranger_1.1.0  
+[33] pillar_1.4.3       scales_1.1.0       backports_1.1.5    generics_0.0.2    
+[37] jsonlite_1.6.1     httpuv_1.5.2       pkgconfig_2.0.3    rstudioapi_0.11   
+[41] munsell_0.5.0      plyr_1.8.6         highr_0.8          httr_1.4.1        
+[45] tools_3.6.3        grid_3.6.3         nlme_3.1-145       data.table_1.12.8 
+[49] gtable_0.3.0       checkmate_2.0.0    DBI_1.1.0          cli_2.0.2         
+[53] readxl_1.3.1       yaml_2.2.1         crayon_1.3.4       farver_2.0.3      
+[57] RColorBrewer_1.1-2 later_1.0.0        promises_1.1.0     fs_1.4.0          
+[61] vctrs_0.2.4        memoise_1.1.0      glue_1.3.2         evaluate_0.14     
+[65] labeling_0.3       reprex_0.3.0       stringi_1.4.6     </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
