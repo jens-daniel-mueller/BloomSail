@@ -1,0 +1,3062 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Jens Daniel Müller und Lara Sophie Burchardt" />
+
+
+<title>Finnmaid and GETM</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">BloomSail</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Data base
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="read-in.html">Read-in</a>
+    </li>
+    <li>
+      <a href="merging_interpolation.html">Mergind and interpolation</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="response_time.html">Response time</a>
+</li>
+<li>
+  <a href="CT_dynamics.html">CT dynamics</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    NCP reconstruction
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="BloomSail_surface.html">BloomSail surface observations</a>
+    </li>
+    <li>
+      <a href="Finnmaid+GETM.html">Finnmaid + GETM</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/jens-daniel-mueller/BloomSail">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+<li>
+  <a href="https://jens-daniel-mueller.github.io/">
+    <span class="fa fa-home"></span>
+     
+    Jens' homepage
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Finnmaid and GETM</h1>
+<h4 class="author">Jens Daniel Müller und Lara Sophie Burchardt</h4>
+<h4 class="date">21 April, 2020</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2020-04-21
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>BloomSail/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.1). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20191021code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20191021)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20191021code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20191021)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea82b4fe4176517c93c72e0b8fbe3479fac0f957ftargetblanka82b4fea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a82b4fe4176517c93c72e0b8fbe3479fac0f957f" target="_blank">a82b4fe</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea82b4fe4176517c93c72e0b8fbe3479fac0f957ftargetblanka82b4fea" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a82b4fe4176517c93c72e0b8fbe3479fac0f957f" target="_blank">a82b4fe</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    data/Finnmaid_2018/
+    Ignored:    data/GETM/
+    Ignored:    data/Maps/
+    Ignored:    data/Ostergarnsholm/
+    Ignored:    data/TinaV/
+    Ignored:    data/_merged_data_files/
+    Ignored:    data/_summarized_data_files/
+
+Untracked files:
+    Untracked:  output/Plots/Figures_publication/
+
+Unstaged changes:
+    Deleted:    analysis/license.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/Finnmaid+GETM.Rmd</code>) and HTML (<code>docs/Finnmaid+GETM.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/f8fcf50113d19f26f0a6bde854a8d84f6c979fa6/docs/Finnmaid+GETM.html" target="_blank">f8fcf50</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-19
+</td>
+<td>
+created pub figures for time series
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/489ddf37aa44923bb0dfd24222570cb6ec8ab5d2/docs/Finnmaid+GETM.html" target="_blank">489ddf3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/ece3767a4d842bcc54389a85ee03c55d38d951cc/analysis/Finnmaid+GETM.Rmd" target="_blank">ece3767</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-15
+</td>
+<td>
+plot integrated temperature and surface temperature
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/2eb40f3c65f788993e24d145b6d855dbd87b970b/docs/Finnmaid+GETM.html" target="_blank">2eb40f3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/3aaff30c8068a78b51016c53c959af254f4e121a/analysis/Finnmaid+GETM.Rmd" target="_blank">3aaff30</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-15
+</td>
+<td>
+T penetration depth for GETM BloomSail comparison added
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/4748ea0a776863f8d605263414283ed1d5eb4db6/docs/Finnmaid+GETM.html" target="_blank">4748ea0</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/e7c8528004158524b1ddf66c659426bcdce53060/analysis/Finnmaid+GETM.Rmd" target="_blank">e7c8528</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-14
+</td>
+<td>
+Temp penetration depth GETM
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/48631ee007743f3618c0fa74ed4c24e3b82c4098/docs/Finnmaid+GETM.html" target="_blank">48631ee</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/4e9464ff3c7386d062b38db754d5a06b425d8866/analysis/Finnmaid+GETM.Rmd" target="_blank">4e9464f</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-09
+</td>
+<td>
+corrected na approx function
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/7ba778ce3f9e36a711c4aee2af919fde47c395ed/docs/Finnmaid+GETM.html" target="_blank">7ba778c</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b72d86decfbc0c0447f20cfe2d39df62fa6eb2ec/analysis/Finnmaid+GETM.Rmd" target="_blank">b72d86d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-07
+</td>
+<td>
+included hovmoeller plots
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/7d552f726ed02c03aeabbb501e9a258e8438411d/docs/Finnmaid+GETM.html" target="_blank">7d552f7</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/80638698b7280b64748ff5e91819c50c2b00b975/analysis/Finnmaid+GETM.Rmd" target="_blank">8063869</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-07
+</td>
+<td>
+corrected interpolation, referred to surface temp from getm 3d
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/3a5f6206a9f50d6288f0c42a0b78e21da2881f70/docs/Finnmaid+GETM.html" target="_blank">3a5f620</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/78f88d1e83faab2366e085ef4f56437755c4bcdc/analysis/Finnmaid+GETM.Rmd" target="_blank">78f88d1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-03
+</td>
+<td>
+Ploted incremental changes in temp hovmoeller
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/22e1d39d5b4779b8fbae2dca02dbe70f5701c55e/docs/Finnmaid+GETM.html" target="_blank">22e1d39</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/14a358c2a3c0a462e45f82f3b9e5405122a7cdb7/analysis/Finnmaid+GETM.Rmd" target="_blank">14a358c</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-03
+</td>
+<td>
+incremental running mean changes, error solved
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/114ccbcb2dfaa9bbbdd1dc5f0473d6754ee8cfbf/docs/Finnmaid+GETM.html" target="_blank">114ccbc</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/2c4b5b69b1e5ee39b448728c29240720eac52a8c/analysis/Finnmaid+GETM.Rmd" target="_blank">2c4b5b6</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-03
+</td>
+<td>
+incremental changes based on smoothened timeseries
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/da0e3350989e69d1b0099ae0f4d6d1379fae399a/docs/Finnmaid+GETM.html" target="_blank">da0e335</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/3a2b38f5c1a0405b9751eb84a869db4e86d3b4de/analysis/Finnmaid+GETM.Rmd" target="_blank">3a2b38f</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-03
+</td>
+<td>
+applied running mean to CT SST time series
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/37f88be064c343c0d105af3c9a084ee57e60ffb7/docs/Finnmaid+GETM.html" target="_blank">37f88be</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/570dcb28595736ee0731f9349ca01f918163126b/analysis/Finnmaid+GETM.Rmd" target="_blank">570dcb2</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-03
+</td>
+<td>
+applied running mean to CT SST time series
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/6617975db3eb166bbfca4e5bf5c6f6bd03ec221c/docs/Finnmaid+GETM.html" target="_blank">6617975</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/ba45c29ca8854c0598abb7745ce2f8d78a00137f/analysis/Finnmaid+GETM.Rmd" target="_blank">ba45c29</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+ref date in delta T approach
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/415e32dd3345688378f64cd5a7dfcccd1481b14f/docs/Finnmaid+GETM.html" target="_blank">415e32d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/093e4fd9aa0f7a4f77b11ecc02fde00773d4b97c/analysis/Finnmaid+GETM.Rmd" target="_blank">093e4fd</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+relabeled date_time as date_time_ID where appropiate
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/601dc739597d5539a185cb79ba1ab48c5bdbb8e6/docs/Finnmaid+GETM.html" target="_blank">601dc73</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/d4f6d3439253c0f358b3a9907f9324631e5d6abe/analysis/Finnmaid+GETM.Rmd" target="_blank">d4f6d34</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+MLD iCT: updated reference date and plot
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/9b0cb9eca635d58a1713581d5ffa50ffb7b73dd6/docs/Finnmaid+GETM.html" target="_blank">9b0cb9e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/62fb894ec9a47d1bfad320bdf8a60885e304de63/analysis/Finnmaid+GETM.Rmd" target="_blank">62fb894</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+corrected variable confusion in iCT MLD estimate
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/3e6995e50d7beb7419e803923db5f8cbbfea5d65/docs/Finnmaid+GETM.html" target="_blank">3e6995e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/ee9f48e6d695e149bd1b9e4c65fc854dc5a6de75/analysis/Finnmaid+GETM.Rmd" target="_blank">ee9f48e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+gt vs ts plots improved
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/6c2be48e280fc6cc9784e8445c4c182c73bf1ef4/docs/Finnmaid+GETM.html" target="_blank">6c2be48</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/614ab28ace52b25e8c41050ce5e1cf7d882dfd5b/analysis/Finnmaid+GETM.Rmd" target="_blank">614ab28</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Comparison STD ts vs gt added
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/cf752033844e0073d8ca6abaf96b158271ea286c/docs/Finnmaid+GETM.html" target="_blank">cf75203</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b8b65b12035b30d668f6273f0af1c2079ae15f0f/analysis/Finnmaid+GETM.Rmd" target="_blank">b8b65b1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Comparison STD ts vs gt added
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/15d5bd9aef24f986e301144b2ebb726778d6625b/docs/Finnmaid+GETM.html" target="_blank">15d5bd9</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/7c577157fa756522fdd82ad0d7d2adac00707c15/analysis/Finnmaid+GETM.Rmd" target="_blank">7c57715</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Windspeed plot moved to end
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/e6b2f092fa331c589c32297f6fb81509b4fd468d/docs/Finnmaid+GETM.html" target="_blank">e6b2f09</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/7ec8abc3e3039bef25c6e59d371dc786d2a22387/analysis/Finnmaid+GETM.Rmd" target="_blank">7ec8abc</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+revised figures
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/48965588105d969a0b86e626548e0ce092fdd326/docs/Finnmaid+GETM.html" target="_blank">4896558</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/a7f8ceccacc3b83debd25825f902261cafb5c857/analysis/Finnmaid+GETM.Rmd" target="_blank">a7f8cec</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+revised figures
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/f32235544fb655898aefccda089c216119e3c384/docs/Finnmaid+GETM.html" target="_blank">f322355</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/c54fd0e8ea00e48da937879bf86de68befa93e99/analysis/Finnmaid+GETM.Rmd" target="_blank">c54fd0e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+GETM SurfaceAge included
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/624835ecdfb98463f72cb1beb06f16f573c2ae6c/docs/Finnmaid+GETM.html" target="_blank">624835e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/a7ac65d318166a10fec6641b39dcae68ac881ef0/analysis/Finnmaid+GETM.Rmd" target="_blank">a7ac65d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+BloomSail data 1-5m and sd in time series plots
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/26cf7336f18fccb63d14ef05d20022f4b0a98dbd/docs/Finnmaid+GETM.html" target="_blank">26cf733</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/57b77aff9eb07a3350732baf9f116a4e1af65082/analysis/Finnmaid+GETM.Rmd" target="_blank">57b77af</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+corrected Finnmaid lat borders and plotted fm track in map
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/be5d8f5aff4e45c3a7ebee1f06c7f5c170718367/docs/Finnmaid+GETM.html" target="_blank">be5d8f5</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/ccb509f9ca1f8cd490554a4a1e7a3382c1092cd3/analysis/Finnmaid+GETM.Rmd" target="_blank">ccb509f</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+Implemented delta T approach
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/849e990c802b7288a30d35ddd8e803b81c681480/docs/Finnmaid+GETM.html" target="_blank">849e990</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/c19920043d8af20fba341b95f03d041226357b98/analysis/Finnmaid+GETM.Rmd" target="_blank">c199200</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+included BloomSail data to Finnmaid analysis
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/f4a27b8babb6df2ea809b0fbbfaa4987a2a4dcdf/docs/Finnmaid+GETM.html" target="_blank">f4a27b8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b1613b7e3a6370169a2dc8f71712490041f68d6b/analysis/Finnmaid+GETM.Rmd" target="_blank">b1613b7</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+re-calculated MLD, renamed objects and structured site
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/a6c4c2246be92faaecf4654e92031ba76875c4f0/docs/Finnmaid+GETM.html" target="_blank">a6c4c22</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/80c78b3d07120ece6b7f4fc1439fcd4cd8a13047/docs/Finnmaid+GETM.html" target="_blank">80c78b3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/a52fa08bd19dd397dbcb13a55ac9856fd8dd3886/analysis/Finnmaid+GETM.Rmd" target="_blank">a52fa08</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+replaced gas flux page in CT dynamics, rebuild site
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/2494d0d4907bce867fe7948780b674b2268d9472/docs/Finnmaid+GETM.html" target="_blank">2494d0d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b3af7327824eb4af77837fcd19e8293b663bfd8c/analysis/Finnmaid+GETM.Rmd" target="_blank">b3af732</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+cumulative changes
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/671b032f25f1df58b84c9e9957afbe78cc82e334/docs/Finnmaid+GETM.html" target="_blank">671b032</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/9e0c0d7d35bd36513864d62c569db3508e6478b8/analysis/Finnmaid+GETM.Rmd" target="_blank">9e0c0d7</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+NCP MLD calculated
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/6d7422a7a09e1953d3f1f79a86549811e8122c72/docs/Finnmaid+GETM.html" target="_blank">6d7422a</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/5f33d21b9a22a1074537c1c3e4600f842a6c1a98/analysis/Finnmaid+GETM.Rmd" target="_blank">5f33d21</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+NCP MLD calculated
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/d0d5c9e78d11a3f1c45f907d4f5322aa6cbee96b/docs/Finnmaid+GETM.html" target="_blank">d0d5c9e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/1e2508a27700db15a1bd63f1249151f6987c72a2/analysis/Finnmaid+GETM.Rmd" target="_blank">1e2508a</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+harmonized starting dates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/487a50552bff2bda5d9db3963daa470cfaa7465a/docs/Finnmaid+GETM.html" target="_blank">487a505</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/ca1591e92bc36f442506b7eaedefd21df23bbbb7/analysis/Finnmaid+GETM.Rmd" target="_blank">ca1591e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-23
+</td>
+<td>
+delta CT vs delta SST
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/8029abbff564428ae28310295289da96ba1b772f/docs/Finnmaid+GETM.html" target="_blank">8029abb</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/68cd650bc8eea06e8d32955eac88a01746843abb/analysis/Finnmaid+GETM.Rmd" target="_blank">68cd650</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-23
+</td>
+<td>
+FM CT calculation and plots
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/d197f95086e8fc92c715a6521084823ceff0d91d/docs/Finnmaid+GETM.html" target="_blank">d197f95</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/247cf5e6efbf0c85df7779f58742c3fc7d937429/analysis/Finnmaid+GETM.Rmd" target="_blank">247cf5e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-23
+</td>
+<td>
+included GETM read-in from Lara
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/247cf5e6efbf0c85df7779f58742c3fc7d937429/docs/Finnmaid+GETM.html" target="_blank">247cf5e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-23
+</td>
+<td>
+included GETM read-in from Lara
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/0c4d34800959442398cdefa1db0321ba2e3039ed/docs/Finnmaid+GETM.html" target="_blank">0c4d348</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-21
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/677a2fd2f594c5c7310e5c4c58b87c27e14072ac/analysis/Finnmaid+GETM.Rmd" target="_blank">677a2fd</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-21
+</td>
+<td>
+GETM data and plots included
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/0a46275d395066d3c201b5d4a82f9b95cc55824b/analysis/Finnmaid+GETM.Rmd" target="_blank">0a46275</a>
+</td>
+<td>
+LSBurchardt
+</td>
+<td>
+2020-03-21
+</td>
+<td>
+#1 works if run chunk by chunk but not to knit…
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/5f8ca30413bdc1d8c5801af85b2a25df410b1679/docs/Finnmaid+GETM.html" target="_blank">5f8ca30</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/2a20453c53374316875a94d6205aba67e40d1c0c/docs/Finnmaid+GETM.html" target="_blank">2a20453</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/ae57412482ddc4d548b2a77d63f673d6318ef144/analysis/Finnmaid+GETM.Rmd" target="_blank">ae57412</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+Prepared for lara to add GETM code
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/473ab254bb02b26272128615869c13ec93dd3757/docs/Finnmaid+GETM.html" target="_blank">473ab25</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/7c712e32f115841620cd150b0e50a15415713156/analysis/Finnmaid+GETM.Rmd" target="_blank">7c712e3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-03-19
+</td>
+<td>
+Navbar shortened
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(tidyverse)
+library(ncdf4)
+library(vroom)
+library(lubridate)
+library(here)
+library(seacarb)
+library(oce)
+library(patchwork)
+library(zoo)
+library(metR)</code></pre>
+<pre class="r"><code># route
+select_route &lt;- &quot;E&quot;
+
+# latitude limits
+low_lat &lt;- 57.3
+high_lat &lt;- 57.5
+
+#depth range to subset GETM 3d files
+d1_shallow &lt;- 0
+d1_deep &lt;- 25
+
+# date limits
+start_date &lt;- &quot;2018-06-20&quot;
+end_date &lt;- &quot;2018-08-25&quot;
+
+fixed_values &lt;- 
+  read_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;tb_fix.csv&quot;))</code></pre>
+<div id="approach" class="section level1">
+<h1><span class="header-section-number">1</span> Approach</h1>
+<p>In order to test how (and how well) the depth-integrated C<sub>T</sub> estimates can be reproduced if only surface CO<sub>2</sub> data from VOS Finnamaid and hydrographical GETM model date were available, two reconstruction approaches were tested:</p>
+<ol style="list-style-type: decimal">
+<li>MLD: Integration of surface observation across the MLD, assuming homogenious vertical patterns</li>
+<li>Temperature: Vertical reconstruction of incremental CT changes based on profiles of incremental changes in temperature</li>
+</ol>
+</div>
+<div id="getm" class="section level1">
+<h1><span class="header-section-number">2</span> GETM</h1>
+<p>The following information refer to regional mean values modeled along the Finnmaid track east and within the BloomSail field work area (57.3 - 57.5 N).</p>
+<div id="std-profiles" class="section level2">
+<h2><span class="header-section-number">2.1</span> STD Profiles</h2>
+<p>Mean daily salinity and temperature profiles were extracted from 3d GETM data (vertically resolved transects).</p>
+<pre class="r"><code>nc &lt;- nc_open(here::here(&quot;data/GETM&quot;, &quot;Finnmaid.E.3d.2018.nc&quot;))
+#print(nc$var)
+
+lat &lt;- ncvar_get(nc, &quot;latc&quot;)
+
+time_units &lt;- nc$dim$time$units %&gt;%     #we read the time unit from the netcdf file to calibrate the time 
+    substr(start = 15, stop = 33) %&gt;%   #calculation, we take the relevant information from the string
+    ymd_hms()                           # and transform it to the right format
+t &lt;- time_units + ncvar_get(nc, &quot;time&quot;) # read time vector
+rm(time_units)
+
+d &lt;- ncvar_get(nc, &quot;zax&quot;) # read depths vector
+
+for (var_3d in c(&quot;salt&quot;, &quot;temp&quot;, &quot;SurfaceAge&quot;)) {
+  
+array &lt;- ncvar_get(nc, var_3d) # store the data in a 3-dimensional array
+#dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
+
+fillvalue &lt;- ncatt_get(nc, var_3d, &quot;_FillValue&quot;)
+
+# Working with the data
+array[array == fillvalue$value] &lt;- NA
+
+    for (i in seq(1,length(t),1)){
+      
+      # i &lt;- 3
+      array_slice &lt;- array[, , i] # slices data from one day
+      
+      array_slice_df &lt;- as.data.frame(t(array_slice))
+      array_slice_df &lt;- as_tibble(array_slice_df)
+      
+      gt_3d_part &lt;- array_slice_df %&gt;%
+        set_names(as.character(lat)) %&gt;%
+        mutate(dep = -d) %&gt;%
+        gather(&quot;lat&quot;, &quot;value&quot;, 1:length(lat)) %&gt;%
+        mutate(lat = as.numeric(lat)) %&gt;%
+        filter(lat &gt; low_lat, lat &lt; high_lat,
+               dep &gt;= d1_shallow, dep &lt;= d1_deep) %&gt;%
+        #summarise_all(&quot;value&quot;) %&gt;%
+        mutate(var = var_3d,
+               date_time=t[i]) %&gt;% 
+        dplyr::select(date_time, dep, value, var) #%&gt;% 
+        #filter(date_time &gt;= start_date, date_time &lt;= end_date)
+
+      
+      if (exists(&quot;gt_3d&quot;)) {
+        gt_3d &lt;- bind_rows(gt_3d, gt_3d_part)
+        } else {gt_3d &lt;- gt_3d_part}
+      
+  rm(array_slice, array_slice_df, gt_3d_part)
+      
+    }
+rm(array, fillvalue)
+
+}
+
+nc_close(nc)
+rm(nc)
+
+gt_3d &lt;- gt_3d %&gt;% 
+  filter(date_time &gt;= start_date &amp; date_time &lt;= end_date) %&gt;% 
+  group_by(dep,var,date_time ) %&gt;% 
+  summarise_all(list(value=~mean(.,na.rm=TRUE))) %&gt;%
+  ungroup()
+
+gt_3d %&gt;% 
+  vroom_write((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_3d_long.csv&quot;)))
+
+
+rm(gt_3d, d1_deep, d1_shallow, i, lat, d, t, var_3d)</code></pre>
+<p>Seawater density was calculated according to TEOS-10.</p>
+<pre class="r"><code>gt_3d_long &lt;- 
+  read_tsv((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_3d_long.csv&quot;)))
+
+gt_3d &lt;- gt_3d_long %&gt;% 
+  pivot_wider(values_from = value, names_from = var) %&gt;% 
+  mutate(rho = swSigma(salinity = salt, temperature = temp, pressure = dep/10))</code></pre>
+<pre class="r"><code>gt_3d_long &lt;- gt_3d %&gt;% 
+  pivot_longer(c(salt, SurfaceAge, temp, rho), values_to = &quot;value&quot;, names_to = &quot;var&quot;)
+
+gt_3d_long %&gt;% 
+  ggplot(aes(value, dep,
+             col=date_time,
+             group=date_time))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0))+
+  scale_color_viridis_c(name=&quot;Date&quot;, trans = &quot;time&quot;)+
+  facet_wrap(~var, scales = &quot;free_x&quot;, ncol = 2)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/gt_profiles_salt_temp_age_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div id="comparison-bloomsail" class="section level3">
+<h3><span class="header-section-number">2.1.1</span> Comparison BloomSail</h3>
+<p>Vertical, 1m-gridded BloomSail CTD profiles were used for comparison with GETM results. Merging both data sets required the BloomSail profiles to be shifted upward by 0.5m. Note that neither sampling location nor time match exactly.</p>
+<pre class="r"><code>ts_profiles_ID &lt;-
+  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID.csv&quot;))
+
+ts_profiles_ID &lt;- ts_profiles_ID %&gt;% 
+  mutate(rho = swSigma(salinity = sal, temperature = tem, pressure = dep/10),
+         dep = dep - 0.5)</code></pre>
+<p>GETM results were linearly interpolated to the mean BloomSail time stamp.</p>
+<pre class="r"><code>ts_gt_3d &lt;- full_join(gt_3d %&gt;% select(date_time, dep, sal = salt, tem = temp, rho),
+                      ts_profiles_ID %&gt;% select(date_time = date_time_ID,
+                                                dep, sal, tem, rho),
+                      by = c(&quot;date_time&quot;, &quot;dep&quot;), suffix=c(&quot;_gt&quot;, &quot;_ts&quot;))
+
+ts_gt_3d &lt;- ts_gt_3d %&gt;% 
+  arrange(date_time) %&gt;% 
+  group_by(dep) %&gt;% 
+  mutate(tem_gt = approxfun(date_time, tem_gt)(date_time),
+         sal_gt = approxfun(date_time, sal_gt)(date_time),
+         rho_gt = approxfun(date_time, rho_gt)(date_time)) %&gt;% 
+  ungroup() %&gt;% 
+  drop_na()</code></pre>
+<pre class="r"><code>ts_gt_3d_long &lt;- ts_gt_3d %&gt;% 
+  pivot_longer(3:8, values_to = &quot;value&quot;, names_to = c(&quot;var&quot;, &quot;source&quot;), names_sep = &quot;_&quot;)
+
+ts_gt_3d_long %&gt;% 
+  ggplot(aes(value, dep,
+             col=date_time,
+             group=date_time))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0), name=&quot;Depth (m)&quot;)+
+  scale_color_viridis_c(name=&quot;Date&quot;, trans = &quot;time&quot;)+
+  facet_grid(source~var, scales = &quot;free_x&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/Finnmaid+GETM.Rmd/gt_ts_profiles_salt_temp_rho-1.png" alt="STD profiles modeled with GETM (upper panels, gt) and measured during BloomSail campaign (lower panels, ts)" width="672" />
+<p class="caption">
+STD profiles modeled with GETM (upper panels, gt) and measured during BloomSail campaign (lower panels, ts)
+</p>
+</div>
+<pre class="r"><code>ts_gt_3d &lt;- ts_gt_3d_long %&gt;% 
+  pivot_wider(values_from = &quot;value&quot;, names_from = &quot;source&quot;) %&gt;% 
+  mutate(value_diff = gt - ts)
+
+ts_gt_3d %&gt;% 
+  ggplot(aes(value_diff, dep,
+             col=date_time,
+             group=date_time))+
+  geom_vline(xintercept = 0, col=&quot;red&quot;)+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0), name=&quot;Depth (m)&quot;)+
+  scale_color_viridis_c(name=&quot;Date&quot;, trans = &quot;time&quot;)+
+  facet_grid(.~var, scales = &quot;free_x&quot;)+
+  labs(x=&quot;Difference GETM (gt) - Bloomsail (ts)&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/gt_ts_profiles_diff_salt_temp_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="heat-penetration-depth" class="section level3">
+<h3><span class="header-section-number">2.1.2</span> Heat penetration depth</h3>
+<p>As an alternative approach to the integration over the MLD or the reconstruction of C<sub>T</sub> profiles, we can estimate the mean penetration depth of the warming signal, which was defined the surface change in temperature devided by the integrated change in seawater temperature across depth.</p>
+<pre class="r"><code>tem_diff_surface &lt;- ts_gt_3d_long %&gt;% 
+  filter(dep &lt; 6,
+         var==&quot;tem&quot;) %&gt;% 
+  select(date_time_ID = date_time, source, tem=value) %&gt;% 
+  group_by(date_time_ID, source) %&gt;% 
+  summarise_all(mean, na.rm=TRUE) %&gt;% 
+  ungroup() 
+
+tem_diff_surface &lt;- tem_diff_surface %&gt;% 
+  group_by(source) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  mutate(tem_diff_surface = tem - lag(tem)) %&gt;% 
+  ungroup() %&gt;% 
+  select(-tem)
+
+ts_gt_3d_long &lt;- ts_gt_3d_long %&gt;% 
+  filter(var==&quot;tem&quot;) %&gt;% 
+  select(date_time_ID = date_time, source, dep, tem=value) %&gt;% 
+  group_by(source, dep) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  mutate(tem_diff = tem - lag(tem)) %&gt;% 
+  ungroup() %&gt;% 
+  select(-tem)
+
+ts_gt_3d_long &lt;- full_join(ts_gt_3d_long, tem_diff_surface) 
+rm(tem_diff_surface)
+
+tem_depth &lt;- ts_gt_3d_long %&gt;%
+  filter(dep &lt; 18) %&gt;% 
+  group_by(date_time_ID, source) %&gt;% 
+  summarise(tem_diff_int = sum(tem_diff),
+            tem_diff_surface = mean(tem_diff_surface),
+            tem_depth = tem_diff_int/tem_diff_surface) %&gt;% 
+  ungroup()
+
+tem_depth %&gt;% 
+  ggplot(aes(date_time_ID, tem_diff_surface, col=source))+
+  geom_hline(yintercept = 0)+
+  geom_line()+
+  geom_point()</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/heat_penetration_depth_comparison-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tem_depth %&gt;% 
+  ggplot(aes(date_time_ID, tem_diff_int, col=source))+
+  geom_hline(yintercept = 0)+
+  geom_line()+
+  geom_point()</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/heat_penetration_depth_comparison-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tem_depth %&gt;% 
+  ggplot(aes(date_time_ID, tem_depth, col=source))+
+  geom_hline(yintercept = 0)+
+  geom_line()+
+  geom_point()+
+  scale_y_reverse()</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/heat_penetration_depth_comparison-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(ts_gt_3d, ts_gt_3d_long, ts_profiles_ID)</code></pre>
+</div>
+</div>
+<div id="mixed-layer-depth" class="section level2">
+<h2><span class="header-section-number">2.2</span> Mixed layer depth</h2>
+<p>Mean mixed/mixing layer depth estimates based on sewater density and windspeed were extracted from 3h GETM surface data.</p>
+<pre class="r"><code>nc_2d &lt;- nc_open(here(&quot;data/GETM&quot;, &quot;Finnmaid.E.2d.2018.nc&quot;))
+#print(nc_2d)
+
+lat &lt;- ncvar_get(nc_2d, &quot;latc&quot;)
+
+time_units &lt;- nc_2d$dim$time$units %&gt;%     #we read the time unit from the netcdf file to calibrate the time 
+    substr(start = 15, stop = 33) %&gt;%   #calculation, we take the relevant information from the string
+    ymd_hms()                           # and transform it to the right format
+t &lt;- time_units + ncvar_get(nc_2d, &quot;time&quot;) # read time vector
+rm(time_units)
+
+for (var in names(nc_2d$var)[c(3,4,6:12)]) {
+  
+#var &lt;- &quot;mld_rho&quot;
+
+array &lt;- ncvar_get(nc_2d, var) # store the data in a 3-dimensional array
+fillvalue &lt;- ncatt_get(nc_2d, var, &quot;_FillValue&quot;)
+array[array == fillvalue$value] &lt;- NA
+
+array &lt;- as.data.frame(t(array), xy=TRUE)
+array &lt;- as_tibble(array)
+      
+  gt_2d_part &lt;- array %&gt;%
+  set_names(as.character(lat)) %&gt;%
+  mutate(date_time = t) %&gt;%
+  filter(date_time &gt;= start_date &amp; date_time &lt;= end_date) %&gt;% 
+  gather(&quot;lat&quot;, &quot;value&quot;, 1:length(lat)) %&gt;%
+  mutate(lat = as.numeric(lat)) %&gt;%
+  filter(lat &gt; low_lat, lat&lt;high_lat) %&gt;%
+  select(-lat) %&gt;% 
+  group_by(date_time) %&gt;% 
+  summarise_all(list(value=~mean(.,na.rm=TRUE))) %&gt;%
+  ungroup() %&gt;% 
+  mutate(var = var)
+     
+  if (exists(&quot;gt_2d&quot;)) {
+    gt_2d &lt;- bind_rows(gt_2d, gt_2d_part)
+    } else {gt_2d &lt;- gt_2d_part} 
+
+rm(array, fillvalue, gt_2d_part)
+
+}
+
+nc_close(nc_2d)
+rm(nc_2d)
+
+gt_2d &lt;- gt_2d %&gt;% 
+  mutate(value = round(value, 3)) %&gt;% 
+  pivot_wider(values_from = value, names_from = var) %&gt;% 
+  mutate(U_10 = round(sqrt(u10^2 + v10^2), 3)) %&gt;% 
+  select(-c(u10, v10))
+
+
+gt_2d %&gt;% 
+  vroom_write((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_2d.csv&quot;)))
+
+rm(t, var, gt_2d, lat)</code></pre>
+<div id="hovmoeller-plots" class="section level3">
+<h3><span class="header-section-number">2.2.1</span> Hovmoeller Plots</h3>
+<pre class="r"><code>gt_2d &lt;- 
+  read_tsv((here::here(&quot;data/_summarized_data_files&quot;, file = &quot;gt_2d.csv&quot;)))
+
+gt_2d_daily &lt;- gt_2d %&gt;% 
+  mutate(day = yday(date_time)) %&gt;% 
+  group_by(day) %&gt;% 
+  summarise_all(list(~mean(.,na.rm=TRUE))) %&gt;%
+  ungroup() %&gt;% 
+  select(-day)
+
+p_sal &lt;- gt_3d %&gt;% 
+  ggplot()+
+  geom_raster(aes(date_time, dep, fill=salt))+
+  geom_vline(data=fixed_values, aes(xintercept = start))+
+  geom_vline(data=fixed_values, aes(xintercept = end))+
+  scale_fill_viridis_c(name=&quot;Salinity &quot;, direction = -1)+
+  scale_y_reverse()+
+  coord_cartesian(expand = 0)+
+  labs(y=&quot;Depth [m]&quot;)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())+
+  geom_line(data= gt_2d_daily,
+            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)
+
+
+p_tem &lt;- gt_3d %&gt;% 
+  ggplot()+
+  geom_raster(aes(date_time, dep, fill=temp))+
+  geom_vline(data=fixed_values, aes(xintercept = start))+
+  geom_vline(data=fixed_values, aes(xintercept = end))+
+  scale_fill_viridis_c(name=&quot;Temperature (°C)&quot;, option = &quot;B&quot;)+
+  scale_y_reverse()+
+  coord_cartesian(expand = 0)+
+  labs(y=&quot;Depth [m]&quot;, x=&quot;&quot;)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())+
+  geom_line(data= gt_2d_daily,
+            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)
+
+p_rho &lt;- gt_3d %&gt;% 
+  ggplot()+
+  geom_raster(aes(date_time, dep, fill=rho))+
+  geom_vline(data=fixed_values, aes(xintercept = start))+
+  geom_vline(data=fixed_values, aes(xintercept = end))+
+  scale_fill_viridis_c(name=&quot;d Rho (kg/m^3)&quot;, direction = -1)+
+  scale_y_reverse()+
+  coord_cartesian(expand = 0)+
+  labs(y=&quot;Depth [m]&quot;, x=&quot;&quot;)+
+  theme(axis.title.x = element_blank())+
+  geom_line(data= gt_2d_daily,
+            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)
+
+p_age &lt;- gt_3d %&gt;% 
+  ggplot()+
+  geom_raster(aes(date_time, dep, fill=SurfaceAge))+
+  geom_vline(data=fixed_values, aes(xintercept = start))+
+  geom_vline(data=fixed_values, aes(xintercept = end))+
+  scale_fill_viridis_c(name=&quot;SurfaceAge (d)&quot;, direction = -1, trans = &quot;sqrt&quot;)+
+  scale_y_reverse()+
+  coord_cartesian(expand = 0)+
+  labs(y=&quot;Depth [m]&quot;, x=&quot;&quot;)+
+  theme(axis.title.x = element_blank())+
+  geom_line(data= gt_2d_daily,
+            aes(x = date_time, y = mld_rho), color = &quot;white&quot;)
+
+p_sal / p_tem / p_rho / p_age</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/gt_hovmoeller_salt_temp_rho_age-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(p_sal, p_tem, p_rho)</code></pre>
+</div>
+<div id="test-calculation" class="section level3">
+<h3><span class="header-section-number">2.2.2</span> Test calculation</h3>
+<p>Mean mixed layer depth estimates were also calculated for a range of density threshold criteria, Rho lim, from sewater density based on daily mean GETM STD profiles.</p>
+<pre class="r"><code>gt_3d_MLD &lt;- expand_grid(gt_3d, rho_lim = seq(0.1,0.5,0.1))
+
+gt_3d_MLD &lt;- gt_3d_MLD %&gt;% 
+  arrange(dep) %&gt;% 
+  group_by(date_time, rho_lim) %&gt;% 
+  mutate(d_rho = rho - first(rho)) %&gt;% 
+  filter(d_rho &gt; rho_lim) %&gt;% 
+  summarise(MLD = min(dep)) %&gt;% 
+  ungroup() %&gt;% 
+  mutate(rho_lim = as.factor(rho_lim))</code></pre>
+</div>
+<div id="time-series" class="section level3">
+<h3><span class="header-section-number">2.2.3</span> Time series</h3>
+<pre class="r"><code>gt_2d_daily_long &lt;- gt_2d_daily %&gt;% 
+  pivot_longer(4:8, names_to = &quot;var&quot;, values_to = &quot;value&quot;)
+
+p_MLD_gt &lt;- gt_2d_daily_long %&gt;% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_hline(yintercept = 0)+
+  geom_line(aes(date_time, value, col=var))+
+  scale_y_reverse(limits = c(25,0))+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;GETM variable&quot;)+
+  labs(x=&quot;&quot;, y=&quot;MLD (m)&quot;)+
+  theme(axis.title.x = element_blank())
+
+p_MLD_recalc &lt;- gt_3d_MLD %&gt;% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_hline(yintercept = 0)+
+  geom_line(aes(date_time, MLD, col=rho_lim))+
+  scale_y_reverse(limits = c(25,0))+
+  scale_color_viridis_d(name=&quot;Rho lim&quot;)+
+  labs(x=&quot;&quot;, y=&quot;MLD (m)&quot;)
+
+p_MLD_gt / p_MLD_recalc</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/gt_MLD_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(p_MLD_gt, p_MLD_recalc)</code></pre>
+</div>
+</div>
+</div>
+<div id="finnmaid" class="section level1">
+<h1><span class="header-section-number">3</span> Finnmaid</h1>
+<div id="read-data" class="section level2">
+<h2><span class="header-section-number">3.1</span> Read data</h2>
+<p>Finnmaid data, including reconstructed data during LICOS operation failure.</p>
+<pre class="r"><code>fm &lt;-
+ read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
+                      &quot;Finnmaid.csv&quot;))
+
+fm &lt;- fm %&gt;% 
+  filter(Area == &quot;BS&quot;,
+         date &gt; start_date,
+         date &lt; end_date) %&gt;% 
+  select(-c(Lon, Lat, patm, Teq, xCO2, route, Area)) %&gt;% 
+  mutate(ID = as.factor(ID)) %&gt;% 
+  rename(tem=Tem,
+         sal=Sal,
+         date_time = date)</code></pre>
+</div>
+<div id="ct-calculation" class="section level2">
+<h2><span class="header-section-number">3.2</span> C<sub>T</sub> calculation</h2>
+<p>Calculate based on fixed A<sub>T</sub> and salinity mean values.</p>
+<pre class="r"><code>fm &lt;- fm %&gt;% 
+  mutate(CT = carb(24,
+                   var1=pCO2,
+                   var2=fixed_values$AT*1e-6,
+                   S=fixed_values$sal,
+                   T=tem,
+                   k1k2=&quot;m10&quot;, kf=&quot;dg&quot;, ks=&quot;d&quot;, gas=&quot;insitu&quot;)[,16]*1e6)</code></pre>
+</div>
+<div id="timeseries" class="section level2">
+<h2><span class="header-section-number">3.3</span> Timeseries</h2>
+<p>Calculate regional mean and sd values for each crossing of the area.</p>
+<pre class="r"><code>fm_ID &lt;- fm %&gt;% 
+  pivot_longer(c(pCO2, sal, tem, cO2, CT), values_to = &quot;value&quot;, names_to = &quot;var&quot;) %&gt;% 
+  group_by(ID) %&gt;% 
+  mutate(date_time_ID = mean(date_time)) %&gt;%
+  select(-date_time) %&gt;% 
+  ungroup() %&gt;% 
+  group_by(ID, date_time_ID, sensor, var) %&gt;% 
+  summarise_all(list(~mean(.), ~sd(.), ~min(.), ~max(.)), na.rm=TRUE) %&gt;%
+  ungroup() %&gt;% 
+  rename(value=mean)</code></pre>
+<p>Read BloomSail profile data from 1-5m to fill observational gap of Finnmaid date in second half of June.</p>
+<pre class="r"><code>ts_profiles_ID_long &lt;-
+  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum.csv&quot;))
+
+ts_profiles_ID_long_surface &lt;- ts_profiles_ID_long %&gt;% 
+  filter(dep &gt; 1, dep &lt; 5) %&gt;% 
+  mutate(ID = as.factor(ID)) %&gt;% 
+  select(-c(sign, value_cum_sign)) %&gt;% 
+  group_by(ID, date_time_ID, var) %&gt;% 
+  summarise_all(list(~mean(.)), na.rm = TRUE) %&gt;% 
+  ungroup()</code></pre>
+<pre class="r"><code>fm_ID %&gt;% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_path(aes(x=date_time_ID, y=value))+
+  #geom_ribbon(aes(x=date_time, y=value, ymax=max, ymin=min, fill=&quot;Finnmaid&quot;), alpha=0.3)+
+  geom_ribbon(aes(x=date_time_ID, y=value, ymax=value+sd, ymin=value-sd, fill=&quot;Finnmaid&quot;), alpha=0.3)+
+  geom_ribbon(data = ts_profiles_ID_long_surface,
+             aes(x=date_time_ID, ymin=value-sd, ymax=value+sd, fill=&quot;BloomSail&quot;), alpha=0.3)+
+  geom_point(aes(x=date_time_ID, y=value, col=sensor))+
+  geom_point(data = ts_profiles_ID_long_surface,
+             aes(x=date_time_ID, y=value, col=&quot;BloomSail&quot;))+
+  geom_line(data = ts_profiles_ID_long_surface,
+             aes(x=date_time_ID, y=value, col=&quot;BloomSail&quot;))+
+  facet_grid(var~., scales = &quot;free_y&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;)+
+  scale_fill_brewer(palette = &quot;Set1&quot;, name=&quot;+/- SD&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/fm_ts_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="missing-observations" class="section level2">
+<h2><span class="header-section-number">3.4</span> Missing observations</h2>
+<p>The observational gaps in the Finnmaid SST and C<sub>T</sub> time series were filled with two BloomSail observations. The time series was restricted to the period where BloomSail observations are available.</p>
+<pre class="r"><code>ts_gap &lt;- ts_profiles_ID_long_surface %&gt;% 
+  filter(ID %in% c(&quot;180718&quot;, &quot;180723&quot;),
+         var %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
+  select(date_time_ID, ID, var, value = value) %&gt;% 
+  mutate(sensor = &quot;BloomSail&quot;)
+
+fm_ts_ID &lt;- full_join(fm_ID, ts_gap) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  select(-sd) %&gt;% 
+  filter(var %in% c(&quot;tem&quot;, &quot;CT&quot;)) %&gt;% 
+  mutate(period = &quot;BloomSail&quot;,
+         period = if_else(date_time_ID &lt; fixed_values$start, &quot;pre-BloomSail&quot;, period),
+         period = if_else(date_time_ID &gt; fixed_values$end, &quot;post-BloomSail&quot;, period))
+
+fm_ts_ID %&gt;% 
+  ggplot()+
+  geom_rect(data = fixed_values,
+            aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_path(aes(date_time_ID, value, col=period))+
+  geom_point(aes(date_time_ID, value, col=period))+
+  facet_grid(var~., scales = &quot;free_y&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/fm_fill_gap_ts-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>fm_ts_ID &lt;- fm_ts_ID %&gt;% 
+  filter(period == &quot;BloomSail&quot;) %&gt;% 
+  select(-period)
+
+rm(fm_ID, fm, ts_gap, ts_profiles_ID_long_surface)</code></pre>
+</div>
+</div>
+<div id="ict" class="section level1">
+<h1><span class="header-section-number">4</span> iC<sub>T</sub></h1>
+<div id="mld-approach" class="section level2">
+<h2><span class="header-section-number">4.1</span> MLD approach</h2>
+<p>Use dCT from Finnmaid and MLD from GETM and calculate iC<sub>T</sub> as their product.</p>
+<pre class="r"><code>iCT_MLD &lt;- fm_ts_ID %&gt;%
+  select(date_time_ID, var, value) %&gt;% 
+  pivot_wider(values_from = value, names_from = var) %&gt;% 
+  rename(SST = tem)
+
+iCT_MLD &lt;- full_join(iCT_MLD,
+                     gt_2d_daily %&gt;% 
+                       select(-c(SSS, SST, U_10)) %&gt;% 
+                       rename(date_time_ID = date_time))
+
+iCT_MLD &lt;- iCT_MLD %&gt;% 
+  pivot_longer(cols = 4:8, values_to = &quot;MLD&quot;, names_to = &quot;var&quot;) %&gt;% 
+  arrange(date_time_ID) %&gt;%
+  group_by(var) %&gt;% 
+  mutate(MLD = na.approx(MLD)) %&gt;%
+  ungroup()
+
+iCT_MLD &lt;- iCT_MLD %&gt;% 
+  drop_na() %&gt;% 
+  group_by(var) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
+         CT_diff = CT - lag(CT),
+         SST_diff = SST - lag(SST),
+         CT_i_diff = CT_diff * MLD / 1000,
+         CT_i_cum = cumsum(replace_na(CT_i_diff, 0))) %&gt;% 
+  ungroup()</code></pre>
+<div id="incremental-and-cumulative-timeseries" class="section level3">
+<h3><span class="header-section-number">4.1.1</span> Incremental and cumulative timeseries</h3>
+<p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated.</p>
+<pre class="r"><code>iCT_MLD %&gt;% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_point(aes(date_time_ID,  0), shape=21)+
+  geom_col(aes(date_time_ID_ref, CT_i_diff, fill= var),
+           col=&quot;black&quot;, position = &quot;dodge&quot;, alpha = 0.5)+
+  geom_line(aes(date_time_ID,  CT_i_cum, 
+             col= var))+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  scale_fill_brewer(palette = &quot;Set1&quot;, name=&quot;Incremental&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;Cumulative&quot;)+
+  labs(y=&quot;integrated CT changes [mol/m2]&quot;, x=&quot;date&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/plot_integrated_iCT_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="delta-t-appraoch" class="section level2">
+<h2><span class="header-section-number">4.2</span> delta T appraoch</h2>
+<p>As primary production (negative changes in C<sub>T</sub>) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated and will be used to reconstruct changes in CT throughout the water column.</p>
+<p>The following analysis is restricted to the BloomSail period.</p>
+<div id="sst-time-series" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> SST time series</h3>
+<pre class="r"><code>fm_ts_ID %&gt;% 
+  filter(var == &quot;tem&quot;) %&gt;% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_path(aes(x=date_time_ID, y=value, col=&quot;Finnmaid&quot;))+
+  geom_point(aes(x=date_time_ID, y=value, col=&quot;Finnmaid&quot;))+
+  geom_path(data = gt_2d, aes(x=date_time, y=SST, col=&quot;GETM 2d, 3h&quot;))+
+  geom_path(data = gt_2d_daily, aes(x=date_time, y=SST, col=&quot;GETM 2d, daily&quot;))+
+  geom_path(data = gt_3d %&gt;% filter(dep == 3),
+            aes(x=date_time, y=temp, col=&quot;GETM 3d, 3m&quot;))+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
+  labs(x=&quot;&quot;, y=&quot;SST (°C)&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/FM_gt_2d_temp_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="dct-vs-dsst" class="section level3">
+<h3><span class="header-section-number">4.2.2</span> dC<sub>T</sub> vs dSST</h3>
+<p>To investigate the change of surface C<sub>T</sub> with SST, we merge daily mean 2d GETM and Finnmaid data. GETM observations were linearly interpolated to match the time of Finnmaid observations.</p>
+<pre class="r"><code>fm_ts_ID_wide &lt;- fm_ts_ID %&gt;% 
+  filter(var %in% c(&quot;CT&quot;)) %&gt;% 
+  select(date_time_ID, var, value) %&gt;% 
+  pivot_wider(values_from = value, names_from = var)
+
+fm_gt_3d &lt;- expand_grid(fm_ts_ID_wide, dep = unique(gt_3d$dep))
+rm(fm_ts_ID_wide)
+
+fm_gt_3d &lt;- full_join(gt_3d %&gt;% select(date_time_ID = date_time, dep, tem = temp), 
+                      fm_gt_3d)</code></pre>
+<pre class="r"><code>fm_gt_3d &lt;- fm_gt_3d %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  group_by(dep) %&gt;% 
+  mutate(tem = approxfun(date_time_ID, tem)(date_time_ID)) %&gt;% 
+  ungroup() %&gt;% 
+  arrange(dep) %&gt;% 
+  filter(!is.na(CT))</code></pre>
+<pre class="r"><code>CT_tem &lt;- CT_tem %&gt;% 
+  arrange(date_time_ID) %&gt;%
+  mutate(CT = na.approx(CT, na.rm = FALSE),
+         FM = na.approx(FM, na.rm = FALSE)) %&gt;% 
+  drop_na()
+
+rolling_mean &lt;- rollify(~mean(.x, na.rm = TRUE), window = 3)
+
+CT_tem &lt;- CT_tem %&gt;% 
+  mutate(CT_rm = rolling_mean(CT) %&gt;% lead(n = 1),
+         FM_rm = rolling_mean(FM) %&gt;% lead(n = 1),
+         gt_rm = rolling_mean(gt) %&gt;% lead(n = 1))</code></pre>
+<pre class="r"><code>p_SST &lt;- CT_tem %&gt;% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_point(aes(date_time_ID, FM, col=&quot;FM&quot;))+
+  geom_path(aes(date_time_ID, FM_rm, col=&quot;FM&quot;))+
+  geom_point(aes(date_time_ID, gt, col=&quot;gt&quot;))+
+  geom_path(aes(date_time_ID, gt_rm, col=&quot;gt&quot;))+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+p_CT &lt;- CT_tem %&gt;% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_point(aes(date_time_ID, CT, col=&quot;FM&quot;))+
+  geom_path(aes(date_time_ID, CT_rm, col=&quot;FM&quot;))+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
+  theme(axis.title.x = element_blank())
+
+p_SST / p_CT
+
+CT_tem &lt;- CT_tem %&gt;% 
+  select(-c(CT, FM, gt)) %&gt;% 
+  rename(CT = CT_rm,
+         FM = FM_rm,
+         gt = gt_rm)</code></pre>
+<pre class="r"><code>CT_tem &lt;- fm_gt_3d %&gt;% 
+  filter(dep == 3) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  mutate(CT_diff = CT - lag(CT),
+         SST_diff = tem - lag(tem)) %&gt;% 
+  select(-tem)
+
+
+CT_tem %&gt;% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_vline(xintercept = 0)+
+  geom_smooth(aes(SST_diff, CT_diff), method = &quot;lm&quot;, se=FALSE)+
+  geom_point(aes(SST_diff, CT_diff, fill=date_time_ID), shape=21)+
+  scale_fill_viridis_c(trans = &quot;time&quot;, name=&quot;Date&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/CT_vs_temperature-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>CT_tem &lt;- CT_tem %&gt;% 
+  mutate(factor = CT_diff/SST_diff,
+         factor = if_else(is.na(factor), 0, factor))</code></pre>
+<p>Time series of incremental changes in CT and SST help to identify measurement days during which changes in both parameters deviate from the expected correlation (factor).</p>
+<pre class="r"><code>CT_tem_long &lt;- CT_tem %&gt;% 
+  pivot_longer(c(CT_diff, SST_diff, factor), values_to = &quot;value&quot;, names_to = &quot;var&quot;)#
+
+CT_tem_long %&gt;% 
+  ggplot(aes(date_time_ID, value))+
+  geom_hline(yintercept = 0)+
+  geom_point()+
+  geom_line()+
+  scale_color_brewer(palette = &quot;Set1&quot;)+
+  facet_grid(var~., scales = &quot;free_y&quot;)+
+  theme(axis.title.x = element_blank())</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/CT_tem_diff_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The ratio of surface changes in CT with SST based on GETM SST was used.</p>
+<pre class="r"><code>CT_tem &lt;- expand_grid(CT_tem %&gt;% select(date_time_ID, factor),
+                      dep = unique(fm_gt_3d$dep))
+
+fm_gt_3d &lt;- full_join(fm_gt_3d %&gt;% select(date_time_ID, dep, tem), 
+                      CT_tem %&gt;%  select(date_time_ID, dep, factor))</code></pre>
+<pre class="r"><code>fm_gt_3d &lt;- fm_gt_3d %&gt;% 
+  group_by(dep) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  mutate(tem_diff = tem - lag(tem)) %&gt;% 
+  ungroup() %&gt;% 
+  mutate(CT_diff = tem_diff * factor) %&gt;% 
+  select(-factor)</code></pre>
+<p>The reconstructed incremental changes are added up to derive cummulative C<sub>T</sub> changes throughout the water column.</p>
+<pre class="r"><code>fm_gt_3d &lt;- fm_gt_3d %&gt;% 
+  group_by(dep) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
+         CT_diff_daily = CT_diff / date_time_ID_diff,
+         CT_cum = cumsum(replace_na(CT_diff, 0))) %&gt;% 
+  ungroup()</code></pre>
+</div>
+<div id="profiles-of-incremental-changes" class="section level3">
+<h3><span class="header-section-number">4.2.3</span> Profiles of incremental changes</h3>
+<p>Changes of seawater parameters at each depth were reconstructed from one cruise day to the next and divided by the number of days inbetween.</p>
+<pre class="r"><code>fm_gt_3d %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(CT_diff_daily, dep, col=date_time_ID, group=date_time_ID))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_c(trans = &quot;time&quot;)+
+  labs(x=&quot;Change of CT inbetween cruises per day&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/CT_incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>fm_gt_3d %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(tem_diff, dep, col=date_time_ID, group=date_time_ID))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_c(trans = &quot;time&quot;)+
+  labs(x=&quot;Change of temperature inbetween cruises per day&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/tem_incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="profiles-of-cumulative-changes" class="section level3">
+<h3><span class="header-section-number">4.2.4</span> Profiles of cumulative changes</h3>
+<p>Cumulative changes of seawater parameters were calculated at each depth relative to the first cruise day on July 5.</p>
+<pre class="r"><code>fm_gt_3d %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot(aes(CT_cum, dep, col=date_time_ID, group=date_time_ID))+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  scale_color_viridis_c(trans = &quot;time&quot;)+
+  labs(x=&quot;Cumulative change of CT&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/CT_cumulative_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="hovmoeller-daily-changes" class="section level3">
+<h3><span class="header-section-number">4.2.5</span> Hovmoeller daily changes</h3>
+<p>Hoevmoeller plots were generated for the reconstructed daily and cumulative changes in C<sub>T</sub>. Absolute values are not reproducible with this approach.</p>
+<pre class="r"><code>bin_tem &lt;- 0.25
+
+fm_gt_3d %&gt;%
+  filter(dep &lt; 26) %&gt;% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID_ref, y=dep, z=tem_diff),
+                    breaks = MakeBreaks(bin_tem),
+                    col=&quot;black&quot;)+
+  geom_point(aes(x=date_time_ID, y=c(25)), size=3, shape=24, fill=&quot;white&quot;)+
+  scale_fill_divergent(breaks = MakeBreaks(bin_tem),
+                       guide = &quot;colorstrip&quot;,
+                       name=&quot;Tem (°C)&quot;)+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y=&quot;Depth (m)&quot;)+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/Finnmaid+GETM.Rmd/tem_hovmoeller_daily-1.png" alt="Hovmoeller plots of modelled daily changes in temperature." width="672" />
+<p class="caption">
+Hovmoeller plots of modelled daily changes in temperature.
+</p>
+</div>
+<pre class="r"><code>rm(bin_tem)</code></pre>
+<pre class="r"><code>bin_CT &lt;- 10
+
+fm_gt_3d %&gt;%
+  filter(dep &lt; 15) %&gt;% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID_ref, y=dep, z=CT_diff_daily),
+                    breaks = MakeBreaks(bin_CT),
+                    col=&quot;black&quot;)+
+  geom_point(aes(x=date_time_ID, y=c(14)), size=3, shape=24, fill=&quot;white&quot;)+
+  scale_fill_divergent(breaks = MakeBreaks(bin_CT),
+                       guide = &quot;colorstrip&quot;,
+                       name=&quot;CT (µmol/kg)&quot;)+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y=&quot;Depth (m)&quot;)+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/Finnmaid+GETM.Rmd/CT_hovmoeller_daily-1.png" alt="Hovmoeller plots of daily reconstructed changes in C~T~." width="672" />
+<p class="caption">
+Hovmoeller plots of daily reconstructed changes in C<sub>T</sub>.
+</p>
+</div>
+<pre class="r"><code>rm(bin_CT)</code></pre>
+</div>
+<div id="hovmoeller-cumulative-changes" class="section level3">
+<h3><span class="header-section-number">4.2.6</span> Hovmoeller cumulative changes</h3>
+<pre class="r"><code>bin_CT &lt;- 30
+
+fm_gt_3d %&gt;%
+  filter(dep &lt; 15) %&gt;% 
+  ggplot()+
+  geom_contour_fill(aes(x=date_time_ID, y=dep, z=CT_cum),
+                    breaks = MakeBreaks(bin_CT),
+                    col=&quot;black&quot;)+
+  geom_point(aes(x=date_time_ID, y=c(14)), size=3, shape=24, fill=&quot;white&quot;)+
+  scale_fill_divergent(breaks = MakeBreaks(bin_CT),
+                       guide = &quot;colorstrip&quot;,
+                       name=&quot;CT (µmol/kg)&quot;)+
+  scale_y_reverse()+
+  theme_bw()+
+  labs(y=&quot;Depth (m)&quot;)+
+  coord_cartesian(expand = 0)+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/Finnmaid+GETM.Rmd/plot_hovmoeller_cum-1.png" alt="Hovmoeller plots of cumulative reconstructed changes in C~T~." width="672" />
+<p class="caption">
+Hovmoeller plots of cumulative reconstructed changes in C<sub>T</sub>.
+</p>
+</div>
+<pre class="r"><code>rm(bin_CT)</code></pre>
+</div>
+<div id="heat-penetration-depth-1" class="section level3">
+<h3><span class="header-section-number">4.2.7</span> Heat penetration depth</h3>
+<p>As an alternative approach to the integration over the MLD or the reconstruction of C<sub>T</sub> profiles, we can estimate the mean penetration depth of the warming signal, which was defined the surface change in temperature devided by the integrated change in seawater temperature across depth.</p>
+<pre class="r"><code>tem_diff_surface &lt;- fm_gt_3d %&gt;% 
+  filter(dep &lt; 6) %&gt;% 
+  select(date_time_ID, tem_diff_surface=tem_diff) %&gt;% 
+  group_by(date_time_ID) %&gt;% 
+  summarise_all(mean, na.rm=TRUE) %&gt;% 
+  ungroup()
+
+fm_gt_3d &lt;- full_join(fm_gt_3d, tem_diff_surface) 
+rm(tem_diff_surface)
+
+tem_depth &lt;- fm_gt_3d %&gt;%
+  filter(dep &lt; 18) %&gt;% 
+  group_by(date_time_ID) %&gt;% 
+  summarise(tem_diff_int = sum(tem_diff),
+            tem_diff_surface = mean(tem_diff_surface),
+            tem_depth = tem_diff_int/tem_diff_surface) %&gt;% 
+  ungroup()
+
+tem_depth %&gt;% 
+  ggplot(aes(date_time_ID, tem_depth))+
+  geom_hline(yintercept = 0)+
+  geom_line()+
+  geom_point()+
+  scale_y_reverse()</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/heat_penetration_depth-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="ict-time-series" class="section level2">
+<h2><span class="header-section-number">4.3</span> iC<sub>T</sub> time series</h2>
+<p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated for the upper 10 m of the water body.</p>
+<pre class="r"><code>iCT_dT &lt;- fm_gt_3d %&gt;% 
+  filter(dep &lt; 10) %&gt;% 
+  group_by(date_time_ID, date_time_ID_ref) %&gt;%
+  summarise(CT_i_diff = sum(CT_diff)/1000,
+            CT_i_cum = sum(CT_cum)/1000) %&gt;% 
+  ungroup()
+
+
+iCT_dT %&gt;% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_point(aes(date_time_ID,  0), shape=21)+
+  geom_col(aes(date_time_ID_ref, CT_i_diff),
+           position = &quot;dodge&quot;, alpha=0.3)+
+  geom_line(aes(date_time_ID, CT_i_cum))+
+  scale_color_viridis_d(name=&quot;Depth limit (m)&quot;)+
+  scale_fill_viridis_d(name=&quot;Depth limit (m)&quot;)+
+  labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)+
+  theme_bw()</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/cumulative_directional_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="getm-windspeed" class="section level1">
+<h1><span class="header-section-number">5</span> GETM Windspeed</h1>
+<pre class="r"><code>gt_2d %&gt;% 
+  ggplot()+
+  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
+  geom_line(aes(x= date_time, y = U_10, col=&quot;3-hourly&quot;))+
+  geom_line(data = gt_2d_daily,
+            aes(x= date_time, y = U_10, col=&quot;Daily mean&quot;))+
+  labs(y=&quot;U (m/s)&quot;, x = &quot;Date&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;, direction = -1)+
+  theme_bw()</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/plot_gt_winspeed-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="open-tasks-questions" class="section level1">
+<h1><span class="header-section-number">6</span> Open tasks / questions</h1>
+<ul>
+<li>Can delta T approach be improved by:
+<ul>
+<li>Using a mean CT/SST factor -&gt; not meaningful, because it assumes steady relation between dCT and dT</li>
+<li>Using the cumulative values at iCT min</li>
+</ul></li>
+<li>Plot cumulative changes in GETM temperature: Profile + Hovmoeller</li>
+</ul>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.3 (2020-02-29)
+Platform: i386-w64-mingw32/i386 (32-bit)
+Running under: Windows 10 x64 (build 18363)
+
+Matrix products: default
+
+locale:
+[1] LC_COLLATE=English_Germany.1252  LC_CTYPE=English_Germany.1252   
+[3] LC_MONETARY=English_Germany.1252 LC_NUMERIC=C                    
+[5] LC_TIME=English_Germany.1252    
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] metR_0.6.0      zoo_1.8-7       patchwork_1.0.0 seacarb_3.2.13 
+ [5] oce_1.2-0       gsw_1.0-5       testthat_2.3.2  here_0.1       
+ [9] lubridate_1.7.4 vroom_1.2.0     ncdf4_1.17      forcats_0.5.0  
+[13] stringr_1.4.0   dplyr_0.8.5     purrr_0.3.3     readr_1.3.1    
+[17] tidyr_1.0.2     tibble_3.0.0    ggplot2_3.3.0   tidyverse_1.3.0
+[21] workflowr_1.6.1
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.4         whisker_0.4        knitr_1.28         xml2_1.3.0        
+ [5] magrittr_1.5       splines_3.6.3      hms_0.5.3          rvest_0.3.5       
+ [9] tidyselect_1.0.0   bit_1.1-15.2       viridisLite_0.3.0  colorspace_1.4-1  
+[13] lattice_0.20-41    R6_2.4.1           rlang_0.4.5        fansi_0.4.1       
+[17] broom_0.5.5        xfun_0.12          dbplyr_1.4.2       modelr_0.1.6      
+[21] withr_2.1.2        git2r_0.26.1       ellipsis_0.3.0     htmltools_0.4.0   
+[25] assertthat_0.2.1   bit64_0.9-7        rprojroot_1.3-2    digest_0.6.25     
+[29] lifecycle_0.2.0    Matrix_1.2-18      haven_2.2.0        rmarkdown_2.1     
+[33] sp_1.4-1           compiler_3.6.3     cellranger_1.1.0   pillar_1.4.3      
+[37] scales_1.1.0       backports_1.1.5    generics_0.0.2     jsonlite_1.6.1    
+[41] httpuv_1.5.2       pkgconfig_2.0.3    rstudioapi_0.11    munsell_0.5.0     
+[45] plyr_1.8.6         highr_0.8          httr_1.4.1         tools_3.6.3       
+[49] grid_3.6.3         nlme_3.1-145       data.table_1.12.8  gtable_0.3.0      
+[53] checkmate_2.0.0    mgcv_1.8-31        DBI_1.1.0          cli_2.0.2         
+[57] readxl_1.3.1       yaml_2.2.1         crayon_1.3.4       RColorBrewer_1.1-2
+[61] farver_2.0.3       later_1.0.0        promises_1.1.0     fs_1.4.0          
+[65] vctrs_0.2.4        memoise_1.1.0      glue_1.3.2         evaluate_0.14     
+[69] labeling_0.3       reprex_0.3.0       stringi_1.4.6     </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
