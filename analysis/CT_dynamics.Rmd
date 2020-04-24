@@ -411,7 +411,7 @@ bind_cols(start = min(ts_profiles$date_time),
           sal = sal_mean) %>% 
   write_csv(here::here("Data/_summarized_data_files", "tb_fix.csv"))
 
-rm(tb, tb_surface)
+rm(tb)
 
 ```
 
@@ -436,7 +436,7 @@ ts_profiles <- ts_profiles %>%
                    S=sal_mean, T=tem, P=dep/10, k1k2="m10", kf="dg", ks="d",
                    gas="insitu")[,16]*1e6)
 
-rm(sal_mean, AT_mean)
+rm(sal_mean)
 
 ts_profiles %>% 
   write_csv(here::here("Data/_merged_data_files", "ts_profiles.csv"))
@@ -1517,13 +1517,17 @@ p_tem_surf <- ts_profiles_surface_long_ID %>%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())
 
-p_CT_surf <- ts_profiles_surface_long_ID %>%
+p_CT_surf <-
+ts_profiles_surface_long_ID %>%
   filter(var == "CT") %>% 
-  ggplot(aes(x=date_time))+
-  geom_ribbon(aes(ymin=mean-sd, ymax=mean+sd), alpha=0.2)+
-  geom_path(aes(y=mean))+
-  geom_point(aes(y=mean))+
+  ggplot()+
+  geom_ribbon(aes(x=date_time, ymin=mean-sd, ymax=mean+sd), alpha=0.2)+
+  geom_path(aes(x=date_time, y=mean))+
+  geom_point(aes(x=date_time, y=mean))+
+  geom_point(data = tb_surface %>% filter(var == "CT_AT_ratio"),
+             aes(date_time_ID, value*AT_mean, col=station)) +
   scale_fill_discrete(guide=FALSE)+
+  scale_color_brewer(palette = "Set1")+
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis())+
   labs(y = expression(atop(nC[T],
