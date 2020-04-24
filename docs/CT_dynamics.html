@@ -555,16 +555,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee07781a06c90b83d693e91ec008c72bbd1e6d5e0targetblanke07781aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/e07781a06c90b83d693e91ec008c72bbd1e6d5e0" target="_blank">e07781a</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec28b943b3fe610a82d7377b594bb25d5ab2bd24btargetblankc28b943a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c28b943b3fe610a82d7377b594bb25d5ab2bd24b" target="_blank">c28b943</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee07781a06c90b83d693e91ec008c72bbd1e6d5e0targetblanke07781aa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec28b943b3fe610a82d7377b594bb25d5ab2bd24btargetblankc28b943a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/e07781a06c90b83d693e91ec008c72bbd1e6d5e0" target="_blank">e07781a</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c28b943b3fe610a82d7377b594bb25d5ab2bd24b" target="_blank">c28b943</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -621,6 +621,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/c28b943b3fe610a82d7377b594bb25d5ab2bd24b/analysis/CT_dynamics.Rmd" target="_blank">c28b943</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-24
+</td>
+<td>
+discrete data in CT timeseries plot
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/b004af300cdd9d9cb22e7e0dc0fdec2da6ae0e19/docs/CT_dynamics.html" target="_blank">b004af3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -3846,14 +3880,18 @@ ts_profiles_surface_long_ID %&gt;%
   geom_point(aes(x=date_time, y=mean))+
   geom_point(data = tb_surface %&gt;% filter(var == &quot;CT_AT_ratio&quot;),
              aes(date_time_ID, value*AT_mean, col=station)) +
-  scale_fill_discrete(guide=FALSE)+
   scale_color_brewer(palette = &quot;Set1&quot;)+
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis())+
   labs(y = expression(atop(nC[T],
                            (mu*mol~kg^{-1}))))+
   theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+        axis.text.x = element_blank(),
+        legend.position = c(0.35,0.8),
+        legend.title = element_blank(),
+        legend.direction = &quot;horizontal&quot;,
+        legend.background = element_rect(fill = &quot;transparent&quot;),
+        legend.key = element_rect(fill = &quot;transparent&quot;))
 
 
 p_pCO2_surf + p_tem_surf + p_CT_surf + 
@@ -4014,9 +4052,6 @@ p_flux_cum &lt;- ts_og %&gt;%
                            (mol~m^{-2}))))+
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())</code></pre>
-<pre class="r"><code>p_pCO2_surf + p_tem_surf + p_CT_surf + p_pCO2_atm + p_wind + p_flux_daily + p_flux_cum +
-  plot_layout(ncol = 1)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/plot_flux_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="ict-correction" class="section level2">
@@ -4152,7 +4187,7 @@ iCT_10_flux_mix_diff %&gt;%
               heights = c(rep(1,7), 3))
 
 ggsave(here::here(&quot;output/Plots/Figures_publication/article&quot;, &quot;atm_water_timeseries.pdf&quot;),
-       width = 120, height = 250, dpi = 300, units = &quot;mm&quot;)</code></pre>
+       width = 120, height = 270, dpi = 300, units = &quot;mm&quot;)</code></pre>
 </div>
 </div>
 <div id="nomenclature-of-objectes" class="section level1">
