@@ -192,6 +192,7 @@ ts_profiles <- inner_join(cruise_dates, ts_profiles)
 
 lat_lo <- 57.25
 lat_hi <- 57.6
+
 lon_lo <- 18.6
 lon_hi <- 19.7
 
@@ -213,6 +214,11 @@ map_low_res <- map %>%
          lon = as.numeric(as.character(lon)))
 
 
+fm_bs <-
+  read_csv(here::here("Data/_summarized_data_files",
+                       "Finnmaid.csv")) %>% 
+  filter(Lat <= lat_hi, Lat >= lat_lo, Lon >= lon_lo)
+
 ggplot()+
   geom_contour_fill(data = map_low_res,
                     aes(x=lon, y=lat, z=-elev),
@@ -220,17 +226,23 @@ ggplot()+
                     breaks = seq(0,300,20))+
   geom_raster(data=map %>% filter(is.na(elev)),
               aes(lon, lat), fill="black")+
+  geom_line(data = fm_bs, aes(Lon, Lat, group=ID), col="grey")+
+  geom_line(data = fm_bs %>% filter(Area == "BS"), aes(Lon, Lat, group=ID), col="red")+
   geom_label(data = stations %>% filter(!(station %in% c("P14", "P13", "P01"))),
              aes(lon, lat, label=station), col="red")+
   geom_label(data = stations %>% filter(station %in% c("P14", "P13", "P01")),
              aes(lon, lat, label=station), col="grey")+
-  coord_quickmap(expand = 0)+
+  coord_quickmap(expand = 0, ylim = c(lat_lo+0.01, lat_hi-0.01))+
+  labs(x="Longitude (°E)", y="Latitude (°N)")+
   scale_fill_scico(palette = "oslo", na.value = "grey",
                    name="Depth [m]", direction = -1,
                    breaks = seq(0,160,20),
                    guide = "colorstrip")
 
-rm(map, map_low_res, lat_hi, lat_lo, lon_hi, lon_lo)
+ggsave(here::here("output/Plots/Figures_publication/article", "station_map.pdf"),
+       width = 180, height = 150, dpi = 300, units = "mm")
+
+rm(map, map_low_res, lat_hi, lat_lo, lon_hi, lon_lo, fm_bs)
 
 ```
 
@@ -249,8 +261,16 @@ cover %>%
   ggplot(aes(date, station, fill=ID))+
   geom_vline(aes(xintercept = date_time_ID, col=ID))+
   geom_point(shape=21)+
-  scale_color_viridis_d()+
-  scale_fill_viridis_d()
+  scale_fill_viridis_d(labels = cruise_dates$date_ID,
+                       name = "Mean cruise date")+
+  scale_color_viridis_d(labels = cruise_dates$date_ID,
+                       name = "Mean cruise date")+
+    scale_x_datetime(date_breaks = "week",
+                   date_labels = "%b %d")+
+  theme(axis.title.x = element_blank())
+
+ggsave(here::here("output/Plots/Figures_publication/article", "data_coverage.pdf"),
+       width = 130, height = 65, dpi = 300, units = "mm")
 
 rm(cover)
 
@@ -301,29 +321,33 @@ Important notes:
 
 ## Surface time series
 
-0-10m
-
-```{r plot_bottle_CO2_surface_timeseries, fig.cap="Time series of bottle data. Shown are mean values of samples collected at water depths < 10m (usually collected at 0 and 5 m).", fig.asp=1.2}
+```{r plot_bottle_CO2_surface_timeseries, fig.cap="Time series of bottle data. Shown are mean values of samples collected at water depths < 10m (usually collected at 0 and 5 m).", fig.asp=1.1}
 
 tb_surface <- tb_long %>% 
-  filter(dep<11) %>% 
+  filter(dep<9) %>% 
   group_by(ID, date_time_ID, var, station) %>% 
   summarise(value = mean(value, na.rm = TRUE)) %>% 
   ungroup()
 
-rm(tb_long)
+tb_surface_station_mean <- tb_long %>% 
+  filter(dep<9) %>% 
+  group_by(ID, date_time_ID, var) %>% 
+  summarise(value = mean(value, na.rm = TRUE)) %>% 
+  ungroup()
 
-tb_surface %>% 
-  ggplot(aes(date_time_ID, value, col=station))+
-  #geom_point(aes(lubridate::ymd(ID), value, col=station))+
-  geom_point()+
-  geom_path()+
-  scale_fill_viridis_d()+
-  scale_color_brewer(palette = "Set1")+
-  facet_grid(var~., scales = "free_y")+
+tb_long %>%
+  filter(dep<11) %>% 
+  ggplot()+
+  geom_line(data = tb_surface, aes(date_time_ID, value, col="Individual"))+
+  geom_line(data = tb_surface_station_mean, aes(date_time_ID, value, col="Both (mean)"))+
+  geom_point(aes(date_time_ID, value, fill=dep), shape=21)+
+  scale_fill_scico(palette = "oslo", direction = -1, name="Depth (m)")+
+  scale_color_brewer(palette = "Set1", name="Station")+
+  facet_grid(var~station, scales = "free_y")+
   labs(x="Mean transect date")
 
 
+rm(tb_long, tb_surface_station_mean)
 ```
 
 ```{r plot_bottle_CT_surface_timeseries, fig.cap="CT timeseries, derived by multiplying the CT-AT-ratio with mean AT", fig.asp=0.4}
