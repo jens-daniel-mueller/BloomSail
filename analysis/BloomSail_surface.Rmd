@@ -34,15 +34,15 @@ theme_set(theme_bw())
 
 # Approach
 
-In order to test how (and how well) the depth-integrated C~T~ estimates can be reproduced if only surface CO2 data were available, the BloomSail observations were restricted to those made in surface water and following reconstruction approaches were tested:
+In order to test how (and how well) the depth-integrated C~T~ estimates can be reproduced if only surface CO~2~ data were available, the BloomSail observations were restricted to those made in surface water and following reconstruction approaches were tested:
 
 - Mixed layer depth: Integration of surface observation across the MLD, assuming homogenious vertical patterns
-- CT profile reconstruction: Vertical reconstruction of incremental C~T~ changes based on profiles of incremental changes in temperature
-- Temperature penetration depth:  Integration of surface observation across the temperture penetration depth, assuming similar vertical extension as for CT drawdown.
+- C~T~ profile reconstruction: Vertical reconstruction of incremental C~T~ changes based on profiles of incremental changes in temperature
+- Temperature penetration depth:  Integration of surface observation across the temperature penetration depth, assuming similar vertical extension as for C~T~ drawdown.
 
-Note: The reconstruction of CT profiles and the integration across the temperature penetrations depth should produce very similar results. However, the latter avoids to create misinterpretable information about the vertical distribution of CT.
+Note: The reconstruction of C~T~ profiles and the integration across the temperature penetration depth should produce very similar results. However, the latter avoids to create misinterpretable information about the vertical distribution of C~T~.
 
-# Sensor data
+# Data base
 
 1m gridded, downcast profiles were used.
 
@@ -72,8 +72,6 @@ ts_profiles_ID_long_cum <- ts_profiles_ID_long_cum %>%
 
 ```
 
-# Removing c~T~ at depth
-
 CO~2~ data other than 3.5 m water depth were removed.
 
 ```{r remove_CT_depth}
@@ -91,40 +89,11 @@ MLD calculation was previously described in the [CT dynamics](https://jens-danie
 
 ## Timeseries
 
-For comparison to MLD, the effective penetration depth of NCP, z~eff~, was calculated as the ratio of the inremental, depth-integrated change of C~T~, divided by the change in surface C~T~, for all cases where the change in surface C~T~ was negative.
-
-```{r NCP_penetration_depth}
-
-ts_profiles_ID_surface <- ts_profiles_ID %>% 
-  filter(sign=="neg",
-         rho_lim == "0.5",
-         dep == 3.5) %>% 
-  group_by(ID, date_time_ID) %>% 
-  summarise(CT_diff_surf = mean(CT_diff, na.rm = TRUE)) %>% 
-  ungroup()
-
-ts_profiles_ID_i <- ts_profiles_ID %>% 
-  filter(sign=="neg",
-         rho_lim == "0.5") %>% 
-  group_by(ID, date_time_ID) %>% 
-  summarise(CT_diff_i = sum(CT_diff, na.rm = TRUE))
-
-zeff <- inner_join(ts_profiles_ID_surface, ts_profiles_ID_i)
-rm(ts_profiles_ID_surface, ts_profiles_ID_i)
-
-zeff <- zeff %>% 
-  mutate(zeff = CT_diff_i / CT_diff_surf)
-
-```
-
-
-
 ```{r MLD_time_series, fig.asp=0.4}
 
 ts_profiles_ID %>% 
   ggplot()+
   geom_hline(yintercept = 0)+
-  geom_line(data = zeff, aes(date_time_ID, zeff, linetype="zeff"))+
   geom_line(aes(date_time_ID, MLD, col=rho_lim, linetype="MLD"))+
   scale_y_reverse()+
   scale_color_viridis_d(name="Rho limit")+
@@ -140,7 +109,7 @@ rm(zeff)
 
 Integrated C~T~ depletion was calculated as the product of observed incremental C~T~ changes in surface waters and the respective mixed layer depth. 
 
-```{r NCP_calculation}
+```{r MLD_iCT_calculation}
 
 ts_profiles_ID_surface <- ts_profiles_ID %>% 
   filter(dep==3.5) %>% 
@@ -158,7 +127,7 @@ ts_profiles_ID_surface <- ts_profiles_ID %>%
 Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated.
 
 
-```{r iCT_timeseries_MLD, fig.asp=1}
+```{r MLD_iCT_time_series, fig.asp=1}
 
 p_iCT <- ts_profiles_ID_surface %>% 
   ggplot(aes(date_time_ID, iCT_diff, fill= rho_lim))+
@@ -403,7 +372,7 @@ iCT_10 %>%
 
 
 
-# Heat and C~T~ penetration depth
+# Heat penetration depth
 
 To investigate the link between temperature rise and CT drawdown, we estimated the mean penetration depth of both parameters, which was defined as the surface change (0-6m) devided by the integrated change across depth. To derive the integrated values, we summed up all negative changes in CT and temperature. For temperature we limited the integration to the depth at which the cummulative signal on July 23 was below 5% of the surface signal.
 
