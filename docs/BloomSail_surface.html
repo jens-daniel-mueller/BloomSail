@@ -555,16 +555,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9f738ebffc604e75ecf926c74849feac1b77fde0targetblank9f738eba"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/9f738ebffc604e75ecf926c74849feac1b77fde0" target="_blank">9f738eb</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb12f534fa9dcb68033f09228f64433936955adc7targetblankb12f534a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b12f534fa9dcb68033f09228f64433936955adc7" target="_blank">b12f534</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9f738ebffc604e75ecf926c74849feac1b77fde0targetblank9f738eba" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb12f534fa9dcb68033f09228f64433936955adc7targetblankb12f534a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/9f738ebffc604e75ecf926c74849feac1b77fde0" target="_blank">9f738eb</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b12f534fa9dcb68033f09228f64433936955adc7" target="_blank">b12f534</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -621,6 +621,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b12f534fa9dcb68033f09228f64433936955adc7/analysis/BloomSail_surface.Rmd" target="_blank">b12f534</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-27
+</td>
+<td>
+Comparison of iCT approaches
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/d7bdade0e77ff83bab949a60ef8f41c1e2512bc1/docs/BloomSail_surface.html" target="_blank">d7bdade</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1072,7 +1106,13 @@ library(lubridate)</code></pre>
 </div>
 <div id="data-base" class="section level1">
 <h1><span class="header-section-number">2</span> Data base</h1>
-<p>1m gridded, downcast profiles were used.</p>
+<p>1m gridded, downcast profiles were used. CO<sub>2</sub> data other than 3.5 m water depth were removed.</p>
+</div>
+<div id="mld-approach" class="section level1">
+<h1><span class="header-section-number">3</span> MLD approach</h1>
+<p>MLD calculation was previously described in the <a href="https://jens-daniel-mueller.github.io/BloomSail/CT_dynamics.html">CT dynamics</a> chapter.</p>
+<div id="read-data" class="section level2">
+<h2><span class="header-section-number">3.1</span> Read data</h2>
 <pre class="r"><code>ts_profiles_ID &lt;-
   read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum_MLD.csv&quot;))
 
@@ -1081,23 +1121,12 @@ ts_profiles_ID &lt;- ts_profiles_ID %&gt;%
 
 ts_profiles_ID &lt;- ts_profiles_ID %&gt;% 
   mutate(rho_lim = as.factor(rho_lim))</code></pre>
-<pre class="r"><code>ts_profiles_ID_long_cum &lt;-
-  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum.csv&quot;))
-
-ts_profiles_ID_long_cum &lt;- ts_profiles_ID_long_cum %&gt;% 
-  filter(var %in% c(&quot;CT&quot;, &quot;tem&quot;)) %&gt;% 
-  mutate(ID = as.factor(ID)) %&gt;% 
-  select(-date_ID)</code></pre>
-<p>CO<sub>2</sub> data other than 3.5 m water depth were removed.</p>
 <pre class="r"><code>ts_profiles_ID &lt;- ts_profiles_ID %&gt;% 
   mutate(CT = if_else(dep == 3.5, CT, NaN),
          rho_lim = as.factor(rho_lim))</code></pre>
 </div>
-<div id="mld-approach" class="section level1">
-<h1><span class="header-section-number">3</span> MLD approach</h1>
-<p>MLD calculation was previously described in the <a href="https://jens-daniel-mueller.github.io/BloomSail/CT_dynamics.html">CT dynamics</a> chapter.</p>
 <div id="timeseries" class="section level2">
-<h2><span class="header-section-number">3.1</span> Timeseries</h2>
+<h2><span class="header-section-number">3.2</span> Timeseries</h2>
 <pre class="r"><code>ts_profiles_ID %&gt;% 
   ggplot()+
   geom_hline(yintercept = 0)+
@@ -1108,10 +1137,9 @@ ts_profiles_ID_long_cum &lt;- ts_profiles_ID_long_cum %&gt;%
   labs(y=&quot;Depth (m)&quot;)+
   theme(axis.title.x = element_blank())</code></pre>
 <p><img src="figure/BloomSail_surface.Rmd/MLD_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>rm(zeff)</code></pre>
 </div>
 <div id="ict-calculation" class="section level2">
-<h2><span class="header-section-number">3.2</span> iC<sub>T</sub> calculation</h2>
+<h2><span class="header-section-number">3.3</span> iC<sub>T</sub> calculation</h2>
 <p>Integrated C<sub>T</sub> depletion was calculated as the product of observed incremental C<sub>T</sub> changes in surface waters and the respective mixed layer depth.</p>
 <pre class="r"><code>ts_profiles_ID_surface &lt;- ts_profiles_ID %&gt;% 
   filter(dep==3.5) %&gt;% 
@@ -1122,7 +1150,7 @@ ts_profiles_ID_long_cum &lt;- ts_profiles_ID_long_cum %&gt;%
   ungroup()</code></pre>
 </div>
 <div id="incremental-and-cumulative-timeseries" class="section level2">
-<h2><span class="header-section-number">3.3</span> Incremental and cumulative timeseries</h2>
+<h2><span class="header-section-number">3.4</span> Incremental and cumulative timeseries</h2>
 <p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated.</p>
 <pre class="r"><code>p_iCT &lt;- ts_profiles_ID_surface %&gt;% 
   ggplot(aes(date_time_ID, iCT_diff, fill= rho_lim))+
@@ -1150,11 +1178,14 @@ p_iCT_cum &lt;- ts_profiles_ID_surface %&gt;%
 <p><img src="figure/BloomSail_surface.Rmd/MLD_iCT_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(p_iCT, p_iCT_cum)
 
+ts_profiles_ID_surface_MLD &lt;- ts_profiles_ID_surface
 rm(ts_profiles_ID, ts_profiles_ID_surface)</code></pre>
 </div>
 </div>
-<div id="temperature-approach" class="section level1">
-<h1><span class="header-section-number">4</span> Temperature approach</h1>
+<div id="ct-profile-reconstruction" class="section level1">
+<h1><span class="header-section-number">4</span> C<sub>T</sub> profile reconstruction</h1>
+<div id="read-data-1" class="section level2">
+<h2><span class="header-section-number">4.1</span> Read data</h2>
 <pre class="r"><code>ts_profiles_ID &lt;-
   read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID.csv&quot;))
 
@@ -1162,8 +1193,9 @@ ts_profiles_ID &lt;- ts_profiles_ID %&gt;%
   mutate(CT = if_else(dep == 3.5, CT, NaN),
          ID = as.factor(ID)) %&gt;% 
   select(-date_ID)</code></pre>
+</div>
 <div id="ct-vs-temperature" class="section level2">
-<h2><span class="header-section-number">4.1</span> C<sub>T</sub> vs temperature</h2>
+<h2><span class="header-section-number">4.2</span> C<sub>T</sub> vs temperature</h2>
 <p>As primary production (negative changes in C<sub>T</sub>) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated.</p>
 <pre class="r"><code>ts_profiles_ID_diff &lt;- ts_profiles_ID %&gt;% 
   drop_na() %&gt;% 
@@ -1179,10 +1211,10 @@ ts_profiles_ID_diff %&gt;%
   geom_vline(xintercept = 0)+
   geom_path()+
   geom_point()</code></pre>
-<p><img src="figure/BloomSail_surface.Rmd/CT_and_temperature_changes_in_surface-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/BloomSail_surface.Rmd/CT_recon_CT_and_temperature_changes_in_surface-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="reconstruction-of-ct-dynamics" class="section level2">
-<h2><span class="header-section-number">4.2</span> Reconstruction of C<sub>T</sub> dynamics</h2>
+<h2><span class="header-section-number">4.3</span> Reconstruction of C<sub>T</sub> dynamics</h2>
 <p>The ratio of the incremental change of C<sub>T</sub> with temperature at the seasurface was applied to calculate the C<sub>T</sub> in other water depth based on the known change in temperature.</p>
 <pre class="r"><code>ts_profiles_ID_diff &lt;- ts_profiles_ID_diff %&gt;% 
   select(ID, factor)
@@ -1212,7 +1244,7 @@ ts_profiles_ID &lt;- ts_profiles_ID %&gt;%
   ungroup()</code></pre>
 </div>
 <div id="profiles-of-incremental-changes" class="section level2">
-<h2><span class="header-section-number">4.3</span> Profiles of incremental changes</h2>
+<h2><span class="header-section-number">4.4</span> Profiles of incremental changes</h2>
 <p>Changes of seawater parameters at each depth were reconstructed from one cruise day to the next and divided by the number of days inbetween.</p>
 <pre class="r"><code>ts_profiles_ID_long %&gt;% 
   arrange(dep) %&gt;% 
@@ -1224,10 +1256,10 @@ ts_profiles_ID &lt;- ts_profiles_ID %&gt;%
   scale_color_viridis_d()+
   facet_wrap(~var, scales = &quot;free_x&quot;)+
   labs(x=&quot;Change of value inbetween cruises per day&quot;)</code></pre>
-<p><img src="figure/BloomSail_surface.Rmd/incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/BloomSail_surface.Rmd/CT_recon_incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="profiles-of-cumulative-changes" class="section level2">
-<h2><span class="header-section-number">4.4</span> Profiles of cumulative changes</h2>
+<h2><span class="header-section-number">4.5</span> Profiles of cumulative changes</h2>
 <p>Cumulative changes of seawater parameters were calculated at each depth relative to the first cruise day on July 5.</p>
 <pre class="r"><code>ts_profiles_ID_long %&gt;% 
   arrange(dep) %&gt;% 
@@ -1239,13 +1271,13 @@ ts_profiles_ID &lt;- ts_profiles_ID %&gt;%
   scale_color_viridis_d()+
   labs(x=&quot;Cumulative change of value&quot;)+
   facet_wrap(~var, scales = &quot;free_x&quot;)</code></pre>
-<p><img src="figure/BloomSail_surface.Rmd/cumulative_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/BloomSail_surface.Rmd/CT_recon_cumulative_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="hovmoeller-plots" class="section level2">
-<h2><span class="header-section-number">4.5</span> Hovmoeller plots</h2>
+<h2><span class="header-section-number">4.6</span> Hovmoeller plots</h2>
 <p>Hoevmoeller plots were generated for the reconstructed daily and cumulative changes in C<sub>T</sub>. Absolute values are not reproducible with this approach. Furthermore, it meets our expectations</p>
 <div id="daily-changes" class="section level3">
-<h3><span class="header-section-number">4.5.1</span> Daily changes</h3>
+<h3><span class="header-section-number">4.6.1</span> Daily changes</h3>
 <pre class="r"><code>bin_CT &lt;- 2.5
 
 ts_profiles_ID_long %&gt;%
@@ -1265,15 +1297,15 @@ ts_profiles_ID_long %&gt;%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/BloomSail_surface.Rmd/plot_hovmoeller_daily-1.png" alt="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature. Note: Daily changes are currently plotted against the day when they were observed compared to the previous transect, although plotting against the mean date would be more plausible." width="672" />
+<img src="figure/BloomSail_surface.Rmd/CT_recon_hovmoeller_daily-1.png" alt="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature." width="672" />
 <p class="caption">
-Hovmoeller plots of daily reconstructed changes in C<sub>T</sub> and temperature. Note: Daily changes are currently plotted against the day when they were observed compared to the previous transect, although plotting against the mean date would be more plausible.
+Hovmoeller plots of daily reconstructed changes in C<sub>T</sub> and temperature.
 </p>
 </div>
 <pre class="r"><code>rm(bin_CT)</code></pre>
 </div>
 <div id="cumulative-changes" class="section level3">
-<h3><span class="header-section-number">4.5.2</span> Cumulative changes</h3>
+<h3><span class="header-section-number">4.6.2</span> Cumulative changes</h3>
 <pre class="r"><code>bin_CT &lt;- 20
 
 ts_profiles_ID_long %&gt;%
@@ -1293,19 +1325,19 @@ ts_profiles_ID_long %&gt;%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/BloomSail_surface.Rmd/plot_hovmoeller_cum-1.png" alt="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature." width="672" />
+<img src="figure/BloomSail_surface.Rmd/CT_recon_hovmoeller_cum-1.png" alt="Hovmoeller plots of daily reconstructed changes in C~T~." width="672" />
 <p class="caption">
-Hovmoeller plots of daily reconstructed changes in C<sub>T</sub> and temperature.
+Hovmoeller plots of daily reconstructed changes in C<sub>T</sub>.
 </p>
 </div>
 <pre class="r"><code>rm(bin_CT)</code></pre>
 </div>
 </div>
 <div id="ict-time-series" class="section level2">
-<h2><span class="header-section-number">4.6</span> iC<sub>T</sub> time series</h2>
+<h2><span class="header-section-number">4.7</span> iC<sub>T</sub> time series</h2>
 <p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated for the upper 10 m of the water body.</p>
 <pre class="r"><code>iCT_10 &lt;- ts_profiles_ID_long %&gt;%
-  filter(dep &lt; 10, 
+  filter(dep &lt; 12, 
          var == &quot;CT&quot;) %&gt;% 
   select(ID, date_time_ID, date_time_ID_ref, CT_diff=value_diff, CT_cum=value_cum) %&gt;% 
   group_by(ID, date_time_ID, date_time_ID_ref) %&gt;% 
@@ -1323,12 +1355,29 @@ iCT_10 %&gt;%
   scale_fill_viridis_d(name=&quot;Depth limit (m)&quot;)+
   labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)+
   theme_bw()</code></pre>
-<p><img src="figure/BloomSail_surface.Rmd/integrated_NCP-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/BloomSail_surface.Rmd/CT_recon_iCT_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(ts_profiles_ID, ts_profiles_ID_long)</code></pre>
 </div>
 </div>
 <div id="heat-penetration-depth" class="section level1">
 <h1><span class="header-section-number">5</span> Heat penetration depth</h1>
 <p>To investigate the link between temperature rise and CT drawdown, we estimated the mean penetration depth of both parameters, which was defined as the surface change (0-6m) devided by the integrated change across depth. To derive the integrated values, we summed up all negative changes in CT and temperature. For temperature we limited the integration to the depth at which the cummulative signal on July 23 was below 5% of the surface signal.</p>
+<div id="read-data-2" class="section level2">
+<h2><span class="header-section-number">5.1</span> Read data</h2>
+<pre class="r"><code>ts_profiles_ID_long_cum &lt;-
+  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum.csv&quot;))
+
+ts_profiles_ID_long_cum &lt;- ts_profiles_ID_long_cum %&gt;% 
+  filter(var %in% c(&quot;CT&quot;, &quot;tem&quot;)) %&gt;% 
+  mutate(ID = as.factor(ID)) %&gt;% 
+  select(-date_ID)</code></pre>
+<pre class="r"><code>ts_profiles_ID &lt;-
+  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum_MLD.csv&quot;))
+
+ts_profiles_ID &lt;- ts_profiles_ID %&gt;% 
+  filter(rho_lim == 0.1) %&gt;% 
+  select(ID, date_time_ID, dep, CT = value, CT_diff = value_diff, CT_cum = value_cum) %&gt;% 
+  mutate(ID = as.factor(ID))</code></pre>
 <pre class="r"><code># surface values
 
 diff_surface &lt;- ts_profiles_ID_long_cum %&gt;% 
@@ -1413,7 +1462,7 @@ penetration_depth_mean</code></pre>
                  col=var, linetype = &quot;mean&quot;))+
   geom_line(aes(linetype=&quot;cruise&quot;))+
   geom_point()+
-  scale_y_reverse(name = &quot;Pentration depth (m)&quot;, breaks = seq(0,20,5))+
+  scale_y_reverse(name = &quot;Penetration depth (m)&quot;, breaks = seq(0,20,5))+
   scale_color_brewer(palette = &quot;Set1&quot;, direction = -1)+
   labs(title = &quot;Incremental CT and temperature changes&quot;)+
   theme(axis.title.x = element_blank(),
@@ -1424,11 +1473,11 @@ p_pene_cum &lt;- penetration_depth %&gt;%
   ggplot(aes(date_time_ID, penetration_depth_cum, col=var))+
   geom_hline(yintercept = 0)+
   geom_hline(data = penetration_depth_mean,
-             aes(yintercept = penetration_depth_diff_mean,
+             aes(yintercept = penetration_depth_cum_mean,
                  col=var, linetype = &quot;mean&quot;))+
   geom_line(aes(linetype=&quot;cruise&quot;))+
   geom_point()+
-  scale_y_reverse(name = &quot;Pentration depth (m)&quot;, breaks = seq(0,20,5))+
+  scale_y_reverse(name = &quot;Penetration depth (m)&quot;, breaks = seq(0,20,5))+
   scale_color_brewer(palette = &quot;Set1&quot;, direction = -1)+
   labs(title = &quot;Cumulative CT and temperature changes&quot;)+
   theme(axis.title.x = element_blank(),
@@ -1437,6 +1486,75 @@ p_pene_cum &lt;- penetration_depth %&gt;%
 p_pene_diff / p_pene_cum +
   plot_layout(guides = &quot;collect&quot;)</code></pre>
 <p><img src="figure/BloomSail_surface.Rmd/penetration_depth_CT-tem-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(p_pene_cum, p_pene_diff)</code></pre>
+</div>
+<div id="ict-calculation-1" class="section level2">
+<h2><span class="header-section-number">5.2</span> iC<sub>T</sub> calculation</h2>
+<p>Integrated C<sub>T</sub> depletion was calculated as the product of observed incremental C<sub>T</sub> changes in surface waters and the respective mixed layer depth.</p>
+<pre class="r"><code>penetration_depth &lt;- penetration_depth %&gt;% 
+  filter(var == &quot;tem&quot;) %&gt;% 
+  select(ID, penetration_depth_diff)
+
+ts_profiles_ID_zeff &lt;- full_join(ts_profiles_ID, penetration_depth) 
+  
+ts_profiles_ID_zeff_surface &lt;- ts_profiles_ID_zeff %&gt;% 
+  filter(dep==3.5) %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  mutate(iCT_diff = CT_diff * 11.3 / 1000,
+         iCT_cum = cumsum(replace_na(iCT_diff, 0))) %&gt;% 
+  ungroup()</code></pre>
+<pre class="r"><code>p_iCT &lt;- ts_profiles_ID_zeff_surface %&gt;% 
+  ggplot(aes(date_time_ID, iCT_diff))+
+  geom_hline(yintercept = 0)+
+  geom_col(col=&quot;black&quot;, position = &quot;dodge&quot;)+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  #scale_fill_viridis_d()+
+  labs(y=&quot;integrated CT changes [mol/m2]&quot;)+
+  theme(axis.title.x = element_blank())
+
+p_iCT_cum &lt;- ts_profiles_ID_zeff_surface %&gt;% 
+  ggplot(aes(date_time_ID,  iCT_cum))+
+  geom_line()+
+  geom_hline(yintercept = 0)+
+  scale_color_viridis_d()+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  theme(strip.background = element_blank(),
+        strip.text = element_blank())+
+  labs(y=&quot;integrated, cumulative CT changes [mol/m2]&quot;, x=&quot;date&quot;)
+
+
+(p_iCT / p_iCT_cum)+
+  plot_layout(guides = &#39;collect&#39;)</code></pre>
+<p><img src="figure/BloomSail_surface.Rmd/zeff_iCT_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(p_iCT, p_iCT_cum)
+
+#rm(ts_profiles_ID, ts_profiles_ID_surface)</code></pre>
+</div>
+</div>
+<div id="comparison-of-approaches" class="section level1">
+<h1><span class="header-section-number">6</span> Comparison of approaches</h1>
+<pre class="r"><code>iCT_10_flux_mix &lt;-
+  read_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_NCP_cum.csv&quot;))
+
+iCT_10_flux_mix &lt;- iCT_10_flux_mix %&gt;% 
+  filter(!is.na(CT_i_diff))</code></pre>
+<pre class="r"><code>ggplot()+
+  geom_line(data = ts_profiles_ID_zeff_surface,
+            aes(date_time_ID,  iCT_cum, col=&quot;zeff&quot;))+
+  geom_line(data = ts_profiles_ID_surface_MLD %&gt;% filter(rho_lim == 0.1),
+            aes(date_time_ID,  iCT_cum, col=&quot;Rho 0.1&quot;))+
+  geom_line(data = iCT_10,
+            aes(date_time_ID,  CT_i_cum, col=&quot;CT recon&quot;))+
+  geom_line(data = iCT_10_flux_mix,
+            aes(date_time,  CT_i_cum, col=&quot;best guess&quot;))+
+  geom_hline(yintercept = 0)+
+  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;Estimate&quot;)+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  scale_x_datetime(breaks = &quot;week&quot;,
+                   date_labels = &quot;%b %d&quot;)+
+  theme(axis.title.x = element_blank())+
+  labs(y=&quot;integrated, cumulative CT changes [mol/m2]&quot;)</code></pre>
+<p><img src="figure/BloomSail_surface.Rmd/MLD_CT_zeff_comparison-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
