@@ -24,6 +24,7 @@ library(oce)
 library(marelac)
 library(patchwork)
 library(metR)
+library(lubridate)
 ```
 
 
@@ -33,22 +34,49 @@ theme_set(theme_bw())
 
 # Approach
 
-In order to test how (and how well) the depth-integrated C~T~ estimates can be reproduced if only surface CO2 data were available, the BloomSail observations were restricted to those made in surface water and two reconstruction approaches were tested:
+In order to test how (and how well) the depth-integrated C~T~ estimates can be reproduced if only surface CO2 data were available, the BloomSail observations were restricted to those made in surface water and following reconstruction approaches were tested:
 
-1. MLD: Integration of surface observation across the MLD, assuming homogenious vertical patterns
-2. Temperature: Vertical reconstruction of incremental C~T~ changes based on profiles of incremental changes in temperature
+- Mixed layer depth: Integration of surface observation across the MLD, assuming homogenious vertical patterns
+- CT profile reconstruction: Vertical reconstruction of incremental C~T~ changes based on profiles of incremental changes in temperature
+- Temperature penetration depth:  Integration of surface observation across the temperture penetration depth, assuming similar vertical extension as for CT drawdown.
+
+Note: The reconstruction of CT profiles and the integration across the temperature penetrations depth should produce very similar results. However, the latter avoids to create misinterpretable information about the vertical distribution of CT.
 
 # Sensor data
 
-1m gridded, downcast profiles, from which CO~2~ data other than 3.5 m water depth were removed, were used.
+1m gridded, downcast profiles were used.
 
-```{r read_Tina-V_Sensor_data}
+```{r read_CT_cum}
 
 ts_profiles_ID <-
   read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum_MLD.csv"))
 
 ts_profiles_ID <- ts_profiles_ID %>% 
   select(ID, date_time_ID, dep, CT = value, CT_diff = value_diff, CT_cum = value_cum, sign, rho_lim, MLD)
+
+ts_profiles_ID <- ts_profiles_ID %>% 
+  mutate(rho_lim = as.factor(rho_lim))
+
+```
+
+
+```{r read_ts_data}
+
+ts_profiles_ID_long_cum <-
+  read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum.csv"))
+
+ts_profiles_ID_long_cum <- ts_profiles_ID_long_cum %>% 
+  filter(var %in% c("CT", "tem")) %>% 
+  mutate(ID = as.factor(ID)) %>% 
+  select(-date_ID)
+
+```
+
+# Removing c~T~ at depth
+
+CO~2~ data other than 3.5 m water depth were removed.
+
+```{r remove_CT_depth}
 
 ts_profiles_ID <- ts_profiles_ID %>% 
   mutate(CT = if_else(dep == 3.5, CT, NaN),
@@ -130,7 +158,7 @@ ts_profiles_ID_surface <- ts_profiles_ID %>%
 Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated.
 
 
-```{r plot_integrated_NCP_timeseries, fig.asp=1.5}
+```{r iCT_timeseries_MLD, fig.asp=1}
 
 p_iCT <- ts_profiles_ID_surface %>% 
   ggplot(aes(date_time_ID, iCT_diff, fill= rho_lim))+
@@ -166,7 +194,7 @@ rm(ts_profiles_ID, ts_profiles_ID_surface)
 # Temperature approach
 
 
-```{r read_ts_data}
+```{r read_ts_data_tem_appraoch}
 
 ts_profiles_ID <-
   read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID.csv"))
@@ -290,7 +318,7 @@ Hoevmoeller plots were generated for the reconstructed daily and cumulative chan
 
 ### Daily changes
 
-```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature. Note: Daily changes are currently plotted against the day when they were observed compared to the previous transect, although plotting against the mean date would be more plausible.", fig.asp=0.5, eval=FALSE}
+```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature. Note: Daily changes are currently plotted against the day when they were observed compared to the previous transect, although plotting against the mean date would be more plausible.", fig.asp=0.5}
 
 bin_CT <- 2.5
 
@@ -317,7 +345,7 @@ rm(bin_CT)
 
 ### Cumulative changes
 
-```{r plot_hovmoeller_cum, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature.", fig.asp=0.5, eval=FALSE}
+```{r plot_hovmoeller_cum, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature.", fig.asp=0.5}
 
 bin_CT <- 20
 
@@ -342,39 +370,6 @@ ts_profiles_ID_long %>%
 rm(bin_CT)
 
 ```
-
-
-## Heat penetration depth
-
-As an alternative approach to the integration over the MLD or the reconstruction of C~T~ profiles, we can estimate the mean penetration depth of the warming signal, which was defined the surface change in temperature devided by the integrated change in seawater temperature across depth.
-
-```{r heat_penetration_depth}
-
-tem_diff_surface <- ts_profiles_ID %>% 
-  filter(dep == 3.5) %>% 
-  select(ID, tem_diff_surface=tem_diff)
-
-ts_profiles_ID <- full_join(ts_profiles_ID, tem_diff_surface) 
-rm(tem_diff_surface)
-
-tem_depth <- ts_profiles_ID %>%
-  filter(dep < 18) %>% 
-  group_by(ID, date_time_ID) %>% 
-  summarise(tem_diff_int = sum(tem_diff),
-            tem_diff_surface = mean(tem_diff_surface),
-            tem_depth = tem_diff_int/tem_diff_surface) %>% 
-  ungroup()
-
-tem_depth %>% 
-  ggplot(aes(date_time_ID, tem_depth))+
-  geom_hline(yintercept = 0)+
-  geom_line()+
-  geom_point()+
-  scale_y_reverse()
-
-```
-
-
 
 
 ## iC~T~ time series
@@ -405,3 +400,130 @@ iCT_10 %>%
 
 
 ```
+
+
+
+# Heat and C~T~ penetration depth
+
+To investigate the link between temperature rise and CT drawdown, we estimated the mean penetration depth of both parameters, which was defined as the surface change (0-6m) devided by the integrated change across depth. To derive the integrated values, we summed up all negative changes in CT and temperature. For temperature we limited the integration to the depth at which the cummulative signal on July 23 was below 5% of the surface signal.
+
+```{r penetration_depth_tem_integration_depth}
+
+# surface values
+
+diff_surface <- ts_profiles_ID_long_cum %>% 
+  filter(dep < 6) %>% 
+  group_by(ID, var) %>% 
+  summarise(value_diff_surface = mean(value_diff, na.rm = TRUE),
+            value_cum_surface  =mean(value_cum, na.rm = TRUE)) %>% 
+  ungroup()
+
+ts_profiles_ID_long_cum <- full_join(ts_profiles_ID_long_cum, diff_surface) 
+rm(diff_surface)
+
+# directional changes in CT and tem
+
+penetration_depth_CT <- ts_profiles_ID_long_cum %>%
+  filter(var == "CT") %>% 
+  mutate(value_diff = if_else(value_diff<=0, value_diff, NaN),
+         value_cum = if_else(value_cum  <=0, value_cum, NaN))
+
+penetration_depth_tem <- ts_profiles_ID_long_cum %>%
+  filter(var == "tem") %>% 
+  mutate(value_diff = if_else(value_diff>=0, value_diff, NaN),
+         value_cum = if_else(value_cum  >=0, value_cum, NaN))
+
+penetration_depth <- full_join(penetration_depth_CT,
+                                  penetration_depth_tem)
+
+# define integration depth
+
+integration_depth_tem <- penetration_depth_tem %>% 
+  filter(ID == "180723") %>% 
+  mutate(value_cum_rel = 100*value_cum/value_cum_surface)
+
+integration_depth_tem %>% 
+  ggplot(aes(value_cum_rel, dep))+
+  geom_vline(xintercept = c(5))+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse(name = "Depth (m)")+
+  scale_x_continuous(breaks = seq(0,100,10),
+                     name = "Cumulative temperature change relative to surface (%)")
+
+integration_depth_tem <- integration_depth_tem %>% 
+  filter(value_cum_rel < 5) %>% 
+  pull(dep) %>% 
+  min()
+
+rm(penetration_depth_CT, penetration_depth_tem)
+
+```
+
+```{r penetration_depth_calculation}
+
+
+# calculate penetration depths
+
+penetration_depth <- penetration_depth %>% 
+  filter(dep < integration_depth_tem) %>% 
+  group_by(var, ID, date_time_ID) %>% 
+  summarise(value_diff_int = sum(value_diff, na.rm = TRUE),
+            value_cum_int = sum(value_cum, na.rm = TRUE),
+            value_diff_surface = mean(value_diff_surface, na.rm = TRUE),
+            value_cum_surface = mean(value_cum_surface, na.rm = TRUE),
+            penetration_depth_diff = value_diff_int/value_diff_surface,
+            penetration_depth_cum = value_cum_int/value_cum_surface) %>% 
+  ungroup() %>% 
+  filter(penetration_depth_diff > 0)
+
+penetration_depth_mean <- penetration_depth %>% 
+  group_by(var) %>% 
+  summarise(penetration_depth_diff_mean = mean(penetration_depth_diff, na.rm=TRUE),
+            penetration_depth_cum_mean = mean(penetration_depth_cum, na.rm=TRUE),
+            penetration_depth_diff_sd = sd(penetration_depth_diff, na.rm=TRUE),
+            penetration_depth_cum_sd = sd(penetration_depth_cum, na.rm=TRUE)) %>% 
+  ungroup()
+
+penetration_depth_mean
+
+
+```
+
+
+```{r penetration_depth_CT-tem, fig.asp=1.2}
+
+p_pene_diff <- penetration_depth %>% 
+  ggplot(aes(date_time_ID, penetration_depth_diff, col=var))+
+  geom_hline(yintercept = 0)+
+  geom_hline(data = penetration_depth_mean,
+             aes(yintercept = penetration_depth_diff_mean,
+                 col=var, linetype = "mean"))+
+  geom_line(aes(linetype="cruise"))+
+  geom_point()+
+  scale_y_reverse(name = "Pentration depth (m)", breaks = seq(0,20,5))+
+  scale_color_brewer(palette = "Set1", direction = -1)+
+  labs(title = "Incremental CT and temperature changes")+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        legend.title = element_blank())
+
+p_pene_cum <- penetration_depth %>% 
+  ggplot(aes(date_time_ID, penetration_depth_cum, col=var))+
+  geom_hline(yintercept = 0)+
+  geom_hline(data = penetration_depth_mean,
+             aes(yintercept = penetration_depth_diff_mean,
+                 col=var, linetype = "mean"))+
+  geom_line(aes(linetype="cruise"))+
+  geom_point()+
+  scale_y_reverse(name = "Pentration depth (m)", breaks = seq(0,20,5))+
+  scale_color_brewer(palette = "Set1", direction = -1)+
+  labs(title = "Cumulative CT and temperature changes")+
+  theme(axis.title.x = element_blank(),
+        legend.title = element_blank())
+
+p_pene_diff / p_pene_cum +
+  plot_layout(guides = "collect")
+
+```
+
