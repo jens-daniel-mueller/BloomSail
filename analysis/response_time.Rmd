@@ -1572,3 +1572,4 @@ Quality assesment of response time correction
 
 - Condering the summary metrics: If the standard deviation of the offset between up- and downcast is as large as the offset itself, does it make sense to apply the tau factor? In other words: Does it make the profiles significantly better?
 - Compare Contros and own response time estimates
+- Calculate up- and downcast deviation for shallow (low pCO2) profiles only

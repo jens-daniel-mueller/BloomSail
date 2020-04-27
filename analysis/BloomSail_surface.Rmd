@@ -173,7 +173,8 @@ ts_profiles_ID <-
 
 ts_profiles_ID <- ts_profiles_ID %>% 
   mutate(CT = if_else(dep == 3.5, CT, NaN),
-         ID = as.factor(ID))
+         ID = as.factor(ID)) %>% 
+  select(-date_ID)
 
 ```
 
