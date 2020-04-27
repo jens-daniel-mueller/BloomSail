@@ -45,8 +45,16 @@ Note: The reconstruction of C~T~ profiles and the integration across the tempera
 # Data base
 
 1m gridded, downcast profiles were used.
+CO~2~ data other than 3.5 m water depth were removed.
 
-```{r read_CT_cum}
+# MLD approach
+
+MLD calculation was previously described in the [CT dynamics](https://jens-daniel-mueller.github.io/BloomSail/CT_dynamics.html) chapter.
+
+## Read data
+
+
+```{r MLD_read_CT_cum}
 
 ts_profiles_ID <-
   read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum_MLD.csv"))
@@ -59,22 +67,7 @@ ts_profiles_ID <- ts_profiles_ID %>%
 
 ```
 
-
-```{r read_ts_data}
-
-ts_profiles_ID_long_cum <-
-  read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum.csv"))
-
-ts_profiles_ID_long_cum <- ts_profiles_ID_long_cum %>% 
-  filter(var %in% c("CT", "tem")) %>% 
-  mutate(ID = as.factor(ID)) %>% 
-  select(-date_ID)
-
-```
-
-CO~2~ data other than 3.5 m water depth were removed.
-
-```{r remove_CT_depth}
+```{r MLD_remove_CT_depth}
 
 ts_profiles_ID <- ts_profiles_ID %>% 
   mutate(CT = if_else(dep == 3.5, CT, NaN),
@@ -82,10 +75,6 @@ ts_profiles_ID <- ts_profiles_ID %>%
 
 ```
 
-
-# MLD approach
-
-MLD calculation was previously described in the [CT dynamics](https://jens-daniel-mueller.github.io/BloomSail/CT_dynamics.html) chapter.
 
 ## Timeseries
 
@@ -100,8 +89,6 @@ ts_profiles_ID %>%
   scale_linetype(name="Estimate")+
   labs(y="Depth (m)")+
   theme(axis.title.x = element_blank())
-
-rm(zeff)
 
 ```
 
@@ -155,15 +142,17 @@ p_iCT_cum <- ts_profiles_ID_surface %>%
 
 rm(p_iCT, p_iCT_cum)
 
+ts_profiles_ID_surface_MLD <- ts_profiles_ID_surface
 rm(ts_profiles_ID, ts_profiles_ID_surface)
 
 ```
 
 
-# Temperature approach
+# C~T~ profile reconstruction
 
+## Read data
 
-```{r read_ts_data_tem_appraoch}
+```{r CT_recon_read_ts_data}
 
 ts_profiles_ID <-
   read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID.csv"))
@@ -180,7 +169,7 @@ ts_profiles_ID <- ts_profiles_ID %>%
 
 As primary production (negative changes in C~T~) and increase in seawater temperature have a common driver (light), the relation between both changes was investigated.
 
-```{r CT_and_temperature_changes_in_surface}
+```{r CT_recon_CT_and_temperature_changes_in_surface}
 
 ts_profiles_ID_diff <- ts_profiles_ID %>% 
   drop_na() %>% 
@@ -204,7 +193,7 @@ ts_profiles_ID_diff %>%
 
 The ratio of the incremental change of C~T~ with temperature at the seasurface was applied to calculate the C~T~ in other water depth based on the known change in temperature.
 
-```{r reconctruction_CT_incremental_changes_profiles}
+```{r CT_recon_incremental_changes_profiles_calculation}
 
 ts_profiles_ID_diff <- ts_profiles_ID_diff %>% 
   select(ID, factor)
@@ -226,7 +215,7 @@ ts_profiles_ID <- ts_profiles_ID %>%
 
 The reconstructed incremental changes are added up to derive cummulative C~T~ changes throughout the water column.
 
-```{r reconctruction_CT_cumulative_changes_profiles}
+```{r CT_recon__cumulative_changes_profiles_calculation}
 
 ts_profiles_ID_long <- ts_profiles_ID %>% 
   select(ID, date_time_ID, dep, tem = tem_diff, CT = CT_diff) %>% 
@@ -245,7 +234,7 @@ ts_profiles_ID_long <- ts_profiles_ID %>%
 
 Changes of seawater parameters at each depth were reconstructed from one cruise day to the next and divided by the number of days inbetween.
 
-```{r incremental_changes_profiles}
+```{r CT_recon_incremental_changes_profiles}
 
 ts_profiles_ID_long %>% 
   arrange(dep) %>% 
@@ -266,7 +255,7 @@ ts_profiles_ID_long %>%
 
 Cumulative changes of seawater parameters were calculated at each depth relative to the first cruise day on July 5.
 
-```{r cumulative_changes_profiles}
+```{r CT_recon_cumulative_changes_profiles}
 
 ts_profiles_ID_long %>% 
   arrange(dep) %>% 
@@ -287,7 +276,7 @@ Hoevmoeller plots were generated for the reconstructed daily and cumulative chan
 
 ### Daily changes
 
-```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature. Note: Daily changes are currently plotted against the day when they were observed compared to the previous transect, although plotting against the mean date would be more plausible.", fig.asp=0.5}
+```{r CT_recon_hovmoeller_daily, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature.", fig.asp=0.5}
 
 bin_CT <- 2.5
 
@@ -314,7 +303,7 @@ rm(bin_CT)
 
 ### Cumulative changes
 
-```{r plot_hovmoeller_cum, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~ and temperature.", fig.asp=0.5}
+```{r CT_recon_hovmoeller_cum, fig.cap="Hovmoeller plots of daily reconstructed changes in C~T~.", fig.asp=0.5}
 
 bin_CT <- 20
 
@@ -345,10 +334,10 @@ rm(bin_CT)
 
 Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated for the upper 10 m of the water body.
 
-```{r integrated_NCP}
+```{r CT_recon_iCT_timeseries}
 
 iCT_10 <- ts_profiles_ID_long %>%
-  filter(dep < 10, 
+  filter(dep < 12, 
          var == "CT") %>% 
   select(ID, date_time_ID, date_time_ID_ref, CT_diff=value_diff, CT_cum=value_cum) %>% 
   group_by(ID, date_time_ID, date_time_ID_ref) %>% 
@@ -367,6 +356,7 @@ iCT_10 %>%
   labs(y="iCT [mol/m2]", x="")+
   theme_bw()
 
+rm(ts_profiles_ID, ts_profiles_ID_long)
 
 ```
 
@@ -375,6 +365,36 @@ iCT_10 %>%
 # Heat penetration depth
 
 To investigate the link between temperature rise and CT drawdown, we estimated the mean penetration depth of both parameters, which was defined as the surface change (0-6m) devided by the integrated change across depth. To derive the integrated values, we summed up all negative changes in CT and temperature. For temperature we limited the integration to the depth at which the cummulative signal on July 23 was below 5% of the surface signal.
+
+## Read data
+
+
+```{r zeff_read_ts_data}
+
+ts_profiles_ID_long_cum <-
+  read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum.csv"))
+
+ts_profiles_ID_long_cum <- ts_profiles_ID_long_cum %>% 
+  filter(var %in% c("CT", "tem")) %>% 
+  mutate(ID = as.factor(ID)) %>% 
+  select(-date_ID)
+
+```
+
+
+```{r zeff_read_CT_cum}
+
+ts_profiles_ID <-
+  read_csv(here::here("Data/_merged_data_files", "ts_profiles_ID_long_cum_MLD.csv"))
+
+ts_profiles_ID <- ts_profiles_ID %>% 
+  filter(rho_lim == 0.1) %>% 
+  select(ID, date_time_ID, dep, CT = value, CT_diff = value_diff, CT_cum = value_cum) %>% 
+  mutate(ID = as.factor(ID))
+
+
+```
+
 
 ```{r penetration_depth_tem_integration_depth}
 
@@ -470,7 +490,7 @@ p_pene_diff <- penetration_depth %>%
                  col=var, linetype = "mean"))+
   geom_line(aes(linetype="cruise"))+
   geom_point()+
-  scale_y_reverse(name = "Pentration depth (m)", breaks = seq(0,20,5))+
+  scale_y_reverse(name = "Penetration depth (m)", breaks = seq(0,20,5))+
   scale_color_brewer(palette = "Set1", direction = -1)+
   labs(title = "Incremental CT and temperature changes")+
   theme(axis.title.x = element_blank(),
@@ -481,11 +501,11 @@ p_pene_cum <- penetration_depth %>%
   ggplot(aes(date_time_ID, penetration_depth_cum, col=var))+
   geom_hline(yintercept = 0)+
   geom_hline(data = penetration_depth_mean,
-             aes(yintercept = penetration_depth_diff_mean,
+             aes(yintercept = penetration_depth_cum_mean,
                  col=var, linetype = "mean"))+
   geom_line(aes(linetype="cruise"))+
   geom_point()+
-  scale_y_reverse(name = "Pentration depth (m)", breaks = seq(0,20,5))+
+  scale_y_reverse(name = "Penetration depth (m)", breaks = seq(0,20,5))+
   scale_color_brewer(palette = "Set1", direction = -1)+
   labs(title = "Cumulative CT and temperature changes")+
   theme(axis.title.x = element_blank(),
@@ -494,5 +514,97 @@ p_pene_cum <- penetration_depth %>%
 p_pene_diff / p_pene_cum +
   plot_layout(guides = "collect")
 
+rm(p_pene_cum, p_pene_diff)
+
 ```
+
+## iC~T~ calculation
+
+Integrated C~T~ depletion was calculated as the product of observed incremental C~T~ changes in surface waters and the respective mixed layer depth. 
+
+```{r zeff_iCT_calculation}
+
+penetration_depth <- penetration_depth %>% 
+  filter(var == "tem") %>% 
+  select(ID, penetration_depth_diff)
+
+ts_profiles_ID_zeff <- full_join(ts_profiles_ID, penetration_depth) 
+  
+ts_profiles_ID_zeff_surface <- ts_profiles_ID_zeff %>% 
+  filter(dep==3.5) %>% 
+  arrange(date_time_ID) %>% 
+  mutate(iCT_diff = CT_diff * 11.3 / 1000,
+         iCT_cum = cumsum(replace_na(iCT_diff, 0))) %>% 
+  ungroup()
+  
+```
+
+
+```{r zeff_iCT_time_series, fig.asp=1}
+
+p_iCT <- ts_profiles_ID_zeff_surface %>% 
+  ggplot(aes(date_time_ID, iCT_diff))+
+  geom_hline(yintercept = 0)+
+  geom_col(col="black", position = "dodge")+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  #scale_fill_viridis_d()+
+  labs(y="integrated CT changes [mol/m2]")+
+  theme(axis.title.x = element_blank())
+
+p_iCT_cum <- ts_profiles_ID_zeff_surface %>% 
+  ggplot(aes(date_time_ID,  iCT_cum))+
+  geom_line()+
+  geom_hline(yintercept = 0)+
+  scale_color_viridis_d()+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  theme(strip.background = element_blank(),
+        strip.text = element_blank())+
+  labs(y="integrated, cumulative CT changes [mol/m2]", x="date")
+
+
+(p_iCT / p_iCT_cum)+
+  plot_layout(guides = 'collect')
+
+rm(p_iCT, p_iCT_cum)
+
+#rm(ts_profiles_ID, ts_profiles_ID_surface)
+
+```
+
+# Comparison of approaches
+
+```{r read_iCT_data}
+
+iCT_10_flux_mix <-
+  read_csv(here::here("Data/_merged_data_files", "ts_NCP_cum.csv"))
+
+iCT_10_flux_mix <- iCT_10_flux_mix %>% 
+  filter(!is.na(CT_i_diff))
+
+```
+
+
+```{r MLD_CT_zeff_comparison}
+
+ggplot()+
+  geom_line(data = ts_profiles_ID_zeff_surface,
+            aes(date_time_ID,  iCT_cum, col="zeff"))+
+  geom_line(data = ts_profiles_ID_surface_MLD %>% filter(rho_lim == 0.1),
+            aes(date_time_ID,  iCT_cum, col="Rho 0.1"))+
+  geom_line(data = iCT_10,
+            aes(date_time_ID,  CT_i_cum, col="CT recon"))+
+  geom_line(data = iCT_10_flux_mix,
+            aes(date_time,  CT_i_cum, col="best guess"))+
+  geom_hline(yintercept = 0)+
+  scale_color_brewer(palette = "Set1", name="Estimate")+
+  scale_y_continuous(breaks = seq(-100, 100, 0.2))+
+  scale_x_datetime(breaks = "week",
+                   date_labels = "%b %d")+
+  theme(axis.title.x = element_blank())+
+  labs(y="integrated, cumulative CT changes [mol/m2]")
+
+
+
+```
+
 
