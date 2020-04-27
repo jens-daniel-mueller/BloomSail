@@ -439,7 +439,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Response time correction of Contros HydroC pCO<sub>2</sub> data</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">21 April, 2020</h4>
+<h4 class="date">27 April, 2020</h4>
 
 </div>
 
@@ -464,7 +464,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-04-21
+<strong>Last updated:</strong> 2020-04-27
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -555,16 +555,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea82b4fe4176517c93c72e0b8fbe3479fac0f957ftargetblanka82b4fea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a82b4fe4176517c93c72e0b8fbe3479fac0f957f" target="_blank">a82b4fe</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef73f07310909453981c7cbc4432a55e5b7da064etargetblankf73f073a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f73f07310909453981c7cbc4432a55e5b7da064e" target="_blank">f73f073</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea82b4fe4176517c93c72e0b8fbe3479fac0f957ftargetblanka82b4fea" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef73f07310909453981c7cbc4432a55e5b7da064etargetblankf73f073a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a82b4fe4176517c93c72e0b8fbe3479fac0f957f" target="_blank">a82b4fe</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f73f07310909453981c7cbc4432a55e5b7da064e" target="_blank">f73f073</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -583,9 +583,6 @@ Ignored files:
 
 Untracked files:
     Untracked:  output/Plots/Figures_publication/
-
-Unstaged changes:
-    Deleted:    analysis/license.Rmd
 
 </code></pre>
 <p>
@@ -624,6 +621,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f73f07310909453981c7cbc4432a55e5b7da064e/analysis/response_time.Rmd" target="_blank">f73f073</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-27
+</td>
+<td>
+removed Date-ID column causing error
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/472c2b459f86cf55cddac51550b16020a0ed2e31/docs/response_time.html" target="_blank">472c2b4</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-21
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -3324,6 +3355,7 @@ rm(df)</code></pre>
 <ul>
 <li>Condering the summary metrics: If the standard deviation of the offset between up- and downcast is as large as the offset itself, does it make sense to apply the tau factor? In other words: Does it make the profiles significantly better?</li>
 <li>Compare Contros and own response time estimates</li>
+<li>Calculate up- and downcast deviation for shallow (low pCO2) profiles only</li>
 </ul>
 <br>
 <p>
