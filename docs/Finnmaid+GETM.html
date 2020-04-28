@@ -439,7 +439,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Finnmaid and GETM</h1>
 <h4 class="author">Jens Daniel Müller und Lara Sophie Burchardt</h4>
-<h4 class="date">21 April, 2020</h4>
+<h4 class="date">28 April, 2020</h4>
 
 </div>
 
@@ -464,7 +464,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-04-21
+<strong>Last updated:</strong> 2020-04-28
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -555,16 +555,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea82b4fe4176517c93c72e0b8fbe3479fac0f957ftargetblanka82b4fea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a82b4fe4176517c93c72e0b8fbe3479fac0f957f" target="_blank">a82b4fe</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4f17cbb604b7f7a652aae4918a4cda276d021948targetblank4f17cbba"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/4f17cbb604b7f7a652aae4918a4cda276d021948" target="_blank">4f17cbb</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea82b4fe4176517c93c72e0b8fbe3479fac0f957ftargetblanka82b4fea" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4f17cbb604b7f7a652aae4918a4cda276d021948targetblank4f17cbba" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a82b4fe4176517c93c72e0b8fbe3479fac0f957f" target="_blank">a82b4fe</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/4f17cbb604b7f7a652aae4918a4cda276d021948" target="_blank">4f17cbb</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -580,12 +580,8 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
-
-Untracked files:
-    Untracked:  output/Plots/Figures_publication/
-
-Unstaged changes:
-    Deleted:    analysis/license.Rmd
+    Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
+    Ignored:    output/Plots/Figures_publication/Appendix/
 
 </code></pre>
 <p>
@@ -624,6 +620,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/4f17cbb604b7f7a652aae4918a4cda276d021948/analysis/Finnmaid+GETM.Rmd" target="_blank">4f17cbb</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-28
+</td>
+<td>
+zeff for Finnmaid data
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/472c2b459f86cf55cddac51550b16020a0ed2e31/docs/Finnmaid+GETM.html" target="_blank">472c2b4</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-21
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -2838,38 +2868,8 @@ Hovmoeller plots of cumulative reconstructed changes in C<sub>T</sub>.
 </div>
 <pre class="r"><code>rm(bin_CT)</code></pre>
 </div>
-<div id="heat-penetration-depth-1" class="section level3">
-<h3><span class="header-section-number">4.2.7</span> Heat penetration depth</h3>
-<p>As an alternative approach to the integration over the MLD or the reconstruction of C<sub>T</sub> profiles, we can estimate the mean penetration depth of the warming signal, which was defined the surface change in temperature devided by the integrated change in seawater temperature across depth.</p>
-<pre class="r"><code>tem_diff_surface &lt;- fm_gt_3d %&gt;% 
-  filter(dep &lt; 6) %&gt;% 
-  select(date_time_ID, tem_diff_surface=tem_diff) %&gt;% 
-  group_by(date_time_ID) %&gt;% 
-  summarise_all(mean, na.rm=TRUE) %&gt;% 
-  ungroup()
-
-fm_gt_3d &lt;- full_join(fm_gt_3d, tem_diff_surface) 
-rm(tem_diff_surface)
-
-tem_depth &lt;- fm_gt_3d %&gt;%
-  filter(dep &lt; 18) %&gt;% 
-  group_by(date_time_ID) %&gt;% 
-  summarise(tem_diff_int = sum(tem_diff),
-            tem_diff_surface = mean(tem_diff_surface),
-            tem_depth = tem_diff_int/tem_diff_surface) %&gt;% 
-  ungroup()
-
-tem_depth %&gt;% 
-  ggplot(aes(date_time_ID, tem_depth))+
-  geom_hline(yintercept = 0)+
-  geom_line()+
-  geom_point()+
-  scale_y_reverse()</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/heat_penetration_depth-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="ict-time-series" class="section level2">
-<h2><span class="header-section-number">4.3</span> iC<sub>T</sub> time series</h2>
+<div id="ict-time-series" class="section level3">
+<h3><span class="header-section-number">4.2.7</span> iC<sub>T</sub> time series</h3>
 <p>Total incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were calculated for the upper 10 m of the water body.</p>
 <pre class="r"><code>iCT_dT &lt;- fm_gt_3d %&gt;% 
   filter(dep &lt; 10) %&gt;% 
@@ -2893,21 +2893,77 @@ iCT_dT %&gt;%
 <p><img src="figure/Finnmaid+GETM.Rmd/cumulative_directional_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="getm-windspeed" class="section level1">
-<h1><span class="header-section-number">5</span> GETM Windspeed</h1>
-<pre class="r"><code>gt_2d %&gt;% 
+<div id="heat-penetration-depth-1" class="section level2">
+<h2><span class="header-section-number">4.3</span> Heat penetration depth</h2>
+<p>As an alternative approach to the integration over the MLD or the reconstruction of C<sub>T</sub> profiles, we can estimate the mean penetration depth of the warming signal, which was defined the surface change in temperature devided by the integrated change in seawater temperature across depth.</p>
+<pre class="r"><code>tem_diff_surface &lt;- fm_gt_3d %&gt;% 
+  filter(dep &lt; 6) %&gt;% 
+  select(date_time_ID, tem_diff_surface=tem_diff) %&gt;% 
+  group_by(date_time_ID) %&gt;% 
+  summarise_all(mean, na.rm=TRUE) %&gt;% 
+  ungroup()
+
+fm_gt_3d &lt;- full_join(fm_gt_3d, tem_diff_surface) 
+rm(tem_diff_surface)
+
+max_date_time_ID &lt;- fm_ts_ID %&gt;%
+  filter(var == &quot;CT&quot;) %&gt;% 
+  slice(which.min(value)) %&gt;% 
+  pull(date_time_ID)
+
+tem_depth &lt;- fm_gt_3d %&gt;%
+  filter(dep &lt; 18) %&gt;% 
+  group_by(date_time_ID) %&gt;% 
+  summarise(tem_diff_int = sum(tem_diff),
+            tem_diff_surface = mean(tem_diff_surface),
+            tem_depth = tem_diff_int/tem_diff_surface) %&gt;% 
+  ungroup()
+
+mean_heat_pen_depth &lt;- tem_depth %&gt;% 
+  filter(date_time_ID &lt;= max_date_time_ID) %&gt;% 
+  summarise(mean(tem_depth, na.rm = TRUE)) %&gt;% 
+  pull()
+
+tem_depth %&gt;% 
+  ggplot(aes(date_time_ID, tem_depth))+
+  geom_hline(yintercept = 0)+
+  geom_hline(yintercept = mean_heat_pen_depth)+
+  geom_vline(xintercept = max_date_time_ID)+
+  geom_line()+
+  geom_point()+
+  scale_y_reverse()+
+  scale_x_datetime(breaks = &quot;week&quot;,
+                   date_labels = &quot;%b %d&quot;)</code></pre>
+<p><img src="figure/Finnmaid+GETM.Rmd/heat_penetration_depth-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>iCT_zeff &lt;- fm_ts_ID %&gt;%
+  select(date_time_ID, var, value) %&gt;% 
+  pivot_wider(values_from = value, names_from = var) %&gt;% 
+  rename(SST = tem)
+
+iCT_zeff &lt;- iCT_zeff %&gt;% 
+  arrange(date_time_ID) %&gt;% 
+  mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
+         CT_diff = CT - lag(CT),
+         SST_diff = SST - lag(SST),
+         CT_i_diff = CT_diff * mean_heat_pen_depth / 1000,
+         CT_i_cum = cumsum(replace_na(CT_i_diff, 0)))</code></pre>
+<pre class="r"><code>iCT_zeff %&gt;% 
   ggplot()+
-  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_line(aes(x= date_time, y = U_10, col=&quot;3-hourly&quot;))+
-  geom_line(data = gt_2d_daily,
-            aes(x= date_time, y = U_10, col=&quot;Daily mean&quot;))+
-  labs(y=&quot;U (m/s)&quot;, x = &quot;Date&quot;)+
-  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;, direction = -1)+
+  geom_hline(yintercept = 0)+
+  geom_point(aes(date_time_ID,  0), shape=21)+
+  geom_col(aes(date_time_ID_ref, CT_i_diff),
+           position = &quot;dodge&quot;, alpha=0.3)+
+  geom_line(aes(date_time_ID, CT_i_cum))+
+  scale_color_viridis_d(name=&quot;Depth limit (m)&quot;)+
+  scale_fill_viridis_d(name=&quot;Depth limit (m)&quot;)+
+  labs(y=&quot;iCT [mol/m2]&quot;, x=&quot;&quot;)+
   theme_bw()</code></pre>
-<p><img src="figure/Finnmaid+GETM.Rmd/plot_gt_winspeed-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Finnmaid+GETM.Rmd/iCT_zeff-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 <div id="open-tasks-questions" class="section level1">
-<h1><span class="header-section-number">6</span> Open tasks / questions</h1>
+<h1><span class="header-section-number">5</span> Open tasks / questions</h1>
 <ul>
 <li>Can delta T approach be improved by:
 <ul>
