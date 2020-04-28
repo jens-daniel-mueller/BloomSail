@@ -2,10 +2,17 @@
 title: "Data base"
 author: "Jens Daniel Müller"
 date:  "`r format(Sys.time(), '%d %B, %Y')`"
-output: workflowr::wflow_html
+output: 
+  workflowr::wflow_html:
+    number_sections: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
 editor_options:
   chunk_output_type: console
 ---
+
+
 ```{r global_options, include = FALSE}
 knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 ```
@@ -37,7 +44,6 @@ CTD sensor data including recordings from auxiliary pH, O~2~, Chla and pCO~2~ se
 
 ```{r read_ts_profile_transect_regular, eval=FALSE}
 
-#setwd("C:/Mueller_Jens_Data/Research/Projects/BloomSail/data/TinaV/Sensor/Profiles_Transects")
 files <- list.files(path = "data/TinaV/Sensor/Profiles_Transects/", pattern = "[.]cnv$")
 #file <- files[1]
 
@@ -51,16 +57,16 @@ for (file in files){
   tempo <- read.delim(here::here("data/TinaV/Sensor/Profiles_Transects/", file),
                       sep="", skip = 160, header = FALSE)
   tempo <- data.table(tempo[,c(2,3,4,5,6,7,9,11,13)])
-  names(tempo) <- c("date", "Dep.S", "Tem.S", "Sal.S", "V_pH", "pH", "Chl", "O2", "pCO2")
+  names(tempo) <- c("date_time", "dep", "tem", "sal", "V_pH", "pH", "Chl", "O2", "pCO2_analog")
   tempo$start.date <- start.date
-  tempo$date <- tempo$date + tempo$start.date
+  tempo$date_time <- tempo$date_time + tempo$start.date
   
-  tempo$transect.ID <- substr(file, 1, 6)
+  tempo$ID <- substr(file, 1, 6)
   tempo$type <- substr(file, 8,8)
-  tempo$label <- substr(file, 8,10)
+  tempo$station <- substr(file, 8,10)
   
   tempo$cast <- "up"
-  tempo[date < mean(tempo[Dep.S == max(tempo$Dep.S)]$date)]$cast <- "down"
+  tempo[date_time < mean(tempo[dep == max(tempo$dep)]$date_time)]$cast <- "down"
   
   if (exists("dataset")){
     dataset <- rbind(dataset, tempo)
@@ -95,16 +101,16 @@ for (file in files){
   tempo <- read.delim(here::here("data/TinaV/Sensor/Ostergarnsholm/", file),
                       sep="", skip = 160, header = FALSE)
   tempo <- data.table(tempo[,c(2,3,4,5,6,7,9,11,13)])
-  names(tempo) <- c("date", "Dep.S", "Tem.S", "Sal.S", "V_pH", "pH", "Chl", "O2", "pCO2")
+  names(tempo) <- c("date_time", "dep", "tem", "sal", "V_pH", "pH", "Chl", "O2", "pCO2_analog")
   tempo$start.date <- start.date
-  tempo$date <- tempo$date + tempo$start.date
+  tempo$date_time <- tempo$date_time + tempo$start.date
   
-  tempo$transect.ID <- substr(file, 1, 6)
+  tempo$ID <- substr(file, 1, 6)
   tempo$type <- substr(file, 8,8)
-  tempo$label <- substr(file, 11,12)
+  tempo$station <- substr(file, 11,12)
     
   tempo$cast <- "up"
-  tempo[date < mean(tempo[Dep.S == max(tempo$Dep.S)]$date)]$cast <- "down"
+  tempo[date_time < mean(tempo[dep == max(tempo$dep)]$date_time)]$cast <- "down"
   
   if (exists("dataset")){
     dataset <- rbind(dataset, tempo)
@@ -123,16 +129,16 @@ ts_OGB <- dataset
 rm(dataset, file, files)
 
 ts_OGB <- ts_OGB %>% 
-  mutate(type = if_else(label=="bo", "P", "T"),
-         label = if_else(label == "bo", "P14", label),
-         label = if_else(label == "in", "T14", label),
-         label = if_else(label == "ou", "T15", label))
+  mutate(type = if_else(station=="bo", "P", "T"),
+         station = if_else(station == "bo", "P14", station),
+         station = if_else(station == "in", "T14", station),
+         station = if_else(station == "ou", "T15", station))
 
 ```
 
 ```{r merge_ts_regular_and_Ostergarnsholm, eval=FALSE}
 ts <- bind_rows(ts, ts_OGB) %>% 
-  arrange(date)
+  arrange(date_time)
 
 rm(ts_OGB)
 ```
@@ -162,89 +168,89 @@ ts <- data.table(ts)
 
 # Profiling data
 
-# Temperature
+# temperature
 
 # ts %>%
 #   filter(type == "P") %>%
-#   ggplot(aes(Tem.S, Dep.S, col=label, linetype = cast))+
+#   ggplot(aes(tem, dep, col=station, linetype = cast))+
 #   geom_line()+
 #   scale_y_reverse()+
 #   geom_vline(xintercept = c(10, 20))+
-#   facet_wrap(~transect.ID)
+#   facet_wrap(~ID)
 
-ts[transect.ID == "180723" & label == "P07" & Dep.S < 2 & cast == "up"]$Tem.S <- NA
+ts[ID == "180723" & station == "P07" & dep < 2 & cast == "up"]$tem <- NA
 
-# Salinity
+# salinity
 
 # ts %>%
 #   filter(type == "P") %>%
-#   ggplot(aes(Sal.S, Dep.S, col=label, linetype = cast))+
+#   ggplot(aes(sal, dep, col=station, linetype = cast))+
 #   geom_path()+
 #   scale_y_reverse()+
-#   facet_wrap(~transect.ID)
+#   facet_wrap(~ID)
 
-ts[Sal.S < 6]$Sal.S <- NA
+ts[sal < 6]$sal <- NA
 
 # pH
 
 # ts %>%
 #   filter(type == "P") %>%
-#   ggplot(aes(pH, Dep.S, col=label, linetype=cast))+
+#   ggplot(aes(pH, dep, col=station, linetype=cast))+
 #   geom_path()+
 #   scale_y_reverse()+
-#   facet_wrap(~transect.ID)
+#   facet_wrap(~ID)
 # 
 # ts %>%
 #   filter(type == "P") %>%
-#   ggplot(aes(V_pH, Dep.S, col=label, linetype=cast))+
+#   ggplot(aes(V_pH, dep, col=station, linetype=cast))+
 #   geom_path()+
 #   scale_y_reverse()+
-#   facet_wrap(~transect.ID)
+#   facet_wrap(~ID)
 
 ts[pH < 7.5]$V_pH <- NA
 ts[pH < 7.5]$pH <- NA
 
-ts[transect.ID == "180709" & label == "P03" & Dep.S < 5 & cast == "down"]$pH <- NA
-ts[transect.ID == "180709" & label == "P05" & Dep.S < 10 & cast == "down"]$pH <- NA
-ts[transect.ID == "180718" & label == "P10" & Dep.S < 3 & cast == "down"]$pH <- NA
-ts[transect.ID == "180815" & label == "P03" & Dep.S < 2 & cast == "down"]$pH <- NA
-ts[transect.ID == "180820" & label == "P11" & Dep.S < 15 & cast == "down"]$pH <- NA
+ts[ID == "180709" & station == "P03" & dep < 5 & cast == "down"]$pH <- NA
+ts[ID == "180709" & station == "P05" & dep < 10 & cast == "down"]$pH <- NA
+ts[ID == "180718" & station == "P10" & dep < 3 & cast == "down"]$pH <- NA
+ts[ID == "180815" & station == "P03" & dep < 2 & cast == "down"]$pH <- NA
+ts[ID == "180820" & station == "P11" & dep < 15 & cast == "down"]$pH <- NA
 
-ts[transect.ID == "180709" & label == "P03" & Dep.S < 5 & cast == "down"]$V_pH <- NA
-ts[transect.ID == "180709" & label == "P05" & Dep.S < 10 & cast == "down"]$V_pH <- NA
-ts[transect.ID == "180718" & label == "P10" & Dep.S < 3 & cast == "down"]$V_pH <- NA
-ts[transect.ID == "180815" & label == "P03" & Dep.S < 2 & cast == "down"]$V_pH <- NA
-ts[transect.ID == "180820" & label == "P11" & Dep.S < 15 & cast == "down"]$V_pH <- NA
+ts[ID == "180709" & station == "P03" & dep < 5 & cast == "down"]$V_pH <- NA
+ts[ID == "180709" & station == "P05" & dep < 10 & cast == "down"]$V_pH <- NA
+ts[ID == "180718" & station == "P10" & dep < 3 & cast == "down"]$V_pH <- NA
+ts[ID == "180815" & station == "P03" & dep < 2 & cast == "down"]$V_pH <- NA
+ts[ID == "180820" & station == "P11" & dep < 15 & cast == "down"]$V_pH <- NA
 
 
 # pCO2
 
 # ts %>%
 #   filter(type == "P") %>%
-#   ggplot(aes(pCO2, Dep.S, col=label, linetype = cast))+
+#   ggplot(aes(pCO2, dep, col=station, linetype = cast))+
 #   geom_path()+
 #   scale_y_reverse()+
-#   facet_wrap(~transect.ID)
+#   facet_wrap(~ID)
 
-ts[transect.ID == "180616"]$pCO2 <- NA
+ts[ID == "180616"]$pCO2_analog <- NA
 
 # O2
 
 # ts %>% 
 #   filter(type == "P") %>% 
-#   ggplot(aes(O2, Dep.S, col=label, linetype = cast))+
+#   ggplot(aes(O2, dep, col=station, linetype = cast))+
 #   geom_path()+
 #   scale_y_reverse()+
-#   facet_wrap(~transect.ID)
+#   facet_wrap(~ID)
 
 # Chlorophyll
 
 # ts %>%
 #   filter(type == "P") %>%
-#   ggplot(aes(Chl, Dep.S, col=label, linetype = cast))+
+#   ggplot(aes(Chl, dep, col=station, linetype = cast))+
 #   geom_path()+
 #   scale_y_reverse()+
-#   facet_wrap(~transect.ID)
+#   facet_wrap(~ID)
 
 ts[Chl > 100]$Chl <- NA
 
@@ -253,49 +259,49 @@ ts[Chl > 100]$Chl <- NA
 
 # ts %>%
 #   filter(type == "T") %>%
-#   ggplot(aes(date, Dep.S, col=label))+
+#   ggplot(aes(date, dep, col=station))+
 #   geom_point()+
 #   scale_y_reverse()+
-#   facet_wrap(~transect.ID, scales = "free_x")
+#   facet_wrap(~ID, scales = "free_x")
 # 
 # ts %>%
 #   filter(type == "T") %>%
-#   ggplot(aes(date, Tem.S, col=label))+
+#   ggplot(aes(date, tem, col=station))+
 #   geom_point()+
-#   facet_wrap(~transect.ID, scales = "free_x")
+#   facet_wrap(~ID, scales = "free_x")
 # 
 # ts %>%
 #   filter(type == "T") %>%
-#   ggplot(aes(date, Sal.S, col=label))+
+#   ggplot(aes(date, sal, col=station))+
 #   geom_point()+
-#   facet_wrap(~transect.ID, scales = "free_x")
+#   facet_wrap(~ID, scales = "free_x")
 # 
 # ts %>%
 #   filter(type == "T") %>%
-#   ggplot(aes(date, pCO2, col=label))+
+#   ggplot(aes(date, pCO2, col=station))+
 #   geom_point()+
-#   facet_wrap(~transect.ID, scales = "free_x")
+#   facet_wrap(~ID, scales = "free_x")
 # 
 # ts %>%
 #   filter(type == "T") %>%
-#   ggplot(aes(date, pH, col=label))+
+#   ggplot(aes(date, pH, col=station))+
 #   geom_point()+
-#   facet_wrap(~transect.ID, scales = "free_x")
+#   facet_wrap(~ID, scales = "free_x")
 # 
 # ts %>%
 #   filter(type == "T") %>%
-#   ggplot(aes(date, Chl, col=label))+
+#   ggplot(aes(date, Chl, col=station))+
 #   geom_point()+
-#   facet_wrap(~transect.ID, scales = "free_x")
+#   facet_wrap(~ID, scales = "free_x")
 
 ts[type == "T" & Chl > 10]$Chl <- NA
 
 
 # ts %>% 
 #   filter(type == "T") %>% 
-#   ggplot(aes(date, O2, col=label))+
+#   ggplot(aes(date, O2, col=station))+
 #   geom_point()+
-#   facet_wrap(~transect.ID, scales = "free_x")
+#   facet_wrap(~ID, scales = "free_x")
 
 ```
 
@@ -306,32 +312,34 @@ Relevant columns were selected and renamed, only observations from regular stati
 ```{r ts_column_subsetting_writing_summary_file, eval=FALSE}
 
 ts <- ts %>% 
-  select(date_time=date,
-         ID=transect.ID,
+  select(date_time,
+         ID,
          type,
-         station=label,
-         dep=Dep.S,
-         sal=Sal.S,
-         tem=Tem.S,
-         pCO2_analog=pCO2)
+         station,
+         dep,
+         sal,
+         tem,
+         pCO2_analog)
 
 # ts <- ts %>% 
 #   filter( !(station %in% c("PX1", "PX2", "TX1", "TX2") ))
 
 ts %>% 
-  write_csv(here::here("data/_summarized_data_files", "ts_profiles_transects.csv"))
+  write_csv(here::here("data/_summarized_data_files", "ts.csv"))
 
 rm(ts)
 ```
 
-```{r reopen_CTD_data}
-ts <- read_csv(here::here("data/_summarized_data_files", "ts_profiles_transects.csv"),
+## EDA clean data
+
+
+```{r reopen_ts_data}
+ts <- read_csv(here::here("data/_summarized_data_files", "ts.csv"),
                col_types = cols(pCO2_analog = col_double()))
 ```
 
-## EDA clean data
 
-```{r CTD_EDA, eval=FALSE}
+```{r ts_EDA_clean, eval=FALSE}
 
 source("code/eda.R")
 eda(ts, "ts_clean")
@@ -346,7 +354,7 @@ The output of an automated Exploratory Data Analysis (EDA) performed with the pa
 
 ## Overview plots
 
-```{r Temperature_profiles, fig.cap="Temperature profiles by stations. Color refers to the starting date of each cruise.", fig.asp = 1.3}
+```{r temperature_profiles, fig.cap="temperature profiles by stations. Color refers to the starting date of each cruise.", fig.asp = 1.3}
 
 ts %>%
   arrange(date_time) %>% 
@@ -355,8 +363,8 @@ ts %>%
   geom_path()+
   scale_y_reverse()+
   scale_color_viridis_c(trans = "date", name="")+
-  labs(x="Temperature (°C)", y="Depth (m)")+
-  facet_wrap(~station, labeller = label_both)
+  labs(x="temperature (°C)", y="Depth (m)")+
+  facet_wrap(~station)
 
 ```
 
@@ -370,8 +378,8 @@ ts %>%
   geom_path()+
   scale_y_reverse()+
   scale_color_viridis_c(trans = "date", name="")+
-  labs(x="Temperature (°C)", y="Depth (m)")+
-  facet_wrap(~station, labeller = label_both)
+  labs(x="temperature (°C)", y="Depth (m)")+
+  facet_wrap(~station)
 
 ```
 
@@ -392,7 +400,7 @@ th <-
             col_names = c("date_time", "Zero", "Flush", "p_NDIR",
                           "p_in", "T_control", "T_gas", "%rH_gas",
                           "Signal_raw", "Signal_ref", "T_sensor",
-                          "pCO2", "Runtime", "nr.ave")) %>% 
+                          "pCO2_corr", "Runtime", "nr.ave")) %>% 
   mutate(date_time = dmy_hms(date_time),
          Flush = as.factor(as.character(Flush)),
          Zero = as.factor(as.character(Zero)))
@@ -403,7 +411,7 @@ th <-
 
 Individual deployments (periods of observations with less than 30 sec between recordings) were identified and relevant deployment periods were subsetted. This procedure removes only recordings attributable to sensor testing and set-up.
 
-```{r th_deployment_identification_selection, eval=FALSE}
+```{r identify_select_th_deployment, eval=FALSE}
 
 th <- th %>% 
   arrange(date_time) %>% 
@@ -416,7 +424,7 @@ th <- th %>%
 
 ## Removal of duplicated time stamps
 
-```{r duplicated_timestamp_removal, eval=FALSE}
+```{r remove_duplicated_timestamp_th, eval=FALSE}
 
 
 # add counter for date_time observations
@@ -552,7 +560,7 @@ th <- th %>%
 
 ## Flush and Zeroing identification
 
-```{r th_Zeroing_Flush_Identification, eval=FALSE}
+```{r Identify_Zeroing_Flush_th, eval=FALSE}
 
 # Zeroing ID labelling
 
@@ -586,7 +594,7 @@ th <- th %>%
 
 ## Deployment plots
 
-```{r HydroC_deployment_plots, eval=FALSE}
+```{r th_deployment_plots, eval=FALSE}
 
 pdf(file=here::here("output/Plots/read_in",
     "th_deployments.pdf"), onefile = TRUE, width = 7, height = 4)
@@ -601,7 +609,7 @@ for (i in unique(th$deployment)) {
   
   print(
     sub %>% 
-      ggplot(aes(date_time, pCO2, col=Zero_ID))+
+      ggplot(aes(date_time, pCO2_corr, col=Zero_ID))+
       geom_line()+
       labs(title = paste("Deployment: ",i, "| Start time: ", start_date))
 )
@@ -635,13 +643,13 @@ The output of an automated Exploratory Data Analysis (EDA) performed with the pa
 
 Summarized pCO~2~ date were written to file.
 
-```{r writing_summary_file, eval=FALSE}
+```{r write_th_summary_file, eval=FALSE}
 
 th %>% write_csv(here::here("Data/_summarized_data_files",
                             "th_full.csv"))
 
 th %>% 
-  select(date_time, Zero, Flush, pCO2_corr = pCO2, deployment, Zero_ID, duration, mixing) %>% 
+  select(date_time, Zero, Flush, pCO2_corr, deployment, Zero_ID, duration, mixing) %>% 
   write_csv(here::here("Data/_summarized_data_files",
                        "th.csv"))
 
@@ -656,7 +664,7 @@ Discrete samples were collected with a Niskin bottle and analysed for C[T] and A
 
 ## Read data
 
-```{r read_bottle_CO2, eval=FALSE}
+```{r read_tb_CO2_data, eval=FALSE}
 
 
 tb <- read_csv(here::here("Data/TinaV/Bottle/Tracegases", "BloomSail_bottle_CO2_all.csv"),
@@ -674,7 +682,7 @@ tb <- tb %>%
 
 ## Write summary file
 
-```{r write_bottle_CO2, eval=FALSE}
+```{r write_tb_CO2_data, eval=FALSE}
 
 tb %>% write_csv(here::here("Data/_summarized_data_files",
                             "tb.csv"))
@@ -690,7 +698,7 @@ GPS track data were recorded with a Samsung Galaxy tablet.
 
 ## Read data
 
-```{r read_GPS_data, eval=FALSE}
+```{r read_tt_data, eval=FALSE}
 
 files <- list.files(path = "data/TinaV/Track/GPS_Logger_Track/", pattern = "[.]txt$")
 
@@ -726,11 +734,13 @@ rm(dataset, file, files)
 
 ## Write summary file
 
-```{r write_track_data, eval=FALSE}
+```{r write_tt_data, eval=FALSE}
 
 tt %>% 
   write_csv(here::here("data/_summarized_data_files",
                        "tt.csv"))
+
+rm(tt)
 
 ```
 
@@ -754,14 +764,14 @@ for (file in files){
   
   df <- read_excel(here::here("data/Finnmaid_2018", file))
   df <- df[c(1,2,3,12,7,4,15,8,5,17)]
-  names(df) <- c("date","Lon","Lat","pCO2","Sal","Tem","cO2","patm", "Teq","xCO2")
+  names(df) <- c("date_time","lon","lat","pCO2","sal","tem","cO2","patm", "Teq","xCO2")
   df <- df[-c(1),]
-  df$date <- as.POSIXct(as.numeric(df$date)*60*60*24, origin="1899-12-30", tz="GMT")
-  df$Lon <- as.numeric(as.character(df$Lon))
-  df$Lat <- as.numeric(as.character(df$Lat))
+  df$date_time <- as.POSIXct(as.numeric(df$date_time)*60*60*24, origin="1899-12-30", tz="GMT")
+  df$lon <- as.numeric(as.character(df$lon))
+  df$lat <- as.numeric(as.character(df$lat))
   df$pCO2 <- as.numeric(as.character(df$pCO2))
-  df$Sal <- as.numeric(as.character(df$Sal))
-  df$Tem <- as.numeric(as.character(df$Tem))
+  df$sal <- as.numeric(as.character(df$sal))
+  df$tem <- as.numeric(as.character(df$tem))
   df$cO2 <- as.numeric(as.character(df$cO2))
   df$patm <- as.numeric(as.character(df$patm))
   df$Teq <- as.numeric(as.character(df$Teq))
@@ -793,9 +803,9 @@ for (file in files){
   
   df <- read_excel(here::here("data/Finnmaid_2018/LGR", file))
   df <- df[c(2,3,4,8,6,5,14,7,15,9)]
-  names(df) <- c("date","Lon","Lat","pCO2","Sal","Tem","cO2","patm", "Teq","xCO2")
+  names(df) <- c("date_time","lon","lat","pCO2","sal","tem","cO2","patm", "Teq","xCO2")
   df <- df[-c(1),]
-  df$date <- dmy_hms(df$date)
+  df$date_time <- dmy_hms(df$date_time)
   df <- data.table(df)
   
   df$route <- substr(as.character(file), 12, 12)
@@ -812,14 +822,15 @@ for (file in files){
 
 ## Convert O2 concentration units
 
-```{r convert_O2_Los_Gatos, eval=FALSE}
+```{r convert_O2_Los_Gatos_fm, eval=FALSE}
 
 source(here::here("code", "O2stoO2c.R"))
 
 temp.LGR <- temp.LGR %>%
   filter() %>% 
-  mutate(cO2 = O2stoO2c(O2sat = cO2, T=Tem, S=Sal, P=3/10, p_atm = 1013.5))
+  mutate(cO2 = O2stoO2c(O2sat = cO2, T=tem, S=sal, P=3/10, p_atm = 1013.5))
 
+rm(O2stoO2c, pH2Osat, sca_T, Scorr, TCorr, R, Vm)
 
 ```
 
@@ -828,20 +839,20 @@ temp.LGR <- temp.LGR %>%
 temp$sensor <- "LICOR"
 temp.LGR$sensor <- "LosGatos"
 
-temp <- bind_rows(temp, temp.LGR)
+fm <- bind_rows(temp, temp.LGR)
 
-rm(temp.LGR, df, file, files)
+rm(temp, temp.LGR, df, file, files)
 
 
 # temp$Area <- with(temp,
-#                   ifelse(Lon>12 & Lon<12.6, "1.MEB",
-#                   ifelse(Lon>13.1 & Lon<14.3, "2.ARK",
-#                   ifelse(Lat>57.5 & Lat<58.5 & route %in% c("E", "G"), "4.EGS",
-#                   ifelse(Lat>57.3 & Lat<57.5 & route %in% c("E"), "BS",
-#                   ifelse(Lat>56.8 & Lat<57.5 & route=="W", "3.WGS",
-#                   ifelse(Lat>58.5 & Lat<59 & Lon>20, "5.NGS",
-#                   ifelse(Lon>22 & Lon<24, "6.WGF",
-#                   ifelse(Lon>24 & Lon<24.5, "7.HGF", "NaN")))))))))
+#                   ifelse(lon>12 & lon<12.6, "1.MEB",
+#                   ifelse(lon>13.1 & lon<14.3, "2.ARK",
+#                   ifelse(lat>57.5 & lat<58.5 & route %in% c("E", "G"), "4.EGS",
+#                   ifelse(lat>57.3 & lat<57.5 & route %in% c("E"), "BS",
+#                   ifelse(lat>56.8 & lat<57.5 & route=="W", "3.WGS",
+#                   ifelse(lat>58.5 & lat<59 & lon>20, "5.NGS",
+#                   ifelse(lon>22 & lon<24, "6.WGF",
+#                   ifelse(lon>24 & lon<24.5, "7.HGF", "NaN")))))))))
 
 
 
@@ -852,11 +863,12 @@ rm(temp.LGR, df, file, files)
 ```{r write_fm, eval=FALSE}
 
 
-temp <-temp[complete.cases(temp[,pCO2]),]
+fm <-fm[complete.cases(fm[,pCO2]),]
 
-temp %>% 
+fm %>% 
   write_csv(here::here("Data/_summarized_data_files",
                        "fm.csv"))
+rm(fm)
 
 ```
 
@@ -870,7 +882,7 @@ fm <- read_csv(here::here("Data/_summarized_data_files",
                        "fm.csv"))
 
 fm_sub <- fm %>%
-  arrange(date) %>% 
+  arrange(date_time) %>% 
   slice(which(row_number() %% 20 == 1))
 
 tt <- read_csv(here::here("Data/_summarized_data_files", "tt.csv"))
@@ -896,7 +908,7 @@ leaflet() %>%
     primaryAreaUnit = "sqmeters",
     secondaryAreaUnit="acres", 
     position = 'topleft') %>% 
-  addCircles(data = fm_sub, ~Lon, ~Lat,
+  addCircles(data = fm_sub, ~lon, ~lat,
                color = "white",
                group = "Finnmaid") %>% 
   addPolylines(data = tt_sub, ~lon, ~lat,
