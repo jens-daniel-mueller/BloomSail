@@ -25,8 +25,11 @@ Throughout this analysis, the following naming conventions for objects (data set
 The following names should be identical for stored files and objectes in R environment
 
 - source
-  - ts: tina 5 sensor
-  - tb: tina 5 bottle
+  - ts: TinaV Sea-Bird SBE 16 sensor
+  - th: TinaV HydroC CO2
+  - tm: ts + th merged
+  - tb: TinaV discrete bottle
+  - tt: TinaV track data (coordinates + timestamp)
   - fm: finnmaid
   - og: ostergarnsholm tower
   - gt: GETM (high-res huydographical model)
