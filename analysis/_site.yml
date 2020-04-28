@@ -5,6 +5,8 @@ navbar:
   left:
   - text: Data base
     menu:
+    - text: Nomenclature
+      href: nomenclature.html
     - text: Read-in
       href: read-in.html
     - text: Mergind and interpolation

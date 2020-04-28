@@ -8,7 +8,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-On this website we present our ongoing ambition to quantify net primary production during cyanobacteria blooms in the Baltic Sea through vertically resolved pCO~2~ measurements.
+On this website we present our ongoing ambition to quantify the net community production (NCP) during a cyanobacteria bloom in the Baltic Sea through vertically resolved pCO~2~ measurements.
 
 Please navigate trough the navbar on top to take a look at the various chapters of this project.
 

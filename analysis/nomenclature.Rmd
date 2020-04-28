@@ -1,0 +1,95 @@
+---
+title: "Nomenclature used in this project"
+author: "Jens Daniel Müller"
+date:  "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  workflowr::wflow_html:
+    number_sections: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+editor_options:
+  chunk_output_type: console
+---
+
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
+
+
+Throughout this analysis, the following naming conventions for objects (data sets) and variables are used.
+
+# Nomenclature of objectes / data sets
+
+The following names should be identical for stored files and objectes in R environment
+
+- source
+  - ts: tina 5 sensor
+  - tb: tina 5 bottle
+  - fm: finnmaid
+  - og: ostergarnsholm tower
+  - gt: GETM (high-res huydographical model)
+  - mp: bathymetric map
+
+- subsetting and modification levels
+  - profiles vs surface: operation mode tina 5
+  - ID: mean values for cruise (reduced temporal resolution)
+  - daily: daily mean values
+  - long: data stored in long format (all observations in only 2 columns "var" and "value")
+  - fix: constant, unique values such as long-term means, starting dates, etc
+  - iCT: includes cumulative numbers as iCT estimates
+  - NCP: includes cumulative numbers as NCP estimates
+  - CT_tem: data subset to analyse changes of CT with tem
+  - 3d vs 2d: surface vs depth resolved GETM data
+ 
+ 
+# Nomenclature of variables
+
+- Descriptive variables
+  - date
+  - date_time
+  - date_time_ID: mean date of cruise
+  - date_time_ID_diff: time differences in between cruises
+  - date_time_ID_ref: mean date in between cruises corresponding to observed incremental changes
+  - station
+  - ID: character identifying starting date of cruise as YYMMDD
+  - dep: 1m depth intervals
+  - lat
+  - lon
+
+- Observed variables: column names, or identifier in column "var" for long-format tables 
+  - pCO2_analog: analog HydroC signal recorded on SeaBird CTD
+  - pCO2_raw: HydroC signal recorded internally
+  - pCO2_corr: HydroC signal recorded internally postprocessed by manufacturer
+  - pCO2: Response time corrected pCO2_corr
+  - sal
+  - tem
+  - nCT: CT calculated from pCO2, temperature, and fixed AT, S
+  - CT: Measured dissolved inorganic carbon
+  - AT: Measured total alkalinity
+  - U10: wind speed at 10m
+  - mld: mixed or mixing layer depth
+
+- Variable name extension
+  - mean
+  - sd
+  - min
+  - max
+  - int: interpolated value
+  - grid: value gridded to a coarser resolution
+  - diff: difference to previous value
+  - diff_daily: difference to previous value divided by number of days
+  - i: intergrated over depth
+  - cum: cumulative value over time
+  - sign: identifier for pos. or neg. differences
+
+- p_XXX: ggplot object
+
+# Chunk labeling
+
+- criteria_: Definition of criteria for subsetting etc (should be at the beginning of each Rmd file)
+- read_: read data
+- calc_: perform calculations, mutate variables, etc
+- chunks for plotting are labeled according to plot content, because name controls plot file name
+
