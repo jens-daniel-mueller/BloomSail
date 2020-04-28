@@ -315,7 +315,6 @@ rm(ts_gt_3d, ts_gt_3d_long, ts_profiles_ID)
 
 ```
 
-
 ## Mixed layer depth
 
 Mean mixed/mixing layer depth estimates based on sewater density and windspeed were extracted from 3h GETM surface data.
@@ -1040,41 +1039,7 @@ rm(bin_CT)
 ```
 
 
-### Heat penetration depth
-
-As an alternative approach to the integration over the MLD or the reconstruction of C~T~ profiles, we can estimate the mean penetration depth of the warming signal, which was defined the surface change in temperature devided by the integrated change in seawater temperature across depth.
-
-```{r heat_penetration_depth}
-
-tem_diff_surface <- fm_gt_3d %>% 
-  filter(dep < 6) %>% 
-  select(date_time_ID, tem_diff_surface=tem_diff) %>% 
-  group_by(date_time_ID) %>% 
-  summarise_all(mean, na.rm=TRUE) %>% 
-  ungroup()
-
-fm_gt_3d <- full_join(fm_gt_3d, tem_diff_surface) 
-rm(tem_diff_surface)
-
-tem_depth <- fm_gt_3d %>%
-  filter(dep < 18) %>% 
-  group_by(date_time_ID) %>% 
-  summarise(tem_diff_int = sum(tem_diff),
-            tem_diff_surface = mean(tem_diff_surface),
-            tem_depth = tem_diff_int/tem_diff_surface) %>% 
-  ungroup()
-
-tem_depth %>% 
-  ggplot(aes(date_time_ID, tem_depth))+
-  geom_hline(yintercept = 0)+
-  geom_line()+
-  geom_point()+
-  scale_y_reverse()
-
-```
-
-
-## iC~T~ time series
+### iC~T~ time series
 
 Total incremental and cumulative C~T~ changes inbetween cruise dates were calculated for the upper 10 m of the water body.
 
@@ -1104,18 +1069,85 @@ iCT_dT %>%
 ```
 
 
-# GETM Windspeed
+## Heat penetration depth
 
-```{r plot_gt_winspeed}
+As an alternative approach to the integration over the MLD or the reconstruction of C~T~ profiles, we can estimate the mean penetration depth of the warming signal, which was defined the surface change in temperature devided by the integrated change in seawater temperature across depth.
 
-gt_2d %>% 
+```{r heat_penetration_depth}
+
+tem_diff_surface <- fm_gt_3d %>% 
+  filter(dep < 6) %>% 
+  select(date_time_ID, tem_diff_surface=tem_diff) %>% 
+  group_by(date_time_ID) %>% 
+  summarise_all(mean, na.rm=TRUE) %>% 
+  ungroup()
+
+fm_gt_3d <- full_join(fm_gt_3d, tem_diff_surface) 
+rm(tem_diff_surface)
+
+max_date_time_ID <- fm_ts_ID %>%
+  filter(var == "CT") %>% 
+  slice(which.min(value)) %>% 
+  pull(date_time_ID)
+
+tem_depth <- fm_gt_3d %>%
+  filter(dep < 18) %>% 
+  group_by(date_time_ID) %>% 
+  summarise(tem_diff_int = sum(tem_diff),
+            tem_diff_surface = mean(tem_diff_surface),
+            tem_depth = tem_diff_int/tem_diff_surface) %>% 
+  ungroup()
+
+mean_heat_pen_depth <- tem_depth %>% 
+  filter(date_time_ID <= max_date_time_ID) %>% 
+  summarise(mean(tem_depth, na.rm = TRUE)) %>% 
+  pull()
+
+tem_depth %>% 
+  ggplot(aes(date_time_ID, tem_depth))+
+  geom_hline(yintercept = 0)+
+  geom_hline(yintercept = mean_heat_pen_depth)+
+  geom_vline(xintercept = max_date_time_ID)+
+  geom_line()+
+  geom_point()+
+  scale_y_reverse()+
+  scale_x_datetime(breaks = "week",
+                   date_labels = "%b %d")
+
+
+```
+
+
+```{r zeff_iCT_calculation}
+
+iCT_zeff <- fm_ts_ID %>%
+  select(date_time_ID, var, value) %>% 
+  pivot_wider(values_from = value, names_from = var) %>% 
+  rename(SST = tem)
+
+iCT_zeff <- iCT_zeff %>% 
+  arrange(date_time_ID) %>% 
+  mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
+         CT_diff = CT - lag(CT),
+         SST_diff = SST - lag(SST),
+         CT_i_diff = CT_diff * mean_heat_pen_depth / 1000,
+         CT_i_cum = cumsum(replace_na(CT_i_diff, 0)))
+
+```
+
+```{r iCT_zeff}
+
+iCT_zeff %>% 
   ggplot()+
-  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_line(aes(x= date_time, y = U_10, col="3-hourly"))+
-  geom_line(data = gt_2d_daily,
-            aes(x= date_time, y = U_10, col="Daily mean"))+
-  labs(y="U (m/s)", x = "Date")+
-  scale_color_brewer(palette = "Set1", name="", direction = -1)+
+  geom_hline(yintercept = 0)+
+  geom_point(aes(date_time_ID,  0), shape=21)+
+  geom_col(aes(date_time_ID_ref, CT_i_diff),
+           position = "dodge", alpha=0.3)+
+  geom_line(aes(date_time_ID, CT_i_cum))+
+  scale_color_viridis_d(name="Depth limit (m)")+
+  scale_fill_viridis_d(name="Depth limit (m)")+
+  labs(y="iCT [mol/m2]", x="")+
   theme_bw()
 
 ```

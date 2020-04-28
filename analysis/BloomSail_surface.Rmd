@@ -337,7 +337,7 @@ Total incremental and cumulative C~T~ changes inbetween cruise dates were calcul
 ```{r CT_recon_iCT_timeseries}
 
 iCT_10 <- ts_profiles_ID_long %>%
-  filter(dep < 12, 
+  filter(dep < 17, 
          var == "CT") %>% 
   select(ID, date_time_ID, date_time_ID_ref, CT_diff=value_diff, CT_cum=value_cum) %>% 
   group_by(ID, date_time_ID, date_time_ID_ref) %>% 
