@@ -27,10 +27,10 @@ The following names should be identical for stored files and objectes in R envir
 - source
   - tx: data recorded on SV Tina V, where x stands for:
     - s: Sea-Bird SBE 16 sensor
-    - h: TinaV HydroC CO2
-    - m: ts + th merged
+    - h: Contros HydroC CO2
+    - t: track data (coordinates + timestamp)
+    - m: ts + th + tt merged
     - b: TinaV discrete bottle
-    - t: TinaV track data (coordinates + timestamp)
   - fm: finnmaid
   - og: ostergarnsholm tower
   - gt: GETM (high-res huydographical model)

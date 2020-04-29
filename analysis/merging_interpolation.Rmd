@@ -2,7 +2,7 @@
 title: "Merging and interpolation of observations"
 author: "Jens Daniel Müller"
 date:  "`r format(Sys.time(), '%d %B, %Y')`"
-output: workflowr::wflow_html
+output: workflowr::wflow_hts_thl
 editor_options:
   chunk_output_type: console
 ---
@@ -52,10 +52,10 @@ ts <- ts %>%
 
 # Merge Sensor and HydroC data --------------------------------------------
 
-tm <- full_join(ts, th) %>% 
+ts_th <- full_join(ts, th) %>% 
   arrange(date_time)
 
-# tm_full <- full_join(ts, th_full) %>% 
+# ts_th_full <- full_join(ts, th_full) %>% 
 #   arrange(date_time)
 
 rm(th, ts)
@@ -70,7 +70,7 @@ CTD and auxillary recordings (15 sec measurment interval) are interpolated to Hy
 
 # Interpolate Sensor data to HydroC timestamp
 
-tm <- tm %>%
+ts_th <- ts_th %>%
   mutate(dep_maxgap = na.approx(dep, na.rm = FALSE, maxgap = 20),
          dep = approxfun(date_time, dep)(date_time),
          sal = approxfun(date_time, sal)(date_time),
@@ -81,8 +81,8 @@ tm <- tm %>%
   fill(ID, type, station) %>% 
   filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
 
-# tm_full <-
-#   tm_full %>%
+# ts_th_full <-
+#   ts_th_full %>%
 #   mutate(dep = na.approx(dep, na.rm = FALSE, maxgap = 20),
 #          sal = na.approx(sal, na.rm = FALSE, maxgap = 20),
 #          tem = na.approx(tem, na.rm = FALSE, maxgap = 20),
@@ -97,12 +97,12 @@ tm <- tm %>%
 
 # Time stamp synchronzity -------------------------------------------------
 # 
-# tm <- tm %>% 
+# ts_th <- ts_th %>% 
 #   mutate(day = yday(date_time))
 # 
-# for (dayID in unique(tm$day)) {
+# for (dayID in unique(ts_th$day)) {
 #   
-#   tm %>%
+#   ts_th %>%
 #     filter(day == dayID) %>% 
 #       ggplot()+
 #       geom_point(aes(date_time, pCO2, col="HC"))+
@@ -116,14 +116,14 @@ tm <- tm %>%
 # }
 # 
 # 
-# for (depID in unique(tm$deployment)) {
+# for (depID in unique(ts_th$deployment)) {
 #   
-#   tm_dep <- tm %>%
+#   ts_th_dep <- ts_th %>%
 #     filter(deployment == depID, Zero == 1)
 #   
-#   for (zerID in unique(tm_dep$Zero_ID)) {
+#   for (zerID in unique(ts_th_dep$Zero_ID)) {
 #     
-#     tm_dep %>%
+#     ts_th_dep %>%
 #       filter(Zero_ID == zerID) %>% 
 #       ggplot()+
 #       geom_point(aes(date_time, pCO2, col="HC"))+
@@ -142,20 +142,22 @@ tm <- tm %>%
 
 ```{r safe_merged_data_file, eval=FALSE}
 
-tm %>% 
-  write_csv(here::here("Data/_merged_data_files", "tm.csv"))
-#write_csv(tm_full, here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_full.csv"))
+ts_th %>% 
+  write_csv(here::here("Data/_merged_data_files", "ts_th.csv"))
+#write_csv(ts_th_full, here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_full.csv"))
 
-rm(tm)
+rm(ts_th)
 
 ```
 
 ## Time series pCO~2~
 
-```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µatm. Zeroing periods are included.", fig.asp = 3}
+### Absolute values
 
-tm <- read_csv(here::here("data/_merged_data_files",
-                          "tm.csv"),
+```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µats_th. Zeroing periods are included.", fig.asp = 3}
+
+ts_th <- read_csv(here::here("data/_merged_data_files",
+                          "ts_th.csv"),
                col_types = cols(ID = col_character(),
                                 pCO2_analog = col_double(),
                                 pCO2_corr = col_double(),
@@ -167,53 +169,52 @@ tm <- read_csv(here::here("data/_merged_data_files",
                                 mixing = col_character()))
 
 
-tm %>% 
+ts_th %>% 
   filter(!is.na(pCO2_corr)) %>% 
   ggplot()+
   geom_path(aes(date_time, pCO2_corr, col = "HydroC, drift corrected"))+
   geom_path(aes(date_time, pCO2_analog, col = "analog CTD"))+
   scale_color_brewer(palette = "Set1", name = "pCO2 record")+
-  labs(y=expression(pCO[2]~(µatm)), x="")+
+  labs(y=expression(pCO[2]~(µats_th)), x="")+
   facet_wrap(~ID, scales = "free_x", ncol = 1)
 
 ```
 
-```{r pCO2_diff_time_series, fig.cap="pCO~2~ difference betweeb HydroC and drift corrected data provided by Contos. Please note that pCO2 range is restricted to +/- 50  µatm.", fig.asp = 3}
+### Offset analog vs post-processed pCO~2~
 
-tm %>% 
+```{r pCO2_diff_time_series, fig.cap="pCO~2~ difference betweeb HydroC and drift corrected data provided by Contos. Please note that pCO2 range is restricted to +/- 50  µats_th.", fig.asp = 3}
+
+ts_th %>% 
   filter(!is.na(pCO2_corr)) %>% 
   ggplot()+
   geom_path(aes(date_time, pCO2_corr - pCO2_analog))+
-  ylim(-40, 10)+
-  labs(y=expression(pCO[2]~(µatm)), x="")+
+  ylim(-30, 0)+
+  labs(y=expression(pCO[2]~(µats_th)), x="")+
   facet_wrap(~ID, scales = "free_x", ncol = 1)
 
 ```
 
-
-
-
 ```{r measurement_frequency, eval=FALSE, include=FALSE}
 
-df <- df %>% 
+ts_th <- ts_th %>% 
   mutate(dt = c(0,diff(date_time)))
 
-df %>% 
+ts_th %>% 
   filter(dt < 30) %>% 
   ggplot(aes(date_time, dt))+
   geom_point()
 
 ```
 
-# Sensor and track data
+# Merges sensor (ts_th) + track (tt) data
 
 ```{r merge_sensor_track, eval=FALSE}
 
-Sensor <- read_csv(here::here("data/_merged_data_files",
-                          "BloomSail_CTD_HydroC.csv"),
+ts_th <- read_csv(here::here("data/_merged_data_files",
+                          "ts_th.csv"),
                col_types = cols(ID = col_character(),
                                 pCO2_analog = col_double(),
-                                pCO2 = col_double(),
+                                pCO2_corr = col_double(),
                                 Zero = col_factor(),
                                 Flush = col_factor(),
                                 Zero_ID = col_integer(),
@@ -222,31 +223,24 @@ Sensor <- read_csv(here::here("data/_merged_data_files",
                                 mixing = col_character()))
 
 
-track <- 
-  read_csv(here::here("Data/_summarized_data_files",
-                       "TinaV_Track.csv"))
+tt <- read_csv(here::here("Data/_summarized_data_files",
+                          "tt.csv"))
 
 
-df <- full_join(Sensor, track) %>% 
+tm <- full_join(ts_th, tt) %>% 
   arrange(date_time)
 
-# interpolate track data and than remove columns that originate from track time stamp
-df <-
-  df %>%
-  mutate(lat = na.approx(lat, na.rm = FALSE, maxgap = 20),
-         lon = na.approx(lon, na.rm = FALSE, maxgap = 20)) %>% 
+# interpolate tt data and than remove columns that originate from tt time stamp
+tm <- tm %>%
+  mutate(lat = approxfun(date_time, lat)(date_time),
+         lon = approxfun(date_time, lon)(date_time)) %>% 
   filter(!is.na(dep))
 
-df %>% 
-  write_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_track.csv"))
+tm %>% write_csv(here::here("Data/_merged_data_files",
+                            "tm.csv"))
 
-rm(df)
+rm(tm, ts_th, tt)
 ```
-
-
-```
-
 
 # Tasks / open questions
 
-- Check interpolation to CTD Sensor timestamp as alternative option
