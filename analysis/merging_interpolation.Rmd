@@ -184,7 +184,7 @@ tm %>%
   filter(!is.na(pCO2_corr)) %>% 
   ggplot()+
   geom_path(aes(date_time, pCO2_corr - pCO2_analog))+
-  ylim(-50, 50)+
+  ylim(-40, 10)+
   labs(y=expression(pCO[2]~(µatm)), x="")+
   facet_wrap(~ID, scales = "free_x", ncol = 1)
 
