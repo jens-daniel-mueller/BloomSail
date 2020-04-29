@@ -442,7 +442,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Merging and interpolation of observations</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">28 April, 2020</h4>
+<h4 class="date">29 April, 2020</h4>
 
 </div>
 
@@ -467,7 +467,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-04-28
+<strong>Last updated:</strong> 2020-04-29
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -558,16 +558,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree058c7098d0719d2fbcf34c0d3576435f4c722686targetblank058c709a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/058c7098d0719d2fbcf34c0d3576435f4c722686" target="_blank">058c709</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree70bd3f004df3d6988da9ea08d99279e856556697targetblank70bd3f0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/70bd3f004df3d6988da9ea08d99279e856556697" target="_blank">70bd3f0</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree058c7098d0719d2fbcf34c0d3576435f4c722686targetblank058c709a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree70bd3f004df3d6988da9ea08d99279e856556697targetblank70bd3f0a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/058c7098d0719d2fbcf34c0d3576435f4c722686" target="_blank">058c709</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/70bd3f004df3d6988da9ea08d99279e856556697" target="_blank">70bd3f0</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -584,13 +584,6 @@ Ignored files:
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
-    Ignored:    output/Plots/Figures_publication/Appendix/
-
-Unstaged changes:
-    Modified:   output/Plots/Figures_publication/Article/Hov_abs_profiles_cum.pdf
-    Modified:   output/Plots/Figures_publication/Article/data_coverage.pdf
-    Modified:   output/Plots/Figures_publication/Article/profiles_all.pdf
-    Modified:   output/Plots/Figures_publication/Article/station_map.pdf
 
 </code></pre>
 <p>
@@ -629,6 +622,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/70bd3f004df3d6988da9ea08d99279e856556697/analysis/merging_interpolation.Rmd" target="_blank">70bd3f0</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-29
+</td>
+<td>
+correct interpolation, new d pco2 plot
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/b5722a7fc1f85352505fa8e350cae436fb5fd712/docs/merging_interpolation.html" target="_blank">b5722a7</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-28
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -1270,27 +1297,27 @@ library(lubridate)
 library(zoo)
 # library(dygraphs)
 # library(xts)</code></pre>
-<div id="ctd-and-pco2-data" class="section level1">
-<h1>CTD and pCO<sub>2</sub> data</h1>
+<div id="ctd-ts-hydroc-co2-data-th" class="section level1">
+<h1>CTD (ts) + HydroC CO<sub>2</sub> data (th)</h1>
 <div id="merging-summarized-data-sets" class="section level2">
 <h2>Merging summarized data sets</h2>
 <pre class="r"><code># Load Sensor and HydroC data ---------------------------------------------
+ts &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
+                          &quot;ts.csv&quot;),
+               col_types = list(&quot;pCO2_analog&quot; = col_double()))
 
-CTD &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
-                              &quot;Tina_V_Sensor_Profiles_Transects.csv&quot;),
-                   col_types = list(&quot;pCO2&quot; = col_double())) %&gt;% 
-  rename(pCO2_analog = pCO2)
+th &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
+                          &quot;th.csv&quot;))
 
-HC &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;Tina_V_HydroC.csv&quot;))
-HC_full &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;Tina_V_HydroC_full.csv&quot;))
+# th_full &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;Tina_V_HydroC_full.csv&quot;))
 
 # Time offset correction ----------------------------------------------
 
-# Time offset was determined by comparing zeroing reads from Sensor and HC
+# Time offset was determined by comparing zeroing reads from Sensor and th
 # in the plots produced in the section Time stamp synchronzity below
 # before applying this correction
 
-CTD &lt;- CTD %&gt;% 
+ts &lt;- ts %&gt;% 
   mutate(day = yday(date_time),
          date_time = if_else(day &gt;= 206 &amp; day &lt;= 220,
                              date_time - 80, date_time - 10)) %&gt;% 
@@ -1298,55 +1325,52 @@ CTD &lt;- CTD %&gt;%
 
 # Merge Sensor and HydroC data --------------------------------------------
 
-df &lt;- full_join(CTD, HC) %&gt;% 
+tm &lt;- full_join(ts, th) %&gt;% 
   arrange(date_time)
 
-df_full &lt;- full_join(CTD, HC_full) %&gt;% 
-  arrange(date_time)
+# tm_full &lt;- full_join(ts, th_full) %&gt;% 
+#   arrange(date_time)
 
-rm(HC, HC_full, CTD)</code></pre>
+rm(th, ts)</code></pre>
 </div>
 <div id="interpolation-to-common-time-stamp" class="section level2">
 <h2>Interpolation to common time stamp</h2>
 <p>CTD and auxillary recordings (15 sec measurment interval) are interpolated to HydroC time stamps (first 10 sec, than 1 sec measurement interval) when gaps between observations are not larger than 20. Thereafter, HydroC readings not falling in regular transects/profilings are removed, by removing rows with NA depth values. Furthermore, CTD readings without corresponding HydroC reading are removed, except during periods when HydroC was not operating.</p>
 <pre class="r"><code># Interpolate Sensor data to HydroC timestamp
 
-df &lt;-
-  df %&gt;%
-  mutate(dep = na.approx(dep, na.rm = FALSE, maxgap = 20),
-         sal = na.approx(sal, na.rm = FALSE, maxgap = 20),
-         tem = na.approx(tem, na.rm = FALSE, maxgap = 20),
-         pCO2_analog = na.approx(pCO2_analog, na.rm = FALSE, maxgap = 20),
-         pH = na.approx(pH, na.rm = FALSE, maxgap = 20),
-         V_pH = na.approx(V_pH, na.rm = FALSE, maxgap = 20),
-         O2 = na.approx(O2, na.rm = FALSE, maxgap = 20),
-         Chl = na.approx(Chl, na.rm = FALSE, maxgap = 20)) %&gt;% 
+tm &lt;- tm %&gt;%
+  mutate(dep_maxgap = na.approx(dep, na.rm = FALSE, maxgap = 20),
+         dep = approxfun(date_time, dep)(date_time),
+         sal = approxfun(date_time, sal)(date_time),
+         tem = approxfun(date_time, tem)(date_time),
+         pCO2_analog = approxfun(date_time, pCO2_analog)(date_time)) %&gt;% 
   filter(!is.na(dep)) %&gt;% #remove HC readings not falling in regular transects/profilings
+  select(- dep_maxgap) %&gt;% 
   fill(ID, type, station) %&gt;% 
   filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
 
-df_full &lt;-
-  df_full %&gt;%
-  mutate(dep = na.approx(dep, na.rm = FALSE, maxgap = 20),
-         sal = na.approx(sal, na.rm = FALSE, maxgap = 20),
-         tem = na.approx(tem, na.rm = FALSE, maxgap = 20),
-         pCO2_analog = na.approx(pCO2_analog, na.rm = FALSE, maxgap = 20),
-         pH = na.approx(pH, na.rm = FALSE, maxgap = 20),
-         V_pH = na.approx(V_pH, na.rm = FALSE, maxgap = 20),
-         O2 = na.approx(O2, na.rm = FALSE, maxgap = 20),
-         Chl = na.approx(Chl, na.rm = FALSE, maxgap = 20)) %&gt;% 
-  filter(!is.na(dep)) %&gt;% #remove HC readings not falling in regular transects/profilings
-  fill(ID, type, station) %&gt;% 
-  filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
+# tm_full &lt;-
+#   tm_full %&gt;%
+#   mutate(dep = na.approx(dep, na.rm = FALSE, maxgap = 20),
+#          sal = na.approx(sal, na.rm = FALSE, maxgap = 20),
+#          tem = na.approx(tem, na.rm = FALSE, maxgap = 20),
+#          pCO2_analog = na.approx(pCO2_analog, na.rm = FALSE, maxgap = 20),
+#          pH = na.approx(pH, na.rm = FALSE, maxgap = 20),
+#          V_pH = na.approx(V_pH, na.rm = FALSE, maxgap = 20),
+#          O2 = na.approx(O2, na.rm = FALSE, maxgap = 20),
+#          Chl = na.approx(Chl, na.rm = FALSE, maxgap = 20)) %&gt;% 
+#   filter(!is.na(dep)) %&gt;% #remove HC readings not falling in regular transects/profilings
+#   fill(ID, type, station) %&gt;% 
+#   filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
 
 # Time stamp synchronzity -------------------------------------------------
 # 
-# df &lt;- df %&gt;% 
+# tm &lt;- tm %&gt;% 
 #   mutate(day = yday(date_time))
 # 
-# for (dayID in unique(df$day)) {
+# for (dayID in unique(tm$day)) {
 #   
-#   df %&gt;%
+#   tm %&gt;%
 #     filter(day == dayID) %&gt;% 
 #       ggplot()+
 #       geom_point(aes(date_time, pCO2, col=&quot;HC&quot;))+
@@ -1360,14 +1384,14 @@ df_full &lt;-
 # }
 # 
 # 
-# for (depID in unique(df$deployment)) {
+# for (depID in unique(tm$deployment)) {
 #   
-#   df_dep &lt;- df %&gt;%
+#   tm_dep &lt;- tm %&gt;%
 #     filter(deployment == depID, Zero == 1)
 #   
-#   for (zerID in unique(df_dep$Zero_ID)) {
+#   for (zerID in unique(tm_dep$Zero_ID)) {
 #     
-#     df_dep %&gt;%
+#     tm_dep %&gt;%
 #       filter(Zero_ID == zerID) %&gt;% 
 #       ggplot()+
 #       geom_point(aes(date_time, pCO2, col=&quot;HC&quot;))+
@@ -1379,15 +1403,22 @@ df_full &lt;-
 #     
 #   }
 # }</code></pre>
-<pre class="r"><code>write_csv(df, here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC.csv&quot;))
-write_csv(df_full, here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_full.csv&quot;))
+</div>
+<div id="write-merged-file" class="section level2">
+<h2>Write merged file</h2>
+<pre class="r"><code>tm %&gt;% 
+  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;tm.csv&quot;))
+#write_csv(tm_full, here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_full.csv&quot;))
 
-rm(df, df_full)</code></pre>
-<pre class="r"><code>df &lt;- read_csv(here::here(&quot;data/_merged_data_files&quot;,
-                          &quot;BloomSail_CTD_HydroC.csv&quot;),
+rm(tm)</code></pre>
+</div>
+<div id="time-series-pco2" class="section level2">
+<h2>Time series pCO<sub>2</sub></h2>
+<pre class="r"><code>tm &lt;- read_csv(here::here(&quot;data/_merged_data_files&quot;,
+                          &quot;tm.csv&quot;),
                col_types = cols(ID = col_character(),
                                 pCO2_analog = col_double(),
-                                pCO2 = col_double(),
+                                pCO2_corr = col_double(),
                                 Zero = col_factor(),
                                 Flush = col_factor(),
                                 Zero_ID = col_integer(),
@@ -1396,31 +1427,33 @@ rm(df, df_full)</code></pre>
                                 mixing = col_character()))
 
 
-df %&gt;% 
-  filter(!is.na(pCO2)) %&gt;% 
+tm %&gt;% 
+  filter(!is.na(pCO2_corr)) %&gt;% 
   ggplot()+
-  geom_path(aes(date_time, pCO2, col = &quot;HydroC, drift corrected&quot;))+
+  geom_path(aes(date_time, pCO2_corr, col = &quot;HydroC, drift corrected&quot;))+
   geom_path(aes(date_time, pCO2_analog, col = &quot;analog CTD&quot;))+
   scale_color_brewer(palette = &quot;Set1&quot;, name = &quot;pCO2 record&quot;)+
   labs(y=expression(pCO[2]~(µatm)), x=&quot;&quot;)+
   facet_wrap(~ID, scales = &quot;free_x&quot;, ncol = 1)</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/merging_interpolation.Rmd/timeseries_pCO2-1.png" alt="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO~2~ measurement range is restricted to 100-500  µatm here due to the settings of the analog voltage output of the sensor. Zeroing periods are included." width="672" />
+<img src="figure/merging_interpolation.Rmd/pCO2_time_series-1.png" alt="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µatm. Zeroing periods are included." width="672" />
 <p class="caption">
-pCO<sub>2</sub> record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO<sub>2</sub> measurement range is restricted to 100-500 µatm here due to the settings of the analog voltage output of the sensor. Zeroing periods are included.
+pCO<sub>2</sub> record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500 µatm. Zeroing periods are included.
 </p>
 </div>
-<pre class="r"><code># ts &lt;- xts(cbind(df$pCO2, df$dep), order.by = df$date_time)
-# names(ts) &lt;- c(&quot;pCO2&quot;, &quot;Depth&quot;)
-# 
-# ts %&gt;% 
-#   dygraph() %&gt;% 
-#   dyRangeSelector() %&gt;% #dateWindow = c(&quot;2012-01-01&quot;, &quot;2016-12-31&quot;)
-#   dySeries(&quot;pCO2&quot;, label = &quot;pCO2&quot;) %&gt;% 
-#   dySeries(&quot;Depth&quot;, axis = &#39;y2&#39;, label = &quot;Depth&quot;) %&gt;% 
-#   dyAxis(&quot;y&quot;, label = &quot;pCO2 [µatm]&quot;) %&gt;% 
-#   dyAxis(&quot;y2&quot;, label = &quot;Depth [m]&quot;) %&gt;% 
-#   dyOptions(drawPoints = TRUE, pointSize = 1)</code></pre>
+<pre class="r"><code>tm %&gt;% 
+  filter(!is.na(pCO2_corr)) %&gt;% 
+  ggplot()+
+  geom_path(aes(date_time, pCO2_corr - pCO2_analog))+
+  ylim(-50, 50)+
+  labs(y=expression(pCO[2]~(µatm)), x=&quot;&quot;)+
+  facet_wrap(~ID, scales = &quot;free_x&quot;, ncol = 1)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/merging_interpolation.Rmd/pCO2_diff_time_series-1.png" alt="pCO~2~ difference betweeb HydroC and drift corrected data provided by Contos. Please note that pCO2 range is restricted to +/- 50  µatm." width="672" />
+<p class="caption">
+pCO<sub>2</sub> difference betweeb HydroC and drift corrected data provided by Contos. Please note that pCO2 range is restricted to +/- 50 µatm.
+</p>
+</div>
 </div>
 </div>
 <div id="sensor-and-track-data" class="section level1">
