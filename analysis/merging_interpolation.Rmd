@@ -21,29 +21,30 @@ library(zoo)
 ```
 
 
-# CTD and pCO~2~ data
+# CTD (ts) + HydroC CO~2~ data (th)
 
 ## Merging summarized data sets
 
 
-```{r load_summarized_data, eval=FALSE}
+```{r load_summarized_data_synchronize_time_stamp, eval=FALSE}
+
 # Load Sensor and HydroC data ---------------------------------------------
+ts <- read_csv(here::here("Data/_summarized_data_files",
+                          "ts.csv"),
+               col_types = list("pCO2_analog" = col_double()))
 
-CTD <- read_csv(here::here("Data/_summarized_data_files",
-                              "Tina_V_Sensor_Profiles_Transects.csv"),
-                   col_types = list("pCO2" = col_double())) %>% 
-  rename(pCO2_analog = pCO2)
+th <- read_csv(here::here("Data/_summarized_data_files",
+                          "th.csv"))
 
-HC <- read_csv(here::here("Data/_summarized_data_files", "Tina_V_HydroC.csv"))
-HC_full <- read_csv(here::here("Data/_summarized_data_files", "Tina_V_HydroC_full.csv"))
+# th_full <- read_csv(here::here("Data/_summarized_data_files", "Tina_V_HydroC_full.csv"))
 
 # Time offset correction ----------------------------------------------
 
-# Time offset was determined by comparing zeroing reads from Sensor and HC
+# Time offset was determined by comparing zeroing reads from Sensor and th
 # in the plots produced in the section Time stamp synchronzity below
 # before applying this correction
 
-CTD <- CTD %>% 
+ts <- ts %>% 
   mutate(day = yday(date_time),
          date_time = if_else(day >= 206 & day <= 220,
                              date_time - 80, date_time - 10)) %>% 
@@ -51,13 +52,13 @@ CTD <- CTD %>%
 
 # Merge Sensor and HydroC data --------------------------------------------
 
-df <- full_join(CTD, HC) %>% 
+tm <- full_join(ts, th) %>% 
   arrange(date_time)
 
-df_full <- full_join(CTD, HC_full) %>% 
-  arrange(date_time)
+# tm_full <- full_join(ts, th_full) %>% 
+#   arrange(date_time)
 
-rm(HC, HC_full, CTD)
+rm(th, ts)
 ```
 
 
@@ -65,46 +66,43 @@ rm(HC, HC_full, CTD)
 
 CTD and auxillary recordings (15 sec measurment interval) are interpolated to HydroC time stamps (first 10 sec, than 1 sec measurement interval) when gaps between observations are not larger than 20. Thereafter, HydroC readings not falling in regular transects/profilings are removed, by removing rows with NA depth values. Furthermore, CTD readings without corresponding HydroC reading are removed, except during periods when HydroC was not operating.
 
-```{r interpolation, eval=FALSE}
+```{r interpolation_to_common_timestamp, eval=FALSE}
 
 # Interpolate Sensor data to HydroC timestamp
 
-df <-
-  df %>%
-  mutate(dep = na.approx(dep, na.rm = FALSE, maxgap = 20),
-         sal = na.approx(sal, na.rm = FALSE, maxgap = 20),
-         tem = na.approx(tem, na.rm = FALSE, maxgap = 20),
-         pCO2_analog = na.approx(pCO2_analog, na.rm = FALSE, maxgap = 20),
-         pH = na.approx(pH, na.rm = FALSE, maxgap = 20),
-         V_pH = na.approx(V_pH, na.rm = FALSE, maxgap = 20),
-         O2 = na.approx(O2, na.rm = FALSE, maxgap = 20),
-         Chl = na.approx(Chl, na.rm = FALSE, maxgap = 20)) %>% 
+tm <- tm %>%
+  mutate(dep_maxgap = na.approx(dep, na.rm = FALSE, maxgap = 20),
+         dep = approxfun(date_time, dep)(date_time),
+         sal = approxfun(date_time, sal)(date_time),
+         tem = approxfun(date_time, tem)(date_time),
+         pCO2_analog = approxfun(date_time, pCO2_analog)(date_time)) %>% 
   filter(!is.na(dep)) %>% #remove HC readings not falling in regular transects/profilings
+  select(- dep_maxgap) %>% 
   fill(ID, type, station) %>% 
   filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
 
-df_full <-
-  df_full %>%
-  mutate(dep = na.approx(dep, na.rm = FALSE, maxgap = 20),
-         sal = na.approx(sal, na.rm = FALSE, maxgap = 20),
-         tem = na.approx(tem, na.rm = FALSE, maxgap = 20),
-         pCO2_analog = na.approx(pCO2_analog, na.rm = FALSE, maxgap = 20),
-         pH = na.approx(pH, na.rm = FALSE, maxgap = 20),
-         V_pH = na.approx(V_pH, na.rm = FALSE, maxgap = 20),
-         O2 = na.approx(O2, na.rm = FALSE, maxgap = 20),
-         Chl = na.approx(Chl, na.rm = FALSE, maxgap = 20)) %>% 
-  filter(!is.na(dep)) %>% #remove HC readings not falling in regular transects/profilings
-  fill(ID, type, station) %>% 
-  filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
+# tm_full <-
+#   tm_full %>%
+#   mutate(dep = na.approx(dep, na.rm = FALSE, maxgap = 20),
+#          sal = na.approx(sal, na.rm = FALSE, maxgap = 20),
+#          tem = na.approx(tem, na.rm = FALSE, maxgap = 20),
+#          pCO2_analog = na.approx(pCO2_analog, na.rm = FALSE, maxgap = 20),
+#          pH = na.approx(pH, na.rm = FALSE, maxgap = 20),
+#          V_pH = na.approx(V_pH, na.rm = FALSE, maxgap = 20),
+#          O2 = na.approx(O2, na.rm = FALSE, maxgap = 20),
+#          Chl = na.approx(Chl, na.rm = FALSE, maxgap = 20)) %>% 
+#   filter(!is.na(dep)) %>% #remove HC readings not falling in regular transects/profilings
+#   fill(ID, type, station) %>% 
+#   filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
 
 # Time stamp synchronzity -------------------------------------------------
 # 
-# df <- df %>% 
+# tm <- tm %>% 
 #   mutate(day = yday(date_time))
 # 
-# for (dayID in unique(df$day)) {
+# for (dayID in unique(tm$day)) {
 #   
-#   df %>%
+#   tm %>%
 #     filter(day == dayID) %>% 
 #       ggplot()+
 #       geom_point(aes(date_time, pCO2, col="HC"))+
@@ -118,14 +116,14 @@ df_full <-
 # }
 # 
 # 
-# for (depID in unique(df$deployment)) {
+# for (depID in unique(tm$deployment)) {
 #   
-#   df_dep <- df %>%
+#   tm_dep <- tm %>%
 #     filter(deployment == depID, Zero == 1)
 #   
-#   for (zerID in unique(df_dep$Zero_ID)) {
+#   for (zerID in unique(tm_dep$Zero_ID)) {
 #     
-#     df_dep %>%
+#     tm_dep %>%
 #       filter(Zero_ID == zerID) %>% 
 #       ggplot()+
 #       geom_point(aes(date_time, pCO2, col="HC"))+
@@ -140,24 +138,27 @@ df_full <-
 
 ```
 
+## Write merged file
 
 ```{r safe_merged_data_file, eval=FALSE}
 
-write_csv(df, here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC.csv"))
-write_csv(df_full, here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_full.csv"))
+tm %>% 
+  write_csv(here::here("Data/_merged_data_files", "tm.csv"))
+#write_csv(tm_full, here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_full.csv"))
 
-rm(df, df_full)
+rm(tm)
 
 ```
 
+## Time series pCO~2~
 
-```{r timeseries_pCO2, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO~2~ measurement range is restricted to 100-500  µatm here due to the settings of the analog voltage output of the sensor. Zeroing periods are included.", fig.asp = 3}
+```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µatm. Zeroing periods are included.", fig.asp = 3}
 
-df <- read_csv(here::here("data/_merged_data_files",
-                          "BloomSail_CTD_HydroC.csv"),
+tm <- read_csv(here::here("data/_merged_data_files",
+                          "tm.csv"),
                col_types = cols(ID = col_character(),
                                 pCO2_analog = col_double(),
-                                pCO2 = col_double(),
+                                pCO2_corr = col_double(),
                                 Zero = col_factor(),
                                 Flush = col_factor(),
                                 Zero_ID = col_integer(),
@@ -166,28 +167,31 @@ df <- read_csv(here::here("data/_merged_data_files",
                                 mixing = col_character()))
 
 
-df %>% 
-  filter(!is.na(pCO2)) %>% 
+tm %>% 
+  filter(!is.na(pCO2_corr)) %>% 
   ggplot()+
-  geom_path(aes(date_time, pCO2, col = "HydroC, drift corrected"))+
+  geom_path(aes(date_time, pCO2_corr, col = "HydroC, drift corrected"))+
   geom_path(aes(date_time, pCO2_analog, col = "analog CTD"))+
   scale_color_brewer(palette = "Set1", name = "pCO2 record")+
   labs(y=expression(pCO[2]~(µatm)), x="")+
   facet_wrap(~ID, scales = "free_x", ncol = 1)
 
-# ts <- xts(cbind(df$pCO2, df$dep), order.by = df$date_time)
-# names(ts) <- c("pCO2", "Depth")
-# 
-# ts %>% 
-#   dygraph() %>% 
-#   dyRangeSelector() %>% #dateWindow = c("2012-01-01", "2016-12-31")
-#   dySeries("pCO2", label = "pCO2") %>% 
-#   dySeries("Depth", axis = 'y2', label = "Depth") %>% 
-#   dyAxis("y", label = "pCO2 [µatm]") %>% 
-#   dyAxis("y2", label = "Depth [m]") %>% 
-#   dyOptions(drawPoints = TRUE, pointSize = 1)
+```
+
+```{r pCO2_diff_time_series, fig.cap="pCO~2~ difference betweeb HydroC and drift corrected data provided by Contos. Please note that pCO2 range is restricted to +/- 50  µatm.", fig.asp = 3}
+
+tm %>% 
+  filter(!is.na(pCO2_corr)) %>% 
+  ggplot()+
+  geom_path(aes(date_time, pCO2_corr - pCO2_analog))+
+  ylim(-50, 50)+
+  labs(y=expression(pCO[2]~(µatm)), x="")+
+  facet_wrap(~ID, scales = "free_x", ncol = 1)
 
 ```
+
+
+
 
 ```{r measurement_frequency, eval=FALSE, include=FALSE}
 
