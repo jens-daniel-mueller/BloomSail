@@ -34,6 +34,8 @@ library(gsubfn)
 theme_set(theme_bw())
 ```
 
+In this document, raw data files are read, merged into one file with harmonized column names and written as summarized data file.
+
 
 # Sea-Bird SBE 16 sensor data (ts)
 

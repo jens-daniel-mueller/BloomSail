@@ -62,11 +62,15 @@ The following names should be identical for stored files and objectes in R envir
   - lat
   - lon
 
-- Observed variables: column names, or identifier in column "var" for long-format tables 
-  - pCO2_analog: analog HydroC signal recorded on SeaBird CTD
-  - pCO2_raw: HydroC signal recorded internally
-  - pCO2_corr: HydroC signal recorded internally postprocessed by manufacturer
-  - pCO2: Response time corrected pCO2_corr
+- Observed variables: column names, or identifier in column "var" for long-format tables
+  - pCO2: partial pressure of carbon dioxide, with following postfix indicating manipulation level 
+    - _analog: analog HydroC signal recorded on SeaBird CTD
+    - _raw: HydroC signal recorded internally
+    - _corr: pCO2_raw postprocessed by manufacturer
+    - _equi: pCO2_corr at the end of an in-water equilibration period at constant depth
+    - _RT: Response time corrected pCO2_corr
+    - _RT_mean: running mean of pCO2_RT
+    - none: pCO2_RT_mean gridded to regular depth levels
   - sal
   - tem
   - nCT: CT calculated from pCO2, temperature, and fixed AT, S
@@ -84,9 +88,11 @@ The following names should be identical for stored files and objectes in R envir
   - grid: value gridded to a coarser resolution
   - diff: difference to previous value
   - diff_daily: difference to previous value divided by number of days
+  - delta: offset from same parameter but estimated differently
   - i: intergrated over depth
   - cum: cumulative value over time
   - sign: identifier for pos. or neg. differences
+  - rel: relative to some absolute value
 
 - p_XXX: ggplot object
 

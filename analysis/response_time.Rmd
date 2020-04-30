@@ -19,54 +19,39 @@ knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 ```{r packages}
 library(tidyverse)
 library(seacarb)
-library(data.table)
 library(broom)
 library(lubridate)
 library(tibbletime)
-library(patchwork)
-```
-
-# Sensitivity considerations
-
-A change in DIC of 1 µmol kg^-1^ corresponds to a change in pCO~2~ of around 1 µatm, in the Central Baltic Sea at a pCO~2~ of around 100 µatm (summertime conditions).
-
-```{r sensitivity_estimate, fig.cap="pCO~2~ sensitivity to changes in DIC."}
-
-df <- data.frame(cbind(
-  (c(1720)),
-  (c(7))))
-
-Tem <- seq(5,25,5)
-pCO2<-seq(50,500,20)
-
-df<-merge(df, Tem)
-names(df) <- c("AT", "S", "Tem")  
-
-df<-merge(df, pCO2)
-names(df) <- c("AT", "S", "Tem", "pCO2")  
-
-df<-data.table(df)
-df$AT<-df$AT*1e-6
-
-df$DIC<-carb(flag=24, var1=df$pCO2, var2=df$AT, S=df$S, T=df$Tem, k1k2="m10", kf="dg", pHscale="T")[,16]
-df$pCO2.corr<-carb(flag=15, var1=df$AT, var2=df$DIC, S=df$S, T=df$Tem, k1k2="m10", kf="dg", pHscale="T")[,9]
-
-df$pCO2.2<-df$pCO2.corr + 25
-df$DIC.2<-carb(flag=24, var1=df$pCO2.2, var2=df$AT, S=df$S, T=df$Tem, k1k2="m10", kf="dg", pHscale="T")[,16]
-
-
-df$ratio<-(df$pCO2.2-df$pCO2.corr)/(df$DIC.2*1e6-df$DIC*1e6)
-
-df %>% 
-  ggplot(aes(pCO2, ratio, col=as.factor(Tem)))+
-  geom_line()+
-  scale_color_viridis_d(option = "C",name="Tem [°C]")+
-  labs(x=expression(pCO[2]~(µatm)), y=expression(Delta~pCO[2]~"/"~Delta~DIC~(µatm~µmol^{-1}~kg)))+
-  scale_y_continuous(limits = c(0,8), breaks = seq(0,10,1))
-
-rm(df, Tem, pCO2)
 
 ```
+
+
+```{r ggplot_theme, include = FALSE}
+theme_set(theme_bw())
+```
+
+
+# List of relevant parameters
+
+Response time determination
+
+- Fit interval length: Use tau from one or all fit interval length? Scale fit interval length to expected tau?
+- tau residual threshold (mean absolute residula <1% of final pCO2, entire group removed)
+- Mean vs T-dependent tau
+
+Response time correction
+
+- correction procedure (Bittig vs. Fiedler, Miloshevich, Fietzek)
+- Smoothing
+
+Quality assesment of response time correction
+
+- Down-Up-difference vs reference value
+- Depth interval width for offset calculation
+- Max depth for Down-Up-difference (currently upper 20m)
+- NA criterion for included Down-Up-difference (currently 2)
+
+
 
 # Response time determination
 
@@ -102,27 +87,31 @@ Response times were determined by fitting a nonlinear least-squares model with t
 * only completed Flush periods (duration > 500 sec) included
 
 
-```{r response_determination_data_preparation}
+```{r read_prepare_tm_data}
 
-df <- read_csv(here::here("data/_merged_data_files",
-                          "BloomSail_CTD_HydroC.csv"),
+tm <- read_csv(here::here("data/_merged_data_files",
+                          "tm.csv"),
                col_types = cols(ID = col_character(),
                                 pCO2_analog = col_double(),
-                                pCO2 = col_double(),
+                                pCO2_corr = col_double(),
                                 Zero = col_factor(),
                                 Flush = col_factor(),
                                 Zero_ID = col_integer(),
                                 deployment = col_integer(),
                                 duration = col_double(),
-                                mixing = col_character()))
+                                mixing = col_character(),
+                                lat = col_double(),
+                                lon = col_double()))
 
-df <- df %>%
-  select(date_time, ID, dep, tem, Flush, pCO2, Zero_ID, duration, mixing)
+tm <- tm %>%
+  select(date_time, ID, dep, tem, Flush, pCO2_corr, Zero_ID, duration, mixing)
 
-df <- df %>%
+tm_flush <- tm %>%
   filter(Flush == 1, mixing == "equilibration")
 
-df <- df %>% 
+rm(tm)
+
+tm_flush <- tm_flush %>% 
   group_by(Zero_ID) %>% 
   mutate(duration = duration- min(duration),
          max_duration = max(duration)) %>% 
@@ -132,40 +121,46 @@ df <- df %>%
 
 ```
 
+### Example plot
+
 An example plot for a `nls` model fitted to pCO~2~ observations during a Flush phase is shown below.
 
 ```{r response_determination_example_plot, fig.cap="Example response time determination by non-linear least squares fit to the pCO~2~ recovery signal after zeroing. The vertical line indicates the determined response time tau. The horizontal line indicates 63% of the difference between start and final fitted pCO~2~."}
 
-i <- unique(df$Zero_ID)[30]
+i <- unique(tm_flush$Zero_ID)[30]
 
-df_ID <- df %>%
+tm_flush_ID <- tm_flush %>%
   filter(Zero_ID == i, duration <= 300)
 
-fit <-
-df_ID %>%
-  nls(pCO2 ~ SSasymp(duration, yf, y0, log_alpha), data = .)
+fit <- tm_flush_ID %>%
+  nls(pCO2_corr ~ SSasymp(duration, yf, y0, log_alpha), data = .)
 
 tau <- as.numeric(exp(-tidy(fit)[3,2]))
-pCO2_end <- as.numeric(tidy(fit)[1,2])
-pCO2_start <- as.numeric(tidy(fit)[2,2])
-dpCO2 = pCO2_end - pCO2_start
+pCO2_corr_end <- as.numeric(tidy(fit)[1,2])
+pCO2_corr_start <- as.numeric(tidy(fit)[2,2])
+pCO2_corr_delta = pCO2_corr_end - pCO2_corr_start
 mean_abs_resid <- mean(abs(resid(fit)))
 
 augment(fit) %>%
-  ggplot(aes(duration, pCO2))+
+  ggplot(aes(duration, pCO2_corr))+
   geom_point()+
   geom_line(aes(y = .fitted))+
   geom_vline(xintercept = tau)+
-  geom_hline(yintercept = pCO2_start + 0.63 *(dpCO2))+
+  geom_hline(yintercept = pCO2_corr_start + 0.63 *(pCO2_corr_delta))+
   labs(y=expression(pCO[2]~(µatm)), x="Duration of Flush period (s)")
 
-rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, mean_abs_resid)
+rm(tm_flush_ID, fit, i, tau,
+   pCO2_corr_delta, pCO2_corr_end, pCO2_corr_start,
+   mean_abs_resid)
+
 ```
 
-
+### Flush intervals
 
 ```{r set_flush_duration_intervals}
+
 duration_intervals <- seq(150,500,50)
+
 ```
 
 
@@ -173,54 +168,67 @@ As there was some speculation about the dependence of determined response times 
 
 `r duration_intervals` secs
 
+### Residual limits
+
+```{r set_residual_limit}
+
+resid_limit <- 1
+
+```
+
+A mean absolute residual threshold of >`r resid_limit`% of final pCO~2~ was defined.
+
+### Fitting algorithm
+
 
 ```{r fit_plot_all_response_times, include=TRUE, eval=FALSE}
 
 pdf(file=here::here("output/Plots/response_time",
-    "RT_determination_pCO2_flushperiods_nls.pdf"), onefile = TRUE, width = 7, height = 4)
+                    "tau_determination_pCO2_corr_flushperiods_nls.pdf"),
+    onefile = TRUE, width = 7, height = 4)
 
-for (i in unique(df$Zero_ID)) {
+for (i in unique(tm_flush$Zero_ID)) {
   for (max_duration in duration_intervals) {
     
-    df_ID <- df %>%
+    tm_flush_ID <- tm_flush %>%
       filter(Zero_ID == i, duration <= max_duration)
     
     fit <- 
       try(
-      df_ID %>%
-          nls(pCO2 ~ SSasymp(duration, yf, y0, log_alpha), data = .),
+      tm_flush_ID %>%
+          nls(pCO2_corr ~ SSasymp(duration, yf, y0, log_alpha), data = .),
       TRUE)
     
     if (class(fit) == "nls"){
     
       tau <- as.numeric(exp(-tidy(fit)[3,2]))
-      pCO2_end <- as.numeric(tidy(fit)[1,2])
-      pCO2_start <- as.numeric(tidy(fit)[2,2])
-      dpCO2 = pCO2_end - pCO2_start
-      mean_abs_resid <- mean(abs(resid(fit))/pCO2_end)*100
+      pCO2_corr_end <- as.numeric(tidy(fit)[1,2])
+      pCO2_corr_start <- as.numeric(tidy(fit)[2,2])
+      pCO2_corr_delta = pCO2_corr_end - pCO2_corr_start
+      mean_abs_resid <- mean(abs(resid(fit))/pCO2_corr_end)*100
       
       temp <- as_tibble(bind_cols(Zero_ID = i,
                                   duration = max_duration,
-                                  date_time = mean(df_ID$date_time),
-                                  dep = mean(df_ID$dep),
-                                  tem = mean(df_ID$tem),
-                                  pCO2 = pCO2_end,
+                                  date_time = mean(tm_flush_ID$date_time),
+                                  dep = mean(tm_flush_ID$dep),
+                                  tem = mean(tm_flush_ID$tem),
+                                  pCO2_corr = pCO2_corr_end,
                                   tau = tau,
                                   resid = mean_abs_resid))
       
-      if (exists("tau_df")){tau_df <- bind_rows(tau_df, temp)}
-        else {tau_df <- temp}
+      if (exists("tau_tm_flush")){tau_tm_flush <- bind_rows(tau_tm_flush, temp)}
+        else {tau_tm_flush <- temp}
       
-      if (mean_abs_resid > 1){warn <- "orange"}
+      if (mean_abs_resid > resid_limit){warn <- "orange"}
         else {warn <- "black"}
       
       print(
       augment(fit) %>%
-        ggplot(aes(duration, pCO2))+
+        ggplot(aes(duration, pCO2_corr))+
         geom_point(col = warn)+
         geom_line(aes(y = .fitted))+
         geom_vline(xintercept = tau)+
-        geom_hline(yintercept = pCO2_start + 0.63 *(dpCO2))+
+        geom_hline(yintercept = pCO2_corr_start + 0.63 *(pCO2_corr_delta))+
         labs(y=expression(pCO[2]~(µatm)), x="Duration of Flush period (s)",
              title = paste("Zero_ID: ", i,
                            "Tau: ", round(tau,1),
@@ -235,19 +243,19 @@ for (i in unique(df$Zero_ID)) {
     
       temp <- as_tibble(bind_cols(Zero_ID = i,
                                   duration = max_duration,
-                                  date_time = mean(df_ID$date_time),
-                                  dep = mean(df_ID$dep),
-                                  tem = mean(df_ID$tem),
-                                  pCO2 = pCO2_end,
+                                  date_time = mean(tm_flush_ID$date_time),
+                                  dep = mean(tm_flush_ID$dep),
+                                  tem = mean(tm_flush_ID$tem),
+                                  pCO2_corr = pCO2_corr_end,
                                   tau = NaN,
                                   resid = NaN))
       
-      if (exists("tau_df")){tau_df <- bind_rows(tau_df, temp)}
-        else {tau_df <- temp}
+      if (exists("tau_tm_flush")){tau_tm_flush <- bind_rows(tau_tm_flush, temp)}
+        else {tau_tm_flush <- temp}
       
       print(
-      df_ID %>%
-        ggplot(aes(duration, pCO2))+
+      tm_flush_ID %>%
+        ggplot(aes(duration, pCO2_corr))+
         geom_point(col="red")+
         labs(y=expression(pCO[2]~(µatm)), x="Duration of Flush period (s)",
              title = paste("Zero_ID: ", i,
@@ -261,40 +269,42 @@ for (i in unique(df$Zero_ID)) {
 
 dev.off()
 
-rm(df_ID, fit, i, tau, dpCO2, pCO2_end, pCO2_start, temp, max_duration, mean_abs_resid, warn)
+rm(tm_flush_ID, fit, i, tau, pCO2_corr_delta, pCO2_corr_end, pCO2_corr_start, temp, max_duration, mean_abs_resid, warn)
 
-tau_df %>% 
-  write_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_response_times_all.csv"))
+tau_tm_flush %>% 
+  write_csv(here::here("data/_merged_data_files/response_time",
+                       "tau_tm_flush.csv"))
 
-rm(tau_df, df)
+rm(tau_tm_flush, tm_flush)
 
 ```
 
-A pdf with plots of all individual response time fits can be accessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/RT_determination_pCO2_flushperiods_nls.pdf){target="_blank"}. In this pdf, response time fits that exceed the residual criterion (Mean absolute residual >1% of final pCO~2~) are printed in orange. Data from flush periods without succesful fit are printed red.
+A pdf with plots of all individual response time fits can be accessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/tau_determination_pCO2_corr_flushperiods_nls.pdf){target="_blank"}. In this pdf, response time fits that exceed the residual criterion (Mean absolute residual >`r resid_limit`% of final pCO~2~) are printed in orange. Data from flush periods without succesful fit are printed red.
 
 
 ```{r apply_residual_thresholds_for_tau, results='hide'}
 
-tau_df <- read_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_response_times_all.csv"))
+tau_tm_flush <-
+ read_csv(here::here("data/_merged_data_files/response_time",
+                       "tau_tm_flush.csv"))
 
 # define periods of different pumps used
-max_Zero_ID <- max(unique(tau_df[tau_df$date_time < ymd_hms("2018-07-17;13:08:34"),]$Zero_ID))
-tau_df <- tau_df %>% 
+max_Zero_ID <- max(unique(tau_tm_flush[tau_tm_flush$date_time < ymd_hms("2018-07-17;13:08:34"),]$Zero_ID))
+
+tau_tm_flush <- tau_tm_flush %>% 
   mutate(pump_power = if_else(Zero_ID <= max_Zero_ID, "1W", "8W"))
 
 
-# define subsetting parameters
-resid_limit <- 1
 
 # subset determined tau values by residual threshold
-tau_resid <- tau_df %>% 
+tau_resid <- tau_tm_flush %>% 
   group_by(Zero_ID) %>% 
   mutate(resid_max = max(resid, na.rm = TRUE)) %>% 
   filter(resid_max < resid_limit) %>% 
   select(-resid_max) %>% 
   ungroup()
 
-tau_resid_out <- tau_df %>% 
+tau_resid_out <- tau_tm_flush %>% 
   group_by(Zero_ID) %>% 
   mutate(resid_max = max(resid, na.rm = TRUE)) %>% 
   filter(resid_max > resid_limit) %>% 
@@ -302,7 +312,7 @@ tau_resid_out <- tau_df %>%
   ungroup()
 
 # Flush periods where model failure occured
-tau_df %>% 
+tau_tm_flush %>% 
   filter(is.na(resid)) %>% 
   group_by(Zero_ID) %>% 
   summarise(n()) %>% 
@@ -328,15 +338,13 @@ tau_resid <- tau_resid %>%
   filter(Zero_ID != 2)
 
 # calculate some metrics for the subsetting
-n_Zero_IDs <- tau_df %>% 
+n_Zero_IDs <- tau_tm_flush %>% 
   group_by(Zero_ID) %>% 
   n_groups()
 n_duration_intervals <- length(duration_intervals)
 n_tau_max <- n_Zero_IDs * length(duration_intervals)
-n_tau_total <- nrow(tau_df %>% filter(!is.na(resid)))
+n_tau_total <- nrow(tau_tm_flush %>% filter(!is.na(resid)))
 n_tau_resid <- nrow(tau_resid)
-
-rm(df)
 
 ```
 
@@ -361,7 +369,7 @@ It should be noted that all failed model fits occured in flush periods where the
 
 ```{r tau_fit_residuals, fig.cap="Histogram of residuals from fit displayed for the investigate durations of the fit interval. Vertical line represents the chosen threshold."}
 
-tau_df %>% 
+tau_tm_flush %>% 
   ggplot(aes(resid))+
   geom_histogram()+
   facet_wrap(~duration, labeller = label_both)+
@@ -369,16 +377,6 @@ tau_df %>%
   labs(x=expression(Mean~absolute~residuals~("%"~of~equilibrium~pCO[2])))
 
 ```
-
-```{r tau_vs_date, fig.cap="Tau for all Zeroings with color representing water depth."}
-tau_resid %>% 
-  ggplot(aes(date_time, tau, col=dep, shape=pump_power))+
-  geom_point()+
-  scale_color_viridis_c(name="Depth (m)")+
-  labs(y="Tau (sec)", x="Date")
-
-```
-
 
 ### Fit interval length
 
@@ -407,9 +405,41 @@ tau_resid %>%
   ggplot(aes(duration, d_tau, group=duration))+
   geom_violin()+
   geom_point()+
-  labs(x="Duration (sec)", y="Deviation from mean tau (sec)")
+  labs(x="Duration (sec)", y="Deviation from mean tau (sec)")+
+  facet_wrap(~pump_power)
 
 ```
+
+```{r subset_best_duration}
+
+# tau_resid %>% 
+#   group_by(Zero_ID) %>% 
+#   mutate(d_tau = tau - mean(tau)) %>% 
+#   ungroup() %>% 
+#   group_by(duration) %>% 
+#   summarise(d_tau_sd = sd(d_tau, na.rm = TRUE)) %>% 
+#   ungroup()
+
+tau_resid <- tau_resid %>% 
+  filter(duration == 300) %>% 
+  select(-duration)
+
+```
+
+
+
+### Time series
+
+```{r tau_vs_date, fig.cap="Tau for all Zeroings with color representing water depth."}
+
+tau_resid %>% 
+  ggplot(aes(date_time, tau, col=dep, shape=pump_power))+
+  geom_point()+
+  scale_color_viridis_c(name="Depth (m)")+
+  labs(y="Tau (sec)", x="Date")
+
+```
+
 
 
 ### Temperature dependence
@@ -418,7 +448,6 @@ A temperature dependence of determined response times $\tau$ was found, with sim
 
 ```{r tau_vs_tem, fig.cap="Tau as a function of temperature for all zeroings determined with low power (left) and strong (right) pump. Color represents the water depth."}
 tau_resid %>% 
-  #filter(duration > 200, duration < 400) %>% 
   ggplot(aes(tem, tau, col=dep))+
   geom_smooth(method = "lm")+
   geom_point()+
@@ -451,7 +480,7 @@ Finally, the mean response times are:
 
 RT_mean <- tau_resid %>% 
   group_by(pump_power) %>% 
-  summarise(tau = mean(tau))
+  summarise(tau = mean(tau, na.rm = TRUE))
 
 RT_mean
 
@@ -470,9 +499,10 @@ RT_fit <- tau_resid %>%
 
 RT_fit
 
-RT_fit %>% write_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_RT_fit.csv"))
+RT_fit %>% write_csv(here::here("data/_merged_data_files/response_time",
+                                "tau_fit.csv"))
 
-rm(list=setdiff(ls(), c("tau_resid", "RT_mean", "RT_fit")))
+rm(list=setdiff(ls(), c("tau_resid", "RT_fit")))
 
 ```
 
@@ -490,27 +520,30 @@ Following tasks were performed to prepare data for the response time correction:
 
 ```{r response_correction_data_preparation}
 
-df <- read_csv(here::here("data/_merged_data_files",
-                          "BloomSail_CTD_HydroC.csv"),
+tm <- read_csv(here::here("data/_merged_data_files",
+                          "tm.csv"),
                col_types = cols(ID = col_character(),
                                 pCO2_analog = col_double(),
-                                pCO2 = col_double(),
+                                pCO2_corr = col_double(),
                                 Zero = col_factor(),
                                 Flush = col_factor(),
                                 Zero_ID = col_integer(),
                                 deployment = col_integer(),
                                 duration = col_double(),
-                                mixing = col_character()))
+                                mixing = col_character(),
+                                lat = col_double(),
+                                lon = col_double()))
 
 # extract relevant parts
 
-df <- df %>%
-  select(date_time, ID, type, station, dep, sal, tem, Zero, Flush, pCO2, deployment, Zero_ID)
+tm <- tm %>%
+  select(date_time, ID, type, station, dep, sal, tem,
+         Zero, Flush, pCO2_corr, deployment, Zero_ID)
 
-df <- df %>% 
+tm <- tm %>% 
   filter(type == "P")
 
-df <- df %>%
+tm <- tm %>%
   group_by(ID, station) %>% 
   mutate(duration = as.numeric(date_time - min(date_time)),
          pump_power = if_else(date_time < ymd_hms("2018-07-17;13:08:34"), "1W", "8W")) %>%
@@ -523,29 +556,45 @@ df <- df %>%
 ```{r include_profile_meta_data}
 # Load profile meta data 
 
-meta <- read_csv(here::here("Data/_summarized_data_files",
-                          "Tina_V_Sensor_meta.csv"),
+meta <- read_csv(here::here("Data/TinaV/Sensor",
+                            "Sensor_meta.csv"),
                  col_types = cols(ID = col_character()))
 
 
 # Merge data and meta information 
 
-df <- full_join(df, meta)
+tm <- full_join(tm, meta)
 rm(meta)
 
 
 # creating descriptive variables ------------------------------------------
-df <- df %>% 
+tm <- tm %>% 
   mutate(phase = "standby",
-         phase = if_else(duration >= start & duration < down & !is.na(down) & !is.na(start),   "down", phase),
-         phase = if_else(duration >= down  & duration < lift & !is.na(lift) & !is.na(down ),   "low",  phase),
-         phase = if_else(duration >= lift  & duration < up   & !is.na(up  ) & !is.na(lift  ),  "mid",  phase),
-         phase = if_else(duration >= up    & duration < end  & !is.na(end ) & !is.na(up   ),   "up",   phase))
+         phase = if_else(duration >= start &
+                           duration < down & 
+                           !is.na(down) &
+                           !is.na(start),
+                         "down", phase),
+         phase = if_else(duration >= down  & 
+                           duration < lift & 
+                           !is.na(lift) & 
+                           !is.na(down ),   
+                         "low",  phase),
+         phase = if_else(duration >= lift  & 
+                           duration < up   & 
+                           !is.na(up  ) & 
+                           !is.na(lift  ),  
+                         "mid",  phase),
+         phase = if_else(duration >= up    & 
+                           duration < end  & 
+                           !is.na(end ) & 
+                           !is.na(up   ),   
+                         "up",   phase))
 
-df <- df %>% 
+tm <- tm %>% 
   select(-c(start, down, lift, up, end, comment))
 
-df <- df %>% 
+tm <- tm %>% 
   filter(Zero == 0, Flush == 0)
 
 
@@ -555,31 +604,31 @@ df <- df %>%
 
 ```{r equi_pCO2_reference_points}
 
-df_equi <- df %>% 
+tm_equi_pCO2 <- tm %>% 
   filter(phase %in% c("mid")) %>% 
   group_by(ID, station) %>% 
   top_n(5, row_number()) %>% 
   summarise(date_time = mean(date_time),
             duration = mean(duration),
-            pCO2 = mean(pCO2, na.rm = TRUE),
+            pCO2_corr = mean(pCO2_corr, na.rm = TRUE),
             dep = mean(dep, na.rm = TRUE)) %>% 
   ungroup()
 
 
-df_equi %>% 
- write_csv(here::here("data/_merged_data_files",
-                      "BloomSail_CTD_HydroC_reference_pCO2.csv"))
+tm_equi_pCO2 %>% 
+ write_csv(here::here("data/_merged_data_files/response_time",
+                      "HydroC_reference_pCO2.csv"))
 ```
 
 
 
 ```{r plot_profiling_timeseries_example, fig.cap="Example timeseries of profiling depth and pCO~2~. Colors represent manually assigned profiling phases. The black points represent reference data collected at the end of the mid equilibration period."}
 
-cast_dep <- df %>% 
-  pivot_longer(c(dep, pCO2), names_to = "parameter", values_to = "value")
+cast_dep <- tm %>% 
+  pivot_longer(c(dep, pCO2_corr), names_to = "parameter", values_to = "value")
 
-cast_dep_equi <- df_equi %>% 
-  pivot_longer(c(dep, pCO2), names_to = "parameter", values_to = "value")
+cast_dep_equi <- tm_equi_pCO2 %>% 
+  pivot_longer(c(dep, pCO2_corr), names_to = "parameter", values_to = "value")
 
 max_duration <- round(max(cast_dep$duration)/1000,0)*1000
 
@@ -608,23 +657,22 @@ rm(cast_dep, cast_dep_equi, cast_dep_equi_sub, i_station, i_ID, max_duration)
 
 ```
 
-A pdf with all timeseries plots of profiling depth and pCO~2~ can be accessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/RT_exploration_depth-pCO2_timeseries.pdf){target="_blank"}.
+A pdf with all timeseries plots of profiling depth and pCO~2~ can be accessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/time_series_depth_pCO2_corr_by_profile.pdf){target="_blank"}.
 
 
 ```{r plot_profiling_timeseries, eval=FALSE}
 
-cast_dep <- df %>% 
-  pivot_longer(c(dep, pCO2), names_to = "parameter", values_to = "value")
+cast_dep <- tm %>% 
+  pivot_longer(c(dep, pCO2_corr), names_to = "parameter", values_to = "value")
 
-cast_dep_equi <- df_equi %>% 
-  pivot_longer(c(dep, pCO2), names_to = "parameter", values_to = "value")
-
-
+cast_dep_equi <- tm_equi_pCO2 %>% 
+  pivot_longer(c(dep, pCO2_corr), names_to = "parameter", values_to = "value")
 
 max_duration <- round(max(cast_dep$duration)/1000,0)*1000
 
 pdf(file=here::here("output/Plots/response_time",
-    "RT_exploration_depth-pCO2_timeseries.pdf"), onefile = TRUE, width = 7, height = 4)
+                    "time_series_depth_pCO2_corr_by_profile.pdf"),
+    onefile = TRUE, width = 7, height = 4)
 
 for(i_ID in unique(cast_dep$ID)){
   for(i_station in unique(cast_dep$station)){
@@ -662,45 +710,6 @@ rm(cast_dep, cast_dep_equi, cast_dep_equi_sub, i_station, i_ID, max_duration)
 
 ```
 
-```{r plot_profiling_timeseries_raw, eval=FALSE}
-
-cast_dep <- df %>% 
-  pivot_longer(c(dep, pCO2), names_to = "parameter", values_to = "value")
-
-pdf(file=here::here("output/Plots/response_time",
-    "RT_exploration_depth-pCO2_timeseries_raw.pdf"), onefile = TRUE, width = 7, height = 4)
-
-for(i_ID in unique(cast_dep$ID)){
-  for(i_station in unique(cast_dep$station)){
-
-    if (nrow(cast_dep %>% filter(ID == i_ID, station == i_station)) > 0){
-      
-      print(
-      
-        cast_dep %>%
-        filter(ID == i_ID,
-               station == i_station) %>%
-        ggplot(aes(duration, value))+
-        geom_point(size=0.5)+
-        scale_y_reverse()+
-        scale_x_continuous(breaks = seq(0,6000,100))+
-        labs(title = str_c("Date: ",i_ID," | Station: ",i_station))+
-        facet_grid(parameter~., scales = "free_y")+
-        theme_bw()
-      
-      )
-
-    }
-
-  }
-}
-
-dev.off()
-
-rm(cast_dep, i_station, i_ID)
-
-```
-
 
 ## Reponse time correction
 
@@ -722,39 +731,39 @@ RT_corr <- function(c1, c0, dt, tau) {
 
 # Assign mean response time (tau) values ----------------------------------------------
 
-df_mean <- full_join(df, RT_mean)
-
-df_mean <- df_mean %>% 
-  mutate(RT = "constant")
+# df_mean <- full_join(df, RT_mean)
+# 
+# df_mean <- df_mean %>% 
+#   mutate(RT = "constant")
 
 # Assign T-dependent response time (tau) values ----------------------------------------------
 
 RT_fit <- RT_fit %>% 
   rename(tau_intercept = `(Intercept)`, tau_slope=tem)
 
-df_fit <- full_join(df, RT_fit)
+tm_fit <- full_join(tm, RT_fit)
 
-df_fit <- df_fit %>% 
-  mutate(tau = tau_intercept + tau_slope *tem,
-         RT = "T-dependent") %>% 
+tm_fit <- tm_fit %>% 
+  mutate(tau = tau_intercept + tau_slope *tem) %>% 
   select(-tau_intercept, -tau_slope)
 
-df_fit <- df_fit %>% 
-  mutate(RT = "T-dependent")
+# tm_fit <- tm_fit %>% 
+#   mutate(RT = "T-dependent")
 
 
 # Merge data sets with constand and T-dependent tau
 
-df <- bind_rows(df_fit, df_mean)
+tm <- tm_fit
+#tm <- bind_rows(tm_fit, tm_mean)
 
-rm(df_fit, df_mean)
+rm(tm_fit)
 
-# p1 <- df %>% 
+# p1 <- tm %>% 
 #   ggplot(aes(tau, dep, col=pump_power))+
 #   geom_point()+
 #   scale_y_reverse()
 # 
-# p2 <- df %>% 
+# p2 <- tm %>% 
 #   ggplot(aes(tem, dep, col=pump_power))+
 #   geom_point()+
 #   scale_y_reverse()
@@ -766,32 +775,32 @@ rm(df_fit, df_mean)
 
 # Prepare data set for RT correction --------------------------------------
 
-df <- df %>% 
-  group_by(RT) %>% 
+tm <- tm %>% 
+  #group_by(RT) %>% 
   arrange(date_time) %>% 
-  mutate(dt = as.numeric(as.character(date_time - lag(date_time)))) %>% 
-  ungroup()
+  mutate(dt = as.numeric(as.character(date_time - lag(date_time))))
+ # ungroup()
 
 # measurement frequency
 
-freq <- df %>% 
+freq <- tm %>% 
   filter(dt < 13) %>% 
   group_by(ID) %>% 
   summarise(dt_mean = round(mean(dt, na.rm = TRUE),0))
 
-df <- full_join(df, freq)
+tm <- full_join(tm, freq)
 
 # tau factors
 
-df <- expand_grid(df, tau_factor = seq(0.8, 1.6, 0.2))
+tm <- expand_grid(tm, tau_factor = seq(0.8, 1.6, 0.2))
 
-df <- df %>%
+tm <- tm %>%
   mutate(tau_test = tau*tau_factor)
 
 
 # Apply RT correction to entire data set
 
-for(i_ID in unique(df$ID)){
+for(i_ID in unique(tm$ID)){
   
 #i_ID <- "180716"
   
@@ -800,13 +809,13 @@ for(i_ID in unique(df$ID)){
   window <- 30 / freq_sub
   rolling_mean   <- rollify(~mean(.x, na.rm = TRUE), window = window)
 
-  df_sub <- df %>%
+  tm_sub <- tm %>%
     filter(ID == i_ID) %>% 
-    group_by(station, RT, tau_factor) %>% 
-    mutate(pCO2_RT = RT_corr(pCO2, lag(pCO2), dt, tau_test),
+    group_by(station, tau_factor) %>% 
+    mutate(pCO2_RT = RT_corr(pCO2_corr, lag(pCO2_corr), dt, tau_test),
            pCO2_RT = if_else(pCO2_RT %in% c(Inf, -Inf), NaN, pCO2_RT),
            window = window,
-           pCO2_RT_mean = rolling_mean(pCO2_RT)
+           pCO2_mean = rolling_mean(pCO2_RT)
            #pCO2_RT_median = rolling_median(pCO2_RT)
            ) %>% 
     ungroup()
@@ -814,67 +823,65 @@ for(i_ID in unique(df$ID)){
   # time shift RT corrected data
   shift <- as.integer(as.character(window/2))
   
-  df_sub <- df_sub %>%
-    group_by(station, RT, tau_factor) %>% 
-    mutate(pCO2_RT_mean = lead(pCO2_RT_mean, shift)) %>% 
+  tm_sub <- tm_sub %>%
+    group_by(station, tau_factor) %>% 
+    mutate(pCO2_mean = lead(pCO2_mean, shift)) %>% 
     ungroup()
   
   
-  if (exists("df_corr")){df_corr <- bind_rows(df_corr, df_sub)}
-  else{df_corr <- df_sub}
+  if (exists("tm_corr")){tm_corr <- bind_rows(tm_corr, tm_sub)}
+  else{tm_corr <- tm_sub}
   
-  rm(df_sub, freq_sub, rolling_mean, shift, window)
+  rm(tm_sub, freq_sub, rolling_mean, shift, window)
   
 }
 
-df <- df_corr
-rm(RT_corr, i_ID, freq, df_corr)
+tm <- tm_corr
+rm(RT_corr, i_ID, freq, tm_corr)
 
-df %>% 
- write_csv(here::here("data/_merged_data_files",
-                      "BloomSail_CTD_HydroC_profiles_RT.csv"))
-rm(df)
+tm %>% 
+ write_csv(here::here("data/_merged_data_files/response_time",
+                      "tm_RT.csv"))
+
+rm(tm, RT_fit, tau_resid)
 
 ```
 
 
 ```{r plot_optimized_RT_corrected_profiles_example, fig.cap="Example plot of response time corrected and raw pCO~2~ profiles. Panels highlight the effect of constant vs T-dependent tau estimates (columns) and the optimization by applying a constant factor (rows).", fig.asp = 2.3}
 
-df <-
- read_csv(here::here("data/_merged_data_files",
-                      "BloomSail_CTD_HydroC_profiles_RT.csv"),
+tm <- read_csv(here::here("data/_merged_data_files/response_time",
+                          "tm_RT.csv"),
                col_types = cols(ID = col_character(),
-                                pCO2 = col_double(),
                                 Zero = col_factor(),
                                 Flush = col_factor(),
                                 p_type = col_factor(),
                                 Zero_ID = col_integer(),
-                                deployment = col_integer(),
-                                duration = col_double()))
+                                deployment = col_integer()))
 
 i_ID <- "180730"
 i_station <- "P01"
 
-  equi_cast <- df_equi %>%
+  equi_cast <- tm_equi_pCO2 %>%
     filter(ID == i_ID,
            station == i_station)
 
-  df %>%
+  tm %>%
     filter(ID == i_ID,
            station == i_station,
            phase %in% c("up", "down")) %>%
     ggplot()+
-    geom_path(aes(pCO2, dep, linetype = phase, col="raw"))+
-    geom_path(aes(pCO2_RT_mean, dep, linetype = phase, col="corrected"))+
-    geom_point(data = equi_cast, aes(pCO2, dep))+
+    geom_path(aes(pCO2_corr, dep, linetype = phase, col="raw"))+
+    geom_path(aes(pCO2_mean, dep, linetype = phase, col="corrected"))+
+    geom_point(data = equi_cast, aes(pCO2_corr, dep))+
     scale_y_reverse()+
     scale_color_brewer(palette = "Set1", name="")+
     labs(y="Depth [m]", x=expression(pCO[2]~(µatm)),
          title = str_c("Date: ",i_ID," | Station: ",i_station))+
-    facet_grid(tau_factor~RT, labeller = label_both)
+    facet_grid(tau_factor~., labeller = label_both)
 
   
- rm(equi_cast)
+rm(equi_cast)
 
 ```
 
@@ -885,32 +892,32 @@ A pdf with all timeseries plots of profiling depth and pCO~2~ can be accessed [h
 ```{r plot_optimized_RT_corrected_profiles, eval=FALSE}
 
 pdf(file=here::here("output/Plots/response_time",
-    "RT_correction_pCO2_profiles.pdf"), onefile = TRUE, width = 7, height = 11)
+    "profiles_pCO2_mean.pdf"), onefile = TRUE, width = 7, height = 11)
 
-for(i_ID in unique(df$ID)){
-  for(i_station in unique(df$station)){
+for(i_ID in unique(tm$ID)){
+  for(i_station in unique(tm$station)){
 
-    if (nrow(df %>% filter(ID == i_ID, station == i_station)) > 0){
+    if (nrow(tm %>% filter(ID == i_ID, station == i_station)) > 0){
       
-      equi_cast <- df_equi %>%
+      equi_cast <- tm_equi_pCO2 %>%
         filter(ID == i_ID,
                station == i_station)
       
       print(
 
-  df %>%
+  tm %>%
     filter(ID == i_ID,
            station == i_station,
            phase %in% c("up", "down")) %>%
     ggplot()+
-    geom_path(aes(pCO2, dep, linetype = phase, col="raw"))+
-    geom_path(aes(pCO2_RT_mean, dep, linetype = phase, col="corrected"))+
-    geom_point(data = equi_cast, aes(pCO2, dep))+
+    geom_path(aes(pCO2_corr, dep, linetype = phase, col="raw"))+
+    geom_path(aes(pCO2_mean, dep, linetype = phase, col="corrected"))+
+    geom_point(data = equi_cast, aes(pCO2_corr, dep))+
     scale_y_reverse()+
     scale_color_brewer(palette = "Set1", name="")+
     labs(y="Depth [m]", title = str_c("Date: ",i_ID," | Station: ",i_station))+
     theme_bw()+
-    facet_grid(tau_factor~RT, labeller = label_both)
+    facet_grid(tau_factor~., labeller = label_both)
       
       )
 
@@ -922,7 +929,7 @@ for(i_ID in unique(df$ID)){
 
 dev.off()
 
-rm(equi_cast)
+rm(equi_cast, i_ID, i_station)
 
 ```
 
@@ -940,38 +947,39 @@ First, we analyse all profiles individually. Later we'll merge the information a
 
 ## Down- vs upcast
 
+
 ```{r compute_pCO2_offset_profiles, eval=FALSE}
 
 # pCO2 offset up - down cast
 
-RT_diff <- df %>% 
+tm_grid <- tm %>% 
   filter(phase %in% c("down", "up")) %>% 
-  mutate(dep_int = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1)))),
+  mutate(dep_grid = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1)))),
          tau_factor = as.factor(tau_factor)) %>% 
-  select(ID, station, RT, tau_factor, p_type, dep_int, phase, pCO2, pCO2_RT_mean) %>% 
-  group_by(ID, station, RT, tau_factor, p_type, dep_int, phase) %>%
+  select(ID, station, tau_factor, p_type, dep_grid, phase, pCO2_corr, pCO2_mean) %>% 
+  group_by(ID, station, tau_factor, p_type, dep_grid, phase) %>%
   summarise_all("mean", na.rm = TRUE) %>% 
   ungroup() %>% 
-  pivot_longer(cols = c(pCO2, pCO2_RT_mean), names_to = "correction") %>% 
+  pivot_longer(cols = c(pCO2_corr, pCO2_mean), names_to = "correction") %>% 
   pivot_wider(names_from = phase, values_from = value) %>% 
-  mutate(d_pCO2 = up - down,
-         mean_pCO2 = (down + up)/2,
-         d_pCO2_rel = 100 * d_pCO2 / mean_pCO2)
+  mutate(pCO2_delta = up - down,
+         pCO2_mean = (down + up)/2,
+         pCO2_delta_rel = 100 * pCO2_delta / pCO2_mean)
 
 # descritize depth recordings of equilibrated pCO2 values
 
-df_equi_int <- df_equi %>%
-  mutate(dep_int = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1))))) %>% 
-  select(ID, station, dep_int, pCO2_equi=pCO2)
+tm_equi_pCO2_grid <- tm_equi_pCO2 %>%
+  mutate(dep_grid = as.numeric(as.character(cut(dep, seq(0,40,1), seq(0.5,39.5,1))))) %>% 
+  select(ID, station, dep_grid, pCO2_equi=pCO2_corr)
 
 
-RT_diff %>% 
- write_csv(here::here("data/_merged_data_files",
-                      "BloomSail_CTD_HydroC_profiles_RT_cast-offset.csv"))
+tm_grid %>% 
+ write_csv(here::here("data/_merged_data_files/response_time",
+                      "tm_grid.csv"))
 
-df_equi_int %>% 
- write_csv(here::here("data/_merged_data_files",
-                      "BloomSail_CTD_HydroC_reference_pCO2_int.csv"))
+tm_equi_pCO2_grid %>% 
+ write_csv(here::here("data/_merged_data_files/response_time",
+                      "tm_equi_pCO2_grid.csv"))
 
 
 ```
@@ -979,83 +987,83 @@ df_equi_int %>%
 ```{r plot_corrected_discretized_pCO2_profiles_example, fig.cap="Example plot of discretized, response time corrected and raw pCO~2~ profiles. Panels highlight the effect of constant vs T-dependent tau estimates (columns) and the optimization by applying a constant factor (rows). The black point indicates the reference pCO~2~ value.", fig.asp = 2.3}
 
 
-RT_diff <-
- read_csv(here::here("data/_merged_data_files",
-                      "BloomSail_CTD_HydroC_profiles_RT_cast-offset.csv"),
+tm_grid <-
+ read_csv(here::here("data/_merged_data_files/response_time",
+                      "tm_grid.csv"),
                col_types = cols(ID = col_character()))
 
-df_equi_int <- 
- read_csv(here::here("data/_merged_data_files",
-                      "BloomSail_CTD_HydroC_reference_pCO2_int.csv"),
-               col_types = cols(ID = col_character()))
+tm_equi_pCO2_grid <-
+ read_csv(here::here("data/_merged_data_files/response_time",
+                      "tm_equi_pCO2_grid.csv"),
+          col_types = cols(ID = col_character()))
 
 
 
 i_ID <- "180730"
 i_station <- "P01"
 
-df_equi_int_sub <- df_equi_int %>%
+tm_equi_pCO2_grid_sub <- tm_equi_pCO2_grid %>%
   filter(ID == i_ID,
          station == i_station)
 
 
-      RT_diff %>%
+      tm_grid %>%
         filter(ID == i_ID,
                station == i_station) %>%
-        arrange(dep_int) %>%
+        arrange(dep_grid) %>%
         ggplot()+
-        geom_path(aes(down, dep_int, col=correction, linetype="down"))+
-        geom_path(aes(up, dep_int, col=correction, linetype ="up"))+
-        geom_point(data = df_equi_int_sub, aes(pCO2_equi, dep_int))+
+        geom_path(aes(down, dep_grid, col=correction, linetype="down"))+
+        geom_path(aes(up, dep_grid, col=correction, linetype ="up"))+
+        geom_point(data = tm_equi_pCO2_grid_sub, aes(pCO2_equi, dep_grid))+
         scale_y_reverse(breaks=seq(0,40,2))+
         scale_linetype(name="cast")+
         scale_color_brewer(palette = "Set1", direction = -1)+
         labs(y="Depth [m]", x=expression(pCO[2]~(µatm)),
              title = str_c("Date: ",i_ID," | Station: ",i_station))+
-        facet_grid(tau_factor~RT, labeller = label_both)
+        facet_grid(tau_factor~., labeller = label_both)
       
-rm(df_equi_int_sub)
+rm(tm_equi_pCO2_grid_sub, i_ID, i_station)
 
 ```
 
-A pdf with all discretized pCO~2~ profiles can be assessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/RT_correction_pCO2_profiles_discrete.pdf){target="_blank"}
+A pdf with all discretized pCO~2~ profiles can be assessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/profiles_pCO2_mean_grid.pdf){target="_blank"}
 
 
 ```{r plot_corrected_discretized_pCO2_profiles, eval=FALSE}
 
 pdf(file=here::here("output/Plots/response_time",
-    "RT_correction_pCO2_profiles_discrete.pdf"), onefile = TRUE, width = 7, height = 11)
+    "profiles_pCO2_mean_grid.pdf"), onefile = TRUE, width = 7, height = 11)
 
-for(i_ID in unique(RT_diff$ID)){
-  for(i_station in unique(RT_diff$station)){
+for(i_ID in unique(tm_grid$ID)){
+  for(i_station in unique(tm_grid$station)){
 
-    if (nrow(RT_diff %>% filter(ID == i_ID, station == i_station)) > 0){
+    if (nrow(tm_grid %>% filter(ID == i_ID, station == i_station)) > 0){
       
       
-        df_equi_int_sub <- df_equi_int %>%
+        tm_equi_pCO2_grid_sub <- tm_equi_pCO2_grid %>%
         filter(ID == i_ID,
                station == i_station)
 
       print(
       
-      RT_diff %>%
+      tm_grid %>%
         filter(ID == i_ID,
                station == i_station) %>%
-        arrange(dep_int) %>%
+        arrange(dep_grid) %>%
         ggplot()+
-        geom_path(aes(down, dep_int, col=correction, linetype="down"))+
-        geom_path(aes(up, dep_int, col=correction, linetype ="up"))+
-        geom_point(data = df_equi_int_sub, aes(pCO2_equi, dep_int))+
+        geom_path(aes(down, dep_grid, col=correction, linetype="down"))+
+        geom_path(aes(up, dep_grid, col=correction, linetype ="up"))+
+        geom_point(data = tm_equi_pCO2_grid_sub, aes(pCO2_equi, dep_grid))+
         scale_y_reverse(breaks=seq(0,40,2))+
         scale_linetype(name="cast")+
         scale_color_brewer(palette = "Set1", direction = -1)+
         labs(y="Depth [m]", title = str_c("Date: ",i_ID," | Station: ",i_station))+
         theme_bw()+
-        facet_grid(tau_factor~RT, labeller = label_both)
+        facet_grid(tau_factor~., labeller = label_both)
       
       )
       
-      rm(df_equi_int_sub)
+      rm(tm_equi_pCO2_grid_sub)
     }
 
   }
@@ -1070,21 +1078,25 @@ dev.off()
 
 i_ID <- "180730"
 i_station <- "P01"
-      
-      RT_diff %>%
-        filter(ID == i_ID,
-               station == i_station,
-               correction == "pCO2_RT_mean") %>%
-        arrange(dep_int) %>%
-        ggplot(aes(d_pCO2, dep_int, col=as.factor(tau_factor)))+
-        geom_path()+
-        geom_point()+
-        scale_y_reverse(breaks=seq(0,40,2))+
-        scale_color_discrete(name="tau factor")+
-        labs(x=expression(Delta~pCO[2]~(µatm)), y="Depth [m]", title = str_c("Date: ",i_ID," | Station: ",i_station))+
-        geom_vline(xintercept = 0)+
-        geom_vline(xintercept = c(-10,10), col="red")+
-        facet_wrap(~RT, labeller = label_both)
+
+
+tm_grid %>%
+  filter(ID == i_ID,
+         station == i_station,
+         correction == "pCO2_mean") %>%
+  arrange(dep_grid) %>%
+  ggplot(aes(pCO2_delta, dep_grid, col=as.factor(tau_factor)))+
+  geom_path()+
+  geom_point()+
+  scale_y_reverse(breaks=seq(0,40,2))+
+  scale_color_discrete(name="tau factor")+
+  labs(x=expression(Delta~pCO[2]~(µatm)),
+       y="Depth [m]",
+       title = str_c("Date: ",i_ID," | Station: ",i_station))+
+  geom_vline(xintercept = 0)+
+  geom_vline(xintercept = c(-10,10), col="red")
+
+rm(i_ID, i_station)
 
 ```
 
@@ -1092,21 +1104,21 @@ i_station <- "P01"
 ```{r plot_delta_pCO2_absolute_profiles, eval=FALSE}
 
 pdf(file=here::here("output/Plots/response_time",
-    "RT_correction_delta_pCO2_absolute_profiles_discrete.pdf"), onefile = TRUE, width = 7, height = 7)
+    "profiles_pCO2_delta_grid.pdf"), onefile = TRUE, width = 7, height = 7)
 
-for(i_ID in unique(RT_diff$ID)){
-  for(i_station in unique(RT_diff$station)){
+for(i_ID in unique(tm_grid$ID)){
+  for(i_station in unique(tm_grid$station)){
 
-    if (nrow(RT_diff %>% filter(ID == i_ID, station == i_station)) > 0){
+    if (nrow(tm_grid %>% filter(ID == i_ID, station == i_station)) > 0){
 
       print(
       
-      RT_diff %>%
+      tm_grid %>%
         filter(ID == i_ID,
                station == i_station,
-               correction == "pCO2_RT_mean") %>%
-        arrange(dep_int) %>%
-        ggplot(aes(d_pCO2, dep_int, col=as.factor(tau_factor)))+
+               correction == "pCO2_mean") %>%
+        arrange(dep_grid) %>%
+        ggplot(aes(pCO2_delta, dep_grid, col=as.factor(tau_factor)))+
         geom_path()+
         geom_point()+
         scale_y_reverse(breaks=seq(0,40,2))+
@@ -1114,8 +1126,7 @@ for(i_ID in unique(RT_diff$ID)){
         labs(x = "delta pCO2 [µatm]", y="Depth [m]", title = str_c("Date: ",i_ID," | Station: ",i_station))+
         geom_vline(xintercept = 0)+
         geom_vline(xintercept = c(-10,10), col="red")+
-        theme_bw()+
-        facet_wrap(~RT, labeller = label_both)
+        theme_bw()
       
       )
       
@@ -1129,7 +1140,7 @@ dev.off()
 ```
 
 
-A pdf with all absolute pCO~2~ offset profiles can be assessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/RT_correction_delta_pCO2_absolute_profiles_discrete.pdf){target="_blank"}.
+A pdf with all absolute pCO~2~ offset profiles can be assessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/profiles_pCO2_delta_grid.pdf){target="_blank"}.
 
 
 
@@ -1138,12 +1149,12 @@ A pdf with all absolute pCO~2~ offset profiles can be assessed [here](https://gi
 i_ID <- "180730"
 i_station <- "P01"
 
-      RT_diff %>%
+      tm_grid %>%
         filter(ID == i_ID,
                station == i_station,
-               correction == "pCO2_RT_mean") %>%
-        arrange(dep_int) %>%
-        ggplot(aes(d_pCO2_rel, dep_int, col=as.factor(tau_factor)))+
+               correction == "pCO2_mean") %>%
+        arrange(dep_grid) %>%
+        ggplot(aes(pCO2_delta_rel, dep_grid, col=as.factor(tau_factor)))+
         geom_path()+
         geom_point()+
         scale_y_reverse(breaks=seq(0,40,2))+
@@ -1151,8 +1162,7 @@ i_station <- "P01"
         labs(x=expression(Delta~pCO[2]~("%"~of~absolute~value)), y="Depth [m]",
                           title = str_c("Date: ",i_ID," | Station: ",i_station))+
         geom_vline(xintercept = 0)+
-        geom_vline(xintercept = c(-10,10), col="red")+
-        facet_wrap(~RT, labeller = label_both)
+        geom_vline(xintercept = c(-10,10), col="red")
       
 ```
 
@@ -1162,30 +1172,31 @@ A pdf with all relative pCO~2~ offset profiles can be assessed [here](https://gi
 ```{r plot_delta_pCO2_relative_profiles, eval=FALSE}
 
 pdf(file=here::here("output/Plots/response_time",
-    "RT_correction_delta_pCO2_relative_profiles_discrete.pdf"), onefile = TRUE, width = 7, height = 7)
+    "profiles_pCO2_delta_rel_grid.pdf"), onefile = TRUE, width = 7, height = 7)
 
-for(i_ID in unique(RT_diff$ID)){
-  for(i_station in unique(RT_diff$station)){
+for(i_ID in unique(tm_grid$ID)){
+  for(i_station in unique(tm_grid$station)){
 
-    if (nrow(RT_diff %>% filter(ID == i_ID, station == i_station)) > 0){
+    if (nrow(tm_grid %>% filter(ID == i_ID, station == i_station)) > 0){
 
       print(
       
-      RT_diff %>%
+      tm_grid %>%
         filter(ID == i_ID,
                station == i_station,
-               correction == "pCO2_RT_mean") %>%
-        arrange(dep_int) %>%
-        ggplot(aes(d_pCO2_rel, dep_int, col=as.factor(tau_factor)))+
+               correction == "pCO2_mean") %>%
+        arrange(dep_grid) %>%
+        ggplot(aes(pCO2_delta_rel, dep_grid, col=as.factor(tau_factor)))+
         geom_path()+
         geom_point()+
         scale_y_reverse(breaks=seq(0,40,2))+
         scale_color_discrete(name="tau factor")+
-        labs(x = "delta pCO2 [% of absolute value]", y="Depth [m]", title = str_c("Date: ",i_ID," | Station: ",i_station))+
+        labs(x = "delta pCO2 [% of absolute value]",
+             y="Depth [m]",
+             title = str_c("Date: ",i_ID," | Station: ",i_station))+
         geom_vline(xintercept = 0)+
         geom_vline(xintercept = c(-10,10), col="red")+
-        theme_bw()+
-        facet_wrap(~RT, labeller = label_both)
+        theme_bw()
       
       )
       
@@ -1202,18 +1213,18 @@ dev.off()
 
 ```{r compute_pCO2_offset_reference_value}
 
-equi_diff <- full_join(RT_diff, df_equi_int) %>% 
+tm_equi_delta <- full_join(tm_grid, tm_equi_pCO2_grid) %>% 
   filter(!is.na(pCO2_equi)) %>% 
-  mutate(d_pCO2_equi = down - pCO2_equi,
-         d_pCO2_equi_rel = 100 * d_pCO2_equi / pCO2_equi)
+  mutate(pCO2_delta_equi = down - pCO2_equi,
+         pCO2_delta_equi_rel = 100 * pCO2_delta_equi / pCO2_equi)
 
 ```
 
 ```{r plot_pCO2_offset_reference_value, fig.cap="Offset between pCO~2~ downcast and upcast reference value as a function of absolute pCO~2~. (Conditions: T-dependent tau, Factor = 1.2."}
 
-equi_diff %>% 
-  filter(RT == "T-dependent", tau_factor == 1.2, correction=="pCO2_RT_mean") %>% 
-  ggplot(aes(pCO2_equi, d_pCO2_equi))+
+tm_equi_delta %>% 
+  filter(tau_factor == 1.2, correction=="pCO2_mean") %>% 
+  ggplot(aes(pCO2_equi, pCO2_delta_equi))+
   geom_hline(yintercept = 0)+
   geom_point()+
   labs(x=expression(Reference~pCO[2]~(µatm)), y=expression(Delta~pCO[2]~from~reference~(µatm)))
@@ -1223,13 +1234,12 @@ equi_diff %>%
 
 ```{r plot_pCO2_offset_reference_value_violin, fig.cap="Offset between pCO~2~ downcast and upcast reference value. Panels highlight the effect of constant vs T-dependent tau estimates. Colour distinguish raw and corrected offsets."}
 
-equi_diff %>% 
-  ggplot(aes(as.factor(tau_factor), d_pCO2_equi, fill=correction))+
+tm_equi_delta %>% 
+  ggplot(aes(as.factor(tau_factor), pCO2_delta_equi, fill=correction))+
   geom_hline(yintercept = 0)+
   geom_violin()+
   labs(y=expression(Delta~pCO[2]~from~reference~(µatm)), x="Tau factor")+
-  scale_fill_brewer(palette = "Set1")+
-  facet_wrap(~RT, labeller = label_both)
+  scale_fill_brewer(palette = "Set1")
 
 ```
 
@@ -1245,78 +1255,92 @@ In order to decide, which conditions resulted in the best response correction th
 
 Summary statistics were restricted to complete shallow profiles (not more than 2 observations missing from 1m depth intervals, maximum depth 20m). 
 
+
+
+```{r identify_max_dep_pCO2_within_profiles}
+
+tm_grid_stat <- tm_grid %>% 
+  filter(correction == "pCO2_mean") %>% 
+  group_by(ID, station) %>% 
+  summarise(dep_max = max(dep_grid),
+            pCO2_max = max(down)) %>% 
+  ungroup()
+
+tm_grid_stat %>% 
+  ggplot(aes(dep_max, pCO2_max))+
+  geom_point()
+
+tm_grid <- full_join(tm_grid, tm_grid_stat)
+rm(tm_grid_stat)
+
+```
+
+### Define dep and pCO2 thresholds
+
+```{r dep_pCO2_threshold}
+
+dep_max_lim <- 25
+pCO2_max_lim <- 400
+
+```
+
+Summary metric are restricted to profiles that did not exceed a maximum sampling depth of `r dep_max_lim` m and pCO2 of `r pCO2_max_lim` µatm.
+
 ```{r calculate_performance_metrics}
 
-RT_diff_20 <- RT_diff %>% 
-  filter(dep_int <= 20) %>% 
-  group_by(ID, station, RT, tau_factor, correction) %>% 
-  mutate(nr_na = sum(is.na(d_pCO2))) %>% 
+tm_grid_shallow <- tm_grid %>% 
+  filter(dep_max <= dep_max_lim,
+         pCO2_max <= pCO2_max_lim) %>% 
+  group_by(ID, station, tau_factor, correction) %>% 
+  mutate(nr_na = sum(is.na(pCO2_delta))) %>% 
   ungroup() %>% 
   filter(nr_na <= 2)
 
-RT_diff_30 <- RT_diff %>% 
-  filter(dep_int <= 30) %>% 
-  group_by(ID, station, RT, tau_factor, correction) %>% 
-  mutate(nr_na = sum(is.na(d_pCO2))) %>% 
-  ungroup() %>% 
-  filter(nr_na <= 2)
-  
 
-RT_diff_sum_profile_30 <- RT_diff_30 %>% 
-  mutate(d_pCO2_abs = abs(d_pCO2),
-         d_pCO2_rel_abs = abs(d_pCO2_rel)) %>% 
-  group_by(RT, tau_factor, dep_int, correction) %>% 
-  summarise(mean         = mean(d_pCO2, na.rm = TRUE),
-            sd           = sd(d_pCO2, na.rm = TRUE),
-            mean_abs     = mean(d_pCO2_abs, na.rm = TRUE),
-            mean_rel     = mean(d_pCO2_rel, na.rm = TRUE),
-            sd_rel       = sd(d_pCO2_rel, na.rm = TRUE),
-            mean_rel_abs = mean(d_pCO2_rel_abs, na.rm = TRUE)) %>% 
+tm_grid_shallow_sum <- tm_grid_shallow %>% 
+  mutate(pCO2_delta_abs = abs(pCO2_delta),
+         pCO2_delta_rel_abs = abs(pCO2_delta_rel)) %>% 
+  group_by(tau_factor, dep_grid, correction) %>% 
+  summarise(mean         = mean(pCO2_delta, na.rm = TRUE),
+            sd           = sd(pCO2_delta, na.rm = TRUE),
+            mean_abs     = mean(pCO2_delta_abs, na.rm = TRUE),
+            mean_rel     = mean(pCO2_delta_rel, na.rm = TRUE),
+            sd_rel       = sd(pCO2_delta_rel, na.rm = TRUE),
+            mean_rel_abs = mean(pCO2_delta_rel_abs, na.rm = TRUE)) %>% 
   ungroup() %>% 
-  pivot_longer(cols = 5:10, names_to = "estimate", values_to = "dpCO2")
-
-RT_diff_sum_profile_20 <- RT_diff_20 %>% 
-  mutate(d_pCO2_abs = abs(d_pCO2),
-         d_pCO2_rel_abs = abs(d_pCO2_rel)) %>% 
-  group_by(RT, tau_factor, dep_int, correction) %>% 
-  summarise(mean         = mean(d_pCO2, na.rm = TRUE),
-            sd           = sd(d_pCO2, na.rm = TRUE),
-            mean_abs     = mean(d_pCO2_abs, na.rm = TRUE),
-            mean_rel     = mean(d_pCO2_rel, na.rm = TRUE),
-            sd_rel       = sd(d_pCO2_rel, na.rm = TRUE),
-            mean_rel_abs = mean(d_pCO2_rel_abs, na.rm = TRUE)) %>% 
-  ungroup() %>% 
-  pivot_longer(cols = 5:10, names_to = "estimate", values_to = "dpCO2")
+  pivot_longer(cols = sd:mean_rel_abs,
+               names_to = "estimate", values_to = "pCO2_delta")
 
 
-equi_diff_sum <- equi_diff %>% 
-  mutate(d_pCO2_equi_abs = abs(d_pCO2_equi),
-         d_pCO2_equi_rel_abs = abs(d_pCO2_equi_rel)) %>% 
-  group_by(correction, RT, tau_factor) %>% 
-  summarise(mean         = mean(d_pCO2_equi, na.rm = TRUE),
-            mean_abs     = mean(d_pCO2_equi_abs, na.rm = TRUE),
-            mean_rel = mean(d_pCO2_equi_rel, na.rm = TRUE),
-            mean_rel_abs = mean(d_pCO2_equi_rel_abs, na.rm = TRUE)) %>% 
-  ungroup() %>% 
-  pivot_longer(cols = 4:7, names_to = "estimate", values_to = "dpCO2")
+tm_equi_delta_sum <- tm_equi_delta %>%
+  mutate(pCO2_delta_equi_abs = abs(pCO2_delta_equi),
+         pCO2_delta_equi_rel_abs = abs(pCO2_delta_equi_rel)) %>%
+  group_by(correction, tau_factor) %>%
+  summarise(mean         = mean(pCO2_delta_equi, na.rm = TRUE),
+            mean_abs     = mean(pCO2_delta_equi_abs, na.rm = TRUE),
+            mean_rel = mean(pCO2_delta_equi_rel, na.rm = TRUE),
+            mean_rel_abs = mean(pCO2_delta_equi_rel_abs, na.rm = TRUE)) %>%
+  ungroup() %>%
+  pivot_longer(cols = mean:mean_rel_abs,
+               names_to = "estimate", values_to = "dpCO2")
 
 ```
 
 
 ```{r plot_cast_delta_pCO2, fig.cap="Offset between up- and downcast. Panel columns: Constant and T-dependent tau. Panel rows from top to bottom: Mean of absolute offset, mean of relative absolute offset, standard deviation of offset, standard deviation of relative offset.", fig.asp=2}
 
-RT_diff_sum_profile_30 %>% 
-  filter(correction == "pCO2_RT_mean",
+tm_grid_shallow_sum %>% 
+  filter(correction == "pCO2_mean",
          estimate %in% c("mean_abs", "mean_rel_abs", "sd", "sd_rel")) %>% 
   ggplot()+
   geom_vline(xintercept = 0)+
   geom_hline(yintercept = 20)+
   geom_vline(xintercept = c(10), col="red")+
-  geom_path(aes(dpCO2, dep_int, col=as.factor(tau_factor)))+
+  geom_path(aes(pCO2_delta, dep_grid, col=as.factor(tau_factor)))+
   scale_y_reverse()+
   scale_color_discrete(name="Tau factor")+
   labs(x=expression(Delta~pCO[2]~(µatm)), y="Depth intervals (1m)")+
-  facet_grid(estimate~RT)
+  facet_grid(estimate~.)
 
 ```
 
@@ -1324,21 +1348,21 @@ RT_diff_sum_profile_30 %>%
 ```{r plot_tau_optimum_cast_delta_pCO2, fig.cap="Mean offset between up- and downcast for all profiles up to 20m water depth. The lines between discrete tau factors result from the same analysis performed with high resolution of the tau factor. Left Panel: Mean absolute offset (µatm). Right panel: Mean relative offset (% of absolute value)."}
 
 
-RT_diff_sum_mean_highres <-
- read_csv(here::here("data/_merged_data_files",
-                      "X_BloomSail_CTD_HydroC_profiles_RT_cast-offset_highres_taufactor_mean.csv")) %>% 
-  filter(estimate %in% c("mean_abs", "mean_rel_abs"))
+# RT_diff_sum_mean_highres <-
+#  read_csv(here::here("data/_merged_data_files",
+#                       "X_BloomSail_CTD_HydroC_profiles_RT_cast-offset_highres_taufactor_mean.csv")) %>% 
+#   filter(estimate %in% c("mean_abs", "mean_rel_abs"))
 
-RT_diff_sum_mean <- RT_diff_sum_profile_20 %>% 
-  group_by(RT, estimate, correction, tau_factor) %>% 
-  summarise(mean_dpCO2 = mean(dpCO2)) %>% 
+tm_grid_shallow_sum_mean <- tm_grid_shallow_sum %>% 
+  group_by(estimate, correction, tau_factor) %>% 
+  summarise(pCO2_delta_mean = mean(pCO2_delta)) %>% 
   ungroup()
 
-RT_diff_sum_mean %>% 
+tm_grid_shallow_sum_mean %>% 
   filter(estimate %in% c("mean_abs", "mean_rel_abs")) %>% 
-  ggplot(aes(tau_factor, mean_dpCO2, col=RT, linetype=correction, shape=correction))+
-  geom_line(data = RT_diff_sum_mean_highres, 
-            aes(tau_factor, mean_dpCO2))+
+  ggplot(aes(tau_factor, pCO2_delta_mean, linetype=correction, shape=correction))+
+  # geom_line(data = RT_diff_sum_mean_highres, 
+  #           aes(tau_factor, mean_dpCO2))+
   geom_point()+
   geom_hline(yintercept = 0)+
   labs(x="Tau factor", y=expression(Mean~Delta~pCO[2]))+
@@ -1348,16 +1372,16 @@ RT_diff_sum_mean %>%
 
 Below we determined the tau factor that corresponds to lowest absolute and relative mean offsets, respectively.
 
-```{r cast_tau_with_minimum_offfset}
+```{r cast_tau_with_minimum_offfset, eval=FALSE}
 
 RT_diff_sum_mean_highres %>%
-  filter(correction == "pCO2_RT_mean", estimate %in% c("mean_abs")) %>% 
+  filter(correction == "pCO2_mean", estimate %in% c("mean_abs")) %>% 
   slice(which.min(mean_dpCO2)) %>% 
   select(tau_factor, mean_dpCO2) %>% 
   rename(mean_abs=mean_dpCO2)
 
 RT_diff_sum_mean_highres %>%
-  filter(correction == "pCO2_RT_mean", estimate == "mean_rel_abs") %>% 
+  filter(correction == "pCO2_mean", estimate == "mean_rel_abs") %>% 
   slice(which.min(mean_dpCO2)) %>% 
   select(tau_factor, mean_dpCO2) %>% 
   rename(mean_rel_abs=mean_dpCO2)
@@ -1369,17 +1393,17 @@ Likewise, we analyse the offset from the pCO~2~ reference value:
 
 ```{r tau_optimum_reference_pCO2, fig.cap="Mean pCO~2~ offset from reference values as a function of the factor applied to tau. The lines between discrete tau factors result from the same analysis performed with high resolution of the tau factor. Left Panel: Mean absolute offset (µatm). Right panel: Mean relative offset (% of absolute value)."}
 
-equi_diff_sum_highres <-
- read_csv(here::here("data/_merged_data_files",
-                      "X_BloomSail_CTD_HydroC_profiles_RT_reference-offset_highres_taufactor_mean.csv")) %>% 
-  pivot_longer(cols = 4:7, names_to = "estimate", values_to = "dpCO2") %>% 
-  filter(estimate %in% c("mean_abs", "mean_rel_abs"))
+# tm_equi_delta_sum_highres <-
+#  read_csv(here::here("data/_merged_data_files",
+#                       "X_BloomSail_CTD_HydroC_profiles_RT_reference-offset_highres_taufactor_mean.csv")) %>% 
+#   pivot_longer(cols = 4:7, names_to = "estimate", values_to = "dpCO2") %>% 
+#   filter(estimate %in% c("mean_abs", "mean_rel_abs"))
 
-equi_diff_sum %>%
+tm_equi_delta_sum %>%
   filter(estimate %in% c("mean_abs", "mean_rel_abs")) %>% 
-  ggplot(aes(tau_factor, dpCO2, col=RT, linetype=correction, shape=correction))+
-  geom_line(data = equi_diff_sum_highres,
-            aes(tau_factor, dpCO2))+
+  ggplot(aes(tau_factor, dpCO2, linetype=correction, shape=correction))+
+  # geom_line(data = tm_equi_delta_sum_highres,
+  #           aes(tau_factor, dpCO2))+
   geom_point()+
   geom_hline(yintercept = 0)+
   labs(x="Tau factor", y=expression(Mean~Delta~pCO[2]))+
@@ -1390,17 +1414,17 @@ equi_diff_sum %>%
 
 Below we determined the tau factor that corresponds to lowest absolute and relative mean offsets, respectively.
 
-```{r reference_tau_with_minimum_offfset}
+```{r reference_tau_with_minimum_offfset, eval=FALSE}
 
-equi_diff_sum_highres %>% 
-  filter(correction == "pCO2_RT_mean", estimate %in% c("mean_abs")) %>% 
+tm_equi_delta_sum_highres %>% 
+  filter(correction == "pCO2_mean", estimate %in% c("mean_abs")) %>% 
   slice(which.min(dpCO2)) %>% 
   select(tau_factor, dpCO2) %>% 
   rename(mean_abs=dpCO2)
 
 
-equi_diff_sum_highres %>% 
-  filter(correction == "pCO2_RT_mean", estimate == "mean_rel_abs") %>% 
+tm_equi_delta_sum_highres %>% 
+  filter(correction == "pCO2_mean", estimate == "mean_rel_abs") %>% 
   slice(which.min(dpCO2)) %>% 
   select(tau_factor, dpCO2) %>% 
   rename(mean_rel_abs=dpCO2)
@@ -1426,30 +1450,35 @@ RT_corr <- function(c1, c0, dt, tau) {
 }
 
 
-# load data and response times
-df <- 
-  read_csv(here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_track.csv"),
+
+tm <- read_csv(here::here("data/_merged_data_files",
+                          "tm.csv"),
                col_types = cols(ID = col_character(),
                                 pCO2_analog = col_double(),
-                                pCO2 = col_double(),
+                                pCO2_corr = col_double(),
                                 Zero = col_factor(),
                                 Flush = col_factor(),
-                                mixing = col_factor(),
                                 Zero_ID = col_integer(),
                                 deployment = col_integer(),
                                 duration = col_double(),
-                                lon = col_double(),
-                                lat = col_double()))
+                                mixing = col_character(),
+                                lat = col_double(),
+                                lon = col_double()))
 
-df <- df %>%
-  group_by(ID) %>% 
+tm <- tm %>%
+  group_by(ID, station) %>% 
   mutate(duration = as.numeric(date_time - min(date_time)),
          pump_power = if_else(date_time < ymd_hms("2018-07-17;13:08:34"), "1W", "8W")) %>%
   arrange(date_time)
 
 
 
-RT_fit <- read_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_RT_fit.csv"))
+
+
+
+
+RT_fit <- read_csv(here::here("data/_merged_data_files/response_time",
+                              "tau_fit.csv"))
 
 
 
@@ -1458,18 +1487,18 @@ RT_fit <- read_csv(here::here("data/_summarized_data_files", "Tina_V_HydroC_RT_f
 RT_fit <- RT_fit %>% 
   rename(tau_intercept = `(Intercept)`, tau_slope=tem)
 
-df <- full_join(df, RT_fit)
+tm <- full_join(tm, RT_fit)
 
 
 #Assign tau
-df <- df %>% 
+tm <- tm %>% 
   mutate(tau = tau_intercept + tau_slope *tem) %>% 
   select(-tau_intercept, -tau_slope)
 
 
 # Prepare data set for RT correction --------------------------------------
 
-df <- df %>% 
+tm <- tm %>% 
   group_by(ID, station) %>% 
   arrange(date_time) %>% 
   mutate(dt = as.numeric(as.character(date_time - lag(date_time)))) %>% 
@@ -1477,24 +1506,23 @@ df <- df %>%
 
 # measurement frequency
 
-freq <- df %>% 
+freq <- tm %>% 
   filter(dt < 13) %>% 
   group_by(ID) %>% 
   summarise(dt_mean = round(mean(dt, na.rm = TRUE),0))
 
-df <- full_join(df, freq)
+tm <- full_join(tm, freq)
 
 # tau factors
+tm <- expand_grid(tm, tau_factor = seq(1.2))
 
-df <- expand_grid(df, tau_factor = seq(1.2))
-
-df <- df %>%
+tm <- tm %>%
   mutate(tau_test = tau*tau_factor)
 
 
 # Apply RT correction to entire data set
 
-for(i_ID in unique(df$ID)){
+for(i_ID in unique(tm$ID)){
   
 #i_ID <- "180716"
   
@@ -1503,13 +1531,13 @@ for(i_ID in unique(df$ID)){
   window <- 30 / freq_sub
   rolling_mean   <- rollify(~mean(.x, na.rm = TRUE), window = window)
 
-  df_sub <- df %>%
+  tm_sub <- tm %>%
     filter(ID == i_ID) %>% 
     group_by(station) %>% 
-    mutate(pCO2_RT = RT_corr(pCO2, lag(pCO2), dt, tau_test),
+    mutate(pCO2_RT = RT_corr(pCO2_corr, lag(pCO2_corr), dt, tau_test),
            pCO2_RT = if_else(pCO2_RT %in% c(Inf, -Inf), NaN, pCO2_RT),
            window = window,
-           pCO2_RT_mean = rolling_mean(pCO2_RT)
+           pCO2_mean = rolling_mean(pCO2_RT)
            #pCO2_RT_median = rolling_median(pCO2_RT)
            ) %>% 
     ungroup()
@@ -1517,54 +1545,75 @@ for(i_ID in unique(df$ID)){
   # time shift RT corrected data
   shift <- as.integer(as.character(window/2))
   
-  df_sub <- df_sub %>%
+  tm_sub <- tm_sub %>%
     group_by(station) %>% 
-    mutate(pCO2_RT_mean = lead(pCO2_RT_mean, shift)) %>% 
+    mutate(pCO2_mean = lead(pCO2_mean, shift)) %>% 
     ungroup()
   
   
-  if (exists("df_corr")){df_corr <- bind_rows(df_corr, df_sub)}
-  else{df_corr <- df_sub}
+  if (exists("tm_corr")){tm_corr <- bind_rows(tm_corr, tm_sub)}
+  else{tm_corr <- tm_sub}
   
-  rm(df_sub, freq_sub, rolling_mean, shift, window)
+  rm(tm_sub, freq_sub, rolling_mean, shift, window)
   
 }
 
 
-df <- df_corr
-rm(RT_corr, i_ID, freq, df_corr)
+tm <- tm_corr
+rm(RT_corr, i_ID, freq, tm_corr)
 
-df <- df %>% 
+tm <- tm %>% 
   select(-c(tau, tau_factor, tau_test, window))
 
-df %>% 
- write_csv(here::here("data/_merged_data_files",
-                      "BloomSail_CTD_HydroC_track_RT.csv"))
-rm(df)
+tm %>% 
+ write_csv(here::here("data/_merged_data_files/response_time",
+                      "tm_RT_all.csv"))
+rm(tm)
 
 ```
 
 
+# Sensitivity considerations
 
-# List of relevant parameters
+A change in DIC of 1 µmol kg^-1^ corresponds to a change in pCO~2~ of around 1 µatm, in the Central Baltic Sea at a pCO~2~ of around 100 µatm (summertime conditions).
 
-Response time determination
+```{r sensitivity_estimate, fig.cap="pCO~2~ sensitivity to changes in DIC."}
 
-- Fit interval length: Use tau from one or all fit interval length? Scale fit interval length to expected tau?
-- tau residual threshold (mean absolute residula <1% of final pCO2, entire group removed)
-- Mean vs T-dependent tau
+df <- data.frame(cbind(
+  (c(1720)),
+  (c(7))))
 
-Response time correction
+Tem <- seq(5,25,5)
+pCO2<-seq(50,500,20)
 
-- correction procedure (Bittig vs. Fiedler, Miloshevich, Fietzek)
-- Smoothing
+df<-merge(df, Tem)
+names(df) <- c("AT", "S", "Tem")  
 
-Quality assesment of response time correction
+df<-merge(df, pCO2)
+names(df) <- c("AT", "S", "Tem", "pCO2")  
 
-- Down-Up-difference vs reference value
-- Depth interval width for offset calculation
-- Max depth for Down-Up-difference (currently upper 20m)
-- NA criterion for included Down-Up-difference (currently 2)
+df$AT<-df$AT*1e-6
+
+df$DIC<-carb(flag=24, var1=df$pCO2, var2=df$AT, S=df$S, T=df$Tem, k1k2="m10", kf="dg", pHscale="T")[,16]
+df$pCO2.corr<-carb(flag=15, var1=df$AT, var2=df$DIC, S=df$S, T=df$Tem, k1k2="m10", kf="dg", pHscale="T")[,9]
+
+df$pCO2.2<-df$pCO2.corr + 25
+df$DIC.2<-carb(flag=24, var1=df$pCO2.2, var2=df$AT, S=df$S, T=df$Tem, k1k2="m10", kf="dg", pHscale="T")[,16]
+
+
+df$ratio<-(df$pCO2.2-df$pCO2.corr)/(df$DIC.2*1e6-df$DIC*1e6)
+
+df %>% 
+  ggplot(aes(pCO2, ratio, col=as.factor(Tem)))+
+  geom_line()+
+  scale_color_viridis_d(option = "C",name="Tem [°C]")+
+  labs(x=expression(pCO[2]~(µatm)), y=expression(Delta~pCO[2]~"/"~Delta~DIC~(µatm~µmol^{-1}~kg)))+
+  scale_y_continuous(limits = c(0,8), breaks = seq(0,10,1))
+
+rm(df, Tem, pCO2)
+
+```
+
 
 
 
