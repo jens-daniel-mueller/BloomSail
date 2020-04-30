@@ -442,7 +442,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Nomenclature used in this project</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">29 April, 2020</h4>
+<h4 class="date">30 April, 2020</h4>
 
 </div>
 
@@ -467,7 +467,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-04-29
+<strong>Last updated:</strong> 2020-04-30
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -558,16 +558,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0bbf0e699173a2ff67472507d15d6f127b6b70adtargetblank0bbf0e6a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/0bbf0e699173a2ff67472507d15d6f127b6b70ad" target="_blank">0bbf0e6</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreefe72316587706c4fbdbc46590e19d0ed955f0435targetblankfe72316a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/fe72316587706c4fbdbc46590e19d0ed955f0435" target="_blank">fe72316</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0bbf0e699173a2ff67472507d15d6f127b6b70adtargetblank0bbf0e6a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreefe72316587706c4fbdbc46590e19d0ed955f0435targetblankfe72316a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/0bbf0e699173a2ff67472507d15d6f127b6b70ad" target="_blank">0bbf0e6</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/fe72316587706c4fbdbc46590e19d0ed955f0435" target="_blank">fe72316</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -583,7 +583,11 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
+    Ignored:    data/backup/
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
+
+Untracked files:
+    Untracked:  output/Plots/response_time/
 
 </code></pre>
 <p>
@@ -622,6 +626,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/fe72316587706c4fbdbc46590e19d0ed955f0435/analysis/nomenclature.Rmd" target="_blank">fe72316</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-30
+</td>
+<td>
+revised variable and object names, used temp-dependent tau only, rerun code
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/6465570769090e929abf260dc24973ae6cff070d/docs/nomenclature.html" target="_blank">6465570</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-29
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -800,10 +838,16 @@ Moved nomenlacture to seperate Rmd
 </ul></li>
 <li>Observed variables: column names, or identifier in column “var” for long-format tables
 <ul>
-<li>pCO2_analog: analog HydroC signal recorded on SeaBird CTD</li>
-<li>pCO2_raw: HydroC signal recorded internally</li>
-<li>pCO2_corr: HydroC signal recorded internally postprocessed by manufacturer</li>
-<li>pCO2: Response time corrected pCO2_corr</li>
+<li>pCO2: partial pressure of carbon dioxide, with following postfix indicating manipulation level
+<ul>
+<li>_analog: analog HydroC signal recorded on SeaBird CTD</li>
+<li>_raw: HydroC signal recorded internally</li>
+<li>_corr: pCO2_raw postprocessed by manufacturer</li>
+<li>_equi: pCO2_corr at the end of an in-water equilibration period at constant depth</li>
+<li>_RT: Response time corrected pCO2_corr</li>
+<li>_RT_mean: running mean of pCO2_RT</li>
+<li>none: pCO2_RT_mean gridded to regular depth levels</li>
+</ul></li>
 <li>sal</li>
 <li>tem</li>
 <li>nCT: CT calculated from pCO2, temperature, and fixed AT, S</li>
@@ -822,9 +866,11 @@ Moved nomenlacture to seperate Rmd
 <li>grid: value gridded to a coarser resolution</li>
 <li>diff: difference to previous value</li>
 <li>diff_daily: difference to previous value divided by number of days</li>
+<li>delta: offset from same parameter but estimated differently</li>
 <li>i: intergrated over depth</li>
 <li>cum: cumulative value over time</li>
 <li>sign: identifier for pos. or neg. differences</li>
+<li>rel: relative to some absolute value</li>
 </ul></li>
 <li>p_XXX: ggplot object</li>
 </ul>
