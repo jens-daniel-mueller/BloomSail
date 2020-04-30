@@ -39,7 +39,7 @@ In this document, raw data files are read, merged into one file with harmonized 
 
 # Sea-Bird SBE 16 sensor data (ts)
 
-CTD sensor data including recordings from auxiliary pH, O~2~, Chla and pCO~2~ sensors were recorded with a measurement frequency of 15 sec. (In addition, pCO~2~ data were also internally recorded on the Contros HydroC instrument with higher temporal resolution and will later be used for further analysis after merging with CTD data.)
+CTD sensor data including recordings from auxiliary pH, O~2~, Chla and pCO~2~ sensors were recorded with a measurement frequency of 15 sec. (In addition, pCO~2~ data were also internally recorded on the Contros HydroC instrument with higher tempral resolution and will later be used for further analysis after merging with CTD data.)
 
 ## Read regular profiles and transects
 
@@ -51,40 +51,41 @@ files <- list.files(path = "data/TinaV/Sensor/Profiles_Transects/", pattern = "[
 
 for (file in files){
   
-  start.date <- data.table(read.delim(here::here("data/TinaV/Sensor/Profiles_Transects/", file),
+  start_date <- data.table(read.delim(here::here("data/TinaV/Sensor/Profiles_Transects/", file),
                                       sep="#", nrows = 160))[[78,1]]
-  start.date <- substr(start.date, 15, 34)
-  start.date <- mdy_hms(start.date, tz="UTC")
+  start_date <- substr(start_date, 15, 34)
+  start_date <- mdy_hms(start_date, tz="UTC")
   
-  tempo <- read.delim(here::here("data/TinaV/Sensor/Profiles_Transects/", file),
+  temp <- read.delim(here::here("data/TinaV/Sensor/Profiles_Transects/", file),
                       sep="", skip = 160, header = FALSE)
-  tempo <- data.table(tempo[,c(2,3,4,5,6,7,9,11,13)])
-  names(tempo) <- c("date_time", "dep", "tem", "sal", "V_pH", "pH", "Chl", "O2", "pCO2_analog")
-  tempo$start.date <- start.date
-  tempo$date_time <- tempo$date_time + tempo$start.date
+  temp <- data.table(temp[,c(2,3,4,5,6,7,9,11,13)])
+  names(temp) <- c("date_time", "dep", "tem", "sal", "V_pH", "pH", "Chl", "O2", "pCO2_analog")
+  temp$start_date <- start_date
+  temp$date_time <- temp$date_time + temp$start_date
   
-  tempo$ID <- substr(file, 1, 6)
-  tempo$type <- substr(file, 8,8)
-  tempo$station <- substr(file, 8,10)
+  temp$ID <- substr(file, 1, 6)
+  temp$type <- substr(file, 8,8)
+  temp$station <- substr(file, 8,10)
   
-  tempo$cast <- "up"
-  tempo[date_time < mean(tempo[dep == max(tempo$dep)]$date_time)]$cast <- "down"
+  temp$cast <- "up"
+  temp[date_time < mean(temp[dep == max(temp$dep)]$date_time)]$cast <- "down"
   
   if (exists("dataset")){
-    dataset <- rbind(dataset, tempo)
+    dataset <- rbind(dataset, temp)
   }
   
   if (!exists("dataset")){
-    dataset <- tempo
+    dataset <- temp
   }
   
-  rm(start.date)
-  rm(tempo)
+  rm(start_date)
+  rm(temp)
 }
 
 
 ts <- dataset
 rm(dataset, file, files)
+
 ```
 
 ## Read profiles and transects around Ostergarnsholm
@@ -95,35 +96,35 @@ files <- list.files(path = "data/TinaV/Sensor/Ostergarnsholm/", pattern = "[.]cn
 
 for (file in files){
   
-  start.date <- data.table(read.delim(here::here("data/TinaV/Sensor/Ostergarnsholm/", file),
+  start_date <- data.table(read.delim(here::here("data/TinaV/Sensor/Ostergarnsholm/", file),
                                       sep="#", nrows = 160))[[78,1]]
-  start.date <- substr(start.date, 15, 34)
-  start.date <- mdy_hms(start.date, tz="UTC")
+  start_date <- substr(start_date, 15, 34)
+  start_date <- mdy_hms(start_date, tz="UTC")
   
-  tempo <- read.delim(here::here("data/TinaV/Sensor/Ostergarnsholm/", file),
+  temp <- read.delim(here::here("data/TinaV/Sensor/Ostergarnsholm/", file),
                       sep="", skip = 160, header = FALSE)
-  tempo <- data.table(tempo[,c(2,3,4,5,6,7,9,11,13)])
-  names(tempo) <- c("date_time", "dep", "tem", "sal", "V_pH", "pH", "Chl", "O2", "pCO2_analog")
-  tempo$start.date <- start.date
-  tempo$date_time <- tempo$date_time + tempo$start.date
+  temp <- data.table(temp[,c(2,3,4,5,6,7,9,11,13)])
+  names(temp) <- c("date_time", "dep", "tem", "sal", "V_pH", "pH", "Chl", "O2", "pCO2_analog")
+  temp$start_date <- start_date
+  temp$date_time <- temp$date_time + temp$start_date
   
-  tempo$ID <- substr(file, 1, 6)
-  tempo$type <- substr(file, 8,8)
-  tempo$station <- substr(file, 11,12)
+  temp$ID <- substr(file, 1, 6)
+  temp$type <- substr(file, 8,8)
+  temp$station <- substr(file, 11,12)
     
-  tempo$cast <- "up"
-  tempo[date_time < mean(tempo[dep == max(tempo$dep)]$date_time)]$cast <- "down"
+  temp$cast <- "up"
+  temp[date_time < mean(temp[dep == max(temp$dep)]$date_time)]$cast <- "down"
   
   if (exists("dataset")){
-    dataset <- rbind(dataset, tempo)
+    dataset <- rbind(dataset, temp)
   }
   
   if (!exists("dataset")){
-    dataset <- tempo
+    dataset <- temp
   }
   
-  rm(start.date)
-  rm(tempo)
+  rm(start_date)
+  rm(temp)
 }
 
 
@@ -562,6 +563,14 @@ th <- th %>%
 
 ## Flush and Zeroing identification
 
+```{r set_Flush_mixing_limits}
+
+Flush_duration_lim <- 600
+mixing_duration_lim <- 20
+
+```
+
+
 ```{r Identify_Zeroing_Flush_th, eval=FALSE}
 
 # Zeroing ID labelling
@@ -569,28 +578,28 @@ th <- th %>%
 th <- th %>% 
   arrange(date_time) %>% 
   group_by(Zero) %>% 
-  mutate(Zero_ID = as.factor(cumsum(c(TRUE,diff(date_time)>=30)))) %>% 
+  mutate(Zero_counter = as.factor(cumsum(c(TRUE,diff(date_time)>=30)))) %>% 
   ungroup()
 
-unique(th$Zero_ID)
+unique(th$Zero_counter)
 
 # Flush: Identification
 
 th <- th %>% 
   mutate(Flush = 0) %>% 
-  group_by(Zero, Zero_ID) %>% 
+  group_by(Zero, Zero_counter) %>% 
   mutate(start = min(date_time),
          duration = date_time - start,
-         Flush = if_else(Zero == 0 & duration < 600, "1", "0")) %>% 
+         Flush = if_else(Zero == 0 & duration < Flush_duration_lim, "1", "0")) %>% 
   ungroup()
 
 
 #  Flush: Identify equilibration and internal gas mixing periods
 
 th <- th %>% 
-  mutate(mixing = if_else(duration < 20, "mixing", "equilibration"))
+  mutate(mixing = if_else(duration < mixing_duration_lim, "mixing", "equilibration"))
 
-
+rm(Flush_duration_lim, mixing_duration_lim)
 
 ```
 
@@ -611,7 +620,7 @@ for (i in unique(th$deployment)) {
   
   print(
     sub %>% 
-      ggplot(aes(date_time, pCO2_corr, col=Zero_ID))+
+      ggplot(aes(date_time, pCO2_corr, col=Zero_counter))+
       geom_line()+
       labs(title = paste("Deployment: ",i, "| Start time: ", start_date))
 )
@@ -647,11 +656,11 @@ Summarized pCO~2~ date were written to file.
 
 ```{r write_th_summary_file, eval=FALSE}
 
-th %>% write_csv(here::here("Data/_summarized_data_files",
-                            "th_full.csv"))
+# th %>% write_csv(here::here("Data/_summarized_data_files",
+#                             "th_full.csv"))
 
 th %>% 
-  select(date_time, Zero, Flush, pCO2_corr, deployment, Zero_ID, duration, mixing) %>% 
+  select(date_time, Zero, Flush, pCO2_corr, deployment, Zero_counter, duration, mixing) %>% 
   write_csv(here::here("Data/_summarized_data_files",
                        "th.csv"))
 
@@ -710,13 +719,13 @@ for (file in files){
   # if the merged dataset does exist, append to it
   if (exists("dataset")){
     
-    tempo<-data.table(read.delim(here::here("data/TinaV/Track/GPS_Logger_Track", file),
+    temp<-data.table(read.delim(here::here("data/TinaV/Track/GPS_Logger_Track", file),
                                  sep=",")[,c(2,3,4)])
-    names(tempo) <- c("date_time", "lat", "lon")
-    tempo$date_time<- ymd_hms(tempo$date, tz="UTC")
+    names(temp) <- c("date_time", "lat", "lon")
+    temp$date_time<- ymd_hms(temp$date, tz="UTC")
     
-    dataset<-rbind(dataset, tempo)
-    rm(tempo)
+    dataset<-rbind(dataset, temp)
+    rm(temp)
   }
   
   # if the merged dataset doesn't exist, create it
@@ -764,34 +773,34 @@ files <- list.files(path = "data/Finnmaid_2018", pattern = "[.]xls$")
 for (file in files){
   
   
-  df <- read_excel(here::here("data/Finnmaid_2018", file))
-  df <- df[c(1,2,3,12,7,4,15,8,5,17)]
-  names(df) <- c("date_time","lon","lat","pCO2","sal","tem","cO2","patm", "Teq","xCO2")
-  df <- df[-c(1),]
-  df$date_time <- as.POSIXct(as.numeric(df$date_time)*60*60*24, origin="1899-12-30", tz="GMT")
-  df$lon <- as.numeric(as.character(df$lon))
-  df$lat <- as.numeric(as.character(df$lat))
-  df$pCO2 <- as.numeric(as.character(df$pCO2))
-  df$sal <- as.numeric(as.character(df$sal))
-  df$tem <- as.numeric(as.character(df$tem))
-  df$cO2 <- as.numeric(as.character(df$cO2))
-  df$patm <- as.numeric(as.character(df$patm))
-  df$Teq <- as.numeric(as.character(df$Teq))
-  df$xCO2 <- as.numeric(as.character(df$xCO2))
-  df <- data.table(df)
+  temp <- read_excel(here::here("data/Finnmaid_2018", file))
+  temp <- temp[c(1,2,3,12,7,4,15,8,5,17)]
+  names(temp) <- c("date_time","lon","lat","pCO2","sal","tem","cO2","patm", "Teq","xCO2")
+  temp <- temp[-c(1),]
+  temp$date_time <- as.POSIXct(as.numeric(temp$date_time)*60*60*24, origin="1899-12-30", tz="GMT")
+  temp$lon <- as.numeric(as.character(temp$lon))
+  temp$lat <- as.numeric(as.character(temp$lat))
+  temp$pCO2 <- as.numeric(as.character(temp$pCO2))
+  temp$sal <- as.numeric(as.character(temp$sal))
+  temp$tem <- as.numeric(as.character(temp$tem))
+  temp$cO2 <- as.numeric(as.character(temp$cO2))
+  temp$patm <- as.numeric(as.character(temp$patm))
+  temp$Teq <- as.numeric(as.character(temp$Teq))
+  temp$xCO2 <- as.numeric(as.character(temp$xCO2))
+  temp <- data.table(temp)
   
-  df$route <- strapplyc(as.character(file), ".*(.).xls*", simplify = TRUE)
-  df$ID <- substr(as.character(file), 3, 10)
+  temp$route <- strapplyc(as.character(file), ".*(.).xls*", simplify = TRUE)
+  temp$ID <- substr(as.character(file), 3, 10)
   
-  if (exists("temp")){
-    temp <- rbind (temp, df)
-  } else{temp <- df}
+  if (exists("dataset")){
+    dataset <- rbind (dataset, temp)
+  } else{dataset <- temp}
   
 }
 
 
-rm(df, files, file)
-temp <- temp[pCO2 != 0]
+rm(temp, files, file)
+dataset <- dataset[pCO2 != 0]
 
 
 #### Los Gatos data
@@ -803,21 +812,23 @@ files <- list.files(path = "data/Finnmaid_2018/LGR", pattern = "[.]xls$")
 for (file in files){
   
   
-  df <- read_excel(here::here("data/Finnmaid_2018/LGR", file))
-  df <- df[c(2,3,4,8,6,5,14,7,15,9)]
-  names(df) <- c("date_time","lon","lat","pCO2","sal","tem","cO2","patm", "Teq","xCO2")
-  df <- df[-c(1),]
-  df$date_time <- dmy_hms(df$date_time)
-  df <- data.table(df)
+  temp <- read_excel(here::here("data/Finnmaid_2018/LGR", file))
+  temp <- temp[c(2,3,4,8,6,5,14,7,15,9)]
+  names(temp) <- c("date_time","lon","lat","pCO2","sal","tem","cO2","patm", "Teq","xCO2")
+  temp <- temp[-c(1),]
+  temp$date_time <- dmy_hms(temp$date_time)
+  temp <- data.table(temp)
   
-  df$route <- substr(as.character(file), 12, 12)
-  df$ID <- substr(as.character(file), 3, 10)
+  temp$route <- substr(as.character(file), 12, 12)
+  temp$ID <- substr(as.character(file), 3, 10)
   
-  if (exists("temp.LGR")){
-    temp.LGR <- rbind (temp.LGR, df)
-  } else{temp.LGR <- df}
+  if (exists("dataset.LGR")){
+    dataset.LGR <- rbind (dataset.LGR, temp)
+  } else{dataset.LGR <- temp}
   
 }
+
+rm(temp, files, file)
 
 
 ```
@@ -828,7 +839,7 @@ for (file in files){
 
 source(here::here("code", "O2stoO2c.R"))
 
-temp.LGR <- temp.LGR %>%
+dataset.LGR <- dataset.LGR %>%
   filter() %>% 
   mutate(cO2 = O2stoO2c(O2sat = cO2, T=tem, S=sal, P=3/10, p_atm = 1013.5))
 
@@ -838,15 +849,15 @@ rm(O2stoO2c, pH2Osat, sca_T, Scorr, TCorr, R, Vm)
 
 ```{r merge_Los_Gatos_LICOR_data_files, eval=FALSE}
 
-temp$sensor <- "LICOR"
-temp.LGR$sensor <- "LosGatos"
+dataset$sensor <- "LICOR"
+dataset.LGR$sensor <- "LosGatos"
 
-fm <- bind_rows(temp, temp.LGR)
+fm <- bind_rows(dataset, dataset.LGR)
 
-rm(temp, temp.LGR, df, file, files)
+rm(dataset, dataset.LGR, temp)
 
 
-# temp$Area <- with(temp,
+# dataset$Area <- with(dataset,
 #                   ifelse(lon>12 & lon<12.6, "1.MEB",
 #                   ifelse(lon>13.1 & lon<14.3, "2.ARK",
 #                   ifelse(lat>57.5 & lat<58.5 & route %in% c("E", "G"), "4.EGS",
@@ -864,8 +875,7 @@ rm(temp, temp.LGR, df, file, files)
 
 ```{r write_fm, eval=FALSE}
 
-
-fm <-fm[complete.cases(fm[,pCO2]),]
+# fm <- fm[complete.cases(fm[,pCO2]),]
 
 fm %>% 
   write_csv(here::here("Data/_summarized_data_files",
@@ -917,6 +927,8 @@ leaflet() %>%
                color = "red",
                group = "BloomSail")
 
+
+rm(fm_sub, tt_sub)
 
 ```
 
