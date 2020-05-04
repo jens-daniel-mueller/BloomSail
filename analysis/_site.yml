@@ -9,7 +9,7 @@ navbar:
       href: nomenclature.html
     - text: Read-in
       href: read-in.html
-    - text: Mergind and interpolation
+    - text: Merging and interpolation
       href: merging_interpolation.html
   - text: Response time
     href: response_time.html

@@ -76,7 +76,7 @@ ts_th <- ts_th %>%
   filter(!is.na(dep_maxgap)) %>% #remove HC readings not falling in regular transects/profilings
   select(- dep_maxgap) %>% 
   fill(ID, type, station) %>% 
-  filter(!is.na(deployment)) # removes CTD readings without corresponding HydroC reading
+  filter(!is.na(deployment), !is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading
 
   # filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
 
