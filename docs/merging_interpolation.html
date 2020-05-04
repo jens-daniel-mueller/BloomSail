@@ -558,16 +558,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree30675329fe6a267b90c54a636a053f41cdd5b00etargetblank3067532a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/30675329fe6a267b90c54a636a053f41cdd5b00e" target="_blank">3067532</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree56f6c8afdee7eacdb86a62f3ffdfe61c27f9e139targetblank56f6c8aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/56f6c8afdee7eacdb86a62f3ffdfe61c27f9e139" target="_blank">56f6c8a</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree30675329fe6a267b90c54a636a053f41cdd5b00etargetblank3067532a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree56f6c8afdee7eacdb86a62f3ffdfe61c27f9e139targetblank56f6c8aa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/30675329fe6a267b90c54a636a053f41cdd5b00e" target="_blank">3067532</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/56f6c8afdee7eacdb86a62f3ffdfe61c27f9e139" target="_blank">56f6c8a</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -626,6 +626,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/56f6c8afdee7eacdb86a62f3ffdfe61c27f9e139/analysis/merging_interpolation.Rmd" target="_blank">56f6c8a</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-04
+</td>
+<td>
+corrected dep_maxgap removel criterion
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/c23350e1eb0c1eca9010c8229d7ce878a69331de/docs/merging_interpolation.html" target="_blank">c23350e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1480,7 +1514,7 @@ ts_th &lt;- ts_th %&gt;%
          sal = approxfun(date_time, sal)(date_time),
          tem = approxfun(date_time, tem)(date_time),
          pCO2_analog = approxfun(date_time, pCO2_analog)(date_time)) %&gt;% 
-  filter(!is.na(dep)) %&gt;% #remove HC readings not falling in regular transects/profilings
+  filter(!is.na(dep_maxgap)) %&gt;% #remove HC readings not falling in regular transects/profilings
   select(- dep_maxgap) %&gt;% 
   fill(ID, type, station) %&gt;% 
   filter(!is.na(deployment)) # removes CTD readings without corresponding HydroC reading
@@ -1488,45 +1522,44 @@ ts_th &lt;- ts_th %&gt;%
   # filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
 
 
-# # Time stamp synchronzity
-# 
-# ts_th_Zero &lt;- ts_th %&gt;% 
-#   filter(Zero == 1 | Flush == 1)
-# 
-# pdf(file=here::here(&quot;output/Plots/merging_interpolation&quot;,
-#                     &quot;Zero_time_synchronization.pdf&quot;),
-#     onefile = TRUE, width = 5, height = 5)
-# 
-# for (i_deployment in unique(ts_th$deployment)) {
-# 
-#   #i_deployment &lt;- unique(ts_th_Zero$deployment)[1]
-#   
-#   ts_th_Zero_deployment &lt;- ts_th_Zero %&gt;%
-#     filter(deployment == i_deployment)
-# 
-#   for (i_Zero_counter in unique(ts_th_Zero_deployment$Zero_counter)) {
-#     
-#     #i_Zero_counter &lt;- unique(ts_th_Zero_deployment$Zero_counter)[1]
-#     
-#     print(
-#       
-#     ts_th_Zero_deployment %&gt;%
-#       filter(Zero_counter == i_Zero_counter) %&gt;%
-#       ggplot()+
-#       geom_point(aes(date_time, pCO2_corr, col=&quot;HydroC&quot;))+
-#       geom_point(aes(date_time, pCO2_analog, col=&quot;analog&quot;))+
-#       labs(title = paste(&quot;Depl: &quot;,i_deployment,
-#                          &quot; | Zero_counter: &quot;, i_Zero_counter))
-#     
-#     )
-# 
-#   }
-# }
-# 
-# dev.off()
-# 
-# ts_th %&gt;% 
-#   filter(deployment == 21)</code></pre>
+# Time stamp synchronzity
+
+ts_th_Zero &lt;- ts_th %&gt;%
+  filter(Zero == 1 | Flush == 1 &amp; duration &lt; 120)
+
+pdf(file=here::here(&quot;output/Plots/merging_interpolation&quot;,
+                    &quot;Zero_time_synchronization.pdf&quot;),
+    onefile = TRUE, width = 5, height = 5)
+
+for (i_deployment in unique(ts_th$deployment)) {
+
+  #i_deployment &lt;- unique(ts_th_Zero$deployment)[1]
+
+  ts_th_Zero_deployment &lt;- ts_th_Zero %&gt;%
+    filter(deployment == i_deployment)
+
+  for (i_Zero_counter in unique(ts_th_Zero_deployment$Zero_counter)) {
+
+    #i_Zero_counter &lt;- unique(ts_th_Zero_deployment$Zero_counter)[1]
+
+    print(
+
+    ts_th_Zero_deployment %&gt;%
+      filter(Zero_counter == i_Zero_counter) %&gt;%
+      ggplot()+
+      geom_point(aes(date_time, pCO2_corr, col=&quot;HydroC&quot;))+
+      geom_point(aes(date_time, pCO2_analog, col=&quot;analog&quot;))+
+      labs(title = paste(&quot;Depl: &quot;,i_deployment,
+                         &quot; | Zero_counter: &quot;, i_Zero_counter))
+
+    )
+
+  }
+}
+
+dev.off()
+
+rm(ts_th_Zero, ts_th_Zero_deployment, i_deployment, i_Zero_counter)</code></pre>
 </div>
 <div id="write-merged-file" class="section level2">
 <h2>Write merged file</h2>
