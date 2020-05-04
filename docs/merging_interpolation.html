@@ -558,16 +558,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee78c4355809b19a84542afa4a87d8536a364e6c1targetblanke78c435a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/e78c4355809b19a84542afa4a87d8536a364e6c1" target="_blank">e78c435</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree2ab39d77faaaf0eef792856582eb33ee1d1d1e03targetblank2ab39d7a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/2ab39d77faaaf0eef792856582eb33ee1d1d1e03" target="_blank">2ab39d7</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreee78c4355809b19a84542afa4a87d8536a364e6c1targetblanke78c435a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree2ab39d77faaaf0eef792856582eb33ee1d1d1e03targetblank2ab39d7a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/e78c4355809b19a84542afa4a87d8536a364e6c1" target="_blank">e78c435</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/2ab39d77faaaf0eef792856582eb33ee1d1d1e03" target="_blank">2ab39d7</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -588,6 +588,7 @@ Ignored files:
 
 Untracked files:
     Untracked:  output/Plots/merging_interpolation/
+    Untracked:  output/Plots/response_time/all_plots.pdf
 
 </code></pre>
 <p>
@@ -626,6 +627,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/2ab39d77faaaf0eef792856582eb33ee1d1d1e03/analysis/merging_interpolation.Rmd" target="_blank">2ab39d7</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-04
+</td>
+<td>
+All profiles and timeseries in one plot pdf
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/1ae50d3cd46ab08f34ab16b7176d6139b7a0d656/docs/merging_interpolation.html" target="_blank">1ae50d3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1504,9 +1539,9 @@ finisehd read CTD and HydroC, created merging Rmd
 library(lubridate)
 library(zoo)</code></pre>
 <div id="ctd-ts-hydroc-co2-data-th" class="section level1">
-<h1>CTD (ts) + HydroC CO<sub>2</sub> data (th)</h1>
+<h1><span class="header-section-number">1</span> CTD (ts) + HydroC CO<sub>2</sub> data (th)</h1>
 <div id="merging-summarized-data-sets" class="section level2">
-<h2>Merging summarized data sets</h2>
+<h2><span class="header-section-number">1.1</span> Merging summarized data sets</h2>
 <pre class="r"><code># Load Sensor and HydroC data ---------------------------------------------
 ts &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
                           &quot;ts.csv&quot;),
@@ -1538,7 +1573,7 @@ ts_th &lt;- full_join(ts, th) %&gt;%
 rm(th, ts)</code></pre>
 </div>
 <div id="interpolation-to-common-time-stamp" class="section level2">
-<h2>Interpolation to common time stamp</h2>
+<h2><span class="header-section-number">1.2</span> Interpolation to common time stamp</h2>
 <p>CTD and auxillary recordings (15 sec measurment interval) are interpolated to HydroC time stamps (first 10 sec, than 1 sec measurement interval) when gaps between observations are not larger than 20. Thereafter, HydroC readings not falling in regular transects/profilings are removed, by removing rows with NA depth values. Furthermore, CTD readings without corresponding HydroC reading are removed, except during periods when HydroC was not operating.</p>
 <pre class="r"><code># Interpolate Sensor data to HydroC timestamp
 
@@ -1596,7 +1631,7 @@ dev.off()
 rm(ts_th_Zero, ts_th_Zero_deployment, i_deployment, i_Zero_counter)</code></pre>
 </div>
 <div id="write-merged-file" class="section level2">
-<h2>Write merged file</h2>
+<h2><span class="header-section-number">1.3</span> Write merged file</h2>
 <pre class="r"><code>ts_th %&gt;% 
   write_csv(here::here(&quot;Data/_merged_data_files/merging_interpolation&quot;, &quot;ts_th.csv&quot;))
 #write_csv(ts_th_full, here::here(&quot;Data/_merged_data_files&quot;, &quot;BloomSail_CTD_HydroC_full.csv&quot;))
@@ -1604,9 +1639,9 @@ rm(ts_th_Zero, ts_th_Zero_deployment, i_deployment, i_Zero_counter)</code></pre>
 rm(ts_th)</code></pre>
 </div>
 <div id="time-series-pco2" class="section level2">
-<h2>Time series pCO<sub>2</sub></h2>
+<h2><span class="header-section-number">1.4</span> Time series pCO<sub>2</sub></h2>
 <div id="absolute-values" class="section level3">
-<h3>Absolute values</h3>
+<h3><span class="header-section-number">1.4.1</span> Absolute values</h3>
 <pre class="r"><code>ts_th &lt;- read_csv(here::here(&quot;data/_merged_data_files/merging_interpolation&quot;,
                           &quot;ts_th.csv&quot;),
                col_types = cols(ID = col_character(),
@@ -1637,7 +1672,7 @@ pCO<sub>2</sub> record after interpolation to HydroC timestamp (analog output fr
 </div>
 </div>
 <div id="offset-analog-vs-post-processed-pco2" class="section level3">
-<h3>Offset analog vs post-processed pCO<sub>2</sub></h3>
+<h3><span class="header-section-number">1.4.2</span> Offset analog vs post-processed pCO<sub>2</sub></h3>
 <pre class="r"><code>ts_th %&gt;% 
   filter(!is.na(pCO2_corr)) %&gt;% 
   ggplot()+
@@ -1655,7 +1690,7 @@ pCO<sub>2</sub> difference betweeb HydroC and drift corrected data provided by C
 </div>
 </div>
 <div id="merges-sensor-ts_th-track-tt-data" class="section level1">
-<h1>Merges sensor (ts_th) + track (tt) data</h1>
+<h1><span class="header-section-number">2</span> Merges sensor (ts_th) + track (tt) data</h1>
 <pre class="r"><code>ts_th &lt;- read_csv(here::here(&quot;data/_merged_data_files/merging_interpolation&quot;,
                           &quot;ts_th.csv&quot;),
                col_types = cols(ID = col_character(),
@@ -1688,7 +1723,7 @@ tm %&gt;% write_csv(here::here(&quot;Data/_merged_data_files/merging_interpolati
 rm(tm, ts_th, tt)</code></pre>
 </div>
 <div id="tasks-open-questions" class="section level1">
-<h1>Tasks / open questions</h1>
+<h1><span class="header-section-number">3</span> Tasks / open questions</h1>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
