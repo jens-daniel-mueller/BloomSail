@@ -73,7 +73,7 @@ ts_th <- ts_th %>%
          sal = approxfun(date_time, sal)(date_time),
          tem = approxfun(date_time, tem)(date_time),
          pCO2_analog = approxfun(date_time, pCO2_analog)(date_time)) %>% 
-  filter(!is.na(dep)) %>% #remove HC readings not falling in regular transects/profilings
+  filter(!is.na(dep_maxgap)) %>% #remove HC readings not falling in regular transects/profilings
   select(- dep_maxgap) %>% 
   fill(ID, type, station) %>% 
   filter(!is.na(deployment)) # removes CTD readings without corresponding HydroC reading
@@ -81,45 +81,44 @@ ts_th <- ts_th %>%
   # filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
 
 
-# # Time stamp synchronzity
-# 
-# ts_th_Zero <- ts_th %>% 
-#   filter(Zero == 1 | Flush == 1)
-# 
-# pdf(file=here::here("output/Plots/merging_interpolation",
-#                     "Zero_time_synchronization.pdf"),
-#     onefile = TRUE, width = 5, height = 5)
-# 
-# for (i_deployment in unique(ts_th$deployment)) {
-# 
-#   #i_deployment <- unique(ts_th_Zero$deployment)[1]
-#   
-#   ts_th_Zero_deployment <- ts_th_Zero %>%
-#     filter(deployment == i_deployment)
-# 
-#   for (i_Zero_counter in unique(ts_th_Zero_deployment$Zero_counter)) {
-#     
-#     #i_Zero_counter <- unique(ts_th_Zero_deployment$Zero_counter)[1]
-#     
-#     print(
-#       
-#     ts_th_Zero_deployment %>%
-#       filter(Zero_counter == i_Zero_counter) %>%
-#       ggplot()+
-#       geom_point(aes(date_time, pCO2_corr, col="HydroC"))+
-#       geom_point(aes(date_time, pCO2_analog, col="analog"))+
-#       labs(title = paste("Depl: ",i_deployment,
-#                          " | Zero_counter: ", i_Zero_counter))
-#     
-#     )
-# 
-#   }
-# }
-# 
-# dev.off()
-# 
-# ts_th %>% 
-#   filter(deployment == 21)
+# Time stamp synchronzity
+
+ts_th_Zero <- ts_th %>%
+  filter(Zero == 1 | Flush == 1 & duration < 120)
+
+pdf(file=here::here("output/Plots/merging_interpolation",
+                    "Zero_time_synchronization.pdf"),
+    onefile = TRUE, width = 5, height = 5)
+
+for (i_deployment in unique(ts_th$deployment)) {
+
+  #i_deployment <- unique(ts_th_Zero$deployment)[1]
+
+  ts_th_Zero_deployment <- ts_th_Zero %>%
+    filter(deployment == i_deployment)
+
+  for (i_Zero_counter in unique(ts_th_Zero_deployment$Zero_counter)) {
+
+    #i_Zero_counter <- unique(ts_th_Zero_deployment$Zero_counter)[1]
+
+    print(
+
+    ts_th_Zero_deployment %>%
+      filter(Zero_counter == i_Zero_counter) %>%
+      ggplot()+
+      geom_point(aes(date_time, pCO2_corr, col="HydroC"))+
+      geom_point(aes(date_time, pCO2_analog, col="analog"))+
+      labs(title = paste("Depl: ",i_deployment,
+                         " | Zero_counter: ", i_Zero_counter))
+
+    )
+
+  }
+}
+
+dev.off()
+
+rm(ts_th_Zero, ts_th_Zero_deployment, i_deployment, i_Zero_counter)
 
 ```
 
