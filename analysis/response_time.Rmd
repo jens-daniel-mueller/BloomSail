@@ -22,6 +22,7 @@ library(seacarb)
 library(broom)
 library(lubridate)
 library(tibbletime)
+library(patchwork)
 
 ```
 
@@ -842,7 +843,7 @@ for(i_ID in unique(tm$ID)){
 
 tm_RT %>% 
  write_csv(here::here("data/_merged_data_files/response_time",
-                      "tm_RT_profiles_by_duration.csv"))
+                      "tm_RT_profiles_by_tau_factor.csv"))
 
 rm(i_ID, freq, RT_corr, tm_RT, tau_fit, tau_resid)
 
@@ -968,7 +969,7 @@ for(i_ID in unique(tm$ID)){
 
 tm_RT %>% 
  write_csv(here::here("data/_merged_data_files/response_time",
-                      "tm_RT_profiles_by_duration_high_res.csv"))
+                      "tm_RT_profiles_by_tau_factor_high_res.csv"))
 
 rm(i_ID, freq, RT_corr, tm_RT, tau_fit, tau_resid, tm)
 
@@ -980,7 +981,7 @@ rm(i_ID, freq, RT_corr, tm_RT, tau_fit, tau_resid, tm)
 ```{r plot_optimized_RT_corrected_profiles_example, fig.cap="Example plot of response time corrected and raw pCO~2~ profiles. Panels highlight the effect of constant vs T-dependent tau estimates (columns) and the optimization by applying a constant factor (rows).", fig.asp = 2.3}
 
 tm <- read_csv(here::here("data/_merged_data_files/response_time",
-                          "tm_RT_profiles_by_duration.csv"),
+                          "tm_RT_profiles_by_tau_factor.csv"),
                col_types = cols(ID = col_character(),
                                 Zero = col_factor(),
                                 Flush = col_factor(),
@@ -1412,7 +1413,7 @@ rm(tm_grid_stat)
 ```{r dep_pCO2_threshold}
 
 dep_max_lim <- 25
-pCO2_max_lim <- 400
+pCO2_max_lim <- 250
 
 ```
 
@@ -1561,6 +1562,154 @@ tm_equi_delta_sum_highres %>%
   select(tau_factor, dpCO2) %>% 
   rename(mean_rel_abs=dpCO2)
 ```
+
+
+## Summary plots
+
+
+```{r plot_profiling_timeseries_all, eval=FALSE}
+
+i_tau_factor <- "1.2"
+
+cast_dep <- tm %>% 
+  filter(tau_factor == i_tau_factor) %>% 
+  pivot_longer(c(dep, pCO2_corr, pCO2_mean),
+               names_to = "parameter", values_to = "value")
+
+cast_dep_equi <- tm_pCO2_equi %>% 
+  pivot_longer(c(dep, pCO2_corr), names_to = "parameter", values_to = "value")
+
+tm_sub <- tm %>% 
+  filter(tau_factor == i_tau_factor)
+
+tm_grid_sub <- tm_grid %>% 
+  filter(tau_factor == i_tau_factor)
+
+max_duration <- round(max(cast_dep$duration)/1000,0)*1000
+
+pdf(file=here::here("output/Plots/response_time",
+                    "all_plots.pdf"),
+    onefile = TRUE, width = 7, height = 10)
+
+for(i_ID in unique(tm$ID)){
+  for(i_station in unique(tm$station)){
+
+    # i_ID <- unique(cast_dep$ID)[1]
+    # i_station <- unique(cast_dep$station)[1]
+    i_ID
+    i_station
+    
+    if (nrow(cast_dep %>% filter(ID == i_ID, station == i_station)) > 0){
+          if (nrow(tm %>% filter(ID == i_ID, station == i_station)) > 0){
+     if (nrow(tm_grid %>% filter(ID == i_ID, station == i_station)) > 0){
+      
+      cast_dep_equi_sub <- cast_dep_equi %>%
+        filter(ID == i_ID,
+               station == i_station)
+
+      p_time_series <- cast_dep %>%
+        filter(ID == i_ID,
+               station == i_station) %>%
+        ggplot(aes(duration, value, col=phase))+
+        geom_point(size=0.5)+
+        geom_point(data = cast_dep_equi_sub, aes(duration, value), col="black")+
+        scale_y_reverse()+
+        scale_x_continuous(breaks = seq(0,6000,500))+
+        labs(title = str_c("ID: ",i_ID," | Station: ",i_station))+
+        facet_grid(parameter~., scales = "free_y")+
+        theme_bw()
+
+      p_profile <- tm_sub %>%
+        filter(ID == i_ID,
+               station == i_station,
+               phase %in% c("up", "down")) %>%
+        ggplot()+
+        geom_path(aes(pCO2_corr, dep, linetype = phase, col="raw"))+
+        geom_path(aes(pCO2_mean, dep, linetype = phase, col="corrected"))+
+        #geom_point(data = equi_cast, aes(pCO2_corr, dep))+
+        scale_y_reverse()+
+        coord_cartesian(ylim = c(25,0), xlim = c(70,250))+
+        scale_color_brewer(palette = "Set1", name="", guide = FALSE)+
+        scale_linetype(guide = FALSE)+
+        labs(y="Depth [m]", x="pCO2",
+             title = "full res")
+
+      
+      tm_pCO2_equi_grid_sub <- tm_pCO2_equi_grid %>%
+        filter(ID == i_ID,
+               station == i_station)
+
+      p_profile_grid <- tm_grid_sub %>%
+        filter(ID == i_ID,
+               station == i_station) %>%
+        arrange(dep_grid) %>%
+        ggplot()+
+        geom_path(aes(down, dep_grid, col=correction, linetype="down"))+
+        geom_path(aes(up, dep_grid, col=correction, linetype ="up"))+
+        geom_point(data = tm_pCO2_equi_grid_sub, aes(pCO2_equi, dep_grid))+
+        scale_y_reverse()+
+        coord_cartesian(ylim = c(25,0), xlim = c(70,250))+
+        scale_linetype(name="cast")+
+        scale_color_brewer(palette = "Set1", direction = -1)+
+        labs(x="pCO2",
+             title = "1m grid")+
+        theme(axis.title.y = element_blank(),
+              axis.text.y = element_blank())
+
+
+      p_delta_abs <- tm_grid %>%
+        filter(ID == i_ID,
+               station == i_station,
+               correction == "pCO2_mean") %>%
+        arrange(dep_grid) %>%
+        ggplot(aes(pCO2_delta, dep_grid, col=as.factor(tau_factor)))+
+        geom_path()+
+        geom_point()+
+        scale_y_reverse(breaks=seq(0,40,2))+
+        scale_color_discrete(name="tau factor", guide=FALSE)+
+        labs(x = "delta pCO2 [µatm]", y="Depth [m]")+
+        geom_vline(xintercept = 0)+
+        geom_vline(xintercept = c(-10,10), col="red")
+      
+      p_delta_rel <- tm_grid %>%
+        filter(ID == i_ID,
+               station == i_station,
+               correction == "pCO2_mean") %>%
+        arrange(dep_grid) %>%
+        ggplot(aes(pCO2_delta_rel, dep_grid, col=as.factor(tau_factor)))+
+        geom_path()+
+        geom_point()+
+        scale_y_reverse(breaks=seq(0,40,2))+
+        scale_color_discrete(name="tau factor")+
+        labs(x = "delta pCO2 [% of absolute value]", y="Depth [m]")+
+        geom_vline(xintercept = 0)+
+        geom_vline(xintercept = c(-10,10), col="red")+
+        theme(axis.title.y = element_blank(),
+              axis.text.y = element_blank())
+      
+      print(
+  
+  p_time_series / (p_profile | p_profile_grid) / (p_delta_abs | p_delta_rel)
+  
+)
+    rm(p_time_series, p_profile, p_profile_grid, p_delta_abs, p_delta_rel)
+
+     }}}
+
+
+
+  }
+}
+
+dev.off()
+
+rm(cast_dep, cast_dep_equi, cast_dep_equi_sub, i_station, i_ID,
+   max_duration, tm_pCO2_equi_grid_sub)
+
+
+```
+
+
 
 # Conclusion
 
