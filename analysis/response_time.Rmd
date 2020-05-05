@@ -56,6 +56,15 @@ Quality assesment of response time correction
 
 # Response time determination
 
+## Preset selection conditions
+
+```{r subsettting_criteria}
+
+pump_switch <- ymd_hms("2018-07-17;13:08:34")
+
+```
+
+
 ## HydroC sensor settings
 
 The sensor was first run with a low power pump (1W). Later - and for most parts of the expedition - with a stronger (8W) pump. Pumps were switched between recordings (data file: SD_datafile_20180718_170417CO2-0618-001.txt):  
@@ -287,7 +296,7 @@ tau_values <-
                        "tau_values.csv"))
 
 # define periods of different pumps used
-max_Zero_counter <- max(unique(tau_values[tau_values$date_time < ymd_hms("2018-07-17;13:08:34"),]$Zero_counter))
+max_Zero_counter <- max(unique(tau_values[tau_values$date_time < pump_switch,]$Zero_counter))
 
 tau_values <- tau_values %>% 
   mutate(pump_power = if_else(Zero_counter <= max_Zero_counter, "1W", "8W"))
@@ -429,11 +438,17 @@ tau_resid <- tau_resid %>%
 
 ```{r tau_vs_date, fig.cap="Tau for all Zeroings with color representing water depth."}
 
-tau_resid %>% 
-  ggplot(aes(date_time, tau, col=dep, shape=pump_power))+
-  geom_point()+
+ggplot()+
+  geom_smooth(data = tau_resid %>% filter(dep < 10),
+              aes(date_time, tau, linetype = pump_power),
+              method = "lm",
+              se = FALSE,
+              col="red")+
+  geom_point(data = tau_resid,
+             aes(date_time, tau, col=dep, shape=pump_power))+
   scale_color_viridis_c(name="Depth (m)")+
-  labs(y="Tau (sec)", x="Date")
+  labs(y="Tau (sec)", x="Date")+
+  ylim(0,NA)
 
 ```
 
@@ -499,7 +514,7 @@ tau_fit
 tau_fit %>% write_csv(here::here("data/_merged_data_files/response_time",
                                 "tau_fit.csv"))
 
-rm(list=setdiff(ls(), c("tau_resid", "tau_fit")))
+rm(list=setdiff(ls(), c("tau_resid", "tau_fit", "pump_switch")))
 
 ```
 
@@ -543,7 +558,7 @@ tm <- tm %>%
 tm <- tm %>%
   group_by(ID, station) %>% 
   mutate(duration = as.numeric(date_time - min(date_time)),
-         pump_power = if_else(date_time < ymd_hms("2018-07-17;13:08:34"), "1W", "8W")) %>%
+         pump_power = if_else(date_time < pump_switch, "1W", "8W")) %>%
   arrange(date_time)
 
 ```
@@ -1005,6 +1020,8 @@ i_station <- example_station
     geom_path(aes(pCO2_mean, dep, linetype = phase, col="corrected"))+
     geom_point(data = equi_cast, aes(pCO2_corr, dep))+
     scale_y_reverse()+
+    coord_cartesian(ylim = c(35,0),
+                    xlim = c(70, 270))+
     scale_color_brewer(palette = "Set1", name="")+
     labs(y="Depth [m]", x=expression(pCO[2]~(µatm)),
          title = str_c("Date: ",i_ID," | Station: ",i_station))+
@@ -1044,6 +1061,8 @@ for(i_ID in unique(tm$ID)){
     geom_path(aes(pCO2_mean, dep, linetype = phase, col="corrected"))+
     geom_point(data = equi_cast, aes(pCO2_corr, dep))+
     scale_y_reverse()+
+    coord_cartesian(ylim = c(35,0),
+                    xlim = c(70, 270))+
     scale_color_brewer(palette = "Set1", name="")+
     labs(y="Depth [m]", title = str_c("Date: ",i_ID," | Station: ",i_station))+
     theme_bw()+
@@ -1093,8 +1112,8 @@ tm_grid <- tm %>%
   pivot_longer(cols = c(pCO2_corr, pCO2_mean), names_to = "correction") %>% 
   pivot_wider(names_from = phase, values_from = value) %>% 
   mutate(pCO2_delta = up - down,
-         pCO2_mean = (down + up)/2,
-         pCO2_delta_rel = 100 * pCO2_delta / pCO2_mean)
+         pCO2_up_down_average = (down + up)/2,
+         pCO2_delta_rel = 100 * pCO2_delta / pCO2_up_down_average)
 
 # descritize depth recordings of equilibrated pCO2 values
 
@@ -1148,7 +1167,9 @@ tm_pCO2_equi_grid_sub <- tm_pCO2_equi_grid %>%
         geom_path(aes(down, dep_grid, col=correction, linetype="down"))+
         geom_path(aes(up, dep_grid, col=correction, linetype ="up"))+
         geom_point(data = tm_pCO2_equi_grid_sub, aes(pCO2_equi, dep_grid))+
-        scale_y_reverse(breaks=seq(0,40,2))+
+        scale_y_reverse()+
+        coord_cartesian(ylim = c(35,0),
+                    xlim = c(70, 270))+
         scale_linetype(name="cast")+
         scale_color_brewer(palette = "Set1", direction = -1)+
         labs(y="Depth [m]", x=expression(pCO[2]~(µatm)),
@@ -1187,7 +1208,9 @@ for(i_ID in unique(tm_grid$ID)){
         geom_path(aes(down, dep_grid, col=correction, linetype="down"))+
         geom_path(aes(up, dep_grid, col=correction, linetype ="up"))+
         geom_point(data = tm_pCO2_equi_grid_sub, aes(pCO2_equi, dep_grid))+
-        scale_y_reverse(breaks=seq(0,40,2))+
+        scale_y_reverse()+
+        coord_cartesian(ylim = c(35,0),
+                        xlim = c(70, 270))+
         scale_linetype(name="cast")+
         scale_color_brewer(palette = "Set1", direction = -1)+
         labs(y="Depth [m]", title = str_c("Date: ",i_ID," | Station: ",i_station))+
@@ -1394,6 +1417,7 @@ Summary statistics were restricted to complete shallow profiles (not more than 2
 
 tm_grid_stat <- tm_grid %>% 
   filter(correction == "pCO2_mean") %>% 
+  #drop_na() %>% 
   group_by(ID, station) %>% 
   summarise(dep_max = max(dep_grid),
             pCO2_max = max(down)) %>% 
@@ -1894,6 +1918,5 @@ rm(df, Tem, pCO2)
 
 # Open tasks / questions
 
-- Condering the summary metrics: If the standard deviation of the offset between up- and downcast is as large as the offset itself, does it make sense to apply the tau factor? In other words: Does it make the profiles significantly better?
 - Clean workspace for plotting code after RT correction
 - include high res tau factor output
