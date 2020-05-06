@@ -442,7 +442,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Response time correction of Contros HydroC pCO<sub>2</sub> data</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">05 May, 2020</h4>
+<h4 class="date">06 May, 2020</h4>
 
 </div>
 
@@ -467,7 +467,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-05-05
+<strong>Last updated:</strong> 2020-05-06
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -558,16 +558,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeaa283ada2d74b994bcdc2c3e7f3434a5fc2147datargetblankaa283ada"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/aa283ada2d74b994bcdc2c3e7f3434a5fc2147da" target="_blank">aa283ad</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree53baed856c1cdd65068f5d68717dd824557830c5targetblank53baed8a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/53baed856c1cdd65068f5d68717dd824557830c5" target="_blank">53baed8</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeaa283ada2d74b994bcdc2c3e7f3434a5fc2147datargetblankaa283ada" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree53baed856c1cdd65068f5d68717dd824557830c5targetblank53baed8a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/aa283ada2d74b994bcdc2c3e7f3434a5fc2147da" target="_blank">aa283ad</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/53baed856c1cdd65068f5d68717dd824557830c5" target="_blank">53baed8</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -623,6 +623,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/53baed856c1cdd65068f5d68717dd824557830c5/analysis/response_time.Rmd" target="_blank">53baed8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-06
+</td>
+<td>
+tau high res optimum
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/324117a121834de4175b628ec07ee955fd1f5fd5/docs/response_time.html" target="_blank">324117a</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -3052,7 +3086,6 @@ rm(equi_cast, i_ID, i_station)</code></pre>
 <div id="down--vs-upcast" class="section level2">
 <h2><span class="header-section-number">4.1</span> Down- vs upcast</h2>
 <pre class="r"><code># pCO2 offset up - down cast
-
 tm_grid &lt;- tm %&gt;% 
   filter(phase %in% c(&quot;down&quot;, &quot;up&quot;)) %&gt;% 
   mutate(dep_grid = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1)))),
@@ -3067,6 +3100,34 @@ tm_grid &lt;- tm %&gt;%
          pCO2_up_down_average = (down + up)/2,
          pCO2_delta_rel = 100 * pCO2_delta / pCO2_up_down_average)
 
+
+tm_high_res &lt;- read_csv(here::here(&quot;data/_merged_data_files/response_time&quot;,
+                          &quot;tm_RT_profiles_by_tau_factor_high_res.csv&quot;),
+               col_types = cols(ID = col_character(),
+                                Zero = col_factor(),
+                                Flush = col_factor(),
+                                p_type = col_factor(),
+                                Zero_counter = col_integer(),
+                                deployment = col_integer()))
+
+
+# pCO2 offset up - down cast
+tm_grid_high_res &lt;- tm_high_res %&gt;% 
+  filter(phase %in% c(&quot;down&quot;, &quot;up&quot;)) %&gt;% 
+  mutate(dep_grid = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1)))),
+         tau_factor = as.factor(tau_factor)) %&gt;% 
+  select(ID, station, tau_factor, p_type, dep_grid, phase, pCO2_corr, pCO2_mean) %&gt;% 
+  group_by(ID, station, tau_factor, p_type, dep_grid, phase) %&gt;%
+  summarise_all(&quot;mean&quot;, na.rm = TRUE) %&gt;% 
+  ungroup() %&gt;% 
+  pivot_longer(cols = c(pCO2_corr, pCO2_mean), names_to = &quot;correction&quot;) %&gt;% 
+  pivot_wider(names_from = phase, values_from = value) %&gt;% 
+  mutate(pCO2_delta = up - down,
+         pCO2_up_down_average = (down + up)/2,
+         pCO2_delta_rel = 100 * pCO2_delta / pCO2_up_down_average)
+
+
+
 # descritize depth recordings of equilibrated pCO2 values
 
 tm_pCO2_equi_grid &lt;- tm_pCO2_equi %&gt;%
@@ -3078,6 +3139,10 @@ tm_grid %&gt;%
  write_csv(here::here(&quot;data/_merged_data_files/response_time&quot;,
                       &quot;tm_grid.csv&quot;))
 
+tm_grid_high_res %&gt;% 
+ write_csv(here::here(&quot;data/_merged_data_files/response_time&quot;,
+                      &quot;tm_grid_high_res.csv&quot;))
+
 tm_pCO2_equi_grid %&gt;% 
  write_csv(here::here(&quot;data/_merged_data_files/response_time&quot;,
                       &quot;tm_pCO2_equi_grid.csv&quot;))
@@ -3087,6 +3152,11 @@ rm(tm_grid, tm_pCO2_equi_grid)</code></pre>
 <pre class="r"><code>tm_grid &lt;-
  read_csv(here::here(&quot;data/_merged_data_files/response_time&quot;,
                       &quot;tm_grid.csv&quot;),
+               col_types = cols(ID = col_character()))
+
+tm_grid_high_res &lt;-
+ read_csv(here::here(&quot;data/_merged_data_files/response_time&quot;,
+                      &quot;tm_grid_high_res.csv&quot;),
                col_types = cols(ID = col_character()))
 
 tm_pCO2_equi_grid &lt;-
@@ -3343,6 +3413,20 @@ tm_grid_stat %&gt;%
 <p><img src="figure/response_time.Rmd/identify_max_dep_pCO2_within_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>tm_grid &lt;- full_join(tm_grid, tm_grid_stat)
 rm(tm_grid_stat)</code></pre>
+<pre class="r"><code>tm_grid_stat_high_res &lt;- tm_grid_high_res %&gt;% 
+  filter(correction == &quot;pCO2_mean&quot;) %&gt;% 
+  #drop_na() %&gt;% 
+  group_by(ID, station) %&gt;% 
+  summarise(dep_max = max(dep_grid),
+            pCO2_max = max(down)) %&gt;% 
+  ungroup()
+
+tm_grid_stat_high_res %&gt;% 
+  ggplot(aes(dep_max, pCO2_max))+
+  geom_point()</code></pre>
+<p><img src="figure/response_time.Rmd/identify_max_dep_pCO2_within_profiles_high_res-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tm_grid_high_res &lt;- full_join(tm_grid_high_res, tm_grid_stat_high_res)
+rm(tm_grid_stat_high_res)</code></pre>
 <div id="define-dep-and-pco2-thresholds" class="section level3">
 <h3><span class="header-section-number">4.3.1</span> Define dep and pCO2 thresholds</h3>
 <pre class="r"><code>dep_max_lim &lt;- 25
@@ -3356,8 +3440,30 @@ pCO2_max_lim &lt;- 250</code></pre>
   ungroup() %&gt;% 
   filter(nr_na &lt;= 2)
 
+tm_grid_shallow_high_res &lt;- tm_grid_high_res %&gt;% 
+  filter(dep_max &lt;= dep_max_lim,
+         pCO2_max &lt;= pCO2_max_lim) %&gt;% 
+  group_by(ID, station, tau_factor, correction) %&gt;% 
+  mutate(nr_na = sum(is.na(pCO2_delta))) %&gt;% 
+  ungroup() %&gt;% 
+  filter(nr_na &lt;= 2)
+
 
 tm_grid_shallow_sum &lt;- tm_grid_shallow %&gt;% 
+  mutate(pCO2_delta_abs = abs(pCO2_delta),
+         pCO2_delta_rel_abs = abs(pCO2_delta_rel)) %&gt;% 
+  group_by(tau_factor, dep_grid, correction) %&gt;% 
+  summarise(mean         = mean(pCO2_delta, na.rm = TRUE),
+            sd           = sd(pCO2_delta, na.rm = TRUE),
+            mean_abs     = mean(pCO2_delta_abs, na.rm = TRUE),
+            mean_rel     = mean(pCO2_delta_rel, na.rm = TRUE),
+            sd_rel       = sd(pCO2_delta_rel, na.rm = TRUE),
+            mean_rel_abs = mean(pCO2_delta_rel_abs, na.rm = TRUE)) %&gt;% 
+  ungroup() %&gt;% 
+  pivot_longer(cols = sd:mean_rel_abs,
+               names_to = &quot;estimate&quot;, values_to = &quot;pCO2_delta&quot;)
+
+tm_grid_shallow_sum_high_res &lt;- tm_grid_shallow_high_res %&gt;% 
   mutate(pCO2_delta_abs = abs(pCO2_delta),
          pCO2_delta_rel_abs = abs(pCO2_delta_rel)) %&gt;% 
   group_by(tau_factor, dep_grid, correction) %&gt;% 
@@ -3401,24 +3507,23 @@ tm_equi_delta_sum &lt;- tm_equi_delta %&gt;%
 Offset between up- and downcast. Panel columns: Constant and T-dependent tau. Panel rows from top to bottom: Mean of absolute offset, mean of relative absolute offset, standard deviation of offset, standard deviation of relative offset.
 </p>
 </div>
-<pre class="r"><code># RT_diff_sum_mean_highres &lt;-
-#  read_csv(here::here(&quot;data/_merged_data_files&quot;,
-#                       &quot;X_BloomSail_CTD_HydroC_profiles_RT_cast-offset_highres_taufactor_mean.csv&quot;)) %&gt;% 
-#   filter(estimate %in% c(&quot;mean_abs&quot;, &quot;mean_rel_abs&quot;))
-
-tm_grid_shallow_sum_mean &lt;- tm_grid_shallow_sum %&gt;% 
+<pre class="r"><code>tm_grid_shallow_sum_mean &lt;- tm_grid_shallow_sum %&gt;% 
   group_by(estimate, correction, tau_factor) %&gt;% 
   summarise(pCO2_delta_mean = mean(pCO2_delta)) %&gt;% 
   ungroup()
 
-tm_grid_shallow_sum_mean %&gt;% 
-  filter(estimate %in% c(&quot;mean_abs&quot;, &quot;mean_rel_abs&quot;)) %&gt;% 
-  ggplot(aes(tau_factor, pCO2_delta_mean, linetype=correction, shape=correction))+
-  # geom_line(data = RT_diff_sum_mean_highres, 
-  #           aes(tau_factor, mean_dpCO2))+
-  geom_point()+
+tm_grid_shallow_sum_mean_high_res &lt;- tm_grid_shallow_sum_high_res %&gt;% 
+  group_by(estimate, correction, tau_factor) %&gt;% 
+  summarise(pCO2_delta_mean = mean(pCO2_delta)) %&gt;% 
+  ungroup()
+
+
+ggplot()+
+  geom_point(data = tm_grid_shallow_sum_mean %&gt;% filter(estimate %in% c(&quot;mean_abs&quot;, &quot;mean_rel_abs&quot;)),
+             aes(tau_factor, pCO2_delta_mean, linetype=correction, shape=correction))+
+  geom_line(data = tm_grid_shallow_sum_mean_high_res %&gt;% filter(estimate %in% c(&quot;mean_abs&quot;, &quot;mean_rel_abs&quot;)),
+             aes(tau_factor, pCO2_delta_mean, linetype=correction, shape=correction))+
   geom_hline(yintercept = 0)+
-  labs(x=&quot;Tau factor&quot;, y=expression(Mean~Delta~pCO[2]))+
   facet_wrap(~estimate)</code></pre>
 <div class="figure" style="text-align: center">
 <img src="figure/response_time.Rmd/plot_tau_optimum_cast_delta_pCO2-1.png" alt="Mean offset between up- and downcast for all profiles up to 20m water depth. The lines between discrete tau factors result from the same analysis performed with high resolution of the tau factor. Left Panel: Mean absolute offset (µatm). Right panel: Mean relative offset (% of absolute value)." width="672" />
@@ -3426,18 +3531,20 @@ tm_grid_shallow_sum_mean %&gt;%
 Mean offset between up- and downcast for all profiles up to 20m water depth. The lines between discrete tau factors result from the same analysis performed with high resolution of the tau factor. Left Panel: Mean absolute offset (µatm). Right panel: Mean relative offset (% of absolute value).
 </p>
 </div>
-<p>Below we determined the tau factor that corresponds to lowest absolute and relative mean offsets, respectively.</p>
-<pre class="r"><code>RT_diff_sum_mean_highres %&gt;%
+<p>Below we determined the tau factor that corresponds to lowest absolute mean offset.</p>
+<pre class="r"><code>pCO2_delta_mean_min &lt;- tm_grid_shallow_sum_mean_high_res %&gt;%
   filter(correction == &quot;pCO2_mean&quot;, estimate %in% c(&quot;mean_abs&quot;)) %&gt;% 
-  slice(which.min(mean_dpCO2)) %&gt;% 
-  select(tau_factor, mean_dpCO2) %&gt;% 
-  rename(mean_abs=mean_dpCO2)
+  slice(which.min(pCO2_delta_mean)) %&gt;% 
+  select(pCO2_delta_mean) %&gt;% 
+  pull() %&gt;% 
+  round(2)
 
-RT_diff_sum_mean_highres %&gt;%
-  filter(correction == &quot;pCO2_mean&quot;, estimate == &quot;mean_rel_abs&quot;) %&gt;% 
-  slice(which.min(mean_dpCO2)) %&gt;% 
-  select(tau_factor, mean_dpCO2) %&gt;% 
-  rename(mean_rel_abs=mean_dpCO2)</code></pre>
+tau_factor_min &lt;- tm_grid_shallow_sum_mean_high_res %&gt;%
+  filter(correction == &quot;pCO2_mean&quot;, estimate %in% c(&quot;mean_abs&quot;)) %&gt;% 
+  slice(which.min(pCO2_delta_mean)) %&gt;% 
+  select(tau_factor) %&gt;% 
+  pull()</code></pre>
+<p>A tau factor of 1.25 resulted in the lowest absolute mean offset (4.2 µatm) and will be used for response time correction.</p>
 <p>Likewise, we analyse the offset from the pCO<sub>2</sub> reference value:</p>
 <pre class="r"><code># tm_equi_delta_sum_highres &lt;-
 #  read_csv(here::here(&quot;data/_merged_data_files&quot;,
