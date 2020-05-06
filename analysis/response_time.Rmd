@@ -1470,7 +1470,17 @@ tm_grid_stat %>%
 tm_grid <- full_join(tm_grid, tm_grid_stat)
 tm_grid_high_res <- full_join(tm_grid_high_res, tm_grid_stat)
 
-rm(tm_grid_stat)
+meta <- read_csv(here::here("Data/TinaV/Sensor",
+                            "Sensor_meta.csv"),
+                 col_types = cols(ID = col_character()))
+
+tm_grid_stat <- full_join(meta, tm_grid_stat)
+
+tm_grid_stat  %>% 
+ write_csv(here::here("data/_merged_data_files/response_time",
+                      "tm_grid_stat_meta.csv"))
+
+rm(tm_grid_stat, meta)
 
 ```
 
@@ -1479,8 +1489,9 @@ rm(tm_grid_stat)
 
 ```{r dep_pCO2_threshold}
 
-dep_max_lim <- 25
-pCO2_max_lim <- 250
+dep_max_lim <- 30
+pCO2_max_lim <- 300
+dep_lim <- 20
 
 ```
 
@@ -1490,7 +1501,8 @@ Summary metric are restricted to profiles that did not exceed a maximum sampling
 
 tm_grid_shallow <- tm_grid %>% 
   filter(dep_max <= dep_max_lim,
-         pCO2_max <= pCO2_max_lim) %>% 
+         pCO2_max <= pCO2_max_lim,
+         dep_grid <= dep_lim) %>% 
   group_by(ID, station, tau_factor, correction) %>% 
   mutate(nr_na = sum(is.na(pCO2_delta))) %>% 
   ungroup() %>% 
@@ -1498,7 +1510,8 @@ tm_grid_shallow <- tm_grid %>%
 
 tm_grid_shallow_high_res <- tm_grid_high_res %>% 
   filter(dep_max <= dep_max_lim,
-         pCO2_max <= pCO2_max_lim) %>% 
+         pCO2_max <= pCO2_max_lim,
+         dep_grid <= dep_lim) %>% 
   group_by(ID, station, tau_factor, correction) %>% 
   mutate(nr_na = sum(is.na(pCO2_delta))) %>% 
   ungroup() %>% 
@@ -1898,7 +1911,6 @@ for(i_ID in unique(tm$ID)){
            pCO2_RT = if_else(pCO2_RT %in% c(Inf, -Inf), NaN, pCO2_RT),
            window = window,
            pCO2_mean = rolling_mean(pCO2_RT)
-           #pCO2_RT_median = rolling_median(pCO2_RT)
            ) %>% 
     ungroup()
   
