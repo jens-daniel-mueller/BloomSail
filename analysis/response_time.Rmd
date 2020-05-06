@@ -36,34 +36,25 @@ theme_set(theme_bw())
 
 Response time determination
 
-- Fit interval length: Use tau from one or all fit interval length? Scale fit interval length to expected tau?
-- tau residual threshold (mean absolute residula <1% of final pCO2, entire group removed)
+- Fit interval length
+- tau residual threshold
 - Mean vs T-dependent tau
 
 Response time correction
 
-- correction procedure (Bittig vs. Fiedler, Miloshevich, Fietzek)
-- Smoothing
+- correction algorithm (Bittig vs. Fiedler, Miloshevich, Fietzek)
+- smoothing
 
 Quality assesment of response time correction
 
 - Down-Up-difference vs reference value
 - Depth interval width for offset calculation
-- Max depth for Down-Up-difference (currently upper 20m)
-- NA criterion for included Down-Up-difference (currently 2)
+- Max depth for Down-Up-difference
+- NA criterion for included Down-Up-difference
 
 
 
 # Response time determination
-
-## Preset selection conditions
-
-```{r subsettting_criteria}
-
-pump_switch <- ymd_hms("2018-07-17;13:08:34")
-
-```
-
 
 ## HydroC sensor settings
 
@@ -87,6 +78,14 @@ Logging frequency for all measurement modes (Measure, Zero, Flush) was increased
 * 2018-07-17;12:27:25
 * 2018-07-17;12:27:27
 * 2018-07-17;12:27:28
+
+
+```{r pump_switch_date}
+
+pump_switch <- ymd_hms("2018-07-17;13:08:34")
+
+```
+
 
 ## Model fitting
 
@@ -134,10 +133,11 @@ An example plot for a `nls` model fitted to pCO~2~ observations during a Flush p
 
 ```{r response_determination_example_plot, fig.cap="Example response time determination by non-linear least squares fit to the pCO~2~ recovery signal after zeroing. The vertical line indicates the determined response time tau. The horizontal line indicates 63% of the difference between start and final fitted pCO~2~."}
 
-i <- unique(tm_flush$Zero_counter)[30]
+i_Zero_counter <- 51
 
 tm_flush_counter <- tm_flush %>%
-  filter(Zero_counter == i, duration <= 300)
+  filter(Zero_counter == i_Zero_counter,
+         duration <= 300)
 
 fit <- tm_flush_counter %>%
   nls(pCO2_corr ~ SSasymp(duration, yf, y0, log_alpha), data = .)
@@ -150,13 +150,16 @@ resid_abs_mean <- mean(abs(resid(fit)))
 
 augment(fit) %>%
   ggplot(aes(duration, pCO2_corr))+
-  geom_point()+
-  geom_line(aes(y = .fitted))+
+  geom_point(shape=21)+
+  geom_line(aes(y = .fitted), col="red")+
   geom_vline(xintercept = tau)+
   geom_hline(yintercept = pCO2_corr_start + 0.63 *(pCO2_corr_delta))+
-  labs(y=expression(pCO[2]~(µatm)), x="Duration of Flush period (s)")
+  labs(y=expression(pCO[2]~(µatm)), x="t (sec)")
 
-rm(tm_flush_counter, fit, i, tau,
+ggsave(here::here("output/Plots/Figures_publication/appendix", "tau_fit_example.pdf"),
+       width = 180, height = 90, dpi = 300, units = "mm")
+
+rm(tm_flush_counter, fit, i_Zero_counter, tau,
    pCO2_corr_delta, pCO2_corr_end, pCO2_corr_start,
    resid_abs_mean)
 
@@ -641,8 +644,8 @@ tm_pCO2_equi %>%
 
 ```{r example_profile}
 
-example_ID <- "180730"
-example_station <- "P01"
+example_ID <- "180802"
+example_station <- "P03"
 
 ```
 
