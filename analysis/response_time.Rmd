@@ -418,17 +418,22 @@ tau_resid %>%
 
 ```{r subset_best_duration}
 
-# tau_resid %>% 
-#   group_by(Zero_counter) %>% 
-#   mutate(d_tau = tau - mean(tau)) %>% 
-#   ungroup() %>% 
-#   group_by(duration) %>% 
-#   summarise(d_tau_sd = sd(d_tau, na.rm = TRUE)) %>% 
-#   ungroup()
+duration_min_tau_sd <- tau_resid %>%
+  group_by(Zero_counter) %>%
+  mutate(d_tau = tau - mean(tau)) %>%
+  ungroup() %>%
+  group_by(duration) %>%
+  summarise(d_tau_sd = sd(d_tau, na.rm = TRUE)) %>%
+  ungroup() %>% 
+  slice(which.min(d_tau_sd)) %>%
+  select(duration) %>%
+  pull()
 
 tau_resid <- tau_resid %>% 
-  filter(duration == 300) %>% 
+  filter(duration == duration_min_tau_sd) %>% 
   select(-duration)
+
+rm(duration_min_tau_sd)
 
 ```
 
@@ -436,7 +441,7 @@ tau_resid <- tau_resid %>%
 
 ### Time series
 
-```{r tau_vs_date, fig.cap="Tau for all Zeroings with color representing water depth."}
+```{r tau_vs_date, fig.cap="Tau for all Zeroings with color representing water depth. Red lines represent linear regression trends for tau determined in surface waters (<10m)."}
 
 ggplot()+
   geom_smooth(data = tau_resid %>% filter(dep < 10),
@@ -1023,8 +1028,7 @@ i_station <- example_station
     coord_cartesian(ylim = c(35,0),
                     xlim = c(70, 270))+
     scale_color_brewer(palette = "Set1", name="")+
-    labs(y="Depth [m]", x=expression(pCO[2]~(µatm)),
-         title = str_c("Date: ",i_ID," | Station: ",i_station))+
+    labs(title = str_c("Date: ",i_ID," | Station: ",i_station))+
     facet_grid(tau_factor~., labeller = label_both)
 
   
@@ -1064,7 +1068,7 @@ for(i_ID in unique(tm$ID)){
     coord_cartesian(ylim = c(35,0),
                     xlim = c(70, 270))+
     scale_color_brewer(palette = "Set1", name="")+
-    labs(y="Depth [m]", title = str_c("Date: ",i_ID," | Station: ",i_station))+
+    labs(title = str_c("Date: ",i_ID," | Station: ",i_station))+
     theme_bw()+
     facet_grid(tau_factor~., labeller = label_both)
       
@@ -1098,9 +1102,6 @@ First, we analyse all profiles individually. Later we'll merge the information a
 
 
 ```{r compute_pCO2_offset_profiles, eval=FALSE}
-
-
-
 
 # pCO2 offset up - down cast
 tm_grid <- tm %>% 
@@ -1433,7 +1434,7 @@ tm_equi_delta %>%
   ggplot(aes(as.factor(tau_factor), pCO2_delta_equi, fill=correction))+
   geom_hline(yintercept = 0)+
   geom_violin()+
-  labs(y=expression(Delta~pCO[2]~from~reference~(µatm)), x="Tau factor")+
+  #labs(y=expression(Delta~pCO[2]~from~reference~(µatm)), x="Tau factor")+
   scale_fill_brewer(palette = "Set1")
 
 ```
@@ -1467,29 +1468,12 @@ tm_grid_stat %>%
   geom_point()
 
 tm_grid <- full_join(tm_grid, tm_grid_stat)
+tm_grid_high_res <- full_join(tm_grid_high_res, tm_grid_stat)
+
 rm(tm_grid_stat)
 
 ```
 
-
-```{r identify_max_dep_pCO2_within_profiles_high_res}
-
-tm_grid_stat_high_res <- tm_grid_high_res %>% 
-  filter(correction == "pCO2_mean") %>% 
-  #drop_na() %>% 
-  group_by(ID, station) %>% 
-  summarise(dep_max = max(dep_grid),
-            pCO2_max = max(down)) %>% 
-  ungroup()
-
-tm_grid_stat_high_res %>% 
-  ggplot(aes(dep_max, pCO2_max))+
-  geom_point()
-
-tm_grid_high_res <- full_join(tm_grid_high_res, tm_grid_stat_high_res)
-rm(tm_grid_stat_high_res)
-
-```
 
 ### Define dep and pCO2 thresholds
 
@@ -1586,11 +1570,6 @@ tm_grid_shallow_sum %>%
 ```{r plot_tau_optimum_cast_delta_pCO2, fig.cap="Mean offset between up- and downcast for all profiles up to 20m water depth. The lines between discrete tau factors result from the same analysis performed with high resolution of the tau factor. Left Panel: Mean absolute offset (µatm). Right panel: Mean relative offset (% of absolute value)."}
 
 
-tm_grid_shallow_sum_mean <- tm_grid_shallow_sum %>% 
-  group_by(estimate, correction, tau_factor) %>% 
-  summarise(pCO2_delta_mean = mean(pCO2_delta)) %>% 
-  ungroup()
-
 tm_grid_shallow_sum_mean_high_res <- tm_grid_shallow_sum_high_res %>% 
   group_by(estimate, correction, tau_factor) %>% 
   summarise(pCO2_delta_mean = mean(pCO2_delta)) %>% 
@@ -1598,11 +1577,9 @@ tm_grid_shallow_sum_mean_high_res <- tm_grid_shallow_sum_high_res %>%
 
 
 ggplot()+
-  geom_point(data = tm_grid_shallow_sum_mean %>% filter(estimate %in% c("mean_abs", "mean_rel_abs")),
-             aes(tau_factor, pCO2_delta_mean, linetype=correction, shape=correction))+
   geom_line(data = tm_grid_shallow_sum_mean_high_res %>% filter(estimate %in% c("mean_abs", "mean_rel_abs")),
              aes(tau_factor, pCO2_delta_mean, linetype=correction, shape=correction))+
-  geom_hline(yintercept = 0)+
+  ylim(0,NA)+
   facet_wrap(~estimate)
 
 ```
@@ -1897,7 +1874,7 @@ freq <- tm %>%
 tm <- full_join(tm, freq)
 
 # tau factors
-tm <- expand_grid(tm, tau_factor = seq(1.2))
+tm <- expand_grid(tm, tau_factor = tau_factor_min)
 
 tm <- tm %>%
   mutate(tau_test = tau*tau_factor)
@@ -2002,4 +1979,3 @@ rm(df, Tem, pCO2)
 # Open tasks / questions
 
 - Clean workspace for plotting code after RT correction
-- include high res tau factor output
