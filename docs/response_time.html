@@ -558,16 +558,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree5cc31b0fe6e22fb9913f96c9d423658e9f2024cftargetblank5cc31b0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/5cc31b0fe6e22fb9913f96c9d423658e9f2024cf" target="_blank">5cc31b0</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree55b65ca7bb53f0be2335a3eee15e0e958d8b291ftargetblank55b65caa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/55b65ca7bb53f0be2335a3eee15e0e958d8b291f" target="_blank">55b65ca</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree5cc31b0fe6e22fb9913f96c9d423658e9f2024cftargetblank5cc31b0a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree55b65ca7bb53f0be2335a3eee15e0e958d8b291ftargetblank55b65caa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/5cc31b0fe6e22fb9913f96c9d423658e9f2024cf" target="_blank">5cc31b0</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/55b65ca7bb53f0be2335a3eee15e0e958d8b291f" target="_blank">55b65ca</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -585,6 +585,9 @@ Ignored files:
     Ignored:    data/_summarized_data_files/
     Ignored:    data/backup/
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
+
+Untracked files:
+    Untracked:  output/Plots/Figures_publication/Appendix/tau_fit_example.pdf
 
 </code></pre>
 <p>
@@ -623,6 +626,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/55b65ca7bb53f0be2335a3eee15e0e958d8b291f/analysis/response_time.Rmd" target="_blank">55b65ca</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-06
+</td>
+<td>
+changed example profile
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/6a7848801fd73aa108e59ee9878978ef178a4058/docs/response_time.html" target="_blank">6a78488</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2187,31 +2224,27 @@ library(patchwork)</code></pre>
 <h1><span class="header-section-number">1</span> List of relevant parameters</h1>
 <p>Response time determination</p>
 <ul>
-<li>Fit interval length: Use tau from one or all fit interval length? Scale fit interval length to expected tau?</li>
-<li>tau residual threshold (mean absolute residula &lt;1% of final pCO2, entire group removed)</li>
+<li>Fit interval length</li>
+<li>tau residual threshold</li>
 <li>Mean vs T-dependent tau</li>
 </ul>
 <p>Response time correction</p>
 <ul>
-<li>correction procedure (Bittig vs. Fiedler, Miloshevich, Fietzek)</li>
-<li>Smoothing</li>
+<li>correction algorithm (Bittig vs. Fiedler, Miloshevich, Fietzek)</li>
+<li>smoothing</li>
 </ul>
 <p>Quality assesment of response time correction</p>
 <ul>
 <li>Down-Up-difference vs reference value</li>
 <li>Depth interval width for offset calculation</li>
-<li>Max depth for Down-Up-difference (currently upper 20m)</li>
-<li>NA criterion for included Down-Up-difference (currently 2)</li>
+<li>Max depth for Down-Up-difference</li>
+<li>NA criterion for included Down-Up-difference</li>
 </ul>
 </div>
 <div id="response-time-determination" class="section level1">
 <h1><span class="header-section-number">2</span> Response time determination</h1>
-<div id="preset-selection-conditions" class="section level2">
-<h2><span class="header-section-number">2.1</span> Preset selection conditions</h2>
-<pre class="r"><code>pump_switch &lt;- ymd_hms(&quot;2018-07-17;13:08:34&quot;)</code></pre>
-</div>
 <div id="hydroc-sensor-settings" class="section level2">
-<h2><span class="header-section-number">2.2</span> HydroC sensor settings</h2>
+<h2><span class="header-section-number">2.1</span> HydroC sensor settings</h2>
 <p>The sensor was first run with a low power pump (1W). Later - and for most parts of the expedition - with a stronger (8W) pump. Pumps were switched between recordings (data file: SD_datafile_20180718_170417CO2-0618-001.txt):</p>
 <ul>
 <li>2018-07-17;13:08:34</li>
@@ -2231,9 +2264,10 @@ library(patchwork)</code></pre>
 <li>2018-07-17;12:27:27</li>
 <li>2018-07-17;12:27:28</li>
 </ul>
+<pre class="r"><code>pump_switch &lt;- ymd_hms(&quot;2018-07-17;13:08:34&quot;)</code></pre>
 </div>
 <div id="model-fitting" class="section level2">
-<h2><span class="header-section-number">2.3</span> Model fitting</h2>
+<h2><span class="header-section-number">2.2</span> Model fitting</h2>
 <p>Response times were determined by fitting a nonlinear least-squares model with the <code>nls</code> function as described <a href="http://douglas-watson.github.io/post/2018-09_exponential_curve_fitting/">here</a> by Douglas Watson.</p>
 <ul>
 <li>Flush period length: variable</li>
@@ -2267,12 +2301,13 @@ tm_flush &lt;- tm_flush %&gt;%
   mutate(duration = duration- min(duration)) %&gt;% 
   ungroup()</code></pre>
 <div id="example-plot" class="section level3">
-<h3><span class="header-section-number">2.3.1</span> Example plot</h3>
+<h3><span class="header-section-number">2.2.1</span> Example plot</h3>
 <p>An example plot for a <code>nls</code> model fitted to pCO<sub>2</sub> observations during a Flush phase is shown below.</p>
-<pre class="r"><code>i &lt;- unique(tm_flush$Zero_counter)[30]
+<pre class="r"><code>i_Zero_counter &lt;- 51
 
 tm_flush_counter &lt;- tm_flush %&gt;%
-  filter(Zero_counter == i, duration &lt;= 300)
+  filter(Zero_counter == i_Zero_counter,
+         duration &lt;= 300)
 
 fit &lt;- tm_flush_counter %&gt;%
   nls(pCO2_corr ~ SSasymp(duration, yf, y0, log_alpha), data = .)
@@ -2285,34 +2320,37 @@ resid_abs_mean &lt;- mean(abs(resid(fit)))
 
 augment(fit) %&gt;%
   ggplot(aes(duration, pCO2_corr))+
-  geom_point()+
-  geom_line(aes(y = .fitted))+
+  geom_point(shape=21)+
+  geom_line(aes(y = .fitted), col=&quot;red&quot;)+
   geom_vline(xintercept = tau)+
   geom_hline(yintercept = pCO2_corr_start + 0.63 *(pCO2_corr_delta))+
-  labs(y=expression(pCO[2]~(µatm)), x=&quot;Duration of Flush period (s)&quot;)</code></pre>
+  labs(y=expression(pCO[2]~(µatm)), x=&quot;t (sec)&quot;)</code></pre>
 <div class="figure" style="text-align: center">
 <img src="figure/response_time.Rmd/response_determination_example_plot-1.png" alt="Example response time determination by non-linear least squares fit to the pCO~2~ recovery signal after zeroing. The vertical line indicates the determined response time tau. The horizontal line indicates 63% of the difference between start and final fitted pCO~2~." width="672" />
 <p class="caption">
 Example response time determination by non-linear least squares fit to the pCO<sub>2</sub> recovery signal after zeroing. The vertical line indicates the determined response time tau. The horizontal line indicates 63% of the difference between start and final fitted pCO<sub>2</sub>.
 </p>
 </div>
-<pre class="r"><code>rm(tm_flush_counter, fit, i, tau,
+<pre class="r"><code>ggsave(here::here(&quot;output/Plots/Figures_publication/appendix&quot;, &quot;tau_fit_example.pdf&quot;),
+       width = 180, height = 90, dpi = 300, units = &quot;mm&quot;)
+
+rm(tm_flush_counter, fit, i_Zero_counter, tau,
    pCO2_corr_delta, pCO2_corr_end, pCO2_corr_start,
    resid_abs_mean)</code></pre>
 </div>
 <div id="flush-intervals" class="section level3">
-<h3><span class="header-section-number">2.3.2</span> Flush intervals</h3>
+<h3><span class="header-section-number">2.2.2</span> Flush intervals</h3>
 <pre class="r"><code>duration_intervals &lt;- seq(150,500,50)</code></pre>
 <p>As there was some speculation about the dependence of determined response times (<span class="math inline">\(\tau\)</span>) on the chosen duration of the fit interval, the response time <span class="math inline">\(\tau\)</span> was determined for all zeroings and for total durations of:</p>
 <p>150, 200, 250, 300, 350, 400, 450, 500 secs</p>
 </div>
 <div id="residual-limits" class="section level3">
-<h3><span class="header-section-number">2.3.3</span> Residual limits</h3>
+<h3><span class="header-section-number">2.2.3</span> Residual limits</h3>
 <pre class="r"><code>resid_lim &lt;- 1</code></pre>
 <p>A mean absolute residual threshold of &gt;1% of final pCO<sub>2</sub> was defined.</p>
 </div>
 <div id="fitting-algorithm" class="section level3">
-<h3><span class="header-section-number">2.3.4</span> Fitting algorithm</h3>
+<h3><span class="header-section-number">2.2.4</span> Fitting algorithm</h3>
 <pre class="r"><code>pdf(file=here::here(&quot;output/Plots/response_time&quot;,
                     &quot;tau_determination_pCO2_corr_flushperiods_nls.pdf&quot;),
     onefile = TRUE, width = 7, height = 4)
@@ -2470,9 +2508,9 @@ n_tau_resid &lt;- nrow(tau_resid)</code></pre>
 </div>
 </div>
 <div id="outcome" class="section level2">
-<h2><span class="header-section-number">2.4</span> Outcome</h2>
+<h2><span class="header-section-number">2.3</span> Outcome</h2>
 <div id="general-considerations" class="section level3">
-<h3><span class="header-section-number">2.4.1</span> General considerations</h3>
+<h3><span class="header-section-number">2.3.1</span> General considerations</h3>
 <p>Estimated <span class="math inline">\(\tau\)</span> values were only taken into account when stable environmental pCO<sub>2</sub> levels were present. Absence of stable environmental pCO<sub>2</sub> was assumed when the mean absolute fit residual was above 1 % of the final equilibrium pCO<sub>2</sub>. If one model fit (irrespective the chosen fit interval length) of a particular flush period did not match that criterion, the flush period was ignored entirely. Usually, fits with higher duration did not meet this criterion. For some unexplained reason the first <span class="math inline">\(\tau\)</span> determination resulted in values about twice as high as all other flush periods and was therefore removed as an outlier.</p>
 <p>Metrics to characterize the fitting procedure include the number of:</p>
 <ul>
@@ -2497,7 +2535,7 @@ Histogram of residuals from fit displayed for the investigate durations of the f
 </div>
 </div>
 <div id="fit-interval-length" class="section level3">
-<h3><span class="header-section-number">2.4.2</span> Fit interval length</h3>
+<h3><span class="header-section-number">2.3.2</span> Fit interval length</h3>
 <p>No clear dependence of <span class="math inline">\(\tau\)</span> on the length of the flushing period was found.</p>
 <pre class="r"><code>tau_resid %&gt;% 
   group_by(Zero_counter) %&gt;% 
@@ -2546,7 +2584,7 @@ tau_resid &lt;- tau_resid %&gt;%
 rm(duration_min_tau_sd)</code></pre>
 </div>
 <div id="time-series" class="section level3">
-<h3><span class="header-section-number">2.4.3</span> Time series</h3>
+<h3><span class="header-section-number">2.3.3</span> Time series</h3>
 <pre class="r"><code>ggplot()+
   geom_smooth(data = tau_resid %&gt;% filter(dep &lt; 10),
               aes(date_time, tau, linetype = pump_power),
@@ -2566,7 +2604,7 @@ Tau for all Zeroings with color representing water depth. Red lines represent li
 </div>
 </div>
 <div id="temperature-dependence" class="section level3">
-<h3><span class="header-section-number">2.4.4</span> Temperature dependence</h3>
+<h3><span class="header-section-number">2.3.4</span> Temperature dependence</h3>
 <p>A temperature dependence of determined response times <span class="math inline">\(\tau\)</span> was found, with similar slopes but different intercepts for both pumps used.</p>
 <pre class="r"><code>tau_resid %&gt;% 
   ggplot(aes(tem, tau, col=dep))+
@@ -2599,7 +2637,7 @@ Surface tau (&lt;10m) as a function of temperature for all zeroings determined w
 </div>
 </div>
 <div id="final-tau" class="section level2">
-<h2><span class="header-section-number">2.5</span> Final tau</h2>
+<h2><span class="header-section-number">2.4</span> Final tau</h2>
 <p>Finally, the mean response times are:</p>
 <pre class="r"><code>tau_mean &lt;- tau_resid %&gt;% 
   group_by(pump_power) %&gt;% 
@@ -2735,8 +2773,8 @@ tm_pCO2_equi %&gt;%
 <ul>
 <li>Select profile for example plots</li>
 </ul>
-<pre class="r"><code>example_ID &lt;- &quot;180730&quot;
-example_station &lt;- &quot;P01&quot;</code></pre>
+<pre class="r"><code>example_ID &lt;- &quot;180802&quot;
+example_station &lt;- &quot;P03&quot;</code></pre>
 <pre class="r"><code>cast_dep &lt;- tm %&gt;% 
   pivot_longer(c(dep, pCO2_corr), names_to = &quot;parameter&quot;, values_to = &quot;value&quot;)
 
