@@ -755,6 +755,46 @@ rm(tt)
 
 ```
 
+# Ostergarnsholm
+
+Atmospheric data were recorded at the ICOS station on Osterganrsholm.
+
+## Read data
+
+```{r read_wind_Ostergarn_tower, eval=FALSE}
+
+og <- read_delim(here::here("Data/Ostergarnsholm/Tower", "Oes_Jens_atm_water_June_to_August_2018.csv"),
+                 delim = ";"               )
+
+og <- og %>%
+  mutate(date_time = ymd_hms( paste(paste(year, month, day, sep = "/"),
+                                          paste(hour, min, sec, sep = ":")))) %>% 
+  select("date_time",
+         "CO2 12m [ppm]",
+         "w_c [ppm m/s]",
+         "WS 12m [m/s]",
+         "WD 12m [degrees]",
+         "T 12m [degrees C]",
+         "RIS [W/m^2]"
+         )
+
+og <- og %>% 
+  select(date_time, pCO2_atm = "CO2 12m [ppm]", wind = "WS 12m [m/s]")
+
+```
+
+## Write summary file
+
+```{r write_og_data, eval=FALSE}
+
+og %>% 
+  write_csv(here::here("data/_summarized_data_files",
+                       "og.csv"))
+
+rm(og)
+
+```
+
 
 # Finnmaid
 
@@ -883,7 +923,6 @@ fm %>%
 rm(fm)
 
 ```
-
 
 
 # Interactive map
