@@ -442,7 +442,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Response time correction of Contros HydroC pCO<sub>2</sub> data</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">06 May, 2020</h4>
+<h4 class="date">07 May, 2020</h4>
 
 </div>
 
@@ -467,7 +467,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-05-06
+<strong>Last updated:</strong> 2020-05-07
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -558,16 +558,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree55b65ca7bb53f0be2335a3eee15e0e958d8b291ftargetblank55b65caa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/55b65ca7bb53f0be2335a3eee15e0e958d8b291f" target="_blank">55b65ca</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreead98da2e804c51385cff9e762473449c2b56a42btargetblankad98da2a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ad98da2e804c51385cff9e762473449c2b56a42b" target="_blank">ad98da2</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree55b65ca7bb53f0be2335a3eee15e0e958d8b291ftargetblank55b65caa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreead98da2e804c51385cff9e762473449c2b56a42btargetblankad98da2a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/55b65ca7bb53f0be2335a3eee15e0e958d8b291f" target="_blank">55b65ca</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ad98da2e804c51385cff9e762473449c2b56a42b" target="_blank">ad98da2</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -587,7 +587,18 @@ Ignored files:
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
 
 Untracked files:
+    Untracked:  output/Plots/CT_dynamics/
+    Untracked:  output/Plots/Figures_publication/Appendix/pCO2_RT_corrected_profile_example.pdf
+    Untracked:  output/Plots/Figures_publication/Appendix/pCO2_RT_corrected_profile_mean_abs_offset.pdf
     Untracked:  output/Plots/Figures_publication/Appendix/tau_fit_example.pdf
+    Untracked:  output/Plots/response_time/profiles_pCO2.pdf
+    Untracked:  output/Plots/response_time/profiles_pCO2_grid.pdf
+
+Unstaged changes:
+    Modified:   output/Plots/Figures_publication/Article/Hov_abs_profiles_cum.pdf
+    Modified:   output/Plots/Figures_publication/Article/data_coverage.pdf
+    Modified:   output/Plots/Figures_publication/Article/profiles_all.pdf
+    Modified:   output/Plots/Figures_publication/Article/station_map.pdf
 
 </code></pre>
 <p>
@@ -626,6 +637,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/ad98da2e804c51385cff9e762473449c2b56a42b/analysis/response_time.Rmd" target="_blank">ad98da2</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-07
+</td>
+<td>
+harmonized parameter labeling
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/113b3261da847e9b7debeb99d7e9d15392efa890/docs/response_time.html" target="_blank">113b326</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2958,7 +3003,7 @@ for(i_ID in unique(tm$ID)){
     mutate(pCO2_RT = RT_corr(pCO2_corr, lag(pCO2_corr), dt, tau_test),
            pCO2_RT = if_else(pCO2_RT %in% c(Inf, -Inf), NaN, pCO2_RT),
            window = window,
-           pCO2_mean = rolling_mean(pCO2_RT)
+           pCO2 = rolling_mean(pCO2_RT)
            #pCO2_RT_median = rolling_median(pCO2_RT)
            ) %&gt;% 
     ungroup()
@@ -2968,7 +3013,7 @@ for(i_ID in unique(tm$ID)){
   
   tm_sub &lt;- tm_sub %&gt;%
     group_by(station, tau_factor) %&gt;% 
-    mutate(pCO2_mean = lead(pCO2_mean, shift)) %&gt;% 
+    mutate(pCO2 = lead(pCO2, shift)) %&gt;% 
     ungroup()
   
   
@@ -3078,7 +3123,7 @@ for(i_ID in unique(tm$ID)){
     mutate(pCO2_RT = RT_corr(pCO2_corr, lag(pCO2_corr), dt, tau_test),
            pCO2_RT = if_else(pCO2_RT %in% c(Inf, -Inf), NaN, pCO2_RT),
            window = window,
-           pCO2_mean = rolling_mean(pCO2_RT)
+           pCO2 = rolling_mean(pCO2_RT)
            #pCO2_RT_median = rolling_median(pCO2_RT)
            ) %&gt;% 
     ungroup()
@@ -3088,7 +3133,7 @@ for(i_ID in unique(tm$ID)){
   
   tm_sub &lt;- tm_sub %&gt;%
     group_by(station, tau_factor) %&gt;% 
-    mutate(pCO2_mean = lead(pCO2_mean, shift)) %&gt;% 
+    mutate(pCO2 = lead(pCO2, shift)) %&gt;% 
     ungroup()
   
   
@@ -3126,7 +3171,7 @@ i_station &lt;- example_station
            phase %in% c(&quot;up&quot;, &quot;down&quot;)) %&gt;%
     ggplot()+
     geom_path(aes(pCO2_corr, dep, linetype = phase, col=&quot;raw&quot;))+
-    geom_path(aes(pCO2_mean, dep, linetype = phase, col=&quot;corrected&quot;))+
+    geom_path(aes(pCO2, dep, linetype = phase, col=&quot;corrected&quot;))+
     geom_point(data = equi_cast, aes(pCO2_corr, dep))+
     scale_y_reverse()+
     coord_cartesian(ylim = c(35,0),
@@ -3143,7 +3188,7 @@ Example plot of response time corrected and raw pCO<sub>2</sub> profiles. Panels
 <pre class="r"><code>rm(equi_cast)</code></pre>
 <p>A pdf with all timeseries plots of profiling depth and pCO<sub>2</sub> can be accessed <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/RT_correction_pCO2_profiles.pdf" target="_blank">here</a></p>
 <pre class="r"><code>pdf(file=here::here(&quot;output/Plots/response_time&quot;,
-    &quot;profiles_pCO2_mean.pdf&quot;), onefile = TRUE, width = 7, height = 11)
+    &quot;profiles_pCO2.pdf&quot;), onefile = TRUE, width = 7, height = 11)
 
 for(i_ID in unique(tm$ID)){
   for(i_station in unique(tm$station)){
@@ -3162,7 +3207,7 @@ for(i_ID in unique(tm$ID)){
            phase %in% c(&quot;up&quot;, &quot;down&quot;)) %&gt;%
     ggplot()+
     geom_path(aes(pCO2_corr, dep, linetype = phase, col=&quot;raw&quot;))+
-    geom_path(aes(pCO2_mean, dep, linetype = phase, col=&quot;corrected&quot;))+
+    geom_path(aes(pCO2, dep, linetype = phase, col=&quot;corrected&quot;))+
     geom_point(data = equi_cast, aes(pCO2_corr, dep))+
     scale_y_reverse()+
     coord_cartesian(ylim = c(35,0),
@@ -3200,11 +3245,11 @@ tm_grid &lt;- tm %&gt;%
   filter(phase %in% c(&quot;down&quot;, &quot;up&quot;)) %&gt;% 
   mutate(dep_grid = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1)))),
          tau_factor = as.factor(tau_factor)) %&gt;% 
-  select(ID, station, tau_factor, p_type, dep_grid, phase, pCO2_corr, pCO2_mean) %&gt;% 
+  select(ID, station, tau_factor, p_type, dep_grid, phase, pCO2_corr, pCO2) %&gt;% 
   group_by(ID, station, tau_factor, p_type, dep_grid, phase) %&gt;%
   summarise_all(&quot;mean&quot;, na.rm = TRUE) %&gt;% 
   ungroup() %&gt;% 
-  pivot_longer(cols = c(pCO2_corr, pCO2_mean), names_to = &quot;correction&quot;) %&gt;% 
+  pivot_longer(cols = c(pCO2_corr, pCO2), names_to = &quot;correction&quot;) %&gt;% 
   pivot_wider(names_from = phase, values_from = value) %&gt;% 
   mutate(pCO2_delta = up - down,
          pCO2_up_down_average = (down + up)/2,
@@ -3226,11 +3271,11 @@ tm_grid_high_res &lt;- tm_high_res %&gt;%
   filter(phase %in% c(&quot;down&quot;, &quot;up&quot;)) %&gt;% 
   mutate(dep_grid = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1)))),
          tau_factor = as.factor(tau_factor)) %&gt;% 
-  select(ID, station, tau_factor, p_type, dep_grid, phase, pCO2_corr, pCO2_mean) %&gt;% 
+  select(ID, station, tau_factor, p_type, dep_grid, phase, pCO2_corr, pCO2) %&gt;% 
   group_by(ID, station, tau_factor, p_type, dep_grid, phase) %&gt;%
   summarise_all(&quot;mean&quot;, na.rm = TRUE) %&gt;% 
   ungroup() %&gt;% 
-  pivot_longer(cols = c(pCO2_corr, pCO2_mean), names_to = &quot;correction&quot;) %&gt;% 
+  pivot_longer(cols = c(pCO2_corr, pCO2), names_to = &quot;correction&quot;) %&gt;% 
   pivot_wider(names_from = phase, values_from = value) %&gt;% 
   mutate(pCO2_delta = up - down,
          pCO2_up_down_average = (down + up)/2,
@@ -3258,7 +3303,7 @@ tm_pCO2_equi_grid %&gt;%
                       &quot;tm_pCO2_equi_grid.csv&quot;))
 
 
-rm(tm_grid, tm_pCO2_equi_grid)</code></pre>
+rm(tm_grid, tm_pCO2_equi_grid, tm_grid_high_res)</code></pre>
 <pre class="r"><code>tm_grid &lt;-
  read_csv(here::here(&quot;data/_merged_data_files/response_time&quot;,
                       &quot;tm_grid.csv&quot;),
@@ -3306,9 +3351,9 @@ Example plot of discretized, response time corrected and raw pCO<sub>2</sub> pro
 </p>
 </div>
 <pre class="r"><code>rm(tm_pCO2_equi_grid_sub, i_ID, i_station)</code></pre>
-<p>A pdf with all discretized pCO<sub>2</sub> profiles can be assessed <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/profiles_pCO2_mean_grid.pdf" target="_blank">here</a></p>
+<p>A pdf with all discretized pCO<sub>2</sub> profiles can be assessed <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/profiles_pCO2_grid.pdf" target="_blank">here</a></p>
 <pre class="r"><code>pdf(file=here::here(&quot;output/Plots/response_time&quot;,
-    &quot;profiles_pCO2_mean_grid.pdf&quot;), onefile = TRUE, width = 7, height = 11)
+    &quot;profiles_pCO2_grid.pdf&quot;), onefile = TRUE, width = 7, height = 11)
 
 for(i_ID in unique(tm_grid$ID)){
   for(i_station in unique(tm_grid$station)){
@@ -3355,7 +3400,7 @@ i_station &lt;- example_station
 tm_grid %&gt;%
   filter(ID == i_ID,
          station == i_station,
-         correction == &quot;pCO2_mean&quot;) %&gt;%
+         correction == &quot;pCO2&quot;) %&gt;%
   arrange(dep_grid) %&gt;%
   ggplot(aes(pCO2_delta, dep_grid, col=as.factor(tau_factor)))+
   geom_path()+
@@ -3387,7 +3432,7 @@ for(i_ID in unique(tm_grid$ID)){
       tm_grid %&gt;%
         filter(ID == i_ID,
                station == i_station,
-               correction == &quot;pCO2_mean&quot;) %&gt;%
+               correction == &quot;pCO2&quot;) %&gt;%
         arrange(dep_grid) %&gt;%
         ggplot(aes(pCO2_delta, dep_grid, col=as.factor(tau_factor)))+
         geom_path()+
@@ -3414,7 +3459,7 @@ i_station &lt;- example_station
       tm_grid %&gt;%
         filter(ID == i_ID,
                station == i_station,
-               correction == &quot;pCO2_mean&quot;) %&gt;%
+               correction == &quot;pCO2&quot;) %&gt;%
         arrange(dep_grid) %&gt;%
         ggplot(aes(pCO2_delta_rel, dep_grid, col=as.factor(tau_factor)))+
         geom_path()+
@@ -3445,7 +3490,7 @@ for(i_ID in unique(tm_grid$ID)){
       tm_grid %&gt;%
         filter(ID == i_ID,
                station == i_station,
-               correction == &quot;pCO2_mean&quot;) %&gt;%
+               correction == &quot;pCO2&quot;) %&gt;%
         arrange(dep_grid) %&gt;%
         ggplot(aes(pCO2_delta_rel, dep_grid, col=as.factor(tau_factor)))+
         geom_path()+
@@ -3475,7 +3520,7 @@ dev.off()</code></pre>
   mutate(pCO2_delta_equi = down - pCO2_equi,
          pCO2_delta_equi_rel = 100 * pCO2_delta_equi / pCO2_equi)</code></pre>
 <pre class="r"><code>tm_equi_delta %&gt;% 
-  filter(tau_factor == 1.2, correction==&quot;pCO2_mean&quot;) %&gt;% 
+  filter(tau_factor == 1.2, correction==&quot;pCO2&quot;) %&gt;% 
   ggplot(aes(pCO2_equi, pCO2_delta_equi))+
   geom_hline(yintercept = 0)+
   geom_point()+
@@ -3510,7 +3555,7 @@ Offset between pCO<sub>2</sub> downcast and upcast reference value. Panels highl
 </ul>
 <p>Summary statistics were restricted to complete shallow profiles (not more than 2 observations missing from 1m depth intervals, maximum depth 20m).</p>
 <pre class="r"><code>tm_grid_stat &lt;- tm_grid %&gt;% 
-  filter(correction == &quot;pCO2_mean&quot;) %&gt;% 
+  filter(correction == &quot;pCO2&quot;) %&gt;% 
   #drop_na() %&gt;% 
   group_by(ID, station) %&gt;% 
   summarise(dep_max = max(dep_grid),
@@ -3601,7 +3646,7 @@ tm_equi_delta_sum &lt;- tm_equi_delta %&gt;%
   pivot_longer(cols = mean:mean_rel_abs,
                names_to = &quot;estimate&quot;, values_to = &quot;dpCO2&quot;)</code></pre>
 <pre class="r"><code>tm_grid_shallow_sum %&gt;% 
-  filter(correction == &quot;pCO2_mean&quot;,
+  filter(correction == &quot;pCO2&quot;,
          estimate %in% c(&quot;mean_abs&quot;, &quot;mean_rel_abs&quot;, &quot;sd&quot;, &quot;sd_rel&quot;)) %&gt;% 
   ggplot()+
   geom_vline(xintercept = 0)+
@@ -3637,14 +3682,14 @@ Mean offset between up- and downcast for all profiles up to 20m water depth. The
 </div>
 <p>Below we determined the tau factor that corresponds to lowest absolute mean offset.</p>
 <pre class="r"><code>pCO2_delta_mean_min &lt;- tm_grid_shallow_sum_mean_high_res %&gt;%
-  filter(correction == &quot;pCO2_mean&quot;, estimate %in% c(&quot;mean_abs&quot;)) %&gt;% 
+  filter(correction == &quot;pCO2&quot;, estimate %in% c(&quot;mean_abs&quot;)) %&gt;% 
   slice(which.min(pCO2_delta_mean)) %&gt;% 
   select(pCO2_delta_mean) %&gt;% 
   pull() %&gt;% 
   round(2)
 
 tau_factor_min &lt;- tm_grid_shallow_sum_mean_high_res %&gt;%
-  filter(correction == &quot;pCO2_mean&quot;, estimate %in% c(&quot;mean_abs&quot;)) %&gt;% 
+  filter(correction == &quot;pCO2&quot;, estimate %in% c(&quot;mean_abs&quot;)) %&gt;% 
   slice(which.min(pCO2_delta_mean)) %&gt;% 
   select(tau_factor) %&gt;% 
   pull()</code></pre>
@@ -3671,19 +3716,6 @@ tm_equi_delta_sum %&gt;%
 Mean pCO<sub>2</sub> offset from reference values as a function of the factor applied to tau. The lines between discrete tau factors result from the same analysis performed with high resolution of the tau factor. Left Panel: Mean absolute offset (µatm). Right panel: Mean relative offset (% of absolute value).
 </p>
 </div>
-<p>Below we determined the tau factor that corresponds to lowest absolute and relative mean offsets, respectively.</p>
-<pre class="r"><code>tm_equi_delta_sum_highres %&gt;% 
-  filter(correction == &quot;pCO2_mean&quot;, estimate %in% c(&quot;mean_abs&quot;)) %&gt;% 
-  slice(which.min(dpCO2)) %&gt;% 
-  select(tau_factor, dpCO2) %&gt;% 
-  rename(mean_abs=dpCO2)
-
-
-tm_equi_delta_sum_highres %&gt;% 
-  filter(correction == &quot;pCO2_mean&quot;, estimate == &quot;mean_rel_abs&quot;) %&gt;% 
-  slice(which.min(dpCO2)) %&gt;% 
-  select(tau_factor, dpCO2) %&gt;% 
-  rename(mean_rel_abs=dpCO2)</code></pre>
 </div>
 </div>
 <div id="summary-plots" class="section level2">
@@ -3692,7 +3724,7 @@ tm_equi_delta_sum_highres %&gt;%
 
 cast_dep &lt;- tm %&gt;% 
   filter(tau_factor == i_tau_factor) %&gt;% 
-  pivot_longer(c(dep, pCO2_corr, pCO2_mean),
+  pivot_longer(c(dep, pCO2_corr, pCO2),
                names_to = &quot;parameter&quot;, values_to = &quot;value&quot;)
 
 cast_dep_equi &lt;- tm_pCO2_equi %&gt;% 
@@ -3744,7 +3776,7 @@ for(i_ID in unique(tm$ID)){
                phase %in% c(&quot;up&quot;, &quot;down&quot;)) %&gt;%
         ggplot()+
         geom_path(aes(pCO2_corr, dep, linetype = phase, col=&quot;raw&quot;))+
-        geom_path(aes(pCO2_mean, dep, linetype = phase, col=&quot;corrected&quot;))+
+        geom_path(aes(pCO2, dep, linetype = phase, col=&quot;corrected&quot;))+
         #geom_point(data = equi_cast, aes(pCO2_corr, dep))+
         scale_y_reverse()+
         coord_cartesian(ylim = c(25,0), xlim = c(70,250))+
@@ -3778,7 +3810,7 @@ for(i_ID in unique(tm$ID)){
       p_delta_abs &lt;- tm_grid %&gt;%
         filter(ID == i_ID,
                station == i_station,
-               correction == &quot;pCO2_mean&quot;) %&gt;%
+               correction == &quot;pCO2&quot;) %&gt;%
         arrange(dep_grid) %&gt;%
         ggplot(aes(pCO2_delta, dep_grid, col=as.factor(tau_factor)))+
         geom_path()+
@@ -3792,7 +3824,7 @@ for(i_ID in unique(tm$ID)){
       p_delta_rel &lt;- tm_grid %&gt;%
         filter(ID == i_ID,
                station == i_station,
-               correction == &quot;pCO2_mean&quot;) %&gt;%
+               correction == &quot;pCO2&quot;) %&gt;%
         arrange(dep_grid) %&gt;%
         ggplot(aes(pCO2_delta_rel, dep_grid, col=as.factor(tau_factor)))+
         geom_path()+
@@ -3924,7 +3956,7 @@ for(i_ID in unique(tm$ID)){
     mutate(pCO2_RT = RT_corr(pCO2_corr, lag(pCO2_corr), dt, tau_test),
            pCO2_RT = if_else(pCO2_RT %in% c(Inf, -Inf), NaN, pCO2_RT),
            window = window,
-           pCO2_mean = rolling_mean(pCO2_RT)
+           pCO2 = rolling_mean(pCO2_RT)
            ) %&gt;% 
     ungroup()
   
@@ -3933,7 +3965,7 @@ for(i_ID in unique(tm$ID)){
   
   tm_sub &lt;- tm_sub %&gt;%
     group_by(station) %&gt;% 
-    mutate(pCO2_mean = lead(pCO2_mean, shift)) %&gt;% 
+    mutate(pCO2 = lead(pCO2, shift)) %&gt;% 
     ungroup()
   
   

@@ -382,7 +382,7 @@ div.tocify {
       <a href="read-in.html">Read-in</a>
     </li>
     <li>
-      <a href="merging_interpolation.html">Mergind and interpolation</a>
+      <a href="merging_interpolation.html">Merging and interpolation</a>
     </li>
   </ul>
 </li>
@@ -442,7 +442,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">CT dynamics</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">28 April, 2020</h4>
+<h4 class="date">07 May, 2020</h4>
 
 </div>
 
@@ -467,7 +467,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-04-28
+<strong>Last updated:</strong> 2020-05-07
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -558,16 +558,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree058c7098d0719d2fbcf34c0d3576435f4c722686targetblank058c709a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/058c7098d0719d2fbcf34c0d3576435f4c722686" target="_blank">058c709</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreead98da2e804c51385cff9e762473449c2b56a42btargetblankad98da2a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ad98da2e804c51385cff9e762473449c2b56a42b" target="_blank">ad98da2</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree058c7098d0719d2fbcf34c0d3576435f4c722686targetblank058c709a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreead98da2e804c51385cff9e762473449c2b56a42btargetblankad98da2a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/058c7098d0719d2fbcf34c0d3576435f4c722686" target="_blank">058c709</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ad98da2e804c51385cff9e762473449c2b56a42b" target="_blank">ad98da2</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -583,8 +583,16 @@ Ignored files:
     Ignored:    data/TinaV/
     Ignored:    data/_merged_data_files/
     Ignored:    data/_summarized_data_files/
+    Ignored:    data/backup/
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
-    Ignored:    output/Plots/Figures_publication/Appendix/
+
+Untracked files:
+    Untracked:  output/Plots/CT_dynamics/
+    Untracked:  output/Plots/Figures_publication/Appendix/pCO2_RT_corrected_profile_example.pdf
+    Untracked:  output/Plots/Figures_publication/Appendix/pCO2_RT_corrected_profile_mean_abs_offset.pdf
+    Untracked:  output/Plots/Figures_publication/Appendix/tau_fit_example.pdf
+    Untracked:  output/Plots/response_time/profiles_pCO2.pdf
+    Untracked:  output/Plots/response_time/profiles_pCO2_grid.pdf
 
 </code></pre>
 <p>
@@ -623,6 +631,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/ad98da2e804c51385cff9e762473449c2b56a42b/analysis/CT_dynamics.Rmd" target="_blank">ad98da2</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-07
+</td>
+<td>
+harmonized parameter labeling
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/b5722a7fc1f85352505fa8e350cae436fb5fd712/docs/CT_dynamics.html" target="_blank">b5722a7</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-04-28
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2626,7 +2668,8 @@ library(marelac)
 library(metR)
 library(scico)
 library(lubridate)
-library(zoo)</code></pre>
+library(zoo)
+library(tibbletime)</code></pre>
 <div id="sensor-data" class="section level1">
 <h1><span class="header-section-number">1</span> Sensor data</h1>
 <p>Profile data are prepared by:</p>
@@ -2642,68 +2685,68 @@ library(zoo)</code></pre>
 </ul>
 <p>Please note that:</p>
 <ul>
-<li>The label ID represents the start date of the cruise (“YYMMDD”), not the exact mean sampling date</li>
+<li>The label ID representm the start date of the cruise (“YYMMDD”), not the exact mean sampling date</li>
 </ul>
 <div id="pco2-profile-overview" class="section level2">
 <h2><span class="header-section-number">1.1</span> pCO<sub>2</sub> profile overview</h2>
-<pre class="r"><code>ts &lt;-
- read_csv(here::here(&quot;data/_merged_data_files&quot;,
-                      &quot;BloomSail_CTD_HydroC_track_RT.csv&quot;),
+<pre class="r"><code>tm &lt;-
+ read_csv(here::here(&quot;data/_merged_data_files/response_time&quot;,
+                      &quot;tm_RT_all.csv&quot;),
                col_types = cols(ID = col_character(),
                                 pCO2_analog = col_double(),
-                                pCO2 = col_double(),
+                                pCO2_corr = col_double(),
                                 Zero = col_character(),
                                 Flush = col_character(),
                                 mixing = col_character(),
-                                Zero_ID = col_integer(),
+                                Zero_counter = col_integer(),
                                 deployment = col_integer(),
                                 lon = col_double(),
                                 lat = col_double(),
-                                pCO2_RT = col_double()))
+                                pCO2 = col_double()))
 
 
 # Filter relevant rows and columns
 
-ts_profiles &lt;- ts %&gt;% 
+tm_profiles &lt;- tm %&gt;% 
   filter(type == &quot;P&quot;,
          Flush == &quot;0&quot;,
          Zero == &quot;0&quot;,
          !ID %in% c(&quot;180616&quot;,&quot;180820&quot;),
          !(station %in% c(&quot;PX1&quot;, &quot;PX2&quot;))) %&gt;% 
-  select(date_time, ID, station, lat, lon, dep, sal, tem, pCO2_raw = pCO2, pCO2 = pCO2_RT_mean, duration)
+  select(date_time, ID, station, lat, lon, dep, sal, tem, pCO2_corr, pCO2, duration)
 
 
-stations &lt;- ts_profiles %&gt;% 
+stations &lt;- tm_profiles %&gt;% 
   group_by(station) %&gt;% 
   summarise(lat = mean(lat),
             lon = mean(lon)) %&gt;% 
   ungroup()
 
 
-ts_profiles &lt;- ts_profiles %&gt;% 
+tm_profiles &lt;- tm_profiles %&gt;% 
   filter(!(station %in% c(&quot;P14&quot;, &quot;P13&quot;, &quot;P01&quot;)))
 # Assign meta information
 
-ts_profiles &lt;- ts_profiles %&gt;% 
+tm_profiles &lt;- tm_profiles %&gt;% 
   group_by(ID, station) %&gt;% 
   mutate(duration = as.numeric(date_time - min(date_time))) %&gt;%
   arrange(date_time) %&gt;% 
   ungroup()
 
-meta &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
-                          &quot;Tina_V_Sensor_meta.csv&quot;),
+meta &lt;- read_csv(here::here(&quot;Data/TinaV/Sensor&quot;,
+                            &quot;Sensor_meta.csv&quot;),
                  col_types = cols(ID = col_character()))
 
 meta &lt;- meta %&gt;% 
     filter(!ID %in% c(&quot;180616&quot;,&quot;180820&quot;),
            !(station %in% c(&quot;PX1&quot;, &quot;PX2&quot;, &quot;P14&quot;, &quot;P13&quot;, &quot;P01&quot;)))
 
-ts_profiles &lt;- full_join(ts_profiles, meta)
+tm_profiles &lt;- full_join(tm_profiles, meta)
 rm(meta)
 
 
 # creating descriptive variables
-ts_profiles &lt;- ts_profiles %&gt;% 
+tm_profiles &lt;- tm_profiles %&gt;% 
   mutate(phase = &quot;standby&quot;,
          phase = if_else(duration &gt;= start &amp; duration &lt; down &amp; !is.na(down) &amp; !is.na(start),
                          &quot;down&quot;, phase),
@@ -2714,44 +2757,43 @@ ts_profiles &lt;- ts_profiles %&gt;%
          phase = if_else(duration &gt;= up    &amp; duration &lt; end  &amp; !is.na(end ) &amp; !is.na(up   ),
                          &quot;up&quot;,   phase))
 
-ts_profiles &lt;- ts_profiles %&gt;% 
+tm_profiles &lt;- tm_profiles %&gt;% 
   select(-c(start, down, lift, up, end, comment, p_type, duration))
 
 
 # select downcasst only
-ts_profiles &lt;- ts_profiles %&gt;% 
-  filter(phase == &quot;down&quot;) %&gt;% 
-  select(-phase)
+tm_profiles &lt;- tm_profiles %&gt;% 
+  filter(phase %in% c(&quot;down&quot;, &quot;up&quot;))
 
 
-
-# ts_profiles_highres &lt;- ts_profiles
+tm_profiles_highres &lt;- tm_profiles
 
 # grid observation to 1m depth intervals
-ts_profiles &lt;- ts_profiles %&gt;% 
+tm_profiles &lt;- tm_profiles %&gt;% 
   mutate(dep_grid = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1))))) %&gt;% 
-  group_by(ID, station, dep_grid) %&gt;%
+  group_by(ID, station, dep_grid, phase) %&gt;%
   summarise_all(&quot;mean&quot;, na.rm = TRUE) %&gt;% 
   ungroup() %&gt;% 
   select(-dep, dep=dep_grid)
 
 # subset complete profiles
-profiles_in &lt;- ts_profiles %&gt;% 
-  filter(dep &lt; 20) %&gt;% 
+profiles_in &lt;- tm_profiles %&gt;% 
+  filter(dep &lt; 20,
+         phase == &quot;down&quot;) %&gt;% 
   group_by(ID, station) %&gt;% 
   summarise(nr = n()) %&gt;% 
   mutate(select = if_else(nr &gt; 18 | station == &quot;P14&quot;, &quot;in&quot;, &quot;out&quot;)) %&gt;% 
   select(-nr) %&gt;% 
   ungroup()
 
-ts_profiles &lt;- full_join(ts_profiles, profiles_in)
+tm_profiles &lt;- full_join(tm_profiles, profiles_in)
 rm(profiles_in)
 
-ts_profiles %&gt;% 
+tm_profiles %&gt;% 
   arrange(date_time) %&gt;% 
-  ggplot(aes(pCO2, dep, col=select))+
+  ggplot(aes(pCO2, dep, col=select, linetype=phase))+
   geom_hline(yintercept = 25)+
-  geom_point()+
+  #geom_point()+
   geom_path()+
   scale_y_reverse()+
   scale_x_continuous(breaks = c(0, 600), labels = c(0, 600))+
@@ -2764,21 +2806,22 @@ ts_profiles %&gt;%
 Overview pCO2 profiles at stations (P02-P12) and cruise dates (ID). y-axis restricted to displayed range.
 </p>
 </div>
-<pre class="r"><code>ts_profiles &lt;- ts_profiles %&gt;%
-  filter(select == &quot;in&quot;) %&gt;%
-  select(-select) %&gt;% 
+<pre class="r"><code>tm_profiles &lt;- tm_profiles %&gt;%
+  filter(select == &quot;in&quot;,
+         phase == &quot;down&quot;) %&gt;%
+  select(-c(select, phase)) %&gt;% 
   filter(dep &lt; 25)
 
 # assign mean date_time stamp
 
-cruise_dates &lt;- ts_profiles %&gt;% 
+cruise_dates &lt;- tm_profiles %&gt;% 
   group_by(ID) %&gt;% 
   summarise(date_time_ID = mean(date_time),
             date_ID = format(as.Date(date_time_ID), &quot;%b %d&quot;)) %&gt;% 
   ungroup()
 
 # inner_join remove P14 observations lacking date_time_ID 
-ts_profiles &lt;- inner_join(cruise_dates, ts_profiles)</code></pre>
+tm_profiles &lt;- inner_join(cruise_dates, tm_profiles)</code></pre>
 </div>
 <div id="station-map" class="section level2">
 <h2><span class="header-section-number">1.2</span> Station map</h2>
@@ -2806,10 +2849,10 @@ map_low_res &lt;- map %&gt;%
          lon = as.numeric(as.character(lon)))
 
 
-fm_bs &lt;-
+fm &lt;-
   read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
-                       &quot;Finnmaid.csv&quot;)) %&gt;% 
-  filter(Lat &lt;= lat_hi, Lat &gt;= lat_lo, Lon &gt;= lon_lo)
+                       &quot;fm.csv&quot;)) %&gt;% 
+  filter(lat &lt;= lat_hi, lat &gt;= lat_lo, lon &gt;= lon_lo)
 
 ggplot()+
   geom_contour_fill(data = map_low_res,
@@ -2818,8 +2861,8 @@ ggplot()+
                     breaks = seq(0,300,20))+
   geom_raster(data=map %&gt;% filter(is.na(elev)),
               aes(lon, lat), fill=&quot;black&quot;)+
-  geom_line(data = fm_bs, aes(Lon, Lat, group=ID), col=&quot;grey&quot;)+
-  geom_line(data = fm_bs %&gt;% filter(Area == &quot;BS&quot;), aes(Lon, Lat, group=ID), col=&quot;red&quot;)+
+  geom_line(data = fm, aes(lon, lat, group=ID), col=&quot;grey&quot;)+
+  #geom_line(data = fm %&gt;% filter(Area == &quot;BS&quot;), aes(Lon, Lat, group=ID), col=&quot;red&quot;)+
   geom_label(data = stations %&gt;% filter(!(station %in% c(&quot;P14&quot;, &quot;P13&quot;, &quot;P01&quot;))),
              aes(lon, lat, label=station), col=&quot;red&quot;)+
   geom_label(data = stations %&gt;% filter(station %in% c(&quot;P14&quot;, &quot;P13&quot;, &quot;P01&quot;)),
@@ -2839,11 +2882,11 @@ Location of stations sampled between the east coast of Gotland and Gotland deep.
 <pre class="r"><code>ggsave(here::here(&quot;output/Plots/Figures_publication/article&quot;, &quot;station_map.pdf&quot;),
        width = 180, height = 150, dpi = 300, units = &quot;mm&quot;)
 
-rm(map, map_low_res, lat_hi, lat_lo, lon_hi, lon_lo, fm_bs)</code></pre>
+rm(map, map_low_res, lat_hi, lat_lo, lon_hi, lon_lo, fm)</code></pre>
 </div>
 <div id="data-coverage" class="section level2">
 <h2><span class="header-section-number">1.3</span> Data coverage</h2>
-<pre class="r"><code>cover &lt;- ts_profiles %&gt;% 
+<pre class="r"><code>cover &lt;- tm_profiles %&gt;% 
   group_by(ID, station) %&gt;% 
   summarise(date = mean(date_time),
             date_time_ID = mean(date_time_ID)) %&gt;% 
@@ -2861,9 +2904,9 @@ cover %&gt;%
                    date_labels = &quot;%b %d&quot;)+
   theme(axis.title.x = element_blank())</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/CT_dynamics.Rmd/data_coverage-1.png" alt="Spatio-temporal data coverage, indicated as station visits over time. ID (color) refers to the starting date of the cruise, except for P14, which was visited twice during each cruise." width="672" />
+<img src="figure/CT_dynamics.Rmd/data_coverage-1.png" alt="Spatio-temporal data coverage, indicated as station visitm over time. ID (color) refers to the starting date of the cruise, except for P14, which was visited twice during each cruise." width="672" />
 <p class="caption">
-Spatio-temporal data coverage, indicated as station visits over time. ID (color) refers to the starting date of the cruise, except for P14, which was visited twice during each cruise.
+Spatio-temporal data coverage, indicated as station visitm over time. ID (color) refers to the starting date of the cruise, except for P14, which was visited twice during each cruise.
 </p>
 </div>
 <pre class="r"><code>ggsave(here::here(&quot;output/Plots/Figures_publication/article&quot;, &quot;data_coverage.pdf&quot;),
@@ -2874,14 +2917,13 @@ rm(cover)</code></pre>
 </div>
 <div id="bottle-ct-and-at" class="section level1">
 <h1><span class="header-section-number">2</span> Bottle C<sub>T</sub> and A<sub>T</sub></h1>
-<p>At stations P07 and P10 discrete samples for lab measurments of C<sub>T</sub> and A<sub>T</sub> were collected. Please note that - in contrast to the pCO<sub>2</sub> profiles - samples were taken on June 16, but removed here for harmonization of results.</p>
+<p>At stations P07 and P10 discrete samples for lab measurmentm of C<sub>T</sub> and A<sub>T</sub> were collected. Please note that - in contrast to the pCO<sub>2</sub> profiles - samples were taken on June 16, but removed here for harmonization of resultm.</p>
 <pre class="r"><code>tb &lt;-
-  read_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;Tina_V_Bottle_CO2_lab.csv&quot;),
+  read_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;tb.csv&quot;),
            col_types = cols(ID = col_character()))
 
 tb &lt;- tb %&gt;% 
   filter(station %in% c(&quot;P07&quot;, &quot;P10&quot;)) %&gt;% 
-  select(-pH_Mosley) %&gt;% 
   mutate(CT_AT_ratio = CT/AT,
          ID = if_else(ID == &quot;180722&quot;, &quot;180723&quot;, ID))
 
@@ -2954,7 +2996,7 @@ tb_surface %&gt;%
 CT timeseries, derived by multiplying the CT-AT-ratio with mean AT
 </p>
 </div>
-<p>Important notes: - C<sub>T</sub> drop and temporal patterns observed in the C<sub>T</sub>/A<sub>T</sub> time series agrees well with those found in the C<sub>T</sub> time series derived from pCO<sub>2</sub> measurements</p>
+<p>Important notes: - C<sub>T</sub> drop and temporal patterns observed in the C<sub>T</sub>/A<sub>T</sub> time series agrees well with those found in the C<sub>T</sub> time series derived from pCO<sub>2</sub> measurementm</p>
 </div>
 <div id="mean-alkalinity" class="section level2">
 <h2><span class="header-section-number">2.3</span> Mean alkalinity</h2>
@@ -2969,7 +3011,7 @@ CT timeseries, derived by multiplying the CT-AT-ratio with mean AT
 AT_sd</code></pre>
 <pre><code>[1] 26.23092</code></pre>
 <pre class="r"><code>rm(AT_sd)</code></pre>
-<p>Likewise, the mean salinity amounts to:</p>
+<p>Likewise, the mean salinity amountm to:</p>
 <pre class="r"><code>sal_mean &lt;- tb %&gt;% 
   filter(dep &lt;= 20) %&gt;% 
   summarise(sal = mean(sal, na.rm = TRUE)) %&gt;%
@@ -2977,8 +3019,8 @@ AT_sd</code></pre>
 
 sal_mean</code></pre>
 <pre><code>[1] 6.907083</code></pre>
-<pre class="r"><code>bind_cols(start = min(ts_profiles$date_time), 
-          end = max(ts_profiles$date_time),
+<pre class="r"><code>bind_cols(start = min(tm_profiles$date_time), 
+          end = max(tm_profiles$date_time),
           AT = AT_mean,
           sal = sal_mean) %&gt;% 
   write_csv(here::here(&quot;Data/_summarized_data_files&quot;, &quot;tb_fix.csv&quot;))
@@ -2991,29 +3033,26 @@ rm(tb)</code></pre>
 <div id="calculation-from-pco2" class="section level2">
 <h2><span class="header-section-number">3.1</span> Calculation from pCO<sub>2</sub></h2>
 <p>C<sub>T</sub> profiles were calculated from sensor pCO<sub>2</sub> and T profiles, and constant salinity and alkalinity values. Note that the impact of fixed vs. measured salinity has only a negligible impact on C<sub>T</sub> profiles.</p>
-<pre class="r"><code>ts_profiles &lt;- ts_profiles %&gt;% 
-  drop_na()
-
-ts_profiles &lt;- ts_profiles %&gt;% 
+<pre class="r"><code>tm_profiles &lt;- tm_profiles %&gt;% 
   filter(pCO2 &gt; 0)
 
-ts_profiles &lt;- ts_profiles %&gt;% 
+tm_profiles &lt;- tm_profiles %&gt;% 
   mutate(CT = carb(24, var1=pCO2, var2=1720*1e-6,
                    S=sal_mean, T=tem, P=dep/10, k1k2=&quot;m10&quot;, kf=&quot;dg&quot;, ks=&quot;d&quot;,
                    gas=&quot;insitu&quot;)[,16]*1e6)
 
 rm(sal_mean)
 
-ts_profiles %&gt;% 
-  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles.csv&quot;))</code></pre>
+tm_profiles %&gt;% 
+  write_csv(here::here(&quot;Data/_merged_data_files/CT_dynamics&quot;, &quot;tm_profiles.csv&quot;))</code></pre>
 </div>
 <div id="plot-all-profiles" class="section level2">
 <h2><span class="header-section-number">3.2</span> Plot all profiles</h2>
-<pre class="r"><code>ts_profiles &lt;-  ts_profiles %&gt;% 
+<pre class="r"><code>tm_profiles &lt;-  tm_profiles %&gt;% 
   arrange(date_time_ID)
 
 p_tem &lt;- 
-  ts_profiles %&gt;% 
+  tm_profiles %&gt;% 
   ggplot(aes(tem, dep, col=ID, group = interaction(station, ID)))+
   geom_path()+
   scale_y_reverse(expand = c(0,0))+
@@ -3022,7 +3061,7 @@ p_tem &lt;-
   scale_color_viridis_d(guide = FALSE)
 
 p_pCO2 &lt;- 
-  ts_profiles %&gt;% 
+  tm_profiles %&gt;% 
   ggplot(aes(pCO2, dep, col=ID, group = interaction(station, ID)))+
   geom_path()+
   scale_y_reverse(expand = c(0,0))+
@@ -3033,7 +3072,7 @@ p_pCO2 &lt;-
         axis.ticks.y = element_blank())
 
 p_CT &lt;- 
-  ts_profiles %&gt;% 
+  tm_profiles %&gt;% 
   ggplot(aes(CT, dep, col=ID, group = interaction(station, ID)))+
   geom_path()+
   scale_y_reverse(expand = c(0,0))+
@@ -3055,32 +3094,32 @@ rm( p_tem, p_pCO2, p_CT)</code></pre>
 <div id="mean-profiles" class="section level2">
 <h2><span class="header-section-number">3.3</span> Mean profiles</h2>
 <p>Mean vertical profiles were calculated for each cruise day (ID).</p>
-<pre class="r"><code>ts_profiles_ID_mean &lt;- ts_profiles %&gt;% 
-  select(-c(station,lat, lon, pCO2_raw, date_time)) %&gt;% 
+<pre class="r"><code>tm_profiles_ID_mean &lt;- tm_profiles %&gt;% 
+  select(-c(station,lat, lon, pCO2_corr, date_time)) %&gt;% 
   group_by(ID, date_time_ID, dep) %&gt;% 
   summarise_all(list(mean), na.rm=TRUE) %&gt;% 
   ungroup()
 
-ts_profiles_ID_sd &lt;- ts_profiles %&gt;% 
-  select(-c(station,lat, lon, pCO2_raw, date_time)) %&gt;% 
+tm_profiles_ID_sd &lt;- tm_profiles %&gt;% 
+  select(-c(station,lat, lon, pCO2_corr, date_time)) %&gt;% 
   group_by(ID, date_time_ID, dep) %&gt;% 
   summarise_all(list(sd), na.rm=TRUE) %&gt;% 
   ungroup()
 
-ts_profiles_ID_sd_long &lt;- ts_profiles_ID_sd %&gt;% 
+tm_profiles_ID_sd_long &lt;- tm_profiles_ID_sd %&gt;% 
   pivot_longer(sal:CT, names_to = &quot;var&quot;, values_to = &quot;sd&quot;)
   
-ts_profiles_ID_mean_long &lt;- ts_profiles_ID_mean %&gt;% 
+tm_profiles_ID_mean_long &lt;- tm_profiles_ID_mean %&gt;% 
   pivot_longer(sal:CT, names_to = &quot;var&quot;, values_to = &quot;value&quot;)
   
-ts_profiles_ID_long &lt;- inner_join(ts_profiles_ID_mean_long, ts_profiles_ID_sd_long)
+tm_profiles_ID_long &lt;- inner_join(tm_profiles_ID_mean_long, tm_profiles_ID_sd_long)
 
-ts_profiles_ID_mean %&gt;% 
-  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID.csv&quot;))
+tm_profiles_ID_mean %&gt;% 
+  write_csv(here::here(&quot;Data/_merged_data_files/CT_dynamics&quot;, &quot;tm_profiles_ID.csv&quot;))
 
-rm(ts_profiles_ID_sd_long, ts_profiles_ID_sd, ts_profiles_ID_mean_long, ts_profiles_ID_mean)
+rm(tm_profiles_ID_sd_long, tm_profiles_ID_sd, tm_profiles_ID_mean_long, tm_profiles_ID_mean)
 
-ts_profiles_ID_long %&gt;% 
+tm_profiles_ID_long %&gt;% 
   ggplot(aes(value, dep, col=ID))+
   geom_point()+
   geom_path()+
@@ -3093,11 +3132,11 @@ ts_profiles_ID_long %&gt;%
 Mean vertical profiles per cruise day across all stations.
 </p>
 </div>
-<pre class="r"><code>all &lt;- ts_profiles_ID_long %&gt;% 
+<pre class="r"><code>all &lt;- tm_profiles_ID_long %&gt;% 
   filter(var %in% c(&quot;CT&quot;, &quot;tem&quot;)) %&gt;% 
   rename(group = ID)
 
-ts_profiles_ID_long %&gt;% 
+tm_profiles_ID_long %&gt;% 
   filter(var %in% c(&quot;CT&quot;, &quot;tem&quot;)) %&gt;% 
   ggplot()+
   geom_path(data=all, aes(value, dep, group=group))+
@@ -3121,30 +3160,33 @@ Mean vertical profiles per cruise day across all stations plotted indivdually. R
 </div>
 <div id="individual-profiles" class="section level2">
 <h2><span class="header-section-number">3.4</span> Individual profiles</h2>
-<p>C<sub>T</sub>, pCO<sub>2</sub>, S, and T profiles were plotted individually <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/ts_profiles_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a> and grouped by ID <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/ts_profiles_ID_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a>. The later gives an idea of the differences between stations at one point in time.</p>
-<pre class="r"><code>pdf(file=here::here(&quot;output/Plots/CT_dynamics&quot;,
-    &quot;ts_profiles_pCO2_tem_sal_CT.pdf&quot;), onefile = TRUE, width = 9, height = 5)
+<p>C<sub>T</sub>, pCO<sub>2</sub>, S, and T profiles were plotted individually <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plotm/CT_dynamics/tm_profiles_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a> and grouped by ID <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plotm/CT_dynamics/tm_profiles_ID_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a>. The later gives an idea of the differences between stations at one point in time.</p>
+<pre class="r"><code>tm_profiles_highres &lt;- tm_profiles_highres %&gt;% 
+  filter(phase == &quot;down&quot;)
 
-for(i_ID in unique(ts_profiles$ID)){
-  for(i_station in unique(ts_profiles$station)){
+pdf(file=here::here(&quot;output/Plots/CT_dynamics&quot;,
+    &quot;tm_profiles_pCO2_tem_sal_CT.pdf&quot;), onefile = TRUE, width = 9, height = 5)
 
-    if (nrow(ts_profiles %&gt;% filter(ID == i_ID, station == i_station)) &gt; 0){
+for(i_ID in unique(tm_profiles$ID)){
+  for(i_station in unique(tm_profiles$station)){
+
+    if (nrow(tm_profiles %&gt;% filter(ID == i_ID, station == i_station)) &gt; 0){
       
       
-      # i_ID      &lt;-      unique(ts_profiles$ID)[1]
-      # i_station &lt;- unique(ts_profiles$station)[1]
+      # i_ID      &lt;-      unique(tm_profiles$ID)[1]
+      # i_station &lt;- unique(tm_profiles$station)[1]
 
       p_pCO2 &lt;- 
-        ts_profiles %&gt;%
+        tm_profiles %&gt;%
         arrange(date_time) %&gt;% 
         filter(ID == i_ID,
                station == i_station) %&gt;%
         ggplot(aes(pCO2, dep, col=&quot;grid_RT&quot;))+
-        geom_point(data = ts_profiles_highres %&gt;% arrange(date_time) %&gt;% filter(ID == i_ID, station == i_station),
-                   aes(pCO2_raw, dep, col=&quot;raw&quot;))+
-        geom_point(data = ts_profiles_highres %&gt;% arrange(date_time) %&gt;% filter(ID == i_ID, station == i_station),
+        geom_point(data = tm_profiles_highres %&gt;% arrange(date_time) %&gt;% filter(ID == i_ID, station == i_station),
+                   aes(pCO2_corr, dep, col=&quot;raw&quot;))+
+        geom_point(data = tm_profiles_highres %&gt;% arrange(date_time) %&gt;% filter(ID == i_ID, station == i_station),
                    aes(pCO2, dep, col=&quot;raw_RT&quot;))+
-        geom_point(aes(pCO2_raw, dep, col=&quot;grid&quot;))+
+        geom_point(aes(pCO2_corr, dep, col=&quot;grid&quot;))+
         geom_point()+
         geom_path()+
         scale_y_reverse()+
@@ -3155,7 +3197,7 @@ for(i_ID in unique(ts_profiles$ID)){
         theme(legend.position = &quot;left&quot;)
       
       p_tem &lt;- 
-        ts_profiles %&gt;%
+        tm_profiles %&gt;%
         arrange(date_time) %&gt;% 
         filter(ID == i_ID,
                station == i_station) %&gt;%
@@ -3168,7 +3210,7 @@ for(i_ID in unique(ts_profiles$ID)){
         theme_bw()
       
       p_sal &lt;- 
-        ts_profiles %&gt;%
+        tm_profiles %&gt;%
         arrange(date_time) %&gt;% 
         filter(ID == i_ID,
                station == i_station) %&gt;%
@@ -3181,7 +3223,7 @@ for(i_ID in unique(ts_profiles$ID)){
         theme_bw()
       
       p_CT &lt;- 
-        ts_profiles %&gt;%
+        tm_profiles %&gt;%
         arrange(date_time) %&gt;% 
         filter(ID == i_ID,
                station == i_station) %&gt;%
@@ -3207,28 +3249,28 @@ for(i_ID in unique(ts_profiles$ID)){
 
 dev.off()
 
-rm(i_ID, i_station, ts_profiles_highres)</code></pre>
-<pre class="r"><code>ts_profiles_long &lt;- ts_profiles %&gt;%
-  select(-c(lat, lon, pCO2_raw)) %&gt;% 
+rm(i_ID, i_station, tm_profiles_highres)</code></pre>
+<pre class="r"><code>tm_profiles_long &lt;- tm_profiles %&gt;%
+  select(-c(lat, lon, pCO2_corr)) %&gt;% 
   pivot_longer(sal:CT, values_to = &quot;value&quot;, names_to = &quot;var&quot;)
 
 
 pdf(file=here::here(&quot;output/Plots/CT_dynamics&quot;,
-    &quot;ts_profiles_ID_pCO2_tem_sal_CT.pdf&quot;), onefile = TRUE, width = 9, height = 5)
+    &quot;tm_profiles_ID_pCO2_tem_sal_CT.pdf&quot;), onefile = TRUE, width = 9, height = 5)
 
-for(i_ID in unique(ts_profiles$ID)){
+for(i_ID in unique(tm_profiles$ID)){
 
-  #i_ID &lt;- unique(ts_profiles$ID)[1]
+  #i_ID &lt;- unique(tm_profiles$ID)[1]
   
-  sub_ts_profiles_long &lt;- ts_profiles_long %&gt;% 
+  sub_tm_profiles_long &lt;- tm_profiles_long %&gt;% 
         arrange(date_time) %&gt;% 
         filter(ID == i_ID)
  
   print(
   
-  sub_ts_profiles_long %&gt;% 
+  sub_tm_profiles_long %&gt;% 
     ggplot()+
-    geom_path(data = ts_profiles_long, aes(value, dep, group=interaction(station, ID)), col=&quot;grey&quot;)+
+    geom_path(data = tm_profiles_long, aes(value, dep, group=interaction(station, ID)), col=&quot;grey&quot;)+
     geom_path(aes(value, dep, col=station))+
     scale_y_reverse()+
     labs(y=&quot;Depth [m]&quot;, title = str_c(&quot;ID: &quot;, i_ID))+
@@ -3236,17 +3278,17 @@ for(i_ID in unique(ts_profiles$ID)){
     facet_wrap(~var, scales = &quot;free_x&quot;)
    
   )  
-  rm(sub_ts_profiles_long)
+  rm(sub_tm_profiles_long)
 }
 
 dev.off()
 
-rm(i_ID, ts_profiles_long)</code></pre>
+rm(i_ID, tm_profiles_long)</code></pre>
 </div>
 <div id="profiles-of-incremental-changes" class="section level2">
 <h2><span class="header-section-number">3.5</span> Profiles of incremental changes</h2>
 <p>Changes of seawater vars at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.</p>
-<pre class="r"><code>ts_profiles_ID_long &lt;- ts_profiles_ID_long %&gt;%
+<pre class="r"><code>tm_profiles_ID_long &lt;- tm_profiles_ID_long %&gt;%
     group_by(var, dep) %&gt;%
     arrange(date_time_ID) %&gt;%
     mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
@@ -3257,7 +3299,7 @@ rm(i_ID, ts_profiles_long)</code></pre>
   ungroup()
 
 
-ts_profiles_ID_long %&gt;% 
+tm_profiles_ID_long %&gt;% 
   arrange(dep) %&gt;% 
   ggplot(aes(value_diff_daily, dep, col=ID))+
   geom_vline(xintercept = 0)+
@@ -3272,7 +3314,7 @@ ts_profiles_ID_long %&gt;%
 <div id="profiles-of-cumulative-changes" class="section level2">
 <h2><span class="header-section-number">3.6</span> Profiles of cumulative changes</h2>
 <p>Cumulative changes of seawater vars were calculated at each depth relative to the first cruise day on July 5.</p>
-<pre class="r"><code>ts_profiles_ID_long %&gt;% 
+<pre class="r"><code>tm_profiles_ID_long %&gt;% 
   arrange(dep) %&gt;% 
   ggplot(aes(value_cum, dep, col=ID))+
   geom_vline(xintercept = 0)+
@@ -3288,14 +3330,14 @@ ts_profiles_ID_long %&gt;%
 <li>Salinity in the upper 10m decreases by &gt;0.1 on June 30, and returns to average conditions already on Aug 02.</li>
 </ul>
 <p>Cumulative positive and negative changes of seawater vars were calculated separately at each depth relative to the first cruise day on July 5.</p>
-<pre class="r"><code>ts_profiles_ID_long &lt;- ts_profiles_ID_long %&gt;% 
+<pre class="r"><code>tm_profiles_ID_long &lt;- tm_profiles_ID_long %&gt;% 
   mutate(sign = if_else(value_diff &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;% 
   group_by(var, dep, sign) %&gt;%
   arrange(date_time_ID) %&gt;%
   mutate(value_cum_sign = cumsum(value_diff)) %&gt;% 
   ungroup()
 
-ts_profiles_ID_long %&gt;% 
+tm_profiles_ID_long %&gt;% 
   arrange(dep) %&gt;% 
   ggplot(aes(value_cum_sign, dep, col=ID))+
   geom_vline(xintercept = 0)+
@@ -3307,8 +3349,8 @@ ts_profiles_ID_long %&gt;%
   facet_wrap(~interaction(sign, var), scales = &quot;free_x&quot;, ncol=4)+
   labs(x=&quot;Cumulative directional change of value&quot;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/cumulative_directional_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>ts_profiles_ID_long %&gt;%
-  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum.csv&quot;))</code></pre>
+<pre class="r"><code>tm_profiles_ID_long %&gt;%
+  write_csv(here::here(&quot;Data/_merged_data_files/CT_dynamics&quot;, &quot;tm_profiles_ID_long_cum.csv&quot;))</code></pre>
 </div>
 </div>
 <div id="timeseries" class="section level1">
@@ -3316,12 +3358,12 @@ ts_profiles_ID_long %&gt;%
 <div id="timeseries-depth-intervals" class="section level2">
 <h2><span class="header-section-number">4.1</span> Timeseries depth intervals</h2>
 <p>Mean seawater parameters were calculated for 5m depth intervals.</p>
-<pre class="r"><code>ts_profiles_ID_long_grid &lt;- ts_profiles_ID_long %&gt;% 
+<pre class="r"><code>tm_profiles_ID_long_grid &lt;- tm_profiles_ID_long %&gt;% 
   mutate(dep = cut(dep, seq(0,30,5))) %&gt;% 
   group_by(ID, date_time_ID, dep, var)  %&gt;% 
   summarise_all(list(mean), na.rm=TRUE) 
 
-ts_profiles_ID_long_grid %&gt;% 
+tm_profiles_ID_long_grid %&gt;% 
   ggplot(aes(date_time_ID, value, col=as.factor(dep)))+
   geom_path()+
   #geom_errorbar(aes(date_time_ID, ymax=value+sd, ymin=value-sd, col=as.factor(dep)))+
@@ -3329,15 +3371,15 @@ ts_profiles_ID_long_grid %&gt;%
   scale_color_viridis_d(name=&quot;Depth [m]&quot;)+
   facet_wrap(~var, scales = &quot;free_y&quot;, ncol=1)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/observed_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>rm(ts_profiles_ID_long_grid)</code></pre>
+<pre class="r"><code>rm(tm_profiles_ID_long_grid)</code></pre>
 </div>
-<div id="hovmoeller-plots" class="section level2">
-<h2><span class="header-section-number">4.2</span> Hovmoeller plots</h2>
+<div id="hovmoeller-plotm" class="section level2">
+<h2><span class="header-section-number">4.2</span> Hovmoeller plotm</h2>
 <div id="absolute-values" class="section level3">
 <h3><span class="header-section-number">4.2.1</span> Absolute values</h3>
 <pre class="r"><code>bin_CT &lt;- 30
 
-p_CT_hov &lt;- ts_profiles_ID_long %&gt;% 
+p_CT_hov &lt;- tm_profiles_ID_long %&gt;% 
   filter(var == &quot;CT&quot;) %&gt;% 
   ggplot()+
   geom_contour_fill(aes(x=date_time_ID, y=dep, z=value),
@@ -3357,7 +3399,7 @@ p_CT_hov &lt;- ts_profiles_ID_long %&gt;%
 
 bin_Tem &lt;- 2
 
-p_tem_hov &lt;- ts_profiles_ID_long %&gt;% 
+p_tem_hov &lt;- tm_profiles_ID_long %&gt;% 
   filter(var == &quot;tem&quot;) %&gt;% 
   ggplot()+
   geom_contour_fill(aes(x=date_time_ID, y=dep, z=value),
@@ -3376,9 +3418,9 @@ p_tem_hov &lt;- ts_profiles_ID_long %&gt;%
 
 p_CT_hov / p_tem_hov</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/CT_dynamics.Rmd/plot_hovmoeller_absolut-1.png" alt="Hovmoeller plots of absolute changes in C~T~ and temperature." width="672" />
+<img src="figure/CT_dynamics.Rmd/plot_hovmoeller_absolut-1.png" alt="Hovmoeller plotm of absolute changes in C~T~ and temperature." width="672" />
 <p class="caption">
-Hovmoeller plots of absolute changes in C<sub>T</sub> and temperature.
+Hovmoeller plotm of absolute changes in C<sub>T</sub> and temperature.
 </p>
 </div>
 <pre class="r"><code>rm(p_CT_hov, bin_CT, p_tem_hov, bin_Tem)</code></pre>
@@ -3387,7 +3429,7 @@ Hovmoeller plots of absolute changes in C<sub>T</sub> and temperature.
 <h3><span class="header-section-number">4.2.2</span> Incremental changes</h3>
 <pre class="r"><code>bin_CT &lt;- 2.5
 
-CT_hov &lt;- ts_profiles_ID_long %&gt;% 
+CT_hov &lt;- tm_profiles_ID_long %&gt;% 
   filter(var == &quot;CT&quot;) %&gt;% 
   ggplot()+
   geom_contour_fill(aes(x=date_time_ID_ref, y=dep, z=value_diff_daily),
@@ -3406,7 +3448,7 @@ CT_hov &lt;- ts_profiles_ID_long %&gt;%
 
 bin_Tem &lt;- 0.1
 
-Tem_hov &lt;- ts_profiles_ID_long %&gt;% 
+Tem_hov &lt;- tm_profiles_ID_long %&gt;% 
   filter(var == &quot;tem&quot;) %&gt;% 
   ggplot()+
   geom_contour_fill(aes(x=date_time_ID_ref, y=dep, z=value_diff_daily),
@@ -3423,9 +3465,9 @@ Tem_hov &lt;- ts_profiles_ID_long %&gt;%
 
 CT_hov / Tem_hov</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/CT_dynamics.Rmd/plot_hovmoeller_daily-1.png" alt="Hovmoeller plots of daily changes in C~T~ and temperature. Note that calculated  value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period." width="672" />
+<img src="figure/CT_dynamics.Rmd/plot_hovmoeller_daily-1.png" alt="Hovmoeller plotm of daily changes in C~T~ and temperature. Note that calculated  value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period." width="672" />
 <p class="caption">
-Hovmoeller plots of daily changes in C<sub>T</sub> and temperature. Note that calculated value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period.
+Hovmoeller plotm of daily changes in C<sub>T</sub> and temperature. Note that calculated value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period.
 </p>
 </div>
 <pre class="r"><code>rm(CT_hov, bin_CT, Tem_hov, bin_Tem)</code></pre>
@@ -3434,7 +3476,7 @@ Hovmoeller plots of daily changes in C<sub>T</sub> and temperature. Note that ca
 <h3><span class="header-section-number">4.2.3</span> Cumulative changes</h3>
 <pre class="r"><code>bin_CT &lt;- 20
 
-CT_hov &lt;- ts_profiles_ID_long %&gt;% 
+CT_hov &lt;- tm_profiles_ID_long %&gt;% 
   filter(var == &quot;CT&quot;) %&gt;% 
   ggplot()+
   geom_contour_fill(aes(x=date_time_ID, y=dep, z=value_cum),
@@ -3453,7 +3495,7 @@ CT_hov &lt;- ts_profiles_ID_long %&gt;%
 
 bin_Tem &lt;- 2
 
-Tem_hov &lt;- ts_profiles_ID_long %&gt;% 
+Tem_hov &lt;- tm_profiles_ID_long %&gt;% 
   filter(var == &quot;tem&quot;) %&gt;% 
   ggplot()+
   geom_contour_fill(aes(x=date_time_ID, y=dep, z=value_cum),
@@ -3470,9 +3512,9 @@ Tem_hov &lt;- ts_profiles_ID_long %&gt;%
 
 CT_hov / Tem_hov</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/CT_dynamics.Rmd/plot_hovmoeller_cumulative-1.png" alt="Hovmoeller plots of cumulative changes in C~T~ and temperature." width="672" />
+<img src="figure/CT_dynamics.Rmd/plot_hovmoeller_cumulative-1.png" alt="Hovmoeller plotm of cumulative changes in C~T~ and temperature." width="672" />
 <p class="caption">
-Hovmoeller plots of cumulative changes in C<sub>T</sub> and temperature.
+Hovmoeller plotm of cumulative changes in C<sub>T</sub> and temperature.
 </p>
 </div>
 <pre class="r"><code>rm(CT_hov, bin_CT, Tem_hov, bin_Tem)</code></pre>
@@ -3489,13 +3531,13 @@ Hovmoeller plots of cumulative changes in C<sub>T</sub> and temperature.
 <p>Both aproaches deliver depth-integrated, incremental changes of C<sub>T</sub> inbetween cruise dates. Those were summed up to derive a trajectory of cummulative iC<sub>T</sub> changes.</p>
 <div id="fixed-depths-approach" class="section level2">
 <h2><span class="header-section-number">5.1</span> Fixed depths approach</h2>
-<p>Incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were integrated across the water colums down to predefined depth limits. This was done separately for observed positive/negative changes in C<sub>T</sub>, as well as for the total observed changes.</p>
-<pre class="r"><code>iCT_grid_sign &lt;- ts_profiles_ID_long %&gt;% 
+<p>Incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were integrated across the water colums down to predefined depth limitm. This was done separately for observed positive/negative changes in C<sub>T</sub>, as well as for the total observed changes.</p>
+<pre class="r"><code>iCT_grid_sign &lt;- tm_profiles_ID_long %&gt;% 
   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
   unique() %&gt;% 
   expand_grid(sign = c(&quot;pos&quot;, &quot;neg&quot;))
 
-iCT_grid_total &lt;- ts_profiles_ID_long %&gt;% 
+iCT_grid_total &lt;- tm_profiles_ID_long %&gt;% 
   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
   unique() %&gt;% 
   expand_grid(sign = c(&quot;total&quot;))
@@ -3506,7 +3548,7 @@ iCT_grid_total &lt;- ts_profiles_ID_long %&gt;%
 for (dep_i in seq(9,13,1)) {
 
 
-iCT_sign_temp &lt;- ts_profiles_ID_long %&gt;% 
+iCT_sign_temp &lt;- tm_profiles_ID_long %&gt;% 
   filter(var == &quot;CT&quot;, dep &lt; dep_i) %&gt;% 
   mutate(sign = if_else(ID == &quot;180705&quot; &amp; dep == 0.5, &quot;neg&quot;, sign)) %&gt;% 
   group_by(ID, date_time_ID, date_time_ID_ref, sign) %&gt;% 
@@ -3524,7 +3566,7 @@ iCT_sign_temp &lt;- full_join(iCT_sign_temp, iCT_grid_sign) %&gt;%
   fill(CT_i_cum)
 
 
-iCT_total_temp &lt;- ts_profiles_ID_long %&gt;% 
+iCT_total_temp &lt;- tm_profiles_ID_long %&gt;% 
   filter(var == &quot;CT&quot;, dep &lt; dep_i) %&gt;% 
   group_by(ID, date_time_ID, date_time_ID_ref) %&gt;% 
   summarise(CT_i_diff = sum(value_diff)/1000) %&gt;% 
@@ -3572,7 +3614,7 @@ iCT %&gt;%
 <pre class="r"><code>iCT_fixed_dep &lt;- iCT
 rm(iCT, dep_i)
 # iCT %&gt;%
-#   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;iCT_dep_limits.csv&quot;))</code></pre>
+#   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;iCT_dep_limitm.csv&quot;))</code></pre>
 </div>
 <div id="mld-approach" class="section level2">
 <h2><span class="header-section-number">5.2</span> MLD approach</h2>
@@ -3580,39 +3622,39 @@ rm(iCT, dep_i)
 <div id="density-calculation" class="section level3">
 <h3><span class="header-section-number">5.2.1</span> Density Calculation</h3>
 <p>Seawater density Rho was determined from S, T, and p according to TEOS-10.</p>
-<pre class="r"><code>ts_profiles &lt;- ts_profiles %&gt;% 
+<pre class="r"><code>tm_profiles &lt;- tm_profiles %&gt;% 
   mutate(rho = swSigma(salinity = sal, temperature = tem, pressure = dep/10))</code></pre>
 </div>
 <div id="density-profiles" class="section level3">
 <h3><span class="header-section-number">5.2.2</span> Density profiles</h3>
-<pre class="r"><code>ts_profiles_ID_mean_hydro &lt;- ts_profiles %&gt;% 
-  select(-c(station,lat, lon, pCO2_raw, pCO2, CT, date_time)) %&gt;% 
+<pre class="r"><code>tm_profiles_ID_mean_hydro &lt;- tm_profiles %&gt;% 
+  select(-c(station,lat, lon, pCO2_corr, pCO2, CT, date_time)) %&gt;% 
   group_by(ID, date_time_ID, date_ID, dep) %&gt;% 
   summarise_all(list(mean), na.rm=TRUE) %&gt;% 
   ungroup()
 
-ts_profiles_ID_sd_hydro &lt;- ts_profiles %&gt;% 
-  select(-c(station,lat, lon, pCO2_raw, pCO2, CT, date_time)) %&gt;% 
+tm_profiles_ID_sd_hydro &lt;- tm_profiles %&gt;% 
+  select(-c(station,lat, lon, pCO2_corr, pCO2, CT, date_time)) %&gt;% 
   group_by(ID, date_time_ID, date_ID, dep) %&gt;% 
   summarise_all(list(sd), na.rm=TRUE) %&gt;% 
   ungroup()
 
 
-ts_profiles_ID_sd_hydro_long &lt;- ts_profiles_ID_sd_hydro %&gt;% 
+tm_profiles_ID_sd_hydro_long &lt;- tm_profiles_ID_sd_hydro %&gt;% 
   pivot_longer(sal:rho, names_to = &quot;var&quot;, values_to = &quot;sd&quot;)
   
-ts_profiles_ID_mean_hydro_long &lt;- ts_profiles_ID_mean_hydro %&gt;% 
+tm_profiles_ID_mean_hydro_long &lt;- tm_profiles_ID_mean_hydro %&gt;% 
   pivot_longer(sal:rho, names_to = &quot;var&quot;, values_to = &quot;value&quot;)
   
-ts_profiles_ID_hydro_long &lt;- inner_join(ts_profiles_ID_mean_hydro_long, ts_profiles_ID_sd_hydro_long)
-ts_profiles_ID_hydro &lt;- ts_profiles_ID_mean_hydro
+tm_profiles_ID_hydro_long &lt;- inner_join(tm_profiles_ID_mean_hydro_long, tm_profiles_ID_sd_hydro_long)
+tm_profiles_ID_hydro &lt;- tm_profiles_ID_mean_hydro
 
-rm(ts_profiles_ID_mean_hydro_long,
-   ts_profiles_ID_mean_hydro,
-   ts_profiles_ID_sd_hydro_long,
-   ts_profiles_ID_sd_hydro)
+rm(tm_profiles_ID_mean_hydro_long,
+   tm_profiles_ID_mean_hydro,
+   tm_profiles_ID_sd_hydro_long,
+   tm_profiles_ID_sd_hydro)
 
-ts_profiles_ID_hydro_long %&gt;% 
+tm_profiles_ID_hydro_long %&gt;% 
   ggplot(aes(value, dep, col=ID))+
   geom_point()+
   geom_path()+
@@ -3631,9 +3673,9 @@ Mean vertical profiles per cruise day across all stations.
 <p>Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria</p>
 <pre class="r"><code># density criterion
 
-ts_profiles_ID_hydro &lt;- expand_grid(ts_profiles_ID_hydro, rho_lim = c(0.1,0.2,0.5))
+tm_profiles_ID_hydro &lt;- expand_grid(tm_profiles_ID_hydro, rho_lim = c(0.1,0.2,0.5))
 
-MLD &lt;- ts_profiles_ID_hydro  %&gt;% 
+MLD &lt;- tm_profiles_ID_hydro  %&gt;% 
   arrange(dep) %&gt;% 
   group_by(ID, date_time_ID, rho_lim) %&gt;% 
   mutate(d_rho = rho - first(rho)) %&gt;% 
@@ -3643,10 +3685,10 @@ MLD &lt;- ts_profiles_ID_hydro  %&gt;%
 </div>
 <div id="daily-density-profiles" class="section level3">
 <h3><span class="header-section-number">5.2.4</span> Daily density profiles</h3>
-<pre class="r"><code>ts_profiles_ID_hydro &lt;- 
-  full_join(ts_profiles_ID_hydro, MLD)
+<pre class="r"><code>tm_profiles_ID_hydro &lt;- 
+  full_join(tm_profiles_ID_hydro, MLD)
 
-ts_profiles_ID_hydro %&gt;% 
+tm_profiles_ID_hydro %&gt;% 
   arrange(dep) %&gt;% 
   ggplot(aes(rho, dep))+
   geom_hline(aes(yintercept = MLD, col=as.factor(rho_lim)))+
@@ -3676,24 +3718,24 @@ Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizonta
 </div>
 <div id="ict-calculation" class="section level3">
 <h3><span class="header-section-number">5.2.6</span> iCT calculation</h3>
-<pre class="r"><code># iCT_grid_sign &lt;- ts_profiles_ID_long %&gt;% 
+<pre class="r"><code># iCT_grid_sign &lt;- tm_profiles_ID_long %&gt;% 
 #   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
 #   unique() %&gt;% 
 #   expand_grid(sign = c(&quot;pos&quot;, &quot;neg&quot;))
 # 
-# iCT_grid_total &lt;- ts_profiles_ID_long %&gt;% 
+# iCT_grid_total &lt;- tm_profiles_ID_long %&gt;% 
 #   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
 #   unique() %&gt;% 
 #   expand_grid(sign = c(&quot;total&quot;))
 
 
-iCT &lt;- ts_profiles_ID_long %&gt;% 
+iCT &lt;- tm_profiles_ID_long %&gt;% 
   filter(var == &quot;CT&quot;)
 
 iCT &lt;- full_join(iCT, MLD)
 
-iCT %&gt;%
-    write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_profiles_ID_long_cum_MLD.csv&quot;))
+# iCT %&gt;%
+#     write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;tm_profiles_ID_long_cum_MLD.csv&quot;))
 
 iCT &lt;- iCT %&gt;% 
   filter(dep &lt;= MLD)
@@ -3732,7 +3774,7 @@ iCT %&gt;%
 rm(iCT, MLD)
 
 # iCT %&gt;%
-#   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;iCT_dep_limits.csv&quot;))</code></pre>
+#   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;iCT_dep_limitm.csv&quot;))</code></pre>
 </div>
 </div>
 <div id="comparison-of-approaches" class="section level2">
@@ -3784,11 +3826,11 @@ iCT %&gt;%
 <li>Deeper (fixed() layers were affected by iC<sub>T</sub> changes</li>
 <li>MLD were too shallow to cover all observed negative C<sub>T</sub> changes</li>
 </ul>
-<pre class="r"><code>ts_profiles_ID_long_180723 &lt;- ts_profiles_ID_long %&gt;% 
+<pre class="r"><code>tm_profiles_ID_long_180723 &lt;- tm_profiles_ID_long %&gt;% 
   filter(ID == 180723,
          var == &quot;CT&quot;)
 
-p_ts_profiles_ID_long &lt;- ts_profiles_ID_long_180723 %&gt;% 
+p_tm_profiles_ID_long &lt;- tm_profiles_ID_long_180723 %&gt;% 
   arrange(dep) %&gt;% 
   ggplot(aes(value_cum, dep))+
   geom_vline(xintercept = 0)+
@@ -3799,7 +3841,7 @@ p_ts_profiles_ID_long &lt;- ts_profiles_ID_long_180723 %&gt;%
   labs(x=&quot;Cumulative change of CT on July 23 (180723)&quot;)+
   theme(legend.position = &quot;left&quot;)
 
-ts_profiles_ID_long_180723_dep &lt;- ts_profiles_ID_long_180723 %&gt;% 
+tm_profiles_ID_long_180723_dep &lt;- tm_profiles_ID_long_180723 %&gt;% 
   select(dep, value_cum) %&gt;% 
   filter(value_cum &lt; 0) %&gt;%
   arrange(dep) %&gt;% 
@@ -3807,7 +3849,7 @@ ts_profiles_ID_long_180723_dep &lt;- ts_profiles_ID_long_180723 %&gt;%
          value_cum_dep = cumsum(value_cum),
          value_cum_i_rel = value_cum_dep/value_cum_i*100)
 
-p_ts_profiles_ID_long_rel &lt;- ts_profiles_ID_long_180723_dep %&gt;% 
+p_tm_profiles_ID_long_rel &lt;- tm_profiles_ID_long_180723_dep %&gt;% 
   ggplot(aes(value_cum_i_rel, dep))+
   geom_hline(yintercept = 12, col=&quot;red&quot;)+
   geom_vline(xintercept = 90)+
@@ -3818,17 +3860,17 @@ p_ts_profiles_ID_long_rel &lt;- ts_profiles_ID_long_180723_dep %&gt;%
   labs(y = &quot;Depth (m)&quot;, x = &quot;Relative contribution on July 23&quot;)+
   theme_bw()
 
-p_ts_profiles_ID_long + p_ts_profiles_ID_long_rel</code></pre>
+p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/iCT_depth_distribution_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>rm(ts_profiles_ID_long_180723,
-   ts_profiles_ID_long_180723_dep,
-   p_ts_profiles_ID_long,
-   p_ts_profiles_ID_long_rel)</code></pre>
-<pre class="r"><code>ts_profiles_ID_long_180723 &lt;- ts_profiles_ID_long %&gt;% 
+<pre class="r"><code>rm(tm_profiles_ID_long_180723,
+   tm_profiles_ID_long_180723_dep,
+   p_tm_profiles_ID_long,
+   p_tm_profiles_ID_long_rel)</code></pre>
+<pre class="r"><code>tm_profiles_ID_long_180723 &lt;- tm_profiles_ID_long %&gt;% 
   filter(ID == 180723,
          var == &quot;tem&quot;)
 
-p_ts_profiles_ID_long &lt;- ts_profiles_ID_long_180723 %&gt;% 
+p_tm_profiles_ID_long &lt;- tm_profiles_ID_long_180723 %&gt;% 
   arrange(dep) %&gt;% 
   ggplot(aes(value_cum, dep))+
   geom_vline(xintercept = 0)+
@@ -3839,7 +3881,7 @@ p_ts_profiles_ID_long &lt;- ts_profiles_ID_long_180723 %&gt;%
   labs(x=&quot;Cumulative change of Temp on July 23&quot;)+
   theme(legend.position = &quot;left&quot;)
 
-ts_profiles_ID_long_180723_dep &lt;- ts_profiles_ID_long_180723 %&gt;% 
+tm_profiles_ID_long_180723_dep &lt;- tm_profiles_ID_long_180723 %&gt;% 
   select(dep, value_cum) %&gt;% 
   filter(value_cum &gt; 0) %&gt;%
   arrange(dep) %&gt;% 
@@ -3847,7 +3889,7 @@ ts_profiles_ID_long_180723_dep &lt;- ts_profiles_ID_long_180723 %&gt;%
          value_cum_dep = cumsum(value_cum),
          value_cum_i_rel = value_cum_dep/value_cum_i*100)
 
-p_ts_profiles_ID_long_rel &lt;- ts_profiles_ID_long_180723_dep %&gt;% 
+p_tm_profiles_ID_long_rel &lt;- tm_profiles_ID_long_180723_dep %&gt;% 
   ggplot(aes(value_cum_i_rel, dep))+
   geom_hline(yintercept = 12, col=&quot;red&quot;)+
   geom_vline(xintercept = 90)+
@@ -3858,29 +3900,30 @@ p_ts_profiles_ID_long_rel &lt;- ts_profiles_ID_long_180723_dep %&gt;%
   labs(y = &quot;Depth (m)&quot;, x = &quot;Relative contribution on July 23&quot;)+
   theme_bw()
 
-p_ts_profiles_ID_long + p_ts_profiles_ID_long_rel</code></pre>
+p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/iCT_tem_distribution_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>rm(ts_profiles_ID_long_180723,
-   ts_profiles_ID_long_180723_dep,
-   p_ts_profiles_ID_long,
-   p_ts_profiles_ID_long_rel)</code></pre>
+<pre class="r"><code>rm(tm_profiles_ID_long_180723,
+   tm_profiles_ID_long_180723_dep,
+   p_tm_profiles_ID_long,
+   p_tm_profiles_ID_long_rel)</code></pre>
 </div>
 <div id="air-sea-co2-flux" class="section level2">
 <h2><span class="header-section-number">6.2</span> Air-Sea CO<sub>2</sub> flux</h2>
 <div id="surface-water-data" class="section level3">
 <h3><span class="header-section-number">6.2.1</span> Surface water data</h3>
 <p>The cruise mean pCO<sub>2</sub> recorded in profiling-mode (stations only) and depths &lt; 6m was used for gas exchange calcualtions.</p>
-<pre class="r"><code>ts_profiles_surface_long &lt;- ts_profiles %&gt;% 
-  filter(dep &lt; 6) %&gt;% 
+<pre class="r"><code>dep_lim &lt;- 6</code></pre>
+<pre class="r"><code>tm_profiles_surface_long &lt;- tm_profiles %&gt;% 
+  filter(dep &lt; dep_lim) %&gt;% 
   select(date_time = date_time_ID, ID, tem, pCO2_water = pCO2, CT) %&gt;% 
   pivot_longer(tem:CT, values_to = &quot;value&quot;, names_to = &quot;var&quot;)
 
-ts_profiles_surface_long_ID &lt;- ts_profiles_surface_long %&gt;% 
+tm_profiles_surface_long_ID &lt;- tm_profiles_surface_long %&gt;% 
   group_by(ID, date_time, var) %&gt;% 
   summarise_all(list(~mean(.), ~sd(.), ~min(.), ~max(.))) %&gt;% 
   ungroup()
 
-p_pCO2_surf &lt;- ts_profiles_surface_long_ID %&gt;%
+p_pCO2_surf &lt;- tm_profiles_surface_long_ID %&gt;%
   filter(var == &quot;pCO2_water&quot;) %&gt;% 
   ggplot(aes(x=date_time))+
   geom_ribbon(aes(ymin=mean-sd, ymax=mean+sd), alpha=0.2)+
@@ -3889,12 +3932,12 @@ p_pCO2_surf &lt;- ts_profiles_surface_long_ID %&gt;%
   scale_fill_discrete(guide=FALSE)+
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis())+
-  labs(y = expression(atop(pCO[2],
-                           (mu*atm))))+
+  labs(y = expression(atop(pCO[2], (mu*atm))),
+       title = &quot;Surface water observations&quot;)+
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())
 
-p_tem_surf &lt;- ts_profiles_surface_long_ID %&gt;%
+p_tem_surf &lt;- tm_profiles_surface_long_ID %&gt;%
   filter(var == &quot;tem&quot;) %&gt;% 
   ggplot(aes(x=date_time))+
   geom_ribbon(aes(ymin=mean-sd, ymax=mean+sd), alpha=0.2)+
@@ -3903,12 +3946,12 @@ p_tem_surf &lt;- ts_profiles_surface_long_ID %&gt;%
   scale_fill_discrete(guide=FALSE)+
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis())+
-  labs(y = &quot;temperature \n (\u00B0C)&quot;)+
+  labs(y = &quot;temp \n (\u00B0C)&quot;)+
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())
 
 p_CT_surf &lt;-
-ts_profiles_surface_long_ID %&gt;%
+tm_profiles_surface_long_ID %&gt;%
   filter(var == &quot;CT&quot;) %&gt;% 
   ggplot()+
   geom_ribbon(aes(x=date_time, ymin=mean-sd, ymax=mean+sd), alpha=0.2)+
@@ -3933,85 +3976,79 @@ ts_profiles_surface_long_ID %&gt;%
 p_pCO2_surf + p_tem_surf + p_CT_surf + 
   plot_layout(ncol = 1)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/read_Tina-V_Sensor_data-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>#rm(ts_profiles_surface)
+<pre class="r"><code>#rm(tm_profiles_surface)
 
-start &lt;- min(ts_profiles_surface_long_ID$date_time)
-end   &lt;- max(ts_profiles_surface_long_ID$date_time)</code></pre>
+start &lt;- min(tm_profiles_surface_long_ID$date_time)
+end   &lt;- max(tm_profiles_surface_long_ID$date_time)</code></pre>
 </div>
 <div id="wind-and-atm.-pco2" class="section level3">
 <h3><span class="header-section-number">6.2.2</span> Wind and atm. pCO<sub>2</sub></h3>
 <p>Metrological data were recorded on the flux tower located on Ostergarnsholm island.</p>
-<pre class="r"><code>og &lt;- read_delim(here::here(&quot;Data/Ostergarnsholm/Tower&quot;, &quot;Oes_Jens_atm_water_June_to_August_2018.csv&quot;),
-                 delim = &quot;;&quot;               )
+<pre class="r"><code>og &lt;- read_csv(here::here(&quot;data/_summarized_data_files&quot;,
+                          &quot;og.csv&quot;))
 
 og &lt;- og %&gt;%
-  mutate(date_time = ymd_hms( paste(paste(year, month, day, sep = &quot;/&quot;),
-                                          paste(hour, min, sec, sep = &quot;:&quot;)))) %&gt;% 
-  select(&quot;date_time&quot;,
-         &quot;CO2 12m [ppm]&quot;,
-         &quot;w_c [ppm m/s]&quot;,
-         &quot;WS 12m [m/s]&quot;,
-         &quot;WD 12m [degrees]&quot;,
-         &quot;T 12m [degrees C]&quot;,
-         &quot;RIS [W/m^2]&quot;
-         ) %&gt;% 
   filter(date_time &gt; start,
          date_time &lt; end)
 
-rm(end, start)
-
-og &lt;- og %&gt;% 
-  select(date_time, pCO2_atm = &quot;CO2 12m [ppm]&quot;, wind = &quot;WS 12m [m/s]&quot;)</code></pre>
+rm(end, start)</code></pre>
 </div>
 <div id="time-series-plots" class="section level3">
 <h3><span class="header-section-number">6.2.3</span> Time series plots</h3>
-<p>Data sets for atmospheric and seawater observations were merged and interpolated to a common time stamp.</p>
-<pre class="r"><code>ts_profiles_surface_ID &lt;- ts_profiles_surface_long_ID %&gt;% 
+<p>Data setm for atmospheric and seawater observations were merged and interpolated to a common time stamp.</p>
+<pre class="r"><code>tm_profiles_surface_ID &lt;- tm_profiles_surface_long_ID %&gt;% 
   filter(var %in% c(&quot;pCO2_water&quot;, &quot;tem&quot;)) %&gt;% 
   select(date_time:mean) %&gt;% 
   pivot_wider(names_from = &quot;var&quot;, values_from = &quot;mean&quot;)
 
-ts_og &lt;- full_join(og, ts_profiles_surface_ID) %&gt;% 
+tm_og &lt;- full_join(og, tm_profiles_surface_ID) %&gt;% 
   arrange(date_time)
 
-ts_og &lt;- ts_og %&gt;% 
-  mutate(pCO2_water = na.approx(pCO2_water, rule = 2),
-         tem = na.approx(tem, rule = 2),
-         wind = na.approx(wind, rule = 2)) %&gt;% 
+tm_og &lt;- tm_og %&gt;% 
+  mutate(pCO2_water = approxfun(date_time, pCO2_water)(date_time),
+         tem = approxfun(date_time, tem)(date_time),
+         wind = approxfun(date_time, wind)(date_time)) %&gt;% 
   filter(!is.na(pCO2_atm))
 
-rm(ts_profiles_surface_ID, og)</code></pre>
-<pre class="r"><code>ts_og_long &lt;- ts_og %&gt;% 
-  pivot_longer(&quot;pCO2_atm&quot;:&quot;tem&quot;,
-               names_to = &quot;var&quot;,
-               values_to = &quot;value&quot;)
+rm(tm_profiles_surface_ID, og)</code></pre>
+<pre class="r"><code>rolling_mean   &lt;- rollify(~mean(.x, na.rm = TRUE), window = 48)
 
-p_pCO2_atm &lt;- ts_og_long %&gt;%
-  filter(var == &quot;pCO2_atm&quot;) %&gt;% 
+tm_og &lt;- tm_og %&gt;% 
+  mutate(wind_daily = rolling_mean(wind),
+         pCO2_atm_daily = rolling_mean(pCO2_atm))</code></pre>
+<pre class="r"><code># tm_og_long &lt;- tm_og %&gt;% 
+#   pivot_longer(&quot;pCO2_atm&quot;:&quot;tem&quot;,
+#                names_to = &quot;var&quot;,
+#                values_to = &quot;value&quot;)
+
+p_pCO2_atm &lt;- tm_og %&gt;%
   ggplot(aes(x=date_time))+
-  geom_path(aes(y=value))+
-  scale_fill_discrete(guide=FALSE)+
+  geom_path(aes(y=pCO2_atm))+
+  # geom_path(aes(y=pCO2_atm_daily, col=&quot;24h&quot;))+
+  # scale_color_manual(values = c(&quot;red&quot;, &quot;black&quot;),
+  #                    guide = FALSE)+
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis())+
-  labs(y = expression(atop(pCO[&quot;2,atm&quot;],
-                           (mu*atm))))+
+  labs(y = expression(atop(pCO[&quot;2,atm&quot;], (mu*atm))),
+       title = &quot;Atmospheric observations&quot;)+
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())
 
-p_wind &lt;- ts_og_long %&gt;%
-  filter(var == &quot;wind&quot;) %&gt;% 
+p_wind &lt;- tm_og %&gt;%
   ggplot(aes(x=date_time))+
-  geom_path(aes(y=value))+
-  scale_fill_discrete(guide=FALSE)+
+  geom_path(aes(y=wind))+
+  # geom_path(aes(y=wind_daily, col=&quot;24h&quot;))+
+  # scale_color_brewer(palette = &quot;Set1&quot;)+
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis())+
-  labs(y = expression(atop(windspeed,
-                           (m~s^{-1}))))+
+  labs(y = expression(atop(windspeed, (m~s^{-1}))))+
   theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+        axis.text.x = element_blank(),
+        legend.title = element_blank())
 
 p_pCO2_atm + p_wind +
-  plot_layout(ncol = 1)</code></pre>
+  plot_layout(ncol = 1) + 
+  plot_layout(guides = &#39;collect&#39;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/plot_wind_Ostergarn_tower-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="flux-calculation" class="section level3">
@@ -4020,7 +4057,7 @@ p_pCO2_atm + p_wind +
 <p>with</p>
 <p>dCO2 = K0 * dpCO2 and</p>
 <p>k = coeff * U^2 * (660/Sc)^0.5</p>
-<p>Units used here are:</p>
+<p>Unitm used here are:</p>
 <ul>
 <li><p>dpCO<sub>2</sub>: µatm</p></li>
 <li><p>K0: mol atm-1 kg-1</p></li>
@@ -4037,7 +4074,7 @@ p_pCO2_atm + p_wind +
 
 # Sc_W14(20)
 
-ts_og &lt;- ts_og %&gt;% 
+tm_og &lt;- tm_og %&gt;% 
   mutate(dpCO2 = pCO2_water - pCO2_atm,
          dCO2  = dpCO2 * K0(S=6.92, T=tem),
          # W92 = gas_transfer(t = tem, u10 = wind, species = &quot;CO2&quot;,
@@ -4048,37 +4085,40 @@ ts_og &lt;- ts_og %&gt;%
 
 # calculate flux F [mol m–2 d–1]
 
-ts_og &lt;- ts_og %&gt;% 
-  mutate(flux_daily = k*dCO2*1e-5*24) 
+tm_og &lt;- tm_og %&gt;% 
+  mutate(flux = k*dCO2*1e-5*24,
+         flux_daily = rolling_mean(flux))
 
-rm(Sc_W14)</code></pre>
+rm(Sc_W14, rolling_mean)</code></pre>
 </div>
 <div id="daily-fluxes" class="section level3">
 <h3><span class="header-section-number">6.2.5</span> Daily fluxes</h3>
-<pre class="r"><code>p_flux_daily &lt;- ts_og %&gt;%
+<pre class="r"><code>p_flux_daily &lt;- tm_og %&gt;%
   ggplot(aes(x=date_time))+
-  geom_path(aes(y=flux_daily))+
-  scale_fill_discrete(guide=FALSE)+
+  geom_path(aes(y=flux))+
+  # geom_path(aes(y=flux_daily, col=&quot;24h&quot;))+
+  # scale_color_brewer(palette = &quot;Set1&quot;)+
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis())+
-  labs(y = expression(atop(flux[daily],
-                           (mol~m^{-2}~d^{-1}))))+
+  labs(y = expression(atop(flux[daily], (mol~m^{-2}~d^{-1}))),
+       title = &quot;Air-sea fluxes&quot;)+
   theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())</code></pre>
+        axis.text.x = element_blank(),
+        legend.title = element_blank())</code></pre>
 </div>
 <div id="cumulative-fluxes" class="section level3">
 <h3><span class="header-section-number">6.2.6</span> Cumulative Fluxes</h3>
 <pre class="r"><code># scale flux to time interval
 
-ts_og &lt;- ts_og %&gt;% 
+tm_og &lt;- tm_og %&gt;% 
   mutate(scale = 24*2) %&gt;% 
-  mutate(flux_scale = flux_daily / scale) %&gt;% 
+  mutate(flux_scale = flux / scale) %&gt;% 
   #group_by(freq, k_para) %&gt;% 
   arrange(date_time) %&gt;% 
   mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
   ungroup()
 
-p_flux_cum &lt;- ts_og %&gt;%
+p_flux_cum &lt;- tm_og %&gt;%
   ggplot(aes(x=date_time))+
   geom_path(aes(y=flux_cum))+
   scale_fill_discrete(guide=FALSE)+
@@ -4100,9 +4140,10 @@ p_flux_cum &lt;- ts_og %&gt;%
 <li>Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO2 flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD</li>
 </ul>
 <p>During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased CT values at 0-10 m and a decrease of CT in 10-17m. The loss of CT in 10-17m can be assumed to be entirely cause by mixing with low-CT surface water. Some CT loss is balanced through CT input attributable to the air-sea flux. Therefore, the observed loss, corrected for 7m/MLD-share of the air-sea-flux, was added to the integrated CT changes in 0-10m.</p>
+<pre class="r"><code>i_dep_lim &lt;- 12</code></pre>
 <pre class="r"><code># extract CT data for fixed depth approach, depth limit 10m
 iCT_10 &lt;- iCT_fixed_dep %&gt;% 
-  filter(dep_i == 12, sign==&quot;total&quot;) %&gt;% 
+  filter(dep_i == i_dep_lim, sign==&quot;total&quot;) %&gt;% 
   select(-c(sign, dep_i))
 
 rm(iCT_fixed_dep)
@@ -4114,7 +4155,7 @@ iCT_10 &lt;- iCT_10 %&gt;%
 date_180806 &lt;- unique(iCT_10$date_time)[7]
 
 # calculate cumulative air-sea fluxes affecting 0-10m
-ts_og_flux &lt;- ts_og %&gt;% 
+tm_og_flux &lt;- tm_og %&gt;% 
   mutate(flux_scale = if_else(date_time &gt; date_180806,
                               12/17 * flux_scale,
                               flux_scale)) %&gt;%
@@ -4123,23 +4164,23 @@ ts_og_flux &lt;- ts_og %&gt;%
   select(date_time, flux_cum)
 
 # calculate cumulative air-sea fluxes affecting 10-17m
-ts_og_flux_dep &lt;- ts_og %&gt;% 
+tm_og_flux_dep &lt;- tm_og %&gt;% 
   filter(date_time &gt; date_180806) %&gt;% 
   mutate(flux_scale = 5/17 * flux_scale) %&gt;%
   arrange(date_time) %&gt;% 
   mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
   select(date_time, flux_cum)
 
-iCT_10_flux &lt;- full_join(iCT_10, ts_og_flux) %&gt;% 
+iCT_10_flux &lt;- full_join(iCT_10, tm_og_flux) %&gt;% 
   arrange(date_time)
 
-rm(ts_og_flux, iCT_10, ts_og_long, ts_og)
+rm(tm_og_flux, iCT_10, tm_og)
 
 
 # linear interpolation of cumulative changes to frequency of the flux estimates estimates 
 iCT_10_flux &lt;- iCT_10_flux %&gt;% 
-  mutate(CT_i_cum = na.approx(CT_i_cum, rule = 2),
-         flux_cum = na.approx(flux_cum, rule = 2),
+  mutate(CT_i_cum = approxfun(date_time, CT_i_cum)(date_time),
+         flux_cum = approxfun(date_time, flux_cum)(date_time),
          CT_i_flux_cum = CT_i_cum + flux_cum)
 
 # calculate cumulative fluxes inbetween cruises 
@@ -4151,17 +4192,17 @@ iCT_10_flux_diff &lt;- iCT_10_flux %&gt;%
 
 
 # calculate mixing with deep waters, corrected for air sea fluxes
-iCT_10_mix &lt;- ts_profiles_ID_long %&gt;% 
+iCT_10_mix &lt;- tm_profiles_ID_long %&gt;% 
   filter(ID == &quot;180815&quot;,
          var == &quot;CT&quot;,
          dep &lt; 17,
          dep &gt; 12) %&gt;% 
   group_by(ID, date_time_ID,
            date_time_ID_ref) %&gt;% 
-  summarise(value_diff = sum(value_diff)/1000 + min(ts_og_flux_dep$flux_cum)) %&gt;% 
+  summarise(value_diff = sum(value_diff)/1000 + min(tm_og_flux_dep$flux_cum)) %&gt;% 
   ungroup()
 
-rm(ts_og_flux_dep)
+rm(tm_og_flux_dep)
 
 iCT_10_mix_diff &lt;- iCT_10_mix %&gt;% 
   select(date_time_ID_ref, value_diff) %&gt;% 
@@ -4201,8 +4242,8 @@ p_iCT &lt;- iCT_10_flux_mix %&gt;%
                    sec.axis = dup_axis())+
   scale_fill_brewer(palette = &quot;Set1&quot;, name=&quot;incremental changes&quot;)+
   scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;cumulative changes&quot;)+
-  labs(y=expression(atop(integrated~nC[T],
-                         (mol~m^{-2}))))+
+  labs(y=expression(atop(integrated~nC[T], (mol~m^{-2}))),
+       title = &quot;Water column inventory changes&quot;)+
   guides(guide_colourbar(order = 1))+
   theme(axis.title.x = element_blank(),
         axis.text.x.top = element_blank(),
@@ -4212,33 +4253,30 @@ p_iCT &lt;- iCT_10_flux_mix %&gt;%
 p_iCT</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/iCT_correction-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>iCT_10_flux_mix %&gt;%
-  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_NCP_cum.csv&quot;))
+  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;tm_NCP_cum.csv&quot;))
 
 iCT_10_flux_mix_diff %&gt;%
-  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;ts_NCP_inc.csv&quot;))</code></pre>
+  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;tm_NCP_inc.csv&quot;))</code></pre>
 <pre class="r"><code>p_pCO2_surf + p_tem_surf + p_CT_surf + 
   p_pCO2_atm + p_wind + p_flux_daily + p_flux_cum + 
   p_iCT +
   plot_layout(ncol = 1,
-              heights = c(rep(1,7), 3))
+              heights = c(rep(1,7), 4))
 
 ggsave(here::here(&quot;output/Plots/Figures_publication/article&quot;, &quot;atm_water_timeseries.pdf&quot;),
-       width = 120, height = 270, dpi = 300, units = &quot;mm&quot;)</code></pre>
+       width = 140, height = 270, dpi = 300, units = &quot;mm&quot;)</code></pre>
 </div>
 </div>
 <div id="open-tasks-questions" class="section level1">
 <h1><span class="header-section-number">7</span> Open tasks / questions</h1>
 <ul>
 <li>clean and harmonize chunk labeling (label: plot, 1 plot per chunk, etc)</li>
-<li>included removed stations in map and coverage plot</li>
+<li>included removed stations in coverage plot</li>
 <li>Significance of changes in AT for calculated CT changes
 <ul>
 <li>Calculate AT-S ratios, reconstruct AT profiles, calculate true CT profiles, normalize CT profiles to mean AT</li>
 </ul></li>
-<li>Harmonize selection of profiles for tau optimization and BGC interpretation (how many missing discrete depth intervals are allowed?)</li>
-<li>Introduce errorbars for iCT time series (-&gt; large errorbar after CT increase expected)</li>
 <li>demostrate strong permanent thermocline at around 25 m</li>
-<li>discrete samples: use exact sampling dates</li>
 </ul>
 <br>
 <p>
@@ -4263,12 +4301,12 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] zoo_1.8-7       lubridate_1.7.4 scico_1.1.0     metR_0.6.0     
- [5] marelac_2.1.10  shape_1.4.4     seacarb_3.2.13  oce_1.2-0      
- [9] gsw_1.0-5       testthat_2.3.2  patchwork_1.0.0 forcats_0.5.0  
-[13] stringr_1.4.0   dplyr_0.8.5     purrr_0.3.3     readr_1.3.1    
-[17] tidyr_1.0.2     tibble_3.0.0    ggplot2_3.3.0   tidyverse_1.3.0
-[21] workflowr_1.6.1
+ [1] tibbletime_0.1.3 zoo_1.8-7        lubridate_1.7.4  scico_1.1.0     
+ [5] metR_0.6.0       marelac_2.1.10   shape_1.4.4      seacarb_3.2.13  
+ [9] oce_1.2-0        gsw_1.0-5        testthat_2.3.2   patchwork_1.0.0 
+[13] forcats_0.5.0    stringr_1.4.0    dplyr_0.8.5      purrr_0.3.3     
+[17] readr_1.3.1      tidyr_1.0.2      tibble_3.0.0     ggplot2_3.3.0   
+[21] tidyverse_1.3.0  workflowr_1.6.1 
 
 loaded via a namespace (and not attached):
  [1] Rcpp_1.0.4         whisker_0.4        knitr_1.28         xml2_1.3.0        
