@@ -77,7 +77,7 @@ The following names should be identical for stored files and objectes in R envir
     - none: pCO2_RT_mean gridded to regular depth levels
   - sal
   - tem
-  - nCT: CT calculated from pCO2, temperature, and fixed AT, S
+  - nCT: CT normalized to AT, or calculated from pCO2, temperature, and fixed AT, S
   - CT: Measured dissolved inorganic carbon
   - AT: Measured total alkalinity
   - U10: wind speed at 10m
