@@ -558,16 +558,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree85241e5114d4066a3386d5e09bb62d5b930c6a7etargetblank85241e5a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/85241e5114d4066a3386d5e09bb62d5b930c6a7e" target="_blank">85241e5</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb604fbb31b397cfcfbabc28e261dc1f6154ea4batargetblankb604fbba"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b604fbb31b397cfcfbabc28e261dc1f6154ea4ba" target="_blank">b604fbb</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree85241e5114d4066a3386d5e09bb62d5b930c6a7etargetblank85241e5a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb604fbb31b397cfcfbabc28e261dc1f6154ea4batargetblankb604fbba" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/85241e5114d4066a3386d5e09bb62d5b930c6a7e" target="_blank">85241e5</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b604fbb31b397cfcfbabc28e261dc1f6154ea4ba" target="_blank">b604fbb</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -631,6 +631,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b604fbb31b397cfcfbabc28e261dc1f6154ea4ba/analysis/CT_dynamics.Rmd" target="_blank">b604fbb</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-08
+</td>
+<td>
+integration depth revised
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/4c4a849005d8ef7768d7996fb39a32c7ebe3af2f/docs/CT_dynamics.html" target="_blank">4c4a849</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -3465,8 +3499,8 @@ tm_profiles_ID_long_grid %&gt;%
 <p><img src="figure/CT_dynamics.Rmd/observed_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(tm_profiles_ID_long_grid)</code></pre>
 </div>
-<div id="hovmoeller-plotm" class="section level2">
-<h2><span class="header-section-number">4.2</span> Hovmoeller plotm</h2>
+<div id="hovmoeller-plots" class="section level2">
+<h2><span class="header-section-number">4.2</span> Hovmoeller plots</h2>
 <div id="absolute-values" class="section level3">
 <h3><span class="header-section-number">4.2.1</span> Absolute values</h3>
 <pre class="r"><code>bin_nCT &lt;- 30
@@ -3908,16 +3942,7 @@ inCT %&gt;%
 </ul>
 <div id="best-ict-estimate" class="section level2">
 <h2><span class="header-section-number">6.1</span> Best iC<sub>T</sub> estimate</h2>
-<p>The cummulative iC<sub>T</sub> trajectory determined by integration of C<sub>T</sub> to a fixed water depth of 10 m was used for NCP calculation for the following reasons:</p>
-<ul>
-<li>During the first productivity pulse that lasted until July 23:
-<ul>
-<li>more than 90% of iC<sub>T</sub> changes were located within the upper 10m</li>
-<li>no positive iC<sub>T</sub> changes were located within the upper 10m</li>
-</ul></li>
-<li>Deeper (fixed() layers were affected by iC<sub>T</sub> changes</li>
-<li>MLD were too shallow to cover all observed negative C<sub>T</sub> changes</li>
-</ul>
+<p>To determine the optimum depth for the nC<sub>T</sub> integration we investigated the vertical distribution of cumulative temperature and nC<sub>T</sub> changes on the peak of the productivity signal on June 23:</p>
 <pre class="r"><code>tm_profiles_ID_long_180723 &lt;- tm_profiles_ID_long %&gt;% 
   filter(ID == 180723,
          var == &quot;nCT&quot;)
@@ -3953,7 +3978,7 @@ p_tm_profiles_ID_long_rel &lt;- tm_profiles_ID_long_180723_dep %&gt;%
   theme_bw()
 
 p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/inCT_depth_distribution_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/CT_dynamics.Rmd/i_nCT_depth_distribution_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(tm_profiles_ID_long_180723,
    tm_profiles_ID_long_180723_dep,
    p_tm_profiles_ID_long,
@@ -3993,11 +4018,21 @@ p_tm_profiles_ID_long_rel &lt;- tm_profiles_ID_long_180723_dep %&gt;%
   theme_bw()
 
 p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/inCT_tem_distribution_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/CT_dynamics.Rmd/i_tem_distribution_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(tm_profiles_ID_long_180723,
    tm_profiles_ID_long_180723_dep,
    p_tm_profiles_ID_long,
    p_tm_profiles_ID_long_rel)</code></pre>
+<p>The cummulative iC<sub>T</sub> trajectory determined by integration of C<sub>T</sub> to a fixed water depth of 12 m was used for NCP calculation for the following reasons:</p>
+<ul>
+<li>During the first productivity pulse that lasted until July 23:
+<ul>
+<li>no negative nC<sub>T</sub> changes were detected below that depth</li>
+<li>cumulative nC<sub>T</sub> switch sign at that depth</li>
+<li>95% of the cumulative warming signal appears across that depth</li>
+</ul></li>
+<li>MLD were too shallow to cover all observed negative C<sub>T</sub> changes</li>
+</ul>
 </div>
 <div id="air-sea-co2-flux" class="section level2">
 <h2><span class="header-section-number">6.2</span> Air-Sea CO<sub>2</sub> flux</h2>
@@ -4067,7 +4102,7 @@ tm_profiles_surface_long_ID %&gt;%
 
 p_pCO2_surf + p_tem_surf + p_nCT_surf + 
   plot_layout(ncol = 1)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/read_Tina-V_Sensor_data-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/CT_dynamics.Rmd/surface_water_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#rm(tm_profiles_surface)
 
 start &lt;- min(tm_profiles_surface_long_ID$date_time)
@@ -4084,10 +4119,7 @@ og &lt;- og %&gt;%
          date_time &lt; end)
 
 rm(end, start)</code></pre>
-</div>
-<div id="time-series-plots" class="section level3">
-<h3><span class="header-section-number">6.2.3</span> Time series plots</h3>
-<p>Data setm for atmospheric and seawater observations were merged and interpolated to a common time stamp.</p>
+<p>Data sets for atmospheric and seawater observations were merged and interpolated to a common time stamp.</p>
 <pre class="r"><code>tm_profiles_surface_ID &lt;- tm_profiles_surface_long_ID %&gt;% 
   filter(var %in% c(&quot;pCO2_water&quot;, &quot;tem&quot;)) %&gt;% 
   select(date_time:mean) %&gt;% 
@@ -4108,12 +4140,7 @@ rm(tm_profiles_surface_ID, og)</code></pre>
 tm_og &lt;- tm_og %&gt;% 
   mutate(wind_daily = rolling_mean(wind),
          pCO2_atm_daily = rolling_mean(pCO2_atm))</code></pre>
-<pre class="r"><code># tm_og_long &lt;- tm_og %&gt;% 
-#   pivot_longer(&quot;pCO2_atm&quot;:&quot;tem&quot;,
-#                names_to = &quot;var&quot;,
-#                values_to = &quot;value&quot;)
-
-p_pCO2_atm &lt;- tm_og %&gt;%
+<pre class="r"><code>p_pCO2_atm &lt;- tm_og %&gt;%
   ggplot(aes(x=date_time))+
   geom_path(aes(y=pCO2_atm))+
   # geom_path(aes(y=pCO2_atm_daily, col=&quot;24h&quot;))+
@@ -4141,10 +4168,10 @@ p_wind &lt;- tm_og %&gt;%
 p_pCO2_atm + p_wind +
   plot_layout(ncol = 1) + 
   plot_layout(guides = &#39;collect&#39;)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/plot_wind_Ostergarn_tower-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/CT_dynamics.Rmd/Ostergarn_tower_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="flux-calculation" class="section level3">
-<h3><span class="header-section-number">6.2.4</span> Flux calculation</h3>
+<div id="air-sea-fluxes" class="section level3">
+<h3><span class="header-section-number">6.2.3</span> Air-sea fluxes</h3>
 <p>F = k * dCO2</p>
 <p>with</p>
 <p>dCO2 = K0 * dpCO2 and</p>
@@ -4182,9 +4209,6 @@ tm_og &lt;- tm_og %&gt;%
 #         flux_daily = rolling_mean(flux))
 
 rm(Sc_W14)</code></pre>
-</div>
-<div id="daily-fluxes" class="section level3">
-<h3><span class="header-section-number">6.2.5</span> Daily fluxes</h3>
 <pre class="r"><code>p_flux_daily &lt;- tm_og %&gt;%
   ggplot(aes(x=date_time))+
   geom_path(aes(y=flux))+
@@ -4197,9 +4221,6 @@ rm(Sc_W14)</code></pre>
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         legend.title = element_blank())</code></pre>
-</div>
-<div id="cumulative-fluxes" class="section level3">
-<h3><span class="header-section-number">6.2.6</span> Cumulative Fluxes</h3>
 <pre class="r"><code># scale flux to time interval
 
 tm_og &lt;- tm_og %&gt;% 
@@ -4219,20 +4240,24 @@ p_flux_cum &lt;- tm_og %&gt;%
   labs(y = expression(atop(flux[cum],
                            (mol~m^{-2}))))+
   theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())</code></pre>
+        axis.text.x = element_blank())
+
+p_flux_daily + p_flux_cum</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/flux_air_sea_cumulative_CO2-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="ict-correction" class="section level2">
 <h2><span class="header-section-number">6.3</span> iC<sub>T</sub> correction</h2>
-<p>The cumulative inCT time series obtained through integration across the upper 10m of the water column was used for further calculations of NCP.</p>
+<p>The cumulative integrated nCT (inCT) time series obtained through integration across the upper 12m of the water column was used for further calculations of NCP.</p>
 <p>Correction of inCT for air-sea CO2 fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014).</p>
-<p>To derive an integrated NCP estimated, the observed change in inCT must be corrected for the air-sea flux of CO2. inCT was determined for the upper 10m of the water column. The MLD was always shallower 10m, except for the last cruise day. Therefore:</p>
+<p>To derive an integrated NCP estimated, the observed change in inCT must be corrected for the air-sea flux of CO2. inCT was determined for the upper 12m of the water column. The MLD was always shallower 12m, except for the last cruise day. Therefore:</p>
 <ul>
 <li>Cumulative air-sea fluxes can be added completely to inCT before Aug 7.</li>
-<li>Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO2 flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD</li>
+<li>Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO2 flux was homogenously mixed down to the deepend thermocline at 17m. The flux correction applied to the upper 12m can therefore be scaled with a factor 12/17.</li>
 </ul>
-<p>During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased nCT values at 0-10 m and a decrease of nCT in 10-17m. The loss of nCT in 10-17m can be assumed to be entirely cause by mixing with low-nCT surface water. Some nCT loss is balanced through nCT input attributable to the air-sea flux. Therefore, the observed loss, corrected for 7m/MLD-share of the air-sea-flux, was added to the integrated nCT changes in 0-10m.</p>
-<pre class="r"><code>i_dep_lim &lt;- 12</code></pre>
+<p>During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased inCT at 0-12 m and a decrease of inCT in 12-17m. The loss of nCT in 12-17m can be assumed to be entirely cause by mixing with low-nCT surface water. However, some of the observed nCT loss is balanced through nCT input attributable to the air-sea flux. Therefore, the observed loss, corrected for 5/17 of the air-sea-flux, was added to the integrated nCT changes in 0-12m.</p>
+<pre class="r"><code>i_dep_lim &lt;- 12
+i_dep_mix_lim &lt;- 17</code></pre>
 <pre class="r"><code># extract CT data for fixed depth approach, depth limit 10m
 inCT_10 &lt;- inCT_fixed_dep %&gt;% 
   filter(dep_i == i_dep_lim, sign==&quot;total&quot;) %&gt;% 
@@ -4249,7 +4274,7 @@ date_180806 &lt;- unique(inCT_10$date_time)[7]
 # calculate cumulative air-sea fluxes affecting 0-10m
 tm_og_flux &lt;- tm_og %&gt;% 
   mutate(flux_scale = if_else(date_time &gt; date_180806,
-                              12/17 * flux_scale,
+                              i_dep_lim/i_dep_mix_lim * flux_scale,
                               flux_scale)) %&gt;%
   arrange(date_time) %&gt;% 
   mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
@@ -4258,7 +4283,7 @@ tm_og_flux &lt;- tm_og %&gt;%
 # calculate cumulative air-sea fluxes affecting 10-17m
 tm_og_flux_dep &lt;- tm_og %&gt;% 
   filter(date_time &gt; date_180806) %&gt;% 
-  mutate(flux_scale = 5/17 * flux_scale) %&gt;%
+  mutate(flux_scale = (i_dep_mix_lim - i_dep_lim)/i_dep_mix_lim * flux_scale) %&gt;%
   arrange(date_time) %&gt;% 
   mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
   select(date_time, flux_cum)
@@ -4289,8 +4314,8 @@ inCT_10_flux_diff &lt;- inCT_10_flux %&gt;%
 inCT_10_mix &lt;- tm_profiles_ID_long %&gt;% 
   filter(ID == &quot;180815&quot;,
          var == &quot;nCT&quot;,
-         dep &lt; 17,
-         dep &gt; 12) %&gt;% 
+         dep &lt; i_dep_mix_lim,
+         dep &gt; i_dep_lim) %&gt;% 
   group_by(ID, date_time_ID,
            date_time_ID_ref) %&gt;% 
   summarise(value_diff = sum(value_diff)/1000 + min(tm_og_flux_dep$flux_cum)) %&gt;% 
