@@ -27,6 +27,7 @@ library(scico)
 library(lubridate)
 library(zoo)
 library(tibbletime)
+library(sp) # check points in polygon
 
 ```
 
@@ -133,7 +134,7 @@ tm_profiles <- tm_profiles %>%
   filter(phase %in% c("down", "up"))
 
 
-tm_profiles_highres <- tm_profiles
+#tm_profiles_highres <- tm_profiles
 
 # grid observation to 1m depth intervals
 tm_profiles <- tm_profiles %>% 
@@ -189,13 +190,48 @@ tm_profiles <- inner_join(cruise_dates, tm_profiles)
 
 ## Station map
 
-```{r map, fig.cap="Location of stations sampled between the east coast of Gotland and Gotland deep."}
+```{r subsetting_criteria_fm_and_plot}
 
+# fm data
+poly_lon <- c(18.9, 19.5, 19.5, 18.9)
+poly_lat <- c(57.4, 57.2, 57.45, 57.61)
+
+# plot area
 lat_lo <- 57.25
 lat_hi <- 57.6
 
 lon_lo <- 18.6
 lon_hi <- 19.7
+
+```
+
+
+```{r read_subset_fm_data}
+
+fm <-
+  read_csv(here::here("Data/_summarized_data_files",
+                       "fm.csv")) %>% 
+  filter(lat <= lat_hi, lat >= lat_lo, lon >= lon_lo)
+
+fm <- fm %>% 
+  mutate(Area = point.in.polygon(point.x = lon,
+                                 point.y = lat,
+                                 pol.x = poly_lon,
+                                 pol.y = poly_lat),
+         Area = as.character(Area),
+         Area = if_else(Area == "1", "utilized", "sampled"))
+
+fm %>% 
+  filter(Area == "utilized") %>% 
+  select(-Area) %>% 
+  write_csv(here::here("Data/_summarized_data_files",
+                       "fm_bloomsail.csv"))
+
+```
+
+
+```{r map, fig.cap="Location of stations sampled between the east coast of Gotland and Gotland deep."}
+
 
 map <- read_csv(here::here("data/Maps","Bathymetry_Gotland_east_small.csv")) %>% 
   filter(lat < lat_hi, lat > lat_lo,
@@ -214,36 +250,37 @@ map_low_res <- map %>%
   mutate(lat = as.numeric(as.character(lat)),
          lon = as.numeric(as.character(lon)))
 
-
-fm <-
-  read_csv(here::here("Data/_summarized_data_files",
-                       "fm.csv")) %>% 
-  filter(lat <= lat_hi, lat >= lat_lo, lon >= lon_lo)
+tm_track <- tm %>% 
+  arrange(date_time) %>% 
+  slice(which(row_number() %% 50 == 1))
 
 ggplot()+
   geom_contour_fill(data = map_low_res,
                     aes(x=lon, y=lat, z=-elev),
                     na.fill = TRUE,
-                    breaks = seq(0,300,20))+
+                    breaks = seq(0,300,30))+
   geom_raster(data=map %>% filter(is.na(elev)),
-              aes(lon, lat), fill="black")+
-  geom_line(data = fm, aes(lon, lat, group=ID), col="grey")+
-  #geom_line(data = fm %>% filter(Area == "BS"), aes(Lon, Lat, group=ID), col="red")+
+              aes(lon, lat), fill="darkgrey")+
+  geom_path(data = tm_track, aes(lon, lat, group=ID, col="sampled"))+
+  geom_path(data = fm, aes(lon, lat, group=ID, col=Area))+
   geom_label(data = stations %>% filter(!(station %in% c("P14", "P13", "P01"))),
-             aes(lon, lat, label=station), col="red")+
+             aes(lon, lat, label=station, col="utilized"))+
   geom_label(data = stations %>% filter(station %in% c("P14", "P13", "P01")),
-             aes(lon, lat, label=station), col="grey")+
+             aes(lon, lat, label=station, col="sampled_station"))+
   coord_quickmap(expand = 0, ylim = c(lat_lo+0.01, lat_hi-0.01))+
   labs(x="Longitude (°E)", y="Latitude (°N)")+
-  scale_fill_scico(palette = "oslo", na.value = "grey",
-                   name="Depth [m]", direction = -1,
-                   breaks = seq(0,160,20),
-                   guide = "colorstrip")
+  scale_fill_gradient(low = "lightsteelblue1", high = "dodgerblue4",
+                   name="Depth (m)", breaks = seq(0,180,30),
+                   guide = "colorstrip")+
+  scale_color_manual(values = c("white", "darkgrey", "orangered"), guide=FALSE)
 
 ggsave(here::here("output/Plots/Figures_publication/article", "station_map.pdf"),
-       width = 180, height = 150, dpi = 300, units = "mm")
+       width = 220, height = 150, dpi = 300, units = "mm")
 
-rm(map, map_low_res, lat_hi, lat_lo, lon_hi, lon_lo, fm)
+rm(map, map_low_res,
+   lat_hi, lat_lo, lon_hi, lon_lo, 
+   poly_lat, poly_lon,
+   fm, tm_track)
 
 ```
 
@@ -1596,7 +1633,7 @@ rm(tm_profiles_surface_ID, og)
 
 ```
 
-```{r calculate_running_mean}
+```{r calculate_running_mean, eval=FALSE}
 
 rolling_mean   <- rollify(~mean(.x, na.rm = TRUE), window = 48)
 
@@ -1666,7 +1703,7 @@ Unitm used here are:
 - wind speed U: m s-1
 
 - coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2 
-- gas transfer velocities k: cm hr-1 (= 60*60*100 m s-1)
+- gas transfer velocities k: cm hr-1 (= 60 x 60 x 100 m s-1)
 
 - air sea CO~2~ flux F: mol m–2 d–1
 
@@ -1692,10 +1729,10 @@ tm_og <- tm_og %>%
 # calculate flux F [mol m–2 d–1]
 
 tm_og <- tm_og %>% 
-  mutate(flux = k*dCO2*1e-5*24,
-         flux_daily = rolling_mean(flux))
+  mutate(flux = k*dCO2*1e-5*24)
+#         flux_daily = rolling_mean(flux))
 
-rm(Sc_W14, rolling_mean)
+rm(Sc_W14)
 
 ```
 
@@ -1807,8 +1844,10 @@ rm(tm_og_flux, iCT_10, tm_og)
 # linear interpolation of cumulative changes to frequency of the flux estimates estimates 
 iCT_10_flux <- iCT_10_flux %>% 
   mutate(CT_i_cum = approxfun(date_time, CT_i_cum)(date_time),
-         flux_cum = approxfun(date_time, flux_cum)(date_time),
-         CT_i_flux_cum = CT_i_cum + flux_cum)
+         flux_cum = approxfun(date_time, flux_cum)(date_time)) %>% 
+    fill(flux_cum) %>% 
+  mutate(CT_i_flux_cum = CT_i_cum + flux_cum)
+
 
 # calculate cumulative fluxes inbetween cruises 
 iCT_10_flux_diff <- iCT_10_flux %>% 
