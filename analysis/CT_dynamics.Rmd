@@ -844,7 +844,7 @@ rm(tm_profiles_ID_long_grid)
 ```
 
 
-## Hovmoeller plotm
+## Hovmoeller plots
 
 ### Absolute values
 
@@ -1406,16 +1406,10 @@ In order to derive an estimate of the net community production NCP (which is equ
 
 ## Best iC~T~ estimate
 
-The cummulative iC~T~ trajectory determined by integration of C~T~ to a fixed water depth of 10 m was used for NCP calculation for the following reasons:
+To determine the optimum depth for the nC~T~ integration we investigated the vertical distribution of cumulative temperature and nC~T~ changes on the peak of the productivity signal on June 23:
 
-- During the first productivity pulse that lasted until July 23:
-  - more than 90% of iC~T~ changes were located within the upper 10m
-  - no positive iC~T~ changes were located within the upper 10m
-- Deeper (fixed() layers were affected by iC~T~ changes
-- MLD were too shallow to cover all observed negative C~T~ changes
-  
 
-```{r inCT_depth_distribution_180723}
+```{r i_nCT_depth_distribution_180723}
 
 tm_profiles_ID_long_180723 <- tm_profiles_ID_long %>% 
   filter(ID == 180723,
@@ -1461,8 +1455,7 @@ rm(tm_profiles_ID_long_180723,
 ```
 
 
-
-```{r inCT_tem_distribution_180723}
+```{r i_tem_distribution_180723}
 
 tm_profiles_ID_long_180723 <- tm_profiles_ID_long %>% 
   filter(ID == 180723,
@@ -1507,6 +1500,15 @@ rm(tm_profiles_ID_long_180723,
 
 ```
 
+
+The cummulative iC~T~ trajectory determined by integration of C~T~ to a fixed water depth of 12 m was used for NCP calculation for the following reasons:
+
+- During the first productivity pulse that lasted until July 23:
+  - no negative nC~T~ changes were detected below that depth
+  - cumulative nC~T~ switch sign at that depth
+  - 95% of the cumulative warming signal appears across that depth
+- MLD were too shallow to cover all observed negative C~T~ changes
+  
 ## Air-Sea CO~2~ flux
 
 ### Surface water data
@@ -1520,7 +1522,7 @@ dep_lim <- 6
 ```
 
 
-```{r read_Tina-V_Sensor_data, fig.asp=0.5}
+```{r surface_water_time_series}
 
 tm_profiles_surface_long <- tm_profiles %>% 
   filter(dep < dep_lim) %>% 
@@ -1609,9 +1611,7 @@ rm(end, start)
 
 ```
 
-### Time series plots
-
-Data setm for atmospheric and seawater observations were merged and interpolated to a common time stamp.
+Data sets for atmospheric and seawater observations were merged and interpolated to a common time stamp.
 
 ```{r join_interpolate_wind_water_data}
 
@@ -1645,12 +1645,7 @@ tm_og <- tm_og %>%
 
 
 
-```{r plot_wind_Ostergarn_tower}
-
-# tm_og_long <- tm_og %>% 
-#   pivot_longer("pCO2_atm":"tem",
-#                names_to = "var",
-#                values_to = "value")
+```{r Ostergarn_tower_time_series}
 
 p_pCO2_atm <- tm_og %>%
   ggplot(aes(x=date_time))+
@@ -1683,7 +1678,7 @@ p_pCO2_atm + p_wind +
 
 ```
 
-### Flux calculation
+### Air-sea fluxes
 
 F = k * dCO2
 
@@ -1736,8 +1731,6 @@ rm(Sc_W14)
 
 ```
 
-### Daily fluxes
-
 ```{r flux_air_sea_daily_CO2, fig.asp=0.3}
 
 p_flux_daily <- tm_og %>%
@@ -1754,8 +1747,6 @@ p_flux_daily <- tm_og %>%
         legend.title = element_blank())
 
 ```
-
-### Cumulative Fluxes
 
 ```{r flux_air_sea_cumulative_CO2, fig.asp=0.3}
 # scale flux to time interval
@@ -1779,25 +1770,27 @@ p_flux_cum <- tm_og %>%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())
 
+p_flux_daily + p_flux_cum
+
 ```
 
 ## iC~T~ correction
 
-The cumulative inCT time series obtained through integration across the upper 10m of the water column was used for further calculations of NCP.
+The cumulative integrated nCT (inCT) time series obtained through integration across the upper 12m of the water column was used for further calculations of NCP.
 
 Correction of inCT for air-sea CO2 fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014).
 
-To derive an integrated NCP estimated, the observed change in inCT must be corrected for the air-sea flux of CO2. inCT was determined for the upper 10m of the water column. The MLD was always shallower 10m, except for the last cruise day. Therefore:
+To derive an integrated NCP estimated, the observed change in inCT must be corrected for the air-sea flux of CO2. inCT was determined for the upper 12m of the water column. The MLD was always shallower 12m, except for the last cruise day. Therefore:
 
 - Cumulative air-sea fluxes can be added completely to inCT before Aug 7.
-- Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO2 flux was homogenously mixed down to the MLD. The flux correction applied to the upper 10m can therefore be scaled with a factor 10m/MLD
+- Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO2 flux was homogenously mixed down to the deepend thermocline at 17m. The flux correction applied to the upper 12m can therefore be scaled with a factor 12/17.
     
-During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased nCT values at 0-10 m and a decrease of nCT in 10-17m. The loss of nCT in 10-17m can be assumed to be entirely cause by mixing with low-nCT surface water. Some nCT loss is balanced through nCT input attributable to the air-sea flux. Therefore, the observed loss, corrected for 7m/MLD-share of the air-sea-flux, was added to the integrated nCT changes in 0-10m.
+During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased inCT at 0-12 m and a decrease of inCT in 12-17m. The loss of nCT in 12-17m can be assumed to be entirely cause by mixing with low-nCT surface water. However, some of the observed nCT loss is balanced through nCT input attributable to the air-sea flux. Therefore, the observed loss, corrected for 5/17 of the air-sea-flux, was added to the integrated nCT changes in 0-12m.
 
 ```{r inCT_correction_criteria}
 
 i_dep_lim <- 12
-
+i_dep_mix_lim <- 17
 
 ```
 
@@ -1821,7 +1814,7 @@ date_180806 <- unique(inCT_10$date_time)[7]
 # calculate cumulative air-sea fluxes affecting 0-10m
 tm_og_flux <- tm_og %>% 
   mutate(flux_scale = if_else(date_time > date_180806,
-                              12/17 * flux_scale,
+                              i_dep_lim/i_dep_mix_lim * flux_scale,
                               flux_scale)) %>%
   arrange(date_time) %>% 
   mutate(flux_cum = cumsum(flux_scale)) %>% 
@@ -1830,7 +1823,7 @@ tm_og_flux <- tm_og %>%
 # calculate cumulative air-sea fluxes affecting 10-17m
 tm_og_flux_dep <- tm_og %>% 
   filter(date_time > date_180806) %>% 
-  mutate(flux_scale = 5/17 * flux_scale) %>%
+  mutate(flux_scale = (i_dep_mix_lim - i_dep_lim)/i_dep_mix_lim * flux_scale) %>%
   arrange(date_time) %>% 
   mutate(flux_cum = cumsum(flux_scale)) %>% 
   select(date_time, flux_cum)
@@ -1861,8 +1854,8 @@ inCT_10_flux_diff <- inCT_10_flux %>%
 inCT_10_mix <- tm_profiles_ID_long %>% 
   filter(ID == "180815",
          var == "nCT",
-         dep < 17,
-         dep > 12) %>% 
+         dep < i_dep_mix_lim,
+         dep > i_dep_lim) %>% 
   group_by(ID, date_time_ID,
            date_time_ID_ref) %>% 
   summarise(value_diff = sum(value_diff)/1000 + min(tm_og_flux_dep$flux_cum)) %>% 
