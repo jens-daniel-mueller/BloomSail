@@ -558,16 +558,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree26b4810ec121d3e3b5b91febc627d381c8454461targetblank26b4810a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/26b4810ec121d3e3b5b91febc627d381c8454461" target="_blank">26b4810</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3a9d9771bb0649c6eaf51263ec7c28cbbe67de52targetblank3a9d977a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/3a9d9771bb0649c6eaf51263ec7c28cbbe67de52" target="_blank">3a9d977</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree26b4810ec121d3e3b5b91febc627d381c8454461targetblank26b4810a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3a9d9771bb0649c6eaf51263ec7c28cbbe67de52targetblank3a9d977a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/26b4810ec121d3e3b5b91febc627d381c8454461" target="_blank">26b4810</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/3a9d9771bb0649c6eaf51263ec7c28cbbe67de52" target="_blank">3a9d977</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -576,7 +576,6 @@ Note that you need to be careful to ensure that all relevant files for the analy
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
     Ignored:    data/Finnmaid_2018/
     Ignored:    data/GETM/
     Ignored:    data/Maps/
@@ -586,14 +585,6 @@ Ignored files:
     Ignored:    data/_summarized_data_files/
     Ignored:    data/backup/
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
-
-Untracked files:
-    Untracked:  output/Plots/CT_dynamics/
-    Untracked:  output/Plots/Figures_publication/Appendix/pCO2_RT_corrected_profile_example.pdf
-    Untracked:  output/Plots/Figures_publication/Appendix/pCO2_RT_corrected_profile_mean_abs_offset.pdf
-    Untracked:  output/Plots/Figures_publication/Appendix/tau_fit_example.pdf
-    Untracked:  output/Plots/response_time/profiles_pCO2.pdf
-    Untracked:  output/Plots/response_time/profiles_pCO2_grid.pdf
 
 </code></pre>
 <p>
@@ -632,6 +623,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/3a9d9771bb0649c6eaf51263ec7c28cbbe67de52/analysis/CT_dynamics.Rmd" target="_blank">3a9d977</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-11
+</td>
+<td>
+clean until comparison
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/03dccf3d7be803b769162b35285868094d2400e4/docs/CT_dynamics.html" target="_blank">03dccf3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -3804,15 +3829,19 @@ Hovmoeller plotm of cumulative changes in C<sub>T</sub> and temperature.
 </div>
 <div id="depth-integration-ct" class="section level1">
 <h1><span class="header-section-number">5</span> Depth-integration C<sub>T</sub></h1>
-<p>A critical first step for the determination of net community production (NCP) is the integration of observed changes in C<sub>T</sub> over depth to derive iC<sub>T</sub>. Two approaches were tested:</p>
+<p>A critical first step for the determination of net community production (NCP) is the integration of observed changes in nC<sub>T</sub> over depth. Two approaches were tested:</p>
 <ul>
-<li>Integration of changes in nCT over a predefined, fixed water depth</li>
-<li>Integration of changes in nCT over a mixed layer depth (MLD)</li>
+<li>Integration of changes in nC<sub>T</sub> over a predefined, fixed water depth</li>
+<li>Integration of changes in nC<sub>T</sub> over a mixed layer depth (MLD)</li>
 </ul>
-<p>Both aproaches deliver depth-integrated, incremental changes of C<sub>T</sub> inbetween cruise dates. Those were summed up to derive a trajectory of cummulative iC<sub>T</sub> changes.</p>
+<p>Both aproaches deliver depth-integrated, incremental changes of C<sub>T</sub> inbetween cruise dates. Those were summed up to derive a trajectory of cummulative integrated nC<sub>T</sub> changes.</p>
 <div id="fixed-depths-approach" class="section level2">
 <h2><span class="header-section-number">5.1</span> Fixed depths approach</h2>
-<p>Incremental and cumulative C<sub>T</sub> changes inbetween cruise dates were integrated across the water colums down to predefined depth limitm. This was done separately for observed positive/negative changes in C<sub>T</sub>, as well as for the total observed changes.</p>
+<p>Incremental and cumulative nC<sub>T</sub> changes inbetween cruise dates were integrated across the water colums down to predefined depth limits. This was done separately for observed positive/negative changes in C<sub>T</sub>, as well as for the total observed changes.</p>
+<pre class="r"><code>fixed_depths &lt;- seq(9,13,1)</code></pre>
+<p>Predefined integration depth levels in metres are: 9, 10, 11, 12, 13</p>
+<div id="calculate-inct" class="section level3">
+<h3><span class="header-section-number">5.1.1</span> Calculate inC<sub>T</sub></h3>
 <pre class="r"><code>inCT_grid_sign &lt;- tm_profiles_ID_long %&gt;% 
   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
   unique() %&gt;% 
@@ -3826,7 +3855,7 @@ inCT_grid_total &lt;- tm_profiles_ID_long %&gt;%
 # dep_i &lt;- 10
 #rm(inCT, dep_i)
 
-for (dep_i in seq(9,13,1)) {
+for (dep_i in fixed_depths) {
 
 
 inCT_sign_temp &lt;- tm_profiles_ID_long %&gt;% 
@@ -3880,7 +3909,14 @@ rm(inCT_grid_sign, inCT_grid_total)
 inCT &lt;- inCT %&gt;% 
   mutate(dep_i = as.factor(dep_i))
 
-inCT %&gt;% 
+inCT_fixed_dep &lt;- inCT
+rm(inCT, dep_i, fixed_depths)
+# inCT %&gt;%
+#   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;inCT_dep_limitm.csv&quot;))</code></pre>
+</div>
+<div id="time-series" class="section level3">
+<h3><span class="header-section-number">5.1.2</span> Time series</h3>
+<pre class="r"><code>inCT_fixed_dep %&gt;% 
   ggplot()+
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
   geom_col(aes(date_time_ID_ref, nCT_i_diff, fill=dep_i),
@@ -3888,20 +3924,18 @@ inCT %&gt;%
   geom_line(aes(date_time_ID, nCT_i_cum, col=dep_i))+
   scale_color_viridis_d(name=&quot;Depth limit (m)&quot;)+
   scale_fill_viridis_d(name=&quot;Depth limit (m)&quot;)+
-  labs(y=&quot;inCT [mol/m2]&quot;, x=&quot;&quot;)+
+  scale_x_datetime(breaks = &quot;week&quot;, date_labels = &quot;%d %b&quot;)+
+  labs(y=&quot;inCT (mol/m2)&quot;, x=&quot;&quot;)+
   facet_grid(sign~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
   theme_bw()</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/integrated_inCT_fixed_depth-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>inCT_fixed_dep &lt;- inCT
-rm(inCT, dep_i)
-# inCT %&gt;%
-#   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;inCT_dep_limitm.csv&quot;))</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/inCT_fixed_depth_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 <div id="mld-approach" class="section level2">
 <h2><span class="header-section-number">5.2</span> MLD approach</h2>
 <p>As an alternative to fixed depth levels, vertical integration as low as the mixed layer depth was tested.</p>
 <div id="density-calculation" class="section level3">
-<h3><span class="header-section-number">5.2.1</span> Density Calculation</h3>
+<h3><span class="header-section-number">5.2.1</span> Density calculation</h3>
 <p>Seawater density Rho was determined from S, T, and p according to TEOS-10.</p>
 <pre class="r"><code>tm_profiles &lt;- tm_profiles %&gt;% 
   mutate(rho = swSigma(salinity = sal, temperature = tem, pressure = dep/10))</code></pre>
@@ -3933,9 +3967,8 @@ tm_profiles_ID_hydro &lt;- tm_profiles_ID_mean_hydro
 rm(tm_profiles_ID_mean_hydro_long,
    tm_profiles_ID_mean_hydro,
    tm_profiles_ID_sd_hydro_long,
-   tm_profiles_ID_sd_hydro)
-
-tm_profiles_ID_hydro_long %&gt;% 
+   tm_profiles_ID_sd_hydro)</code></pre>
+<pre class="r"><code>tm_profiles_ID_hydro_long %&gt;% 
   ggplot(aes(value, dep, col=ID))+
   geom_point()+
   geom_path()+
@@ -3943,7 +3976,7 @@ tm_profiles_ID_hydro_long %&gt;%
   scale_color_viridis_d()+
   facet_wrap(~var, scales = &quot;free_x&quot;)</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/CT_dynamics.Rmd/plot_hydrographical_profiles_all-1.png" alt="Mean vertical profiles per cruise day across all stations." width="672" />
+<img src="figure/CT_dynamics.Rmd/profiles_hydrographical_mean-1.png" alt="Mean vertical profiles per cruise day across all stations." width="672" />
 <p class="caption">
 Mean vertical profiles per cruise day across all stations.
 </p>
@@ -3979,9 +4012,9 @@ tm_profiles_ID_hydro %&gt;%
   facet_wrap(~ID)+
   theme_bw()</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/CT_dynamics.Rmd/plot_density_profiles-1.png" alt="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD" width="672" />
+<img src="figure/CT_dynamics.Rmd/density_profiles_MLD_per_ID-1.png" alt="Mean density profiles and MLD per cruise dates (ID)." width="672" />
 <p class="caption">
-Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD
+Mean density profiles and MLD per cruise dates (ID).
 </p>
 </div>
 </div>
@@ -3994,29 +4027,16 @@ Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizonta
   geom_path()+
   scale_color_brewer(palette = &quot;Set1&quot;, name= &quot;Rho limit&quot;)+
   scale_y_reverse()+
+  scale_x_datetime(breaks = &quot;week&quot;, date_labels = &quot;%d %b&quot;)+
   labs(x=&quot;&quot;)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/plot_MLD_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/CT_dynamics.Rmd/MLD_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="inct-calculation" class="section level3">
 <h3><span class="header-section-number">5.2.6</span> inCT calculation</h3>
-<pre class="r"><code># inCT_grid_sign &lt;- tm_profiles_ID_long %&gt;% 
-#   seleCT(ID, date_time_ID, date_time_ID_ref) %&gt;% 
-#   unique() %&gt;% 
-#   expand_grid(sign = c(&quot;pos&quot;, &quot;neg&quot;))
-# 
-# inCT_grid_total &lt;- tm_profiles_ID_long %&gt;% 
-#   seleCT(ID, date_time_ID, date_time_ID_ref) %&gt;% 
-#   unique() %&gt;% 
-#   expand_grid(sign = c(&quot;total&quot;))
-
-
-inCT &lt;- tm_profiles_ID_long %&gt;% 
+<pre class="r"><code>inCT &lt;- tm_profiles_ID_long %&gt;% 
   filter(var == &quot;nCT&quot;)
 
 inCT &lt;- full_join(inCT, MLD)
-
-# inCT %&gt;%
-#     write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;tm_profiles_ID_long_cum_MLD.csv&quot;))
 
 inCT &lt;- inCT %&gt;% 
   filter(dep &lt;= MLD)
@@ -4032,14 +4052,16 @@ inCT &lt;- inCT %&gt;%
   mutate(nCT_i_cum = cumsum(nCT_i_diff)) %&gt;% 
   ungroup()
 
-# inCT_total_temp &lt;- full_join(inCT_total_temp, inCT_grid_total) %&gt;% 
-#   arrange(sign, date_time_ID) %&gt;% 
-#   fill(nCT_i_cum)
-
 inCT &lt;- inCT %&gt;% 
   mutate(rho_lim = as.factor(rho_lim))
 
-inCT %&gt;% 
+inCT_MLD &lt;- inCT
+
+rm(inCT, MLD, tm_profiles_ID_hydro, tm_profiles_ID_hydro_long)</code></pre>
+</div>
+<div id="time-series-1" class="section level3">
+<h3><span class="header-section-number">5.2.7</span> Time series</h3>
+<pre class="r"><code>inCT_MLD %&gt;% 
   ggplot()+
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
   geom_col(aes(date_time_ID_ref, nCT_i_diff, fill=rho_lim),
@@ -4047,15 +4069,10 @@ inCT %&gt;%
   geom_line(aes(date_time_ID, nCT_i_cum, col=rho_lim))+
   scale_color_viridis_d(name=&quot;Rho limit&quot;)+
   scale_fill_viridis_d(name=&quot;Rho limit&quot;)+
+  scale_x_datetime(breaks = &quot;week&quot;, date_labels = &quot;%d %b&quot;)+
   labs(y=&quot;inCT [mol/m2]&quot;, x=&quot;&quot;)+
-  #facet_grid(sign~., scales = &quot;free_y&quot;, space = &quot;free_y&quot;)+
   theme_bw()</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/integrated_inCT_MLD-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>inCT_MLD &lt;- inCT
-rm(inCT, MLD)
-
-# inCT %&gt;%
-#   write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;inCT_dep_limitm.csv&quot;))</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/inCT_MLD_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="comparison-of-approaches" class="section level2">
@@ -4078,8 +4095,9 @@ inCT %&gt;%
   geom_line(data = inCT_MLD %&gt;% filter(rho_lim == 0.1),
             aes(date_time_ID, nCT_i_cum, col=&quot;MLD - 0.1&quot;))+
   scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;&quot;)+
+  scale_x_datetime(breaks = &quot;week&quot;, date_labels = &quot;%d %b&quot;)+
   labs(y=&quot;inCT [mol/m2]&quot;, x=&quot;&quot;)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/comparing_inCT_estimates-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/CT_dynamics.Rmd/inCT_comparison-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(inCT, inCT_MLD)</code></pre>
 </div>
 </div>
