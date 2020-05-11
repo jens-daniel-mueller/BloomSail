@@ -1483,7 +1483,7 @@ In order to derive an estimate of the net community production NCP (which is equ
 To determine the optimum depth for the nC~T~ integration we investigated the vertical distribution of cumulative temperature and nC~T~ changes on the peak of the productivity signal on June 23:
 
 
-```{r i_nCT_depth_distribution_180723}
+```{r nCT_cum_profiles_180723}
 
 tm_profiles_ID_long_180723 <- tm_profiles_ID_long %>% 
   filter(ID == 180723,
@@ -1529,7 +1529,7 @@ rm(tm_profiles_ID_long_180723,
 ```
 
 
-```{r i_tem_distribution_180723}
+```{r tem_cum_profiles_180723}
 
 tm_profiles_ID_long_180723 <- tm_profiles_ID_long %>% 
   filter(ID == 180723,
@@ -1593,7 +1593,7 @@ The cruise mean pCO~2~ recorded in profiling-mode (stations only) and depths < 6
 
 tm_profiles_surface_long <- tm_profiles %>% 
   filter(dep < surface_dep) %>% 
-  select(date_time = date_time_ID, ID, tem, pCO2_water = pCO2, nCT) %>% 
+  select(date_time = date_time_ID, ID, tem, pCO2 = pCO2, nCT) %>% 
   pivot_longer(tem:nCT, values_to = "value", names_to = "var")
 
 tm_profiles_surface_long_ID <- tm_profiles_surface_long %>% 
@@ -1601,15 +1601,10 @@ tm_profiles_surface_long_ID <- tm_profiles_surface_long %>%
   summarise_all(list(~mean(.), ~sd(.), ~min(.), ~max(.))) %>% 
   ungroup()
 
-# tb_surface_ID <- tb_surface %>% 
-#   group_by(ID, var) %>% 
-#   summarise(date_time_ID = mean(date_time_ID, na.rm = TRUE),
-#             value_mean = mean(value, na.rm = TRUE),
-#             value_sd = sd(value, na.rm = TRUE)) %>% 
-#   ungroup()
+rm(tm_profiles_surface_long)
 
 p_pCO2_surf <- tm_profiles_surface_long_ID %>%
-  filter(var == "pCO2_water") %>% 
+  filter(var == "pCO2") %>% 
   ggplot(aes(x=date_time))+
   geom_ribbon(aes(ymin=mean-sd, ymax=mean+sd), alpha=0.2)+
   geom_path(aes(y=mean))+
@@ -1699,15 +1694,17 @@ Data sets for atmospheric and seawater observations were merged and interpolated
 ```{r join_interpolate_wind_water_data}
 
 tm_profiles_surface_ID <- tm_profiles_surface_long_ID %>% 
-  filter(var %in% c("pCO2_water", "tem")) %>% 
+  filter(var %in% c("pCO2", "tem")) %>% 
   select(date_time:mean) %>% 
   pivot_wider(names_from = "var", values_from = "mean")
+
+rm(tm_profiles_surface_long_ID)
 
 tm_og <- full_join(og, tm_profiles_surface_ID) %>% 
   arrange(date_time)
 
 tm_og <- tm_og %>% 
-  mutate(pCO2_water = approxfun(date_time, pCO2_water)(date_time),
+  mutate(pCO2 = approxfun(date_time, pCO2)(date_time),
          tem = approxfun(date_time, tem)(date_time),
          wind = approxfun(date_time, wind)(date_time)) %>% 
   filter(!is.na(pCO2_atm))
@@ -1733,9 +1730,6 @@ tm_og <- tm_og %>%
 p_pCO2_atm <- tm_og %>%
   ggplot(aes(x=date_time))+
   geom_path(aes(y=pCO2_atm))+
-  # geom_path(aes(y=pCO2_atm_daily, col="24h"))+
-  # scale_color_manual(values = c("red", "black"),
-  #                    guide = FALSE)+
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis())+
   labs(y = expression(atop(pCO["2,atm"], (mu*atm))),
@@ -1746,8 +1740,6 @@ p_pCO2_atm <- tm_og %>%
 p_wind <- tm_og %>%
   ggplot(aes(x=date_time))+
   geom_path(aes(y=wind))+
-  # geom_path(aes(y=wind_daily, col="24h"))+
-  # scale_color_brewer(palette = "Set1")+
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis())+
   labs(y = expression(atop(windspeed, (m~s^{-1}))))+
@@ -1796,7 +1788,7 @@ Sc_W14 <- function(tem) {
 # Sc_W14(20)
 
 tm_og <- tm_og %>% 
-  mutate(dpCO2 = pCO2_water - pCO2_atm,
+  mutate(dpCO2 = pCO2 - pCO2_atm,
          dCO2  = dpCO2 * K0(S=6.92, T=tem),
          # W92 = gas_transfer(t = tem, u10 = wind, species = "CO2",
          #                      method = "Wanninkhof1")* 60^2 * 100,
@@ -1837,7 +1829,6 @@ p_flux_daily <- tm_og %>%
 tm_og <- tm_og %>% 
   mutate(scale = 24*2) %>% 
   mutate(flux_scale = flux / scale) %>% 
-  #group_by(freq, k_para) %>% 
   arrange(date_time) %>% 
   mutate(flux_cum = cumsum(flux_scale)) %>% 
   ungroup()
@@ -1878,24 +1869,28 @@ i_dep_mix_lim <- 17
 
 ```
 
-
-
-```{r inCT_correction, fig.asp=0.7}
+```{r prepare_NCP_data_set}
 
 # extract CT data for fixed depth approach, depth limit 10m
-inCT_10 <- inCT_fixed_dep %>% 
+NCP <- inCT_fixed_dep %>% 
   filter(dep_i == i_dep_lim, sign=="total") %>% 
   select(-c(sign, dep_i))
 
 rm(inCT_fixed_dep)
 
-inCT_10 <- inCT_10 %>%
+NCP <- NCP %>%
   select(ID, date_time = date_time_ID, date_time_ID_ref, nCT_i_diff, nCT_i_cum)
 
 # date of the second last cruise
-date_180806 <- unique(inCT_10$date_time)[7]
+date_180806 <- unique(NCP$date_time)[7]
+```
 
-# calculate cumulative air-sea fluxes affecting 0-10m
+
+### Air-sea fluxes
+
+```{r calculate_flux_correction}
+
+# calculate cumulative air-sea fluxes affecting surface water column
 tm_og_flux <- tm_og %>% 
   mutate(flux_scale = if_else(date_time > date_180806,
                               i_dep_lim/i_dep_mix_lim * flux_scale,
@@ -1904,22 +1899,23 @@ tm_og_flux <- tm_og %>%
   mutate(flux_cum = cumsum(flux_scale)) %>% 
   select(date_time, flux_cum)
 
-# calculate cumulative air-sea fluxes affecting 10-17m
+# calculate cumulative air-sea fluxes affecting deepened mixed layer
 tm_og_flux_dep <- tm_og %>% 
   filter(date_time > date_180806) %>% 
-  mutate(flux_scale = (i_dep_mix_lim - i_dep_lim)/i_dep_mix_lim * flux_scale) %>%
+  mutate(flux_scale = 
+           (i_dep_mix_lim - i_dep_lim)/i_dep_mix_lim * flux_scale) %>%
   arrange(date_time) %>% 
   mutate(flux_cum = cumsum(flux_scale)) %>% 
   select(date_time, flux_cum)
 
-inCT_10_flux <- full_join(inCT_10, tm_og_flux) %>% 
+NCP_flux <- full_join(NCP, tm_og_flux) %>% 
   arrange(date_time)
 
-rm(tm_og_flux, inCT_10, tm_og)
+rm(tm_og_flux, NCP, tm_og)
 
 
 # linear interpolation of cumulative changes to frequency of the flux estimates estimates 
-inCT_10_flux <- inCT_10_flux %>% 
+NCP_flux <- NCP_flux %>% 
   mutate(nCT_i_cum = approxfun(date_time, nCT_i_cum)(date_time),
          flux_cum = approxfun(date_time, flux_cum)(date_time)) %>% 
     fill(flux_cum) %>% 
@@ -1927,64 +1923,82 @@ inCT_10_flux <- inCT_10_flux %>%
 
 
 # calculate cumulative fluxes inbetween cruises 
-inCT_10_flux_diff <- inCT_10_flux %>% 
+NCP_flux_diff <- NCP_flux %>% 
   filter(!is.na(date_time_ID_ref)) %>% 
   mutate(flux_diff = flux_cum - lag(flux_cum, default = 0)) %>% 
   select(date_time_ID_ref, observed=nCT_i_diff, flux=flux_diff) %>% 
   pivot_longer(cols = 2:3, names_to = "var", values_to = "value_diff")
 
 
+```
+
+### Vertical mixing
+
+```{r calculate mixing correction}
+
 # calculate mixing with deep waters, corrected for air sea fluxes
-inCT_10_mix <- tm_profiles_ID_long %>% 
+NCP_mix <- tm_profiles_ID_long %>% 
   filter(ID == "180815",
          var == "nCT",
          dep < i_dep_mix_lim,
          dep > i_dep_lim) %>% 
-  group_by(ID, date_time_ID,
-           date_time_ID_ref) %>% 
-  summarise(value_diff = sum(value_diff)/1000 + min(tm_og_flux_dep$flux_cum)) %>% 
+  group_by(ID, date_time_ID, date_time_ID_ref) %>% 
+  summarise(value_diff = 
+              sum(value_diff)/1000 + min(tm_og_flux_dep$flux_cum)) %>% 
   ungroup()
 
 rm(tm_og_flux_dep)
 
-inCT_10_mix_diff <- inCT_10_mix %>% 
+NCP_mix_diff <- NCP_mix %>% 
   select(date_time_ID_ref, value_diff) %>% 
   mutate(var="mixing")
 
-inCT_10_flux_mix_diff <- 
-  full_join(inCT_10_flux_diff, inCT_10_mix_diff)
+NCP_flux_mix_diff <- 
+  full_join(NCP_flux_diff, NCP_mix_diff)
 
-inCT_10_flux_mix <-
-  full_join(inCT_10_flux,
-            inCT_10_mix %>% rename(mix_cum = value_diff))
+NCP_flux_mix <-
+  full_join(NCP_flux,
+            NCP_mix %>% rename(mix_cum = value_diff))
 
-rm(inCT_10_mix, inCT_10_mix_diff, inCT_10_flux, inCT_10_flux_diff, date_180806)
+rm(NCP_mix, NCP_mix_diff, NCP_flux, NCP_flux_diff, date_180806)
 
-inCT_10_flux_mix <- inCT_10_flux_mix %>% 
+NCP_flux_mix <- NCP_flux_mix %>% 
   arrange(date_time) %>% 
   fill(ID) %>% 
   mutate(mix_cum = if_else(ID %in% c("180806", 180815), mix_cum, 0),
          mix_cum = na.approx(mix_cum),
          nCT_i_flux_mix_cum = nCT_i_flux_cum + mix_cum)
 
-  
-p_inCT <- inCT_10_flux_mix %>% 
+# reorder factors for plotting
+NCP_flux_mix_diff <- NCP_flux_mix_diff %>% 
+  mutate(var = factor(var, c("observed", "flux", "mixing")))
+
+NCP_flux_mix_long <- NCP_flux_mix %>% 
+  select(date_time, nCT_i_cum, nCT_i_flux_cum, nCT_i_flux_mix_cum) %>% 
+  pivot_longer(nCT_i_cum:nCT_i_flux_mix_cum,
+               values_to = "value",
+               names_to = "var") %>% 
+  mutate(var = fct_recode(var, 
+                          observed = "nCT_i_cum",
+                          `flux corrected` = "nCT_i_flux_cum",
+                          `flux + mixing corrected (NCP)` = "nCT_i_flux_mix_cum"))
+
+
+p_inCT <- NCP_flux_mix_long %>% 
   arrange(date_time) %>% 
   ggplot()+
-  geom_col(data = inCT_10_flux_mix_diff,
+  geom_col(data = NCP_flux_mix_diff,
            aes(date_time_ID_ref, value_diff, fill=var),
            position = position_dodge2(preserve = "single"),
            alpha=0.5)+
   geom_hline(yintercept = 0)+
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
-  geom_line(aes(date_time, nCT_i_cum, col="observed"))+
-  geom_line(aes(date_time, nCT_i_flux_mix_cum, col="mixing + flux corrected"))+
-  geom_line(aes(date_time, nCT_i_flux_cum, col="flux corrected"))+
+  geom_line(aes(date_time, value, col=var))+
   scale_x_datetime(date_breaks = "week",
                    date_labels = "%b %d",
                    sec.axis = dup_axis())+
-  scale_fill_brewer(palette = "Set1", name="incremental changes")+
-  scale_color_brewer(palette = "Set1", name="cumulative changes")+
+  scale_fill_brewer(palette = "Dark2", name="incremental changes")+
+  scale_color_brewer(palette = "Dark2", name="cumulative changes")+
   labs(y=expression(atop(integrated~nC[T], (mol~m^{-2}))),
        title = "Water column inventory changes")+
   guides(guide_colourbar(order = 1))+
@@ -1995,14 +2009,15 @@ p_inCT <- inCT_10_flux_mix %>%
 
 p_inCT
 
-inCT_10_flux_mix %>%
-  write_csv(here::here("Data/_merged_data_files", "tm_NCP_cum.csv"))
+NCP_flux_mix %>%
+  write_csv(here::here("Data/_merged_data_files/CT_dynamics",
+                       "tm_NCP_cum.csv"))
 
-inCT_10_flux_mix_diff %>%
-  write_csv(here::here("Data/_merged_data_files", "tm_NCP_inc.csv"))
+NCP_flux_mix_diff %>%
+  write_csv(here::here("Data/_merged_data_files/CT_dynamics",
+                       "tm_NCP_inc.csv"))
 
 ```
-
 
 
 ```{r plot_inCT_time_series, include=FALSE}
