@@ -1153,18 +1153,28 @@ rm(nCT_hov, bin_nCT, Tem_hov, bin_Tem)
 
 # Depth-integration C~T~
 
-A critical first step for the determination of net community production (NCP) is the integration of observed changes in C~T~ over depth to derive iC~T~. Two approaches were tested:
+A critical first step for the determination of net community production (NCP) is the integration of observed changes in nC~T~ over depth. Two approaches were tested:
 
-- Integration of changes in nCT over a predefined, fixed water depth
-- Integration of changes in nCT over a mixed layer depth (MLD)
+- Integration of changes in nC~T~ over a predefined, fixed water depth
+- Integration of changes in nC~T~ over a mixed layer depth (MLD)
 
-Both aproaches deliver depth-integrated, incremental changes of C~T~ inbetween cruise dates. Those were summed up to derive a trajectory of cummulative iC~T~ changes.
+Both aproaches deliver depth-integrated, incremental changes of C~T~ inbetween cruise dates. Those were summed up to derive a trajectory of cummulative integrated nC~T~ changes.
 
 ## Fixed depths approach
 
-Incremental and cumulative C~T~ changes inbetween cruise dates were integrated across the water colums down to predefined depth limitm. This was done separately for observed positive/negative changes in C~T~, as well as for the total observed changes.
+Incremental and cumulative nC~T~ changes inbetween cruise dates were integrated across the water colums down to predefined depth limits. This was done separately for observed positive/negative changes in C~T~, as well as for the total observed changes.
 
-```{r integrated_inCT_fixed_depth, fig.asp=1.1}
+```{r fixed_depths_grid}
+
+fixed_depths <- seq(9,13,1)
+
+```
+
+Predefined integration depth levels in metres are: `r fixed_depths`
+
+### Calculate inC~T~
+
+```{r calculate_inCT_fixed_depth}
 
 
 inCT_grid_sign <- tm_profiles_ID_long %>% 
@@ -1180,7 +1190,7 @@ inCT_grid_total <- tm_profiles_ID_long %>%
 # dep_i <- 10
 #rm(inCT, dep_i)
 
-for (dep_i in seq(9,13,1)) {
+for (dep_i in fixed_depths) {
 
 
 inCT_sign_temp <- tm_profiles_ID_long %>% 
@@ -1234,7 +1244,18 @@ rm(inCT_grid_sign, inCT_grid_total)
 inCT <- inCT %>% 
   mutate(dep_i = as.factor(dep_i))
 
-inCT %>% 
+inCT_fixed_dep <- inCT
+rm(inCT, dep_i, fixed_depths)
+# inCT %>%
+#   write_csv(here::here("Data/_merged_data_files", "inCT_dep_limitm.csv"))
+
+```
+
+### Time series
+
+```{r inCT_fixed_depth_time_series, fig.asp=1.1}
+
+inCT_fixed_dep %>% 
   ggplot()+
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
   geom_col(aes(date_time_ID_ref, nCT_i_diff, fill=dep_i),
@@ -1242,14 +1263,11 @@ inCT %>%
   geom_line(aes(date_time_ID, nCT_i_cum, col=dep_i))+
   scale_color_viridis_d(name="Depth limit (m)")+
   scale_fill_viridis_d(name="Depth limit (m)")+
-  labs(y="inCT [mol/m2]", x="")+
+  scale_x_datetime(breaks = "week", date_labels = "%d %b")+
+  labs(y="inCT (mol/m2)", x="")+
   facet_grid(sign~., scales = "free_y", space = "free_y")+
   theme_bw()
 
-inCT_fixed_dep <- inCT
-rm(inCT, dep_i)
-# inCT %>%
-#   write_csv(here::here("Data/_merged_data_files", "inCT_dep_limitm.csv"))
 
 ```
 
@@ -1257,7 +1275,7 @@ rm(inCT, dep_i)
 
 As an alternative to fixed depth levels, vertical integration as low as the mixed layer depth was tested.
 
-### Density Calculation
+### Density calculation
 
 Seawater density Rho was determined from S, T, and p according to TEOS-10.
 
@@ -1270,7 +1288,7 @@ tm_profiles <- tm_profiles %>%
 
 ### Density profiles
 
-```{r plot_hydrographical_profiles_all, fig.cap="Mean vertical profiles per cruise day across all stations."}
+```{r calculate_profiles_hydrographical_mean}
 
 tm_profiles_ID_mean_hydro <- tm_profiles %>% 
   select(-c(station,lat, lon, pCO2_corr, pCO2, nCT, date_time)) %>% 
@@ -1299,6 +1317,11 @@ rm(tm_profiles_ID_mean_hydro_long,
    tm_profiles_ID_sd_hydro_long,
    tm_profiles_ID_sd_hydro)
 
+```
+
+```{r profiles_hydrographical_mean, fig.cap="Mean vertical profiles per cruise day across all stations."}
+
+
 tm_profiles_ID_hydro_long %>% 
   ggplot(aes(value, dep, col=ID))+
   geom_point()+
@@ -1306,7 +1329,7 @@ tm_profiles_ID_hydro_long %>%
   scale_y_reverse()+
   scale_color_viridis_d()+
   facet_wrap(~var, scales = "free_x")
-  
+
 ```
 
 ### MLD calculation
@@ -1330,7 +1353,7 @@ MLD <- tm_profiles_ID_hydro  %>%
 
 ### Daily density profiles
 
-```{r plot_density_profiles, fig.cap="Overview density profiles at stations (P01-P14) and cruise dates (ID). Horizontal lines indicate determined MLD", fig.asp=1.2}
+```{r density_profiles_MLD_per_ID, fig.cap="Mean density profiles and MLD per cruise dates (ID).", fig.asp=1.2}
 
 tm_profiles_ID_hydro <- 
   full_join(tm_profiles_ID_hydro, MLD)
@@ -1349,7 +1372,7 @@ tm_profiles_ID_hydro %>%
 
 ### MLD timeseries
 
-```{r plot_MLD_time_series, fig.asp=0.4}
+```{r MLD_time_series, fig.asp=0.4}
 
 MLD %>% 
   ggplot(aes(date_time_ID, MLD, col=as.factor(rho_lim)))+
@@ -1358,6 +1381,7 @@ MLD %>%
   geom_path()+
   scale_color_brewer(palette = "Set1", name= "Rho limit")+
   scale_y_reverse()+
+  scale_x_datetime(breaks = "week", date_labels = "%d %b")+
   labs(x="")
 
 ```
@@ -1365,26 +1389,12 @@ MLD %>%
 
 ### inCT calculation
 
-```{r integrated_inCT_MLD}
-
-# inCT_grid_sign <- tm_profiles_ID_long %>% 
-#   seleCT(ID, date_time_ID, date_time_ID_ref) %>% 
-#   unique() %>% 
-#   expand_grid(sign = c("pos", "neg"))
-# 
-# inCT_grid_total <- tm_profiles_ID_long %>% 
-#   seleCT(ID, date_time_ID, date_time_ID_ref) %>% 
-#   unique() %>% 
-#   expand_grid(sign = c("total"))
-
+```{r calculate_inCT_MLD}
 
 inCT <- tm_profiles_ID_long %>% 
   filter(var == "nCT")
 
 inCT <- full_join(inCT, MLD)
-
-# inCT %>%
-#     write_csv(here::here("Data/_merged_data_files", "tm_profiles_ID_long_cum_MLD.csv"))
 
 inCT <- inCT %>% 
   filter(dep <= MLD)
@@ -1400,14 +1410,20 @@ inCT <- inCT %>%
   mutate(nCT_i_cum = cumsum(nCT_i_diff)) %>% 
   ungroup()
 
-# inCT_total_temp <- full_join(inCT_total_temp, inCT_grid_total) %>% 
-#   arrange(sign, date_time_ID) %>% 
-#   fill(nCT_i_cum)
-
 inCT <- inCT %>% 
   mutate(rho_lim = as.factor(rho_lim))
 
-inCT %>% 
+inCT_MLD <- inCT
+
+rm(inCT, MLD, tm_profiles_ID_hydro, tm_profiles_ID_hydro_long)
+
+```
+
+### Time series
+
+```{r inCT_MLD_time_series}
+
+inCT_MLD %>% 
   ggplot()+
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
   geom_col(aes(date_time_ID_ref, nCT_i_diff, fill=rho_lim),
@@ -1415,23 +1431,18 @@ inCT %>%
   geom_line(aes(date_time_ID, nCT_i_cum, col=rho_lim))+
   scale_color_viridis_d(name="Rho limit")+
   scale_fill_viridis_d(name="Rho limit")+
+  scale_x_datetime(breaks = "week", date_labels = "%d %b")+
   labs(y="inCT [mol/m2]", x="")+
-  #facet_grid(sign~., scales = "free_y", space = "free_y")+
   theme_bw()
-
-inCT_MLD <- inCT
-rm(inCT, MLD)
-
-# inCT %>%
-#   write_csv(here::here("Data/_merged_data_files", "inCT_dep_limitm.csv"))
-
 ```
+
+
 
 ## Comparison of approaches
 
 In the following, all cummulative iC~T~ trajectories are displayed. Highlighted are those obtained for the fixed depth approach with 10 m limit, and the MLD approach with a high density threshold of 0.5 kg/m3.
 
-```{r comparing_inCT_estimates}
+```{r inCT_comparison}
 
 inCT <- full_join(inCT_fixed_dep, inCT_MLD)
 
@@ -1450,6 +1461,7 @@ inCT %>%
   geom_line(data = inCT_MLD %>% filter(rho_lim == 0.1),
             aes(date_time_ID, nCT_i_cum, col="MLD - 0.1"))+
   scale_color_brewer(palette = "Set1", name="")+
+  scale_x_datetime(breaks = "week", date_labels = "%d %b")+
   labs(y="inCT [mol/m2]", x="")
 
 rm(inCT, inCT_MLD)
@@ -1802,7 +1814,7 @@ rm(Sc_W14)
 
 ```
 
-```{r flux_air_sea_daily_CO2, fig.asp=0.3}
+```{r flux_air_sea_daily_CO2}
 
 p_flux_daily <- tm_og %>%
   ggplot(aes(x=date_time))+
