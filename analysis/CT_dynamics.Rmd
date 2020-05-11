@@ -1935,7 +1935,7 @@ inCT_10_flux_mix_diff %>%
 
 
 
-```{r plot_inCT_time_series, eval=FALSE}
+```{r plot_inCT_time_series}
 
 p_pCO2_surf + p_tem_surf + p_nCT_surf + 
   p_pCO2_atm + p_wind + p_flux_daily + p_flux_cum + 
