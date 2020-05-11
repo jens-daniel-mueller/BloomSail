@@ -558,16 +558,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3a9d9771bb0649c6eaf51263ec7c28cbbe67de52targetblank3a9d977a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/3a9d9771bb0649c6eaf51263ec7c28cbbe67de52" target="_blank">3a9d977</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree316d86c82f2873b3304ca1480ebd8489c87a3696targetblank316d86ca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/316d86c82f2873b3304ca1480ebd8489c87a3696" target="_blank">316d86c</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3a9d9771bb0649c6eaf51263ec7c28cbbe67de52targetblank3a9d977a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree316d86c82f2873b3304ca1480ebd8489c87a3696targetblank316d86ca" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/3a9d9771bb0649c6eaf51263ec7c28cbbe67de52" target="_blank">3a9d977</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/316d86c82f2873b3304ca1480ebd8489c87a3696" target="_blank">316d86c</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -623,6 +623,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/316d86c82f2873b3304ca1480ebd8489c87a3696/analysis/CT_dynamics.Rmd" target="_blank">316d86c</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-11
+</td>
+<td>
+finalized mixing correction
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/5e016a60e199b0b776716e247ef9281827da5938/docs/CT_dynamics.html" target="_blank">5e016a6</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -4151,7 +4185,7 @@ p_tm_profiles_ID_long_rel &lt;- tm_profiles_ID_long_180723_dep %&gt;%
   theme_bw()
 
 p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/i_nCT_depth_distribution_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/CT_dynamics.Rmd/nCT_cum_profiles_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(tm_profiles_ID_long_180723,
    tm_profiles_ID_long_180723_dep,
    p_tm_profiles_ID_long,
@@ -4191,7 +4225,7 @@ p_tm_profiles_ID_long_rel &lt;- tm_profiles_ID_long_180723_dep %&gt;%
   theme_bw()
 
 p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/i_tem_distribution_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/CT_dynamics.Rmd/tem_cum_profiles_180723-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(tm_profiles_ID_long_180723,
    tm_profiles_ID_long_180723_dep,
    p_tm_profiles_ID_long,
@@ -4214,7 +4248,7 @@ p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel</code></pre>
 <p>The cruise mean pCO<sub>2</sub> recorded in profiling-mode (stations only) and depths &lt; 6m was used for gas exchange calcualtions.</p>
 <pre class="r"><code>tm_profiles_surface_long &lt;- tm_profiles %&gt;% 
   filter(dep &lt; surface_dep) %&gt;% 
-  select(date_time = date_time_ID, ID, tem, pCO2_water = pCO2, nCT) %&gt;% 
+  select(date_time = date_time_ID, ID, tem, pCO2 = pCO2, nCT) %&gt;% 
   pivot_longer(tem:nCT, values_to = &quot;value&quot;, names_to = &quot;var&quot;)
 
 tm_profiles_surface_long_ID &lt;- tm_profiles_surface_long %&gt;% 
@@ -4222,15 +4256,10 @@ tm_profiles_surface_long_ID &lt;- tm_profiles_surface_long %&gt;%
   summarise_all(list(~mean(.), ~sd(.), ~min(.), ~max(.))) %&gt;% 
   ungroup()
 
-# tb_surface_ID &lt;- tb_surface %&gt;% 
-#   group_by(ID, var) %&gt;% 
-#   summarise(date_time_ID = mean(date_time_ID, na.rm = TRUE),
-#             value_mean = mean(value, na.rm = TRUE),
-#             value_sd = sd(value, na.rm = TRUE)) %&gt;% 
-#   ungroup()
+rm(tm_profiles_surface_long)
 
 p_pCO2_surf &lt;- tm_profiles_surface_long_ID %&gt;%
-  filter(var == &quot;pCO2_water&quot;) %&gt;% 
+  filter(var == &quot;pCO2&quot;) %&gt;% 
   ggplot(aes(x=date_time))+
   geom_ribbon(aes(ymin=mean-sd, ymax=mean+sd), alpha=0.2)+
   geom_path(aes(y=mean))+
@@ -4309,15 +4338,17 @@ og &lt;- og %&gt;%
 rm(end, start)</code></pre>
 <p>Data sets for atmospheric and seawater observations were merged and interpolated to a common time stamp.</p>
 <pre class="r"><code>tm_profiles_surface_ID &lt;- tm_profiles_surface_long_ID %&gt;% 
-  filter(var %in% c(&quot;pCO2_water&quot;, &quot;tem&quot;)) %&gt;% 
+  filter(var %in% c(&quot;pCO2&quot;, &quot;tem&quot;)) %&gt;% 
   select(date_time:mean) %&gt;% 
   pivot_wider(names_from = &quot;var&quot;, values_from = &quot;mean&quot;)
+
+rm(tm_profiles_surface_long_ID)
 
 tm_og &lt;- full_join(og, tm_profiles_surface_ID) %&gt;% 
   arrange(date_time)
 
 tm_og &lt;- tm_og %&gt;% 
-  mutate(pCO2_water = approxfun(date_time, pCO2_water)(date_time),
+  mutate(pCO2 = approxfun(date_time, pCO2)(date_time),
          tem = approxfun(date_time, tem)(date_time),
          wind = approxfun(date_time, wind)(date_time)) %&gt;% 
   filter(!is.na(pCO2_atm))
@@ -4331,9 +4362,6 @@ tm_og &lt;- tm_og %&gt;%
 <pre class="r"><code>p_pCO2_atm &lt;- tm_og %&gt;%
   ggplot(aes(x=date_time))+
   geom_path(aes(y=pCO2_atm))+
-  # geom_path(aes(y=pCO2_atm_daily, col=&quot;24h&quot;))+
-  # scale_color_manual(values = c(&quot;red&quot;, &quot;black&quot;),
-  #                    guide = FALSE)+
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis())+
   labs(y = expression(atop(pCO[&quot;2,atm&quot;], (mu*atm))),
@@ -4344,8 +4372,6 @@ tm_og &lt;- tm_og %&gt;%
 p_wind &lt;- tm_og %&gt;%
   ggplot(aes(x=date_time))+
   geom_path(aes(y=wind))+
-  # geom_path(aes(y=wind_daily, col=&quot;24h&quot;))+
-  # scale_color_brewer(palette = &quot;Set1&quot;)+
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis())+
   labs(y = expression(atop(windspeed, (m~s^{-1}))))+
@@ -4382,7 +4408,7 @@ p_pCO2_atm + p_wind +
 # Sc_W14(20)
 
 tm_og &lt;- tm_og %&gt;% 
-  mutate(dpCO2 = pCO2_water - pCO2_atm,
+  mutate(dpCO2 = pCO2 - pCO2_atm,
          dCO2  = dpCO2 * K0(S=6.92, T=tem),
          # W92 = gas_transfer(t = tem, u10 = wind, species = &quot;CO2&quot;,
          #                      method = &quot;Wanninkhof1&quot;)* 60^2 * 100,
@@ -4414,7 +4440,6 @@ rm(Sc_W14)</code></pre>
 tm_og &lt;- tm_og %&gt;% 
   mutate(scale = 24*2) %&gt;% 
   mutate(flux_scale = flux / scale) %&gt;% 
-  #group_by(freq, k_para) %&gt;% 
   arrange(date_time) %&gt;% 
   mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
   ungroup()
@@ -4448,19 +4473,20 @@ p_flux_daily + p_flux_cum +
 <pre class="r"><code>i_dep_lim &lt;- 12
 i_dep_mix_lim &lt;- 17</code></pre>
 <pre class="r"><code># extract CT data for fixed depth approach, depth limit 10m
-inCT_10 &lt;- inCT_fixed_dep %&gt;% 
+NCP &lt;- inCT_fixed_dep %&gt;% 
   filter(dep_i == i_dep_lim, sign==&quot;total&quot;) %&gt;% 
   select(-c(sign, dep_i))
 
 rm(inCT_fixed_dep)
 
-inCT_10 &lt;- inCT_10 %&gt;%
+NCP &lt;- NCP %&gt;%
   select(ID, date_time = date_time_ID, date_time_ID_ref, nCT_i_diff, nCT_i_cum)
 
 # date of the second last cruise
-date_180806 &lt;- unique(inCT_10$date_time)[7]
-
-# calculate cumulative air-sea fluxes affecting 0-10m
+date_180806 &lt;- unique(NCP$date_time)[7]</code></pre>
+<div id="air-sea-fluxes-1" class="section level3">
+<h3><span class="header-section-number">6.3.1</span> Air-sea fluxes</h3>
+<pre class="r"><code># calculate cumulative air-sea fluxes affecting surface water column
 tm_og_flux &lt;- tm_og %&gt;% 
   mutate(flux_scale = if_else(date_time &gt; date_180806,
                               i_dep_lim/i_dep_mix_lim * flux_scale,
@@ -4469,22 +4495,23 @@ tm_og_flux &lt;- tm_og %&gt;%
   mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
   select(date_time, flux_cum)
 
-# calculate cumulative air-sea fluxes affecting 10-17m
+# calculate cumulative air-sea fluxes affecting deepened mixed layer
 tm_og_flux_dep &lt;- tm_og %&gt;% 
   filter(date_time &gt; date_180806) %&gt;% 
-  mutate(flux_scale = (i_dep_mix_lim - i_dep_lim)/i_dep_mix_lim * flux_scale) %&gt;%
+  mutate(flux_scale = 
+           (i_dep_mix_lim - i_dep_lim)/i_dep_mix_lim * flux_scale) %&gt;%
   arrange(date_time) %&gt;% 
   mutate(flux_cum = cumsum(flux_scale)) %&gt;% 
   select(date_time, flux_cum)
 
-inCT_10_flux &lt;- full_join(inCT_10, tm_og_flux) %&gt;% 
+NCP_flux &lt;- full_join(NCP, tm_og_flux) %&gt;% 
   arrange(date_time)
 
-rm(tm_og_flux, inCT_10, tm_og)
+rm(tm_og_flux, NCP, tm_og)
 
 
 # linear interpolation of cumulative changes to frequency of the flux estimates estimates 
-inCT_10_flux &lt;- inCT_10_flux %&gt;% 
+NCP_flux &lt;- NCP_flux %&gt;% 
   mutate(nCT_i_cum = approxfun(date_time, nCT_i_cum)(date_time),
          flux_cum = approxfun(date_time, flux_cum)(date_time)) %&gt;% 
     fill(flux_cum) %&gt;% 
@@ -4492,64 +4519,77 @@ inCT_10_flux &lt;- inCT_10_flux %&gt;%
 
 
 # calculate cumulative fluxes inbetween cruises 
-inCT_10_flux_diff &lt;- inCT_10_flux %&gt;% 
+NCP_flux_diff &lt;- NCP_flux %&gt;% 
   filter(!is.na(date_time_ID_ref)) %&gt;% 
   mutate(flux_diff = flux_cum - lag(flux_cum, default = 0)) %&gt;% 
   select(date_time_ID_ref, observed=nCT_i_diff, flux=flux_diff) %&gt;% 
-  pivot_longer(cols = 2:3, names_to = &quot;var&quot;, values_to = &quot;value_diff&quot;)
-
-
-# calculate mixing with deep waters, corrected for air sea fluxes
-inCT_10_mix &lt;- tm_profiles_ID_long %&gt;% 
+  pivot_longer(cols = 2:3, names_to = &quot;var&quot;, values_to = &quot;value_diff&quot;)</code></pre>
+</div>
+<div id="vertical-mixing" class="section level3">
+<h3><span class="header-section-number">6.3.2</span> Vertical mixing</h3>
+<pre class="r"><code># calculate mixing with deep waters, corrected for air sea fluxes
+NCP_mix &lt;- tm_profiles_ID_long %&gt;% 
   filter(ID == &quot;180815&quot;,
          var == &quot;nCT&quot;,
          dep &lt; i_dep_mix_lim,
          dep &gt; i_dep_lim) %&gt;% 
-  group_by(ID, date_time_ID,
-           date_time_ID_ref) %&gt;% 
-  summarise(value_diff = sum(value_diff)/1000 + min(tm_og_flux_dep$flux_cum)) %&gt;% 
+  group_by(ID, date_time_ID, date_time_ID_ref) %&gt;% 
+  summarise(value_diff = 
+              sum(value_diff)/1000 + min(tm_og_flux_dep$flux_cum)) %&gt;% 
   ungroup()
 
 rm(tm_og_flux_dep)
 
-inCT_10_mix_diff &lt;- inCT_10_mix %&gt;% 
+NCP_mix_diff &lt;- NCP_mix %&gt;% 
   select(date_time_ID_ref, value_diff) %&gt;% 
   mutate(var=&quot;mixing&quot;)
 
-inCT_10_flux_mix_diff &lt;- 
-  full_join(inCT_10_flux_diff, inCT_10_mix_diff)
+NCP_flux_mix_diff &lt;- 
+  full_join(NCP_flux_diff, NCP_mix_diff)
 
-inCT_10_flux_mix &lt;-
-  full_join(inCT_10_flux,
-            inCT_10_mix %&gt;% rename(mix_cum = value_diff))
+NCP_flux_mix &lt;-
+  full_join(NCP_flux,
+            NCP_mix %&gt;% rename(mix_cum = value_diff))
 
-rm(inCT_10_mix, inCT_10_mix_diff, inCT_10_flux, inCT_10_flux_diff, date_180806)
+rm(NCP_mix, NCP_mix_diff, NCP_flux, NCP_flux_diff, date_180806)
 
-inCT_10_flux_mix &lt;- inCT_10_flux_mix %&gt;% 
+NCP_flux_mix &lt;- NCP_flux_mix %&gt;% 
   arrange(date_time) %&gt;% 
   fill(ID) %&gt;% 
   mutate(mix_cum = if_else(ID %in% c(&quot;180806&quot;, 180815), mix_cum, 0),
          mix_cum = na.approx(mix_cum),
          nCT_i_flux_mix_cum = nCT_i_flux_cum + mix_cum)
 
-  
-p_inCT &lt;- inCT_10_flux_mix %&gt;% 
+# reorder factors for plotting
+NCP_flux_mix_diff &lt;- NCP_flux_mix_diff %&gt;% 
+  mutate(var = factor(var, c(&quot;observed&quot;, &quot;flux&quot;, &quot;mixing&quot;)))
+
+NCP_flux_mix_long &lt;- NCP_flux_mix %&gt;% 
+  select(date_time, nCT_i_cum, nCT_i_flux_cum, nCT_i_flux_mix_cum) %&gt;% 
+  pivot_longer(nCT_i_cum:nCT_i_flux_mix_cum,
+               values_to = &quot;value&quot;,
+               names_to = &quot;var&quot;) %&gt;% 
+  mutate(var = fct_recode(var, 
+                          observed = &quot;nCT_i_cum&quot;,
+                          `flux corrected` = &quot;nCT_i_flux_cum&quot;,
+                          `flux + mixing corrected (NCP)` = &quot;nCT_i_flux_mix_cum&quot;))
+
+
+p_inCT &lt;- NCP_flux_mix_long %&gt;% 
   arrange(date_time) %&gt;% 
   ggplot()+
-  geom_col(data = inCT_10_flux_mix_diff,
+  geom_col(data = NCP_flux_mix_diff,
            aes(date_time_ID_ref, value_diff, fill=var),
            position = position_dodge2(preserve = &quot;single&quot;),
            alpha=0.5)+
   geom_hline(yintercept = 0)+
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
-  geom_line(aes(date_time, nCT_i_cum, col=&quot;observed&quot;))+
-  geom_line(aes(date_time, nCT_i_flux_mix_cum, col=&quot;mixing + flux corrected&quot;))+
-  geom_line(aes(date_time, nCT_i_flux_cum, col=&quot;flux corrected&quot;))+
+  geom_line(aes(date_time, value, col=var))+
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    date_labels = &quot;%b %d&quot;,
                    sec.axis = dup_axis())+
-  scale_fill_brewer(palette = &quot;Set1&quot;, name=&quot;incremental changes&quot;)+
-  scale_color_brewer(palette = &quot;Set1&quot;, name=&quot;cumulative changes&quot;)+
+  scale_fill_brewer(palette = &quot;Dark2&quot;, name=&quot;incremental changes&quot;)+
+  scale_color_brewer(palette = &quot;Dark2&quot;, name=&quot;cumulative changes&quot;)+
   labs(y=expression(atop(integrated~nC[T], (mol~m^{-2}))),
        title = &quot;Water column inventory changes&quot;)+
   guides(guide_colourbar(order = 1))+
@@ -4559,12 +4599,15 @@ p_inCT &lt;- inCT_10_flux_mix %&gt;%
         legend.direction = &quot;vertical&quot;)
 
 p_inCT</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/inCT_correction-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>inCT_10_flux_mix %&gt;%
-  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;tm_NCP_cum.csv&quot;))
+<p><img src="figure/CT_dynamics.Rmd/calculate%20mixing%20correction-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>NCP_flux_mix %&gt;%
+  write_csv(here::here(&quot;Data/_merged_data_files/CT_dynamics&quot;,
+                       &quot;tm_NCP_cum.csv&quot;))
 
-inCT_10_flux_mix_diff %&gt;%
-  write_csv(here::here(&quot;Data/_merged_data_files&quot;, &quot;tm_NCP_inc.csv&quot;))</code></pre>
+NCP_flux_mix_diff %&gt;%
+  write_csv(here::here(&quot;Data/_merged_data_files/CT_dynamics&quot;,
+                       &quot;tm_NCP_inc.csv&quot;))</code></pre>
+</div>
 </div>
 </div>
 <div id="open-tasks-questions" class="section level1">
