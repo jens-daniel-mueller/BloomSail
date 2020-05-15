@@ -1942,6 +1942,7 @@ tm_profiles_ID_long %>%
   filter(ID %in% c("180806", "180815"),
          var %in% c("nCT", "tem")) %>% 
   ggplot(aes(value, dep, col=ID))+
+  geom_hline(yintercept = c(12,17))+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
