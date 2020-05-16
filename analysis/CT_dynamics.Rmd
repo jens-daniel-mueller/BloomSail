@@ -1953,7 +1953,7 @@ tm_profiles_ID_long %>%
 
 The effect of mixing was derived from the mean concentration difference on Aug 06.
 
-```{r calculate_mixing_correction_concentration_gradient_t1}
+```{r calculate_mixing_correction_concentration_gradient_t1, eval=FALSE}
 
 # calculate mixing with deep waters, corrected for air sea fluxes
 nCT_surface <- tm_profiles_ID_long %>% 
@@ -2000,6 +2000,111 @@ NCP_flux_mix <-
             NCP_mix)
 
 rm(NCP_mix, NCP_mix_diff, NCP_flux, NCP_flux_diff, date_180806)
+
+NCP_flux_mix <- NCP_flux_mix %>% 
+  arrange(date_time) %>% 
+  fill(ID) %>% 
+  mutate(mix_cum = if_else(ID %in% c("180806", 180815), mix_cum, 0),
+         mix_cum = na.approx(mix_cum),
+         nCT_i_flux_mix_cum = nCT_i_flux_cum + mix_cum)
+
+# reorder factors for plotting
+NCP_flux_mix_diff <- NCP_flux_mix_diff %>% 
+  mutate(var = factor(var, c("observed", "flux", "mixing")))
+
+NCP_flux_mix_long <- NCP_flux_mix %>% 
+  select(date_time, nCT_i_cum, nCT_i_flux_cum, nCT_i_flux_mix_cum) %>% 
+  pivot_longer(nCT_i_cum:nCT_i_flux_mix_cum,
+               values_to = "value",
+               names_to = "var") %>% 
+  mutate(var = fct_recode(var, 
+                          observed = "nCT_i_cum",
+                          `flux corrected` = "nCT_i_flux_cum",
+                          `flux + mixing corrected (NCP)` = "nCT_i_flux_mix_cum"))
+
+
+p_inCT <- NCP_flux_mix_long %>% 
+  arrange(date_time) %>% 
+  ggplot()+
+  geom_col(data = NCP_flux_mix_diff,
+           aes(date_time_ID_ref, value_diff, fill=var),
+           position = position_dodge2(preserve = "single"),
+           alpha=0.5)+
+  geom_hline(yintercept = 0)+
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_line(aes(date_time, value, col=var))+
+  scale_x_datetime(date_breaks = "week",
+                   date_labels = "%b %d",
+                   sec.axis = dup_axis())+
+  scale_fill_brewer(palette = "Dark2", name="incremental changes")+
+  scale_color_brewer(palette = "Dark2", name="cumulative changes")+
+  labs(y=expression(atop(integrated~nC[T], (mol~m^{-2}))),
+       title = "Water column inventory changes")+
+  guides(guide_colourbar(order = 1))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x.top = element_blank(),
+        legend.position = "bottom",
+        legend.direction = "vertical")
+
+p_inCT
+
+NCP_flux_mix %>%
+  write_csv(here::here("Data/_merged_data_files/CT_dynamics",
+                       "tm_NCP_cum.csv"))
+
+NCP_flux_mix_diff %>%
+  write_csv(here::here("Data/_merged_data_files/CT_dynamics",
+                       "tm_NCP_inc.csv"))
+
+```
+
+
+```{r calculate_mixing_mass_conservation}
+
+# calculate mixing with deep waters, corrected for air sea fluxes
+nCT_inventory_mean <- tm_profiles_ID_long %>% 
+  filter(ID == "180806",
+         var == "nCT",
+         dep < i_dep_mix_lim) %>% 
+  summarise(nCT_surface = sum(value)/i_dep_mix_lim) %>% 
+  pull()
+
+nCT_delta_mix <- tm_profiles_ID_long %>% 
+  filter(ID == "180806",
+         var == "nCT",
+         dep < i_dep_mix_lim) %>% 
+  mutate(nCT_delta_mix = nCT_inventory_mean - value)
+
+NCP_mix_deep <- nCT_delta_mix %>% 
+  filter(dep < i_dep_mix_lim,
+         dep > i_dep_lim) %>% 
+  summarise(value_diff = sum(nCT_delta_mix)/1000) %>% 
+  mutate(ID = "180815")
+
+NCP_mix_shallow <- nCT_delta_mix %>% 
+  filter(dep < i_dep_lim) %>% 
+  summarise(value_diff = sum(nCT_delta_mix)/1000) %>% 
+  mutate(ID = "180815")
+
+rm(tm_og_flux_dep)
+
+NCP_mix_deep_diff <- NCP_mix_deep %>% 
+  mutate(var="mixing")
+
+NCP_flux_mix_diff <- 
+  full_join(NCP_flux_diff, NCP_mix_deep_diff) %>% #
+  arrange(ID) %>% 
+  fill(date_time_ID_ref)
+
+NCP_mix_deep <- NCP_mix_deep %>% 
+  rename(mix_cum = value_diff) %>% 
+  select(ID, mix_cum)
+  
+NCP_flux_mix <-
+  full_join(NCP_flux,
+            NCP_mix_deep)
+
+rm(NCP_mix_deep, NCP_mix_deep_diff, NCP_flux, NCP_flux_diff, date_180806)
 
 NCP_flux_mix <- NCP_flux_mix %>% 
   arrange(date_time) %>% 
