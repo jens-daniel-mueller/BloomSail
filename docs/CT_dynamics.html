@@ -442,7 +442,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">CT dynamics</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">15 May, 2020</h4>
+<h4 class="date">16 May, 2020</h4>
 
 </div>
 
@@ -467,7 +467,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-05-15
+<strong>Last updated:</strong> 2020-05-16
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -558,16 +558,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9e32c7a5d2a1d076f0af95f2dd35ca7e5a143f78targetblank9e32c7aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/9e32c7a5d2a1d076f0af95f2dd35ca7e5a143f78" target="_blank">9e32c7a</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree93cb4d34acf0e2ef8b9198f53162b821863819a8targetblank93cb4d3a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/93cb4d34acf0e2ef8b9198f53162b821863819a8" target="_blank">93cb4d3</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9e32c7a5d2a1d076f0af95f2dd35ca7e5a143f78targetblank9e32c7aa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree93cb4d34acf0e2ef8b9198f53162b821863819a8targetblank93cb4d3a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/9e32c7a5d2a1d076f0af95f2dd35ca7e5a143f78" target="_blank">9e32c7a</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/93cb4d34acf0e2ef8b9198f53162b821863819a8" target="_blank">93cb4d3</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -626,6 +626,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/93cb4d34acf0e2ef8b9198f53162b821863819a8/analysis/CT_dynamics.Rmd" target="_blank">93cb4d3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-16
+</td>
+<td>
+mixing from inventory redistribution approach
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/2f00b27c65a620dd1bbad0879a145157ee89f846/docs/CT_dynamics.html" target="_blank">2f00b27</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -4702,8 +4736,107 @@ p_inCT &lt;- NCP_flux_mix_long %&gt;%
         legend.position = &quot;bottom&quot;,
         legend.direction = &quot;vertical&quot;)
 
+p_inCT
+
+NCP_flux_mix %&gt;%
+  write_csv(here::here(&quot;Data/_merged_data_files/CT_dynamics&quot;,
+                       &quot;tm_NCP_cum.csv&quot;))
+
+NCP_flux_mix_diff %&gt;%
+  write_csv(here::here(&quot;Data/_merged_data_files/CT_dynamics&quot;,
+                       &quot;tm_NCP_inc.csv&quot;))</code></pre>
+<pre class="r"><code># calculate mixing with deep waters, corrected for air sea fluxes
+nCT_inventory_mean &lt;- tm_profiles_ID_long %&gt;% 
+  filter(ID == &quot;180806&quot;,
+         var == &quot;nCT&quot;,
+         dep &lt; i_dep_mix_lim) %&gt;% 
+  summarise(nCT_surface = sum(value)/i_dep_mix_lim) %&gt;% 
+  pull()
+
+nCT_delta_mix &lt;- tm_profiles_ID_long %&gt;% 
+  filter(ID == &quot;180806&quot;,
+         var == &quot;nCT&quot;,
+         dep &lt; i_dep_mix_lim) %&gt;% 
+  mutate(nCT_delta_mix = nCT_inventory_mean - value)
+
+NCP_mix_deep &lt;- nCT_delta_mix %&gt;% 
+  filter(dep &lt; i_dep_mix_lim,
+         dep &gt; i_dep_lim) %&gt;% 
+  summarise(value_diff = sum(nCT_delta_mix)/1000) %&gt;% 
+  mutate(ID = &quot;180815&quot;)
+
+NCP_mix_shallow &lt;- nCT_delta_mix %&gt;% 
+  filter(dep &lt; i_dep_lim) %&gt;% 
+  summarise(value_diff = sum(nCT_delta_mix)/1000) %&gt;% 
+  mutate(ID = &quot;180815&quot;)
+
+rm(tm_og_flux_dep)
+
+NCP_mix_deep_diff &lt;- NCP_mix_deep %&gt;% 
+  mutate(var=&quot;mixing&quot;)
+
+NCP_flux_mix_diff &lt;- 
+  full_join(NCP_flux_diff, NCP_mix_deep_diff) %&gt;% #
+  arrange(ID) %&gt;% 
+  fill(date_time_ID_ref)
+
+NCP_mix_deep &lt;- NCP_mix_deep %&gt;% 
+  rename(mix_cum = value_diff) %&gt;% 
+  select(ID, mix_cum)
+  
+NCP_flux_mix &lt;-
+  full_join(NCP_flux,
+            NCP_mix_deep)
+
+rm(NCP_mix_deep, NCP_mix_deep_diff, NCP_flux, NCP_flux_diff, date_180806)
+
+NCP_flux_mix &lt;- NCP_flux_mix %&gt;% 
+  arrange(date_time) %&gt;% 
+  fill(ID) %&gt;% 
+  mutate(mix_cum = if_else(ID %in% c(&quot;180806&quot;, 180815), mix_cum, 0),
+         mix_cum = na.approx(mix_cum),
+         nCT_i_flux_mix_cum = nCT_i_flux_cum + mix_cum)
+
+# reorder factors for plotting
+NCP_flux_mix_diff &lt;- NCP_flux_mix_diff %&gt;% 
+  mutate(var = factor(var, c(&quot;observed&quot;, &quot;flux&quot;, &quot;mixing&quot;)))
+
+NCP_flux_mix_long &lt;- NCP_flux_mix %&gt;% 
+  select(date_time, nCT_i_cum, nCT_i_flux_cum, nCT_i_flux_mix_cum) %&gt;% 
+  pivot_longer(nCT_i_cum:nCT_i_flux_mix_cum,
+               values_to = &quot;value&quot;,
+               names_to = &quot;var&quot;) %&gt;% 
+  mutate(var = fct_recode(var, 
+                          observed = &quot;nCT_i_cum&quot;,
+                          `flux corrected` = &quot;nCT_i_flux_cum&quot;,
+                          `flux + mixing corrected (NCP)` = &quot;nCT_i_flux_mix_cum&quot;))
+
+
+p_inCT &lt;- NCP_flux_mix_long %&gt;% 
+  arrange(date_time) %&gt;% 
+  ggplot()+
+  geom_col(data = NCP_flux_mix_diff,
+           aes(date_time_ID_ref, value_diff, fill=var),
+           position = position_dodge2(preserve = &quot;single&quot;),
+           alpha=0.5)+
+  geom_hline(yintercept = 0)+
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape=21)+
+  geom_line(aes(date_time, value, col=var))+
+  scale_x_datetime(date_breaks = &quot;week&quot;,
+                   date_labels = &quot;%b %d&quot;,
+                   sec.axis = dup_axis())+
+  scale_fill_brewer(palette = &quot;Dark2&quot;, name=&quot;incremental changes&quot;)+
+  scale_color_brewer(palette = &quot;Dark2&quot;, name=&quot;cumulative changes&quot;)+
+  labs(y=expression(atop(integrated~nC[T], (mol~m^{-2}))),
+       title = &quot;Water column inventory changes&quot;)+
+  guides(guide_colourbar(order = 1))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x.top = element_blank(),
+        legend.position = &quot;bottom&quot;,
+        legend.direction = &quot;vertical&quot;)
+
 p_inCT</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/calculate_mixing_correction_concentration_gradient_t1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/CT_dynamics.Rmd/calculate_mixing_mass_conservation-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>NCP_flux_mix %&gt;%
   write_csv(here::here(&quot;Data/_merged_data_files/CT_dynamics&quot;,
                        &quot;tm_NCP_cum.csv&quot;))
