@@ -953,7 +953,6 @@ rm(p_nCT_hov, bin_nCT, p_tem_hov, bin_Tem)
 
 ```
 
-
 ```{r pub_fig_nCT_tem_hov_abs_profiles_cum, include=FALSE}
 
 bin_nCT <- 30

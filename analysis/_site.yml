@@ -21,6 +21,8 @@ navbar:
       href: BloomSail_surface.html
     - text: Finnmaid + GETM
       href: Finnmaid+GETM.html
+    - text: Both data sets
+      href: NCP_reconstruction.html
   right:
   - icon: fa-github
     text: Source code
