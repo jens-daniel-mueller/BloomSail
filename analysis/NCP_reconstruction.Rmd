@@ -25,7 +25,6 @@ library(oce)
 library(patchwork)
 library(lubridate)
 library(metR)
-# library(marelac)
 ```
 
 
@@ -48,8 +47,9 @@ Note: The reconstruction of C~T~ profiles and the integration across the tempera
 
 max_dep <- 25
 surface_dep <- 6
-
 integration_dep <- 12
+
+date_CT_min <- ymd_hms("2018-07-24 07:58:29")
 
 ```
 
@@ -66,7 +66,7 @@ tm_profiles_ID <-
   read_csv(here::here("Data/_merged_data_files/CT_dynamics", "tm_profiles_ID.csv"))
 
 tm_profiles_ID <- tm_profiles_ID %>% 
-  select(- c(date_ID))
+  select(-c(date_ID))
 
 ```
 
@@ -77,10 +77,10 @@ tm_profiles_ID_long <- tm_profiles_ID %>%
   pivot_longer(c("tem", "nCT"), values_to = "value", names_to = "var") %>% 
   group_by(var, dep) %>%
   arrange(date_time_ID) %>%
-  mutate(#date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
-         #date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
+  mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
          value_diff = value     - lag(value, default = first(value)),
-         #value_diff_daily = value_diff / date_time_ID_diff,
+         value_diff_daily = value_diff / date_time_ID_diff,
          value_cum = cumsum(value_diff)) %>% 
   ungroup()
 
@@ -91,7 +91,7 @@ tm_profiles_ID_long <- tm_profiles_ID %>%
 
 ### Cumulative on July 23
 
-```{r calculate_penetration_depth_cumulative_tm}
+```{r calculate_TPD_cumulative_tm}
 
 tm_profiles_ID_long_180723 <- tm_profiles_ID_long %>% 
   filter(ID == 180723)
@@ -121,9 +121,9 @@ value_surface <- tm_profiles_ID_long_180723 %>%
   summarise(value_surface = mean(value_cum)) %>% 
   ungroup()
 
-d_pen <- full_join(value_cum, value_surface)
-d_pen <- d_pen %>% 
-  mutate(d_pen = value_cum_i / value_surface)
+TPD <- full_join(value_cum, value_surface)
+TPD <- TPD %>% 
+  mutate(TPD = value_cum_i / value_surface)
   
 rm(value_cum, value_surface)
 
@@ -131,13 +131,13 @@ rm(value_cum, value_surface)
 ```
 
 
-```{r penetration_depth_cumulative_tm_profiles}
+```{r TPD_cumulative_tm_profiles}
 
 p_tm_profiles_ID_long <- tm_profiles_ID_long_180723 %>% 
   arrange(dep) %>% 
   ggplot(aes(value_cum, dep))+
   geom_hline(aes(yintercept = integration_dep, col="integration"))+
-  geom_hline(data = d_pen, aes(yintercept = d_pen, col="penetration"))+
+  geom_hline(data = TPD, aes(yintercept = TPD, col="penetration"))+
   geom_vline(xintercept = 0)+
   geom_point()+
   geom_path()+
@@ -150,7 +150,7 @@ p_tm_profiles_ID_long <- tm_profiles_ID_long_180723 %>%
 p_tm_profiles_ID_long_rel <- tm_profiles_ID_long_180723_dep %>% 
   ggplot(aes(value_cum_i_rel, dep))+
   geom_hline(aes(yintercept = integration_dep, col="integration"))+
-  geom_hline(data = d_pen, aes(yintercept = d_pen, col="penetration"))+
+  geom_hline(data = TPD, aes(yintercept = TPD, col="penetration"))+
   geom_vline(xintercept = 90)+
   geom_point()+
   geom_line()+
@@ -163,19 +163,20 @@ p_tm_profiles_ID_long_rel <- tm_profiles_ID_long_180723_dep %>%
 
 p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel
 
-d_pen
+TPD
 
 rm(tm_profiles_ID_long_180723,
    tm_profiles_ID_long_180723_dep,
    p_tm_profiles_ID_long,
-   p_tm_profiles_ID_long_rel)
+   p_tm_profiles_ID_long_rel,
+   TPD)
 
 ```
 
 
 ### Daily
 
-```{r calculate_penetration_depth_daily_tm}
+```{r calculate_TPD_daily_tm}
 
 # surface values
 diff_surface <- tm_profiles_ID_long %>% 
@@ -193,7 +194,7 @@ rm(diff_surface)
 
 # calculate penetration depths
 
-penetration_depth <- tm_profiles_ID_long %>% 
+TPD <- tm_profiles_ID_long %>% 
   mutate(value_diff = if_else(value_diff > 0 & var == "nCT",
                                       NaN, value_diff),
          value_diff = if_else(value_diff < 0 & var == "tem",
@@ -202,20 +203,20 @@ penetration_depth <- tm_profiles_ID_long %>%
   summarise(value_diff_int = sum(value_diff, na.rm = TRUE),
             value_diff_surface = mean(value_diff_surface, na.rm = TRUE)) %>% 
   ungroup() %>% 
-  mutate(penetration_depth_diff = value_diff_int / value_diff_surface)
+  mutate(i_dep = value_diff_int / value_diff_surface)
 
-penetration_depth_mean <- penetration_depth %>% 
+TPD_mean <- TPD %>% 
   group_by(var) %>% 
-  summarise(penetration_depth_diff_mean = mean(penetration_depth_diff, na.rm=TRUE),
-            penetration_depth_diff_sd = sd(penetration_depth_diff, na.rm=TRUE)) %>% 
+  summarise(i_dep_mean = mean(i_dep, na.rm=TRUE),
+            i_dep_sd = sd(i_dep, na.rm=TRUE)) %>% 
   ungroup()
 
 
 ```
 
-```{r penetration_depth_daily_tm_time_series}
+```{r TPD_daily_tm_time_series}
 
-p_surface <- penetration_depth %>% 
+p_surface <- TPD %>% 
   ggplot(aes(date_time_ID, value_diff_surface))+
   geom_hline(yintercept = 0)+
   geom_line()+
@@ -227,7 +228,7 @@ p_surface <- penetration_depth %>%
         legend.title = element_blank())+
   facet_grid(var~., scales = "free_y")
 
-p_integrated <- penetration_depth %>% 
+p_integrated <- TPD %>% 
   ggplot(aes(date_time_ID, value_diff_int))+
   geom_hline(yintercept = 0)+
   geom_line()+
@@ -239,11 +240,11 @@ p_integrated <- penetration_depth %>%
         legend.title = element_blank())+
   facet_grid(var~., scales = "free_y")
 
-p_pen_dep <- penetration_depth %>% 
-  ggplot(aes(date_time_ID, penetration_depth_diff, col=var))+
+p_pen_dep <- TPD %>% 
+  ggplot(aes(date_time_ID, i_dep, col=var))+
   geom_hline(yintercept = 0)+
-  geom_hline(data = penetration_depth_mean,
-             aes(yintercept = penetration_depth_diff_mean,
+  geom_hline(data = TPD_mean,
+             aes(yintercept = i_dep_mean,
                  col=var, linetype = "mean"))+
   geom_line(aes(linetype="cruise"))+
   geom_point()+
@@ -257,11 +258,11 @@ p_pen_dep <- penetration_depth %>%
 p_surface + p_integrated + p_pen_dep + 
   plot_layout(ncol = 1)
 
-penetration_depth_mean
+TPD_mean
 
 
 rm(p_surface, p_integrated, p_pen_dep)
-rm(penetration_depth, penetration_depth_mean, tm_profiles_ID_long)
+rm(TPD, TPD_mean, tm_profiles_ID_long)
 
 ```
 
@@ -376,6 +377,8 @@ gt_3d <- gt_3d_long %>%
   pivot_wider(values_from = value, names_from = var) %>% 
   select(-SurfaceAge) %>% 
   rename(sal = salt, tem=temp)
+
+rm(select_route, high_lat, low_lat)
 
 ```
 
@@ -598,14 +601,13 @@ fm_tm_ID_wide <- fm_tm_ID %>%
   pivot_wider(values_from = value, names_from = var)
 
 
-
 fm_gt <- expand_grid(fm_tm_ID_wide, dep = unique(gt_3d_int$dep))
 
 fm_gt <- full_join(fm_gt,
                    gt_3d_int %>% rename(date_time_ID = date_time)) %>% 
   arrange(date_time_ID)
 
-rm(fm_tm_ID_wide, gt_3d_int)
+rm(fm_tm_ID_wide, fm_tm_ID, gt_3d_int)
 
 ```
 
@@ -638,6 +640,9 @@ fm_gt <- fm_gt %>%
 
 tm_fm_gt <- bind_rows(tm_profiles_ID, fm_gt)
 
+
+rm(fm_gt, tm_profiles_ID)
+
 ```
 
 ```{r tm_fm_gt_time_series}
@@ -653,6 +658,7 @@ tm_fm_gt_long %>%
   scale_x_datetime(date_breaks = "week",
                    date_labels = "%b %d")+
   facet_grid(var~., scales = "free_y")+
+  labs(title = "Time series at 3.5 m")+
   theme(axis.title.x = element_blank())
 
 ```
@@ -705,7 +711,8 @@ tm_fm_gt %>%
   geom_vline(aes(xintercept = date_time_ID),
              col="white", linetype = "1f")+
   scale_fill_viridis_c(name="Rho", option = "B",
-                       guide = "colorstrip", breaks = MakeBreaks(bin))+
+                       guide = "colorstrip", breaks = MakeBreaks(bin),
+                       direction = -1)+
   scale_y_reverse()+
   scale_x_datetime(date_breaks = "week",
                    date_labels = "%b %d")+
@@ -765,12 +772,29 @@ rm(bin)
 
 rho_lim_value <- 0.1
 
-tm_fm_gt_MLD <- tm_fm_gt_MLD %>% 
+MLD <- tm_fm_gt_MLD %>% 
   filter(rho_lim == rho_lim_value) %>% 
-  select(-rho_lim)
+  select(-rho_lim) %>% 
+  rename(i_dep = MLD) %>% 
+  mutate(i_method = "MLD", i_res = "daily")
+
+rm(tm_fm_gt_MLD)
+
+```
 
 
-tm_fm_gt <- full_join(tm_fm_gt, tm_fm_gt_MLD)
+```{r mean_MLD}
+
+MLD_mean <- MLD %>% 
+  filter(date_time_ID <= date_CT_min) %>% 
+  group_by(source) %>% 
+  summarise(i_dep = mean(i_dep, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  mutate(i_method = "MLD", i_res = "mean")
+
+MLD <- full_join(MLD, MLD_mean)
+
+rm(MLD_mean)
 
 ```
 
@@ -795,6 +819,12 @@ tm_fm_gt_long <- tm_fm_gt_long %>%
   filter(var == "tem") %>% 
   select(-var)
 
+```
+
+
+```{r define_gt_i_dep}
+
+gt_i_dep <- 19
 
 ```
 
@@ -802,11 +832,11 @@ tm_fm_gt_long <- tm_fm_gt_long %>%
 ```{r cumulative_tem_profile}
 
 tm_fm_gt_long %>% 
-  filter(date_time_ID == ymd_hms("2018-07-24 07:58:29")) %>% 
+  filter(date_time_ID == date_CT_min) %>% 
   arrange(dep) %>% 
   ggplot(aes(value_cum, dep))+
   geom_vline(xintercept = 0)+
-  geom_hline(yintercept = 19)+
+  geom_hline(yintercept = gt_i_dep)+
   geom_point()+
   geom_path()+
   scale_y_reverse()+
@@ -819,13 +849,13 @@ tm_fm_gt_long %>%
 
 ### Cumulative changes
 
-```{r calculation_penetration_depth_cumulative}
+```{r calculation_TPD_cumulative}
 
 tm_fm_gt_long_180723 <- tm_fm_gt_long %>% 
-  filter(date_time_ID == ymd_hms("2018-07-24 07:58:29")) %>% 
+  filter(date_time_ID == date_CT_min) %>% 
     mutate(value_cum = if_else(value_cum < 0,
                              NaN, value_cum),
-         value_cum = if_else(source == "fm" & dep > 19,
+         value_cum = if_else(source == "fm" & dep > gt_i_dep,
                              NaN, value_cum))
 
 tm_fm_gt_long_180723_dep <- tm_fm_gt_long_180723 %>% 
@@ -849,9 +879,9 @@ value_surface <- tm_fm_gt_long_180723 %>%
   summarise(value_surface = mean(value_cum)) %>% 
   ungroup()
 
-d_pen <- full_join(value_cum, value_surface)
-d_pen <- d_pen %>% 
-  mutate(d_pen = value_cum_i / value_surface)
+TPD <- full_join(value_cum, value_surface)
+TPD <- TPD %>% 
+  mutate(i_dep = value_cum_i / value_surface)
   
 rm(value_cum, value_surface)
 
@@ -860,13 +890,13 @@ rm(value_cum, value_surface)
 
 ### Cumulative on July 23
 
-```{r penetration_depth_cumulative_profiles_180723}
+```{r TPD_cumulative_profiles_180723}
 
 p_tm_fm_gt_long <- tm_fm_gt_long_180723 %>% 
   arrange(dep) %>% 
   ggplot(aes(value_cum, dep))+
   geom_hline(aes(yintercept = integration_dep, col="integration"))+
-  geom_hline(data = d_pen, aes(yintercept = d_pen, col="penetration"))+
+  geom_hline(data = TPD, aes(yintercept = i_dep, col="penetration"))+
   geom_vline(xintercept = 0)+
   geom_point()+
   geom_path()+
@@ -879,7 +909,7 @@ p_tm_fm_gt_long <- tm_fm_gt_long_180723 %>%
 p_tm_fm_gt_long_rel <- tm_fm_gt_long_180723_dep %>% 
   ggplot(aes(value_cum_i_rel, dep))+
   geom_hline(aes(yintercept = integration_dep, col="integration"))+
-  geom_hline(data = d_pen, aes(yintercept = d_pen, col="penetration"))+
+  geom_hline(data = TPD, aes(yintercept = i_dep, col="penetration"))+
   geom_vline(xintercept = 90)+
   geom_point()+
   geom_line()+
@@ -897,14 +927,16 @@ rm(tm_fm_gt_long_180723,
    p_tm_fm_gt_long,
    p_tm_fm_gt_long_rel)
 
-d_pen
+TPD_cum <- TPD
+
+rm(TPD)
 
 ```
 
 
 ### Daily
 
-```{r penetration_depth_daily}
+```{r TPD_daily}
 
 # surface values
 diff_surface <- tm_fm_gt_long %>% 
@@ -920,7 +952,7 @@ rm(diff_surface)
 
 # calculate penetration depths
 
-penetration_depth <- tm_fm_gt_long %>% 
+TPD <- tm_fm_gt_long %>% 
   mutate(value_diff = if_else(value_diff < 0,
                                       NaN, value_diff),
          value_diff = if_else(source == "fm" & dep > 19,
@@ -929,15 +961,16 @@ penetration_depth <- tm_fm_gt_long %>%
   summarise(value_diff_int = sum(value_diff, na.rm = TRUE),
             value_diff_surface = mean(value_diff_surface, na.rm = TRUE)) %>% 
   ungroup() %>% 
-  mutate(penetration_depth_diff = value_diff_int / value_diff_surface)
+  mutate(i_dep = value_diff_int / value_diff_surface)
 
-penetration_depth_mean <- penetration_depth %>% 
+TPD_mean <- TPD %>% 
+  filter(date_time_ID <= date_CT_min) %>% 
   group_by(source) %>% 
-  summarise(penetration_depth_diff_mean = mean(penetration_depth_diff, na.rm=TRUE),
-            penetration_depth_diff_sd = sd(penetration_depth_diff, na.rm=TRUE)) %>% 
+  summarise(i_dep_sd = sd(i_dep, na.rm=TRUE),
+            i_dep = mean(i_dep, na.rm=TRUE)) %>% 
   ungroup()
 
-p_surface <- penetration_depth %>% 
+p_surface <- TPD %>% 
   ggplot(aes(date_time_ID, value_diff_surface, col=source))+
   geom_hline(yintercept = 0)+
   geom_line()+
@@ -948,7 +981,7 @@ p_surface <- penetration_depth %>%
   theme(axis.title.x = element_blank(),
         legend.title = element_blank())
 
-p_integrated <- penetration_depth %>% 
+p_integrated <- TPD %>% 
   ggplot(aes(date_time_ID, value_diff_int, col=source))+
   geom_hline(yintercept = 0)+
   geom_line()+
@@ -959,11 +992,11 @@ p_integrated <- penetration_depth %>%
   theme(axis.title.x = element_blank(),
         legend.title = element_blank())
 
-p_pen_dep <- penetration_depth %>% 
-  ggplot(aes(date_time_ID, penetration_depth_diff, col=source))+
+p_TPD <- TPD %>% 
+  ggplot(aes(date_time_ID, i_dep, col=source))+
   geom_hline(yintercept = 0)+
-  geom_hline(data = penetration_depth_mean,
-             aes(yintercept = penetration_depth_diff_mean,
+  geom_hline(data = TPD_mean,
+             aes(yintercept = i_dep,
                  col=source, linetype = "mean"))+
   geom_line(aes(linetype="cruise"))+
   geom_point()+
@@ -974,36 +1007,70 @@ p_pen_dep <- penetration_depth %>%
         legend.title = element_blank())
 
 
-p_surface + p_integrated + p_pen_dep + 
+p_surface + p_integrated + p_TPD + 
   plot_layout(ncol = 1)
 
+TPD_mean
 
-penetration_depth_mean
-
-
-rm(p_surface, p_integrated, p_pen_dep)
-rm(penetration_depth, penetration_depth_mean, tm_fm_gt_long)
+rm(p_surface, p_integrated, p_TPD)
 
 ```
 
+```{r join_TPD_estimates}
 
-# Remove CO2 profiles
+TPD <- TPD %>% 
+  select(date_time_ID, source, i_dep) %>% 
+  mutate(i_method = "TPD", i_res = "daily")
 
-```{r tm_remove_CT_depth, eval=FALSE}
+TPD_cum <- TPD_cum %>% 
+  select(source, i_dep) %>% 
+  mutate(i_method = "TPD", i_res = "cum")
 
-tm_profiles_ID_surface <- tm_profiles_ID %>% 
+TPD_mean <- TPD_mean %>% 
+  select(source, i_dep) %>% 
+  mutate(i_method = "TPD", i_res = "mean")
+
+TPD <- full_join(TPD, TPD_cum)
+TPD <- full_join(TPD, TPD_mean)
+
+rm(TPD_cum, TPD_mean)
+
+```
+
+```{r join_i_dep_estimates}
+
+i_dep <- full_join(MLD, TPD)
+rm(MLD, TPD)
+
+```
+
+# Surface obs + integration depths
+
+```{r restrict_to_surface_CO2}
+
+tm_fm_gt_surface <- tm_fm_gt %>% 
   filter(dep < surface_dep) %>% 
-  group_by(ID) %>% 
-  summarise(nCT = mean(nCT)) %>% 
-  ungroup() %>% 
-  mutate(dep = 3.5)
+  select(source, date_time_ID, nCT) %>% 
+  group_by(source, date_time_ID) %>% 
+  summarise(nCT = mean(nCT, na.rm = TRUE)) %>% 
+  ungroup()
+
+tm_fm_gt_surface <- tm_fm_gt_surface %>%
+  group_by(source) %>%
+  arrange(date_time_ID) %>%
+  mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
+         nCT_diff = nCT - lag(nCT, default = first(nCT)),
+         nCT_cum = cumsum(nCT_diff)) %>% 
+  ungroup()
 
 
-tm_profiles_ID <- tm_profiles_ID %>% 
-  select(-nCT)
+```
 
-tm_profiles_ID <- full_join(tm_profiles_ID, tm_profiles_ID_surface)
-rm(tm_profiles_ID_surface)
+```{r merge_obs_integration_depth}
+
+NCP <- full_join(tm_fm_gt_surface, i_dep)
+rm(tm_fm_gt_surface, i_dep)
 
 ```
 
