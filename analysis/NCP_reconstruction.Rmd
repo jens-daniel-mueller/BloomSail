@@ -666,7 +666,7 @@ tm_fm_gt %>%
   geom_contour_fill(breaks = MakeBreaks(bin))+
   geom_vline(aes(xintercept = date_time_ID),
              col="white", linetype = "1f")+
-  scale_fill_viridis_c(name="Temperature (°C)", option = "B",
+  scale_fill_viridis_c(name="Tem (°C)", option = "B",
                        guide = "colorstrip", breaks = MakeBreaks(bin))+
   scale_y_reverse()+
   scale_x_datetime(date_breaks = "week",
@@ -734,23 +734,6 @@ tm_fm_gt_MLD <- tm_fm_gt_MLD %>%
 
 ```
 
-```{r MLD_time_series}
-
-tm_fm_gt_MLD %>% 
-  ggplot()+
-  geom_hline(yintercept = 0)+
-  geom_line(aes(date_time_ID, MLD, col=rho_lim))+
-  scale_y_reverse(limits = c(25,0))+
-  scale_x_datetime(date_breaks = "week",
-                   date_labels = "%b %d")+
-  scale_color_viridis_d(name="Rho lim")+
-  labs(x="", y="MLD (m)")+
-  facet_grid(source~.)
-
-
-```
-
-
 ```{r tm_fm_gt_hovmoeller_tem_MLD}
 
 bin <- 2
@@ -760,10 +743,10 @@ tm_fm_gt %>%
   geom_contour_fill(aes(date_time_ID, dep, z=tem),
                     breaks = MakeBreaks(bin))+
   geom_path(data = tm_fm_gt_MLD, aes(date_time_ID, MLD, col=rho_lim))+
-  scale_fill_gradient(name="Temperature (°C)",
+  scale_fill_gradient(name="Tem (°C)",
                       guide = "colorstrip", breaks = MakeBreaks(bin),
-                      high = "white",
-                      low = "darkgrey")+
+                      high = "grey90",
+                      low = "grey10")+
   scale_color_viridis_d()+
   scale_y_reverse()+
   scale_x_datetime(date_breaks = "week",
