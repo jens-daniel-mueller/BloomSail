@@ -91,7 +91,7 @@ tm_profiles_ID_long <- tm_profiles_ID %>%
 
 ### Cumulative on July 23
 
-```{r penetration_depth_cumulative_tm}
+```{r calculate_penetration_depth_cumulative_tm}
 
 tm_profiles_ID_long_180723 <- tm_profiles_ID_long %>% 
   filter(ID == 180723)
@@ -128,6 +128,11 @@ d_pen <- d_pen %>%
 rm(value_cum, value_surface)
 
 
+```
+
+
+```{r penetration_depth_cumulative_tm_profiles}
+
 p_tm_profiles_ID_long <- tm_profiles_ID_long_180723 %>% 
   arrange(dep) %>% 
   ggplot(aes(value_cum, dep))+
@@ -158,6 +163,8 @@ p_tm_profiles_ID_long_rel <- tm_profiles_ID_long_180723_dep %>%
 
 p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel
 
+d_pen
+
 rm(tm_profiles_ID_long_180723,
    tm_profiles_ID_long_180723_dep,
    p_tm_profiles_ID_long,
@@ -165,9 +172,10 @@ rm(tm_profiles_ID_long_180723,
 
 ```
 
+
 ### Daily
 
-```{r penetration_depth_daily_tm}
+```{r calculate_penetration_depth_daily_tm}
 
 # surface values
 diff_surface <- tm_profiles_ID_long %>% 
@@ -202,7 +210,10 @@ penetration_depth_mean <- penetration_depth %>%
             penetration_depth_diff_sd = sd(penetration_depth_diff, na.rm=TRUE)) %>% 
   ungroup()
 
-penetration_depth_mean
+
+```
+
+```{r penetration_depth_daily_tm_time_series}
 
 p_surface <- penetration_depth %>% 
   ggplot(aes(date_time_ID, value_diff_surface))+
@@ -246,13 +257,19 @@ p_pen_dep <- penetration_depth %>%
 p_surface + p_integrated + p_pen_dep + 
   plot_layout(ncol = 1)
 
+penetration_depth_mean
+
+
 rm(p_surface, p_integrated, p_pen_dep)
 rm(penetration_depth, penetration_depth_mean, tm_profiles_ID_long)
 
 ```
 
 
-## Finnmaid
+
+# GETM
+
+## Subsetting criteria
 
 ```{r gt_subsetting_criteria}
 
@@ -273,20 +290,7 @@ fixed_values <-
 
 ```
 
-### Approach
-
-In order to test how (and how well) the depth-integrated C~T~ estimates can be reproduced if only surface CO~2~ data from VOS Finnamaid and hydrographical GETM model date were available, two reconstruction approaches were tested:
-
-1. MLD: Integration of surface observation across the MLD, assuming homogenious vertical patterns
-2. Temperature: Vertical reconstruction of incremental CT changes based on profiles of incremental changes in temperature
-
-### GETM
-
-The following information refer to regional mean values modeled along the Finnmaid track east and within the BloomSail field work area (57.3 - 57.5 N). 
-
-## STD Profiles 
-
-Mean daily salinity and temperature profiles were extracted from 3d GETM data (vertically resolved transects).
+## Read netcdf file
 
 ```{r read_gt_3d_sal_tem_age, eval=FALSE}
 
@@ -361,9 +365,9 @@ rm(gt_3d, gt_3d_long, i, lat, d, t, var_3d)
 
 ```
 
-Seawater density was calculated according to TEOS-10.
+## Sal and tem profiles
 
-```{r calculate_rho_gt_3d}
+```{r re-read_gt_3d}
 
 gt_3d_long <- 
   read_csv(here::here("data/_summarized_data_files", "gt_3d_long.csv"))
@@ -392,8 +396,6 @@ gt_3d_long %>%
 rm(gt_3d_long)
 
 ```
-
-
 
 
 # Finnmaid
