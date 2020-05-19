@@ -745,16 +745,15 @@ tm_fm_gt %>%
   geom_path(data = tm_fm_gt_MLD, aes(date_time_ID, MLD, col=rho_lim))+
   scale_fill_gradient(name="Tem (°C)",
                       guide = "colorstrip", breaks = MakeBreaks(bin),
-                      high = "grey90",
-                      low = "grey10")+
+                      high = "grey80",
+                      low = "grey5")+
   scale_color_viridis_d()+
   scale_y_reverse()+
   scale_x_datetime(date_breaks = "week",
                    date_labels = "%b %d")+
   coord_cartesian(expand = 0)+
   labs(y="Depth (m)")+
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())+
+  theme(axis.title.x = element_blank())+
   facet_grid(source~.)
 
 
@@ -778,8 +777,6 @@ tm_fm_gt <- full_join(tm_fm_gt, tm_fm_gt_MLD)
 
 ## Penetration depth
 
-
-
 ```{r calculate_cumulative_changes}
 
 tm_fm_gt_long <- tm_fm_gt %>%
@@ -787,10 +784,10 @@ tm_fm_gt_long <- tm_fm_gt %>%
   pivot_longer(c("tem", "nCT"), values_to = "value", names_to = "var") %>% 
   group_by(source, var, dep) %>%
   arrange(date_time_ID) %>%
-  mutate(#date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
-         #date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
+  mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
          value_diff = value     - lag(value, default = first(value)),
-         #value_diff_daily = value_diff / date_time_ID_diff,
+         value_diff_daily = value_diff / date_time_ID_diff,
          value_cum = cumsum(value_diff)) %>% 
   ungroup()
 
@@ -801,19 +798,38 @@ tm_fm_gt_long <- tm_fm_gt_long %>%
 
 ```
 
-## Penetration depth
 
-### Cumulative
+```{r cumulative_tem_profile}
 
-```{r penetration_depth_cumulative}
+tm_fm_gt_long %>% 
+  filter(date_time_ID == ymd_hms("2018-07-24 07:58:29")) %>% 
+  arrange(dep) %>% 
+  ggplot(aes(value_cum, dep))+
+  geom_vline(xintercept = 0)+
+  geom_hline(yintercept = 19)+
+  geom_point()+
+  geom_path()+
+  scale_y_reverse()+
+  labs(y = "Depth (m)", x="Cumulative change")+
+  theme(legend.position = "left")+
+  facet_grid(.~source, scales = "free_x")
+
+```
+
+
+### Cumulative changes
+
+```{r calculation_penetration_depth_cumulative}
 
 tm_fm_gt_long_180723 <- tm_fm_gt_long %>% 
-  filter(date_time_ID == ymd_hms("2018-07-24 07:58:29"))
+  filter(date_time_ID == ymd_hms("2018-07-24 07:58:29")) %>% 
+    mutate(value_cum = if_else(value_cum < 0,
+                             NaN, value_cum),
+         value_cum = if_else(source == "fm" & dep > 19,
+                             NaN, value_cum))
 
 tm_fm_gt_long_180723_dep <- tm_fm_gt_long_180723 %>% 
   select(source, dep, value_cum) %>% 
-  mutate(value_cum = if_else(value_cum < 0,
-                             NaN, value_cum)) %>% 
   group_by(source) %>% 
   arrange(dep) %>% 
   mutate(value_cum_i = sum(value_cum, na.rm = TRUE),
@@ -839,6 +855,12 @@ d_pen <- d_pen %>%
   
 rm(value_cum, value_surface)
 
+```
+
+
+### Cumulative on July 23
+
+```{r penetration_depth_cumulative_profiles_180723}
 
 p_tm_fm_gt_long <- tm_fm_gt_long_180723 %>% 
   arrange(dep) %>% 
@@ -875,7 +897,10 @@ rm(tm_fm_gt_long_180723,
    p_tm_fm_gt_long,
    p_tm_fm_gt_long_rel)
 
+d_pen
+
 ```
+
 
 ### Daily
 
@@ -897,7 +922,9 @@ rm(diff_surface)
 
 penetration_depth <- tm_fm_gt_long %>% 
   mutate(value_diff = if_else(value_diff < 0,
-                                      NaN, value_diff)) %>% 
+                                      NaN, value_diff),
+         value_diff = if_else(source == "fm" & dep > 19,
+                              NaN, value_diff)) %>% 
   group_by(date_time_ID, source) %>% 
   summarise(value_diff_int = sum(value_diff, na.rm = TRUE),
             value_diff_surface = mean(value_diff_surface, na.rm = TRUE)) %>% 
@@ -960,7 +987,7 @@ rm(penetration_depth, penetration_depth_mean, tm_fm_gt_long)
 ```
 
 
-## Remove CO2 profiles
+# Remove CO2 profiles
 
 ```{r tm_remove_CT_depth, eval=FALSE}
 
