@@ -561,16 +561,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree536cb1a9d58785b6b1087aea26ac3f0f3800076etargetblank536cb1aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/536cb1a9d58785b6b1087aea26ac3f0f3800076e" target="_blank">536cb1a</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0ba33ec8de552bc6e02de58e37a904138a3f85b1targetblank0ba33eca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/0ba33ec8de552bc6e02de58e37a904138a3f85b1" target="_blank">0ba33ec</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree536cb1a9d58785b6b1087aea26ac3f0f3800076etargetblank536cb1aa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0ba33ec8de552bc6e02de58e37a904138a3f85b1targetblank0ba33eca" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/536cb1a9d58785b6b1087aea26ac3f0f3800076e" target="_blank">536cb1a</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/0ba33ec8de552bc6e02de58e37a904138a3f85b1" target="_blank">0ba33ec</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -626,6 +626,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/0ba33ec8de552bc6e02de58e37a904138a3f85b1/analysis/NCP_reconstruction.Rmd" target="_blank">0ba33ec</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-19
+</td>
+<td>
+cleaned NCP reconstruction IV
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/7f4066edc099d4f2d427945d2d986ff24755265f/docs/NCP_reconstruction.html" target="_blank">7f4066e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1277,7 +1311,7 @@ tm_fm_gt %&gt;%
   geom_contour_fill(breaks = MakeBreaks(bin))+
   geom_vline(aes(xintercept = date_time_ID),
              col=&quot;white&quot;, linetype = &quot;1f&quot;)+
-  scale_fill_viridis_c(name=&quot;Temperature (°C)&quot;, option = &quot;B&quot;,
+  scale_fill_viridis_c(name=&quot;Tem (°C)&quot;, option = &quot;B&quot;,
                        guide = &quot;colorstrip&quot;, breaks = MakeBreaks(bin))+
   scale_y_reverse()+
   scale_x_datetime(date_breaks = &quot;week&quot;,
@@ -1330,17 +1364,6 @@ tm_fm_gt_MLD &lt;- tm_fm_gt_MLD %&gt;%
   summarise(MLD = min(dep)) %&gt;% 
   ungroup() %&gt;% 
   mutate(rho_lim = as.factor(rho_lim))</code></pre>
-<pre class="r"><code>tm_fm_gt_MLD %&gt;% 
-  ggplot()+
-  geom_hline(yintercept = 0)+
-  geom_line(aes(date_time_ID, MLD, col=rho_lim))+
-  scale_y_reverse(limits = c(25,0))+
-  scale_x_datetime(date_breaks = &quot;week&quot;,
-                   date_labels = &quot;%b %d&quot;)+
-  scale_color_viridis_d(name=&quot;Rho lim&quot;)+
-  labs(x=&quot;&quot;, y=&quot;MLD (m)&quot;)+
-  facet_grid(source~.)</code></pre>
-<p><img src="figure/NCP_reconstruction.Rmd/MLD_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>bin &lt;- 2
 
 tm_fm_gt %&gt;% 
@@ -1348,10 +1371,10 @@ tm_fm_gt %&gt;%
   geom_contour_fill(aes(date_time_ID, dep, z=tem),
                     breaks = MakeBreaks(bin))+
   geom_path(data = tm_fm_gt_MLD, aes(date_time_ID, MLD, col=rho_lim))+
-  scale_fill_gradient(name=&quot;Temperature (°C)&quot;,
+  scale_fill_gradient(name=&quot;Tem (°C)&quot;,
                       guide = &quot;colorstrip&quot;, breaks = MakeBreaks(bin),
-                      high = &quot;white&quot;,
-                      low = &quot;darkgrey&quot;)+
+                      high = &quot;grey90&quot;,
+                      low = &quot;grey10&quot;)+
   scale_color_viridis_d()+
   scale_y_reverse()+
   scale_x_datetime(date_breaks = &quot;week&quot;,
