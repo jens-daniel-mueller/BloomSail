@@ -54,10 +54,7 @@ integration_dep <- 12
 ```
 
 
-
-# Data base
-
-## BloomSail data
+# BloomSail data
 
 1m gridded, downcast profiles were used.
 Mean CO~2~ data from upper 6 metres were used as surface values.
@@ -90,9 +87,9 @@ tm_profiles_ID_long <- tm_profiles_ID %>%
 
 ```
 
-## Penetration depth
+## C~T~ and tem penetration depth
 
-### Cumulative
+### Cumulative on July 23
 
 ```{r penetration_depth_cumulative_tm}
 
@@ -254,27 +251,8 @@ rm(penetration_depth, penetration_depth_mean, tm_profiles_ID_long)
 
 ```
 
-## Remove CO2 profiles
 
-```{r tm_remove_CT_depth_tm, eval=FALSE}
-
-tm_profiles_ID_surface <- tm_profiles_ID %>% 
-  filter(dep < surface_dep) %>% 
-  group_by(ID) %>% 
-  summarise(nCT = mean(nCT)) %>% 
-  ungroup() %>% 
-  mutate(dep = 3.5)
-
-
-tm_profiles_ID <- tm_profiles_ID %>% 
-  select(-nCT)
-
-tm_profiles_ID <- full_join(tm_profiles_ID, tm_profiles_ID_surface)
-rm(tm_profiles_ID_surface)
-
-```
-
-## Finnmaid + GETM
+## Finnmaid
 
 ```{r gt_subsetting_criteria}
 
@@ -420,7 +398,7 @@ rm(gt_3d_long)
 
 # Finnmaid
 
-## Read data
+## Data preparation
 
 Finnmaid data, including reconstructed data during LICOS operation failure.
 
@@ -438,7 +416,7 @@ fm <- fm %>%
 
 ```
 
-## C~T~ calculation
+### C~T~ calculation
 
 Calculate nC~T~ based on fixed A~T~ and salinity mean values. 
 
@@ -454,7 +432,7 @@ fm <- fm %>%
 
 ```
 
-## Timeseries
+### Regional averaging
 
 Calculate regional mean and sd values for each crossing of the area.
 
@@ -494,9 +472,9 @@ tm_profiles_ID_long_surface <- tm_profiles %>%
 
 ```
 
+### Timeseries
 
-
-```{r fm_tm_time_series, fig.asp=1.5}
+```{r fm_tm_time_series, fig.asp=1.2}
 
 fm_ID %>% 
   ggplot()+
@@ -522,6 +500,7 @@ fm_ID %>%
 ## Missing observations
 
 The observational gaps in the Finnmaid SST and C~T~ time series were filled with:
+
 - two BloomSail observations
 - an interpolated finnmaid value to match the starting date
 
@@ -565,31 +544,15 @@ fm_tm_ID <- full_join(fm_tm_ID, tm_gap) %>%
          period = if_else(date_time_ID > fixed_values$end, "post-BloomSail", period))
 
 
+fm_tm_ID <- fm_tm_ID %>% 
+  filter(period == "BloomSail") %>% 
+  select(-period)
+
 rm(fm_ID, fm, tm_gap, tm_profiles_ID_long_surface, tm_profiles)
 
 ```
 
 ```{r fm_time_series_filled}
-
-fm_tm_ID %>% 
-  ggplot()+
-  geom_rect(data = fixed_values,
-            aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_path(aes(date_time_ID, value, col=period))+
-  geom_point(aes(date_time_ID, value, col=period))+
-  facet_grid(var~., scales = "free_y")+
-  scale_color_brewer(palette = "Set1")+
-  scale_x_datetime(date_breaks = "week",
-                   date_labels = "%b %d")+
-  theme(axis.title.x = element_blank())
-
-fm_tm_ID <- fm_tm_ID %>% 
-  filter(period == "BloomSail") %>% 
-  select(-period)
-
-```
-
-```{r fm_time_series_filled_BloomSail_period_only}
 
 fm_tm_ID %>% 
   ggplot()+
@@ -604,9 +567,7 @@ fm_tm_ID %>%
 ```
 
 
-
-# Merge BloomSail, Finnmaid, GETM
-
+# Merge all data sets
 
 ## Interpolate gt dep grid
 
@@ -687,7 +648,10 @@ tm_fm_gt_long %>%
   ggplot(aes(date_time_ID, value, col=source))+
   geom_path()+
   geom_point()+
-  facet_wrap(~var, scales = "free_y")
+  scale_x_datetime(date_breaks = "week",
+                   date_labels = "%b %d")+
+  facet_grid(var~., scales = "free_y")+
+  theme(axis.title.x = element_blank())
 
 ```
 
@@ -703,11 +667,12 @@ tm_fm_gt %>%
   scale_fill_viridis_c(name="Temperature (°C)", option = "B",
                        guide = "colorstrip", breaks = MakeBreaks(bin))+
   scale_y_reverse()+
+  scale_x_datetime(date_breaks = "week",
+                   date_labels = "%b %d")+
   coord_cartesian(expand = 0)+
   labs(y="Depth (m)")+
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())+
-  facet_wrap(~source)
+  theme(axis.title.x = element_blank())+
+  facet_grid(source~.)
 
 
 rm(bin)
