@@ -707,11 +707,12 @@ tm_fm_gt %>%
   scale_fill_viridis_c(name="Rho", option = "B",
                        guide = "colorstrip", breaks = MakeBreaks(bin))+
   scale_y_reverse()+
+  scale_x_datetime(date_breaks = "week",
+                   date_labels = "%b %d")+
   coord_cartesian(expand = 0)+
   labs(y="Depth (m)")+
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())+
-  facet_wrap(~source)
+  theme(axis.title.x = element_blank())+
+  facet_grid(source~.)
 
 rm(bin)
 ```
@@ -740,9 +741,11 @@ tm_fm_gt_MLD %>%
   geom_hline(yintercept = 0)+
   geom_line(aes(date_time_ID, MLD, col=rho_lim))+
   scale_y_reverse(limits = c(25,0))+
+  scale_x_datetime(date_breaks = "week",
+                   date_labels = "%b %d")+
   scale_color_viridis_d(name="Rho lim")+
   labs(x="", y="MLD (m)")+
-  facet_wrap(~source)
+  facet_grid(source~.)
 
 
 ```
@@ -763,11 +766,13 @@ tm_fm_gt %>%
                       low = "darkgrey")+
   scale_color_viridis_d()+
   scale_y_reverse()+
+  scale_x_datetime(date_breaks = "week",
+                   date_labels = "%b %d")+
   coord_cartesian(expand = 0)+
   labs(y="Depth (m)")+
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())+
-  facet_wrap(~source)
+  facet_grid(source~.)
 
 
 rm(bin)
@@ -864,7 +869,7 @@ p_tm_fm_gt_long <- tm_fm_gt_long_180723 %>%
   scale_color_brewer(palette = "Dark2", guide = FALSE)+
   labs(y = "Depth (m)", x="Cumulative change")+
   theme(legend.position = "left")+
-  facet_grid(.~source, scales = "free_x")
+  facet_wrap(.~source, ncol=1, scales = "free_x")
 
 p_tm_fm_gt_long_rel <- tm_fm_gt_long_180723_dep %>% 
   ggplot(aes(value_cum_i_rel, dep))+
@@ -922,8 +927,6 @@ penetration_depth_mean <- penetration_depth %>%
             penetration_depth_diff_sd = sd(penetration_depth_diff, na.rm=TRUE)) %>% 
   ungroup()
 
-penetration_depth_mean
-
 p_surface <- penetration_depth %>% 
   ggplot(aes(date_time_ID, value_diff_surface, col=source))+
   geom_hline(yintercept = 0)+
@@ -963,6 +966,10 @@ p_pen_dep <- penetration_depth %>%
 
 p_surface + p_integrated + p_pen_dep + 
   plot_layout(ncol = 1)
+
+
+penetration_depth_mean
+
 
 rm(p_surface, p_integrated, p_pen_dep)
 rm(penetration_depth, penetration_depth_mean, tm_fm_gt_long)
