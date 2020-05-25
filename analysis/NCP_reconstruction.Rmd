@@ -166,11 +166,70 @@ p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel
 
 TPD
 
-rm(tm_profiles_ID_long_180723,
-   tm_profiles_ID_long_180723_dep,
+rm(tm_profiles_ID_long_180723_dep,
    p_tm_profiles_ID_long,
-   p_tm_profiles_ID_long_rel,
-   TPD)
+   p_tm_profiles_ID_long_rel)
+
+```
+
+
+```{r TPD_CPD_cumulative_tm_profiles_example}
+
+p_nCT <-
+  tm_profiles_ID_long_180723 %>% 
+  filter(var == "nCT") %>% 
+  arrange(dep) %>% 
+  ggplot()+
+  geom_col(data = tm_profiles_ID_long_180723 %>% 
+             filter(var == "nCT", value_cum<0),
+           aes(x=value_cum, y=dep, fill="Integrated change"),
+           width = 1, alpha=0.3)+
+  geom_vline(xintercept = 0)+
+  scale_y_reverse(expand = c(0,0))+
+  geom_point(aes(value_cum, dep))+
+  geom_path(aes(value_cum, dep))+
+  geom_hline(data = TPD %>% filter(var == "nCT"),
+             aes(yintercept = TPD, col="Penetration depth"))+
+  geom_vline(data = TPD %>% filter(var == "nCT"),
+             aes(xintercept = value_surface, col="Surface change"))+
+  scale_fill_manual(values = "black")+
+  scale_color_brewer(palette = "Dark2")+
+  labs(y = "Depth (m)", x = expression(nC[T]~(µmol~kg^{-1})))+
+  theme(legend.title = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank())
+
+p_tem <- 
+  tm_profiles_ID_long_180723 %>% 
+  filter(var == "tem") %>% 
+  arrange(dep) %>% 
+  ggplot()+
+  geom_col(data = tm_profiles_ID_long_180723 %>% 
+             filter(var == "tem", value_cum>0),
+           aes(x=value_cum, y=dep, fill="Integrated change"),
+           width = 1, alpha=0.3)+
+  geom_vline(xintercept = 0)+
+  scale_y_reverse(expand = c(0,0))+
+  geom_point(aes(value_cum, dep))+
+  geom_path(aes(value_cum, dep))+
+  geom_hline(data = TPD %>% filter(var == "tem"),
+             aes(yintercept = TPD, col="Penetration depth"))+
+  geom_vline(data = TPD %>% filter(var == "tem"),
+             aes(xintercept = value_surface, col="Surface change"))+
+  scale_fill_manual(values = "black")+
+  scale_color_brewer(palette = "Dark2")+
+  labs(y = "Depth (m)", x = "Temperature (\u00B0C)")+
+  theme(legend.title = element_blank())
+
+p_tem + p_nCT +
+  plot_layout(guides = 'collect')
+
+ggsave(here::here("output/Plots/Figures_publication/appendix",
+                  "TPD_CPD_cumulative.pdf"),
+       width = 210, height = 220, dpi = 300, units = "mm")
+
+rm(TPD, tm_profiles_ID_long_180723, p_tem, p_nCT)
 
 ```
 
