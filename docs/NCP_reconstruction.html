@@ -392,6 +392,9 @@ div.tocify {
 <li>
   <a href="CT_dynamics.html">CT dynamics</a>
 </li>
+<li>
+  <a href="Phytoplankton.html">Phytoplankton</a>
+</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     NCP reconstruction
@@ -445,7 +448,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">NCP reconstruction</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">20 May, 2020</h4>
+<h4 class="date">25 May, 2020</h4>
 
 </div>
 
@@ -470,7 +473,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-05-20
+<strong>Last updated:</strong> 2020-05-25
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -561,16 +564,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeef996405125132e45a9bcc71fbc90c40c1acdbdctargetblankef99640a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ef996405125132e45a9bcc71fbc90c40c1acdbdc" target="_blank">ef99640</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeeef261ff43c3b4907417f336df6f7aee4a2dc165targetblankeef261fa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/eef261ff43c3b4907417f336df6f7aee4a2dc165" target="_blank">eef261f</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeef996405125132e45a9bcc71fbc90c40c1acdbdctargetblankef99640a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeeef261ff43c3b4907417f336df6f7aee4a2dc165targetblankeef261fa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ef996405125132e45a9bcc71fbc90c40c1acdbdc" target="_blank">ef99640</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/eef261ff43c3b4907417f336df6f7aee4a2dc165" target="_blank">eef261f</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -590,6 +593,9 @@ Ignored files:
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
 
 Untracked files:
+    Untracked:  output/Plots/Figures_publication/Appendix/Phytoplankton_mean_total_biomass.pdf
+    Untracked:  output/Plots/Figures_publication/Appendix/TPD_CPD_cumulative.pdf
+    Untracked:  output/Plots/Figures_publication/Appendix/tb_profiles.pdf
     Untracked:  output/Plots/Figures_publication/Article/reconstruction_timeseries.pdf
 
 </code></pre>
@@ -629,6 +635,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/eef261ff43c3b4907417f336df6f7aee4a2dc165/analysis/NCP_reconstruction.Rmd" target="_blank">eef261f</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-25
+</td>
+<td>
+TPD CPD appendix plots
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/9166c1d1cec54c95b40e0379a83d7ac357dda80d/docs/NCP_reconstruction.html" target="_blank">9166c1d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1040,11 +1080,64 @@ p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel</code></pre>
   &lt;chr&gt;       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;
 1 nCT        -935.         -89.5   10.4
 2 tem          71.0          6.10  11.6</code></pre>
-<pre class="r"><code>rm(tm_profiles_ID_long_180723,
-   tm_profiles_ID_long_180723_dep,
+<pre class="r"><code>rm(tm_profiles_ID_long_180723_dep,
    p_tm_profiles_ID_long,
-   p_tm_profiles_ID_long_rel,
-   TPD)</code></pre>
+   p_tm_profiles_ID_long_rel)</code></pre>
+<pre class="r"><code>p_nCT &lt;-
+  tm_profiles_ID_long_180723 %&gt;% 
+  filter(var == &quot;nCT&quot;) %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot()+
+  geom_col(data = tm_profiles_ID_long_180723 %&gt;% 
+             filter(var == &quot;nCT&quot;, value_cum&lt;0),
+           aes(x=value_cum, y=dep, fill=&quot;Integrated change&quot;),
+           width = 1, alpha=0.3)+
+  geom_vline(xintercept = 0)+
+  scale_y_reverse(expand = c(0,0))+
+  geom_point(aes(value_cum, dep))+
+  geom_path(aes(value_cum, dep))+
+  geom_hline(data = TPD %&gt;% filter(var == &quot;nCT&quot;),
+             aes(yintercept = TPD, col=&quot;Penetration depth&quot;))+
+  geom_vline(data = TPD %&gt;% filter(var == &quot;nCT&quot;),
+             aes(xintercept = value_surface, col=&quot;Surface change&quot;))+
+  scale_fill_manual(values = &quot;black&quot;)+
+  scale_color_brewer(palette = &quot;Dark2&quot;)+
+  labs(y = &quot;Depth (m)&quot;, x = expression(nC[T]~(µmol~kg^{-1})))+
+  theme(legend.title = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank())
+
+p_tem &lt;- 
+  tm_profiles_ID_long_180723 %&gt;% 
+  filter(var == &quot;tem&quot;) %&gt;% 
+  arrange(dep) %&gt;% 
+  ggplot()+
+  geom_col(data = tm_profiles_ID_long_180723 %&gt;% 
+             filter(var == &quot;tem&quot;, value_cum&gt;0),
+           aes(x=value_cum, y=dep, fill=&quot;Integrated change&quot;),
+           width = 1, alpha=0.3)+
+  geom_vline(xintercept = 0)+
+  scale_y_reverse(expand = c(0,0))+
+  geom_point(aes(value_cum, dep))+
+  geom_path(aes(value_cum, dep))+
+  geom_hline(data = TPD %&gt;% filter(var == &quot;tem&quot;),
+             aes(yintercept = TPD, col=&quot;Penetration depth&quot;))+
+  geom_vline(data = TPD %&gt;% filter(var == &quot;tem&quot;),
+             aes(xintercept = value_surface, col=&quot;Surface change&quot;))+
+  scale_fill_manual(values = &quot;black&quot;)+
+  scale_color_brewer(palette = &quot;Dark2&quot;)+
+  labs(y = &quot;Depth (m)&quot;, x = &quot;Temperature (\u00B0C)&quot;)+
+  theme(legend.title = element_blank())
+
+p_tem + p_nCT +
+  plot_layout(guides = &#39;collect&#39;)</code></pre>
+<p><img src="figure/NCP_reconstruction.Rmd/TPD_CPD_cumulative_tm_profiles_example-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(here::here(&quot;output/Plots/Figures_publication/appendix&quot;,
+                  &quot;TPD_CPD_cumulative.pdf&quot;),
+       width = 210, height = 220, dpi = 300, units = &quot;mm&quot;)
+
+rm(TPD, tm_profiles_ID_long_180723, p_tem, p_nCT)</code></pre>
 </div>
 <div id="daily" class="section level3">
 <h3><span class="header-section-number">2.1.2</span> Daily</h3>
