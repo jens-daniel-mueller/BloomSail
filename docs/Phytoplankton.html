@@ -564,16 +564,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3080fb3a3dd39667d1bf4db559cf827ef3a37242targetblank3080fb3a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/3080fb3a3dd39667d1bf4db559cf827ef3a37242" target="_blank">3080fb3</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9bedac531f1b9e3e6f877ddb582f2aba389b2246targetblank9bedac5a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/9bedac531f1b9e3e6f877ddb582f2aba389b2246" target="_blank">9bedac5</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3080fb3a3dd39667d1bf4db559cf827ef3a37242targetblank3080fb3a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree9bedac531f1b9e3e6f877ddb582f2aba389b2246targetblank9bedac5a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/3080fb3a3dd39667d1bf4db559cf827ef3a37242" target="_blank">3080fb3</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/9bedac531f1b9e3e6f877ddb582f2aba389b2246" target="_blank">9bedac5</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -598,8 +598,6 @@ Untracked files:
     Untracked:  output/Plots/Figures_publication/Article/reconstruction_timeseries.pdf
 
 Unstaged changes:
-    Modified:   analysis/_site.yml
-    Modified:   analysis/read-in.Rmd
     Modified:   output/Plots/Figures_publication/Article/Hov_abs_profiles_cum.pdf
     Modified:   output/Plots/Figures_publication/Article/atm_water_timeseries.pdf
     Modified:   output/Plots/Figures_publication/Article/data_coverage.pdf
@@ -648,6 +646,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/9bedac531f1b9e3e6f877ddb582f2aba389b2246/analysis/Phytoplankton.Rmd" target="_blank">9bedac5</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-25
+</td>
+<td>
+revised pp time series plot
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/ae61e7ede1c1195407eb8775b7754d9a40bc3fdd/docs/Phytoplankton.html" target="_blank">ae61e7e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-25
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/jens-daniel-mueller/BloomSail/blob/3080fb3a3dd39667d1bf4db559cf827ef3a37242/analysis/Phytoplankton.Rmd" target="_blank">3080fb3</a>
 </td>
 <td>
@@ -668,30 +700,32 @@ Added Phytoplanktion read-in and new Rmd
 </div>
 </div>
 <pre class="r"><code>library(tidyverse)</code></pre>
-<div id="sensor-data" class="section level1">
-<h1><span class="header-section-number">1</span> Sensor data</h1>
+<div id="phytoplankton-cell-counts" class="section level1">
+<h1><span class="header-section-number">1</span> Phytoplankton cell counts</h1>
 <div id="data-preparation" class="section level2">
 <h2><span class="header-section-number">1.1</span> Data preparation</h2>
 <pre class="r"><code>max_dep &lt;- 25
 surface_dep &lt;- 6
 
 stations_in &lt;- c(&quot;P07&quot;, &quot;P10&quot;)
-dates_out &lt;- c(&quot;180616&quot;,&quot;180820&quot;)
 
-class_in &lt;- &quot;t&quot; # total biomass</code></pre>
-<p>Profile data are prepared by:</p>
-<p>Please note that:</p>
-<ul>
-<li>The label ID representm the start date of the cruise (“YYMMDD”), not the exact mean sampling date</li>
-</ul>
+class_in &lt;- &quot;t&quot; # using total biomass per Species class only</code></pre>
 <pre class="r"><code>tp &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
-                            &quot;tp.csv&quot;))
+                            &quot;tp.csv&quot;),
+           col_types = cols(ID = col_character()))
+
+cruise_dates &lt;- read_csv(here::here(&quot;Data/_summarized_data_files&quot;,
+                            &quot;cruise_date.csv&quot;),
+           col_types = cols(ID = col_character()))
+
 
 #### calculate mean total phytoplanton biomass in different water depth intervals
 
 tp &lt;- tp %&gt;% 
   filter(station %in% stations_in,
-         class == class_in)
+         class == class_in,
+         Species != &quot;Nodulariadead&quot;) %&gt;% 
+  mutate(ID = if_else(ID == &quot;180722&quot;, &quot;180723&quot;, ID))
 
 tp &lt;- tp %&gt;% 
   mutate(dep_grid = cut(dep,
@@ -703,20 +737,22 @@ tp_ID_grid &lt;- tp %&gt;%
   group_by(ID, dep_grid, Species) %&gt;% 
   summarise(value = mean(value, na.rm = TRUE)) %&gt;% 
   ungroup()
-  
-tp_ID_grid %&gt;% 
-  ggplot(aes(lubridate::ymd(ID), value, col=dep_grid))+
+
+
+tp_ID_grid &lt;- full_join(cruise_dates, tp_ID_grid)</code></pre>
+<pre class="r"><code>tp_ID_grid %&gt;% 
+  filter(Species != &quot;total&quot;) %&gt;% 
+  ggplot(aes(date_time_ID, value, col=dep_grid))+
   geom_point()+
   geom_line()+
   facet_grid(Species~.)+
-  #coord_cartesian(ylim=c(0, 500))+
   scale_color_brewer(palette = &quot;Set1&quot;, name= &quot;Depth (m)&quot;)+
-  scale_x_date(date_breaks = &quot;7 day&quot;, date_labels = &quot;%b %d&quot;, limits = c(as.Date(&quot;2018-06-11&quot;),as.Date(NA)))+
-  labs(y=expression(Biomass~(mg/m^3)), x=&quot;Datum&quot;)+
-  theme_bw()</code></pre>
-<p><img src="figure/Phytoplankton.Rmd/read_prepare_sensor_data-1.png" width="672" style="display: block; margin: auto;" /></p>
+  scale_x_datetime(breaks = &quot;week&quot;, date_labels = &quot;%d %b&quot;)+
+  labs(y=expression(Biomass~(mg/m^3)))+
+  theme(axis.title.x = element_blank())</code></pre>
+<p><img src="figure/Phytoplankton.Rmd/phytoplankton_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggsave(here::here(&quot;output/Plots/Figures_publication/appendix&quot;, &quot;Phytoplankton_mean_total_biomass.pdf&quot;),
-       width = 180, height = 80, dpi = 300, units = &quot;mm&quot;)</code></pre>
+       width = 180, height = 120, dpi = 300, units = &quot;mm&quot;)</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
