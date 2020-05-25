@@ -564,16 +564,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef7f098369f99d493fd68258d57643284ace4dbb0targetblankf7f0983a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f7f098369f99d493fd68258d57643284ace4dbb0" target="_blank">f7f0983</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree2b97ae38d2cd26413b1a712a8c90a49293a928b8targetblank2b97ae3a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/2b97ae38d2cd26413b1a712a8c90a49293a928b8" target="_blank">2b97ae3</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef7f098369f99d493fd68258d57643284ace4dbb0targetblankf7f0983a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree2b97ae38d2cd26413b1a712a8c90a49293a928b8targetblank2b97ae3a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f7f098369f99d493fd68258d57643284ace4dbb0" target="_blank">f7f0983</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/2b97ae38d2cd26413b1a712a8c90a49293a928b8" target="_blank">2b97ae3</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -596,7 +596,8 @@ Untracked files:
     Untracked:  output/Plots/Figures_publication/Appendix/Phytoplankton_mean_total_biomass.pdf
     Untracked:  output/Plots/Figures_publication/Appendix/TPD_CPD_cumulative.pdf
     Untracked:  output/Plots/Figures_publication/Appendix/tb_profiles.pdf
-    Untracked:  output/Plots/Figures_publication/Article/reconstruction_timeseries.pdf
+    Untracked:  output/Plots/Figures_publication/Article/reconstruction_NCP_timeseries.pdf
+    Untracked:  output/Plots/Figures_publication/Article/reconstruction_iCT_timeseries.pdf
 
 </code></pre>
 <p>
@@ -635,6 +636,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/2b97ae38d2cd26413b1a712a8c90a49293a928b8/analysis/NCP_reconstruction.Rmd" target="_blank">2b97ae3</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-25
+</td>
+<td>
+added gas flux to reconstructed iCT
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/4dd0f4f7a104f03b69354203efd4c3ae7f8ce8c0/docs/NCP_reconstruction.html" target="_blank">4dd0f4f</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-25
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2055,7 +2090,7 @@ p_NCP &lt;- NCP_flux_int %&gt;%
         strip.text.x = element_blank(),
         axis.text.x.top = element_blank())
 
-p_nCT / p_hov_dep / p_iCT / p_NCP</code></pre>
+p_nCT / p_hov_dep / p_NCP</code></pre>
 <p><img src="figure/NCP_reconstruction.Rmd/NCP_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggsave(here::here(&quot;output/Plots/Figures_publication/article&quot;, &quot;reconstruction_NCP_timeseries.pdf&quot;),
        width = 210, height = 220, dpi = 300, units = &quot;mm&quot;)</code></pre>
