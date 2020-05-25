@@ -18,7 +18,7 @@ navbar:
   - text: Phytoplankton
     href: Phytoplankton.html
   - text: NCP reconstruction
-  - href: NCP_reconstruction.html
+    href: NCP_reconstruction.html
   right:
   - icon: fa-github
     text: Source code
