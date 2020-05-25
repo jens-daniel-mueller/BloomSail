@@ -415,14 +415,16 @@ sal_mean
 
 ```{r write_fixed_values}
 
-bind_cols(start = min(tm_profiles$date_time), 
+tb_fix <- bind_cols(start = min(tm_profiles$date_time), 
           end = max(tm_profiles$date_time),
           AT = AT_mean,
           AT_sd = AT_sd,
-          sal = sal_mean) %>% 
+          sal = sal_mean)
+
+tb_fix %>% 
   write_csv(here::here("Data/_summarized_data_files", "tb_fix.csv"))
 
-rm(AT_sd)
+#rm(AT_sd)
 ```
 
 ## nC~T~ calculation
@@ -438,7 +440,9 @@ tb <- tb %>%
 
 ## Vertical profiles
 
-```{r bottle_CO2_profiles}
+### Stations
+
+```{r bottle_CO2_profiles_station}
 
 tb_long <- tb %>% 
   pivot_longer(c(sal:AT, nCT), names_to = "var", values_to = "value")
@@ -453,6 +457,73 @@ tb_long %>%
   facet_grid(station~var, scales = "free_x")+
   theme(legend.position = "bottom",
         legend.title = element_blank())
+
+```
+
+### Mean
+
+```{r bottle_CO2_profiles_mean}
+
+tb_long_mean <- tb_long %>% 
+  mutate(dep_grid = as.numeric(as.character(cut(dep,
+                        breaks = seq(-2.5,30,5),
+                        labels = seq(0,25, 5))))) %>% 
+  group_by(ID, date_time_ID, date_ID, dep_grid, var) %>% 
+  summarise(value = mean(value, na.rm = TRUE)) %>% 
+  ungroup()
+
+p_AT <- tb_long_mean %>% 
+  filter(dep_grid < 25, var == "AT") %>% 
+  ggplot(aes(value, dep_grid))+
+  annotate("rect", xmin = AT_mean-AT_sd,
+                xmax = AT_mean+AT_sd,
+                ymin = -Inf,
+                ymax = Inf,
+            alpha = 0.3)+
+  geom_vline(data = tb_fix, aes(xintercept = AT), linetype=2)+
+  geom_path(aes(col=ID))+
+  geom_point(aes(fill=ID), shape=21)+
+  scale_y_reverse(sec.axis = dup_axis())+
+  labs(x = expression(A[T]~(µmol~kg^{-1})),
+       y = "Depth (m)")+
+  scale_fill_viridis_d(guide = FALSE)+
+  scale_color_viridis_d(guide = FALSE)+
+  theme(axis.text.y.right = element_blank(),
+        axis.title.y.right = element_blank())
+
+p_CT <- tb_long_mean %>% 
+  filter(dep_grid < 25, var == "CT") %>% 
+  ggplot(aes(value, dep_grid))+
+  geom_path(aes(col=ID))+
+  geom_point(aes(fill=ID), shape=21)+
+  scale_y_reverse(sec.axis = dup_axis())+
+  labs(x = expression(C[T]~(µmol~kg^{-1})),
+       y = "Depth (m)")+
+  scale_fill_viridis_d(guide = FALSE)+
+  scale_color_viridis_d(guide = FALSE)+
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank())
+
+p_nCT <- tb_long_mean %>% 
+  filter(dep_grid < 25, var == "nCT") %>% 
+  ggplot(aes(value, dep_grid))+
+  geom_path(aes(col=ID))+
+  geom_point(aes(fill=ID), shape=21)+
+  scale_y_reverse(sec.axis = dup_axis())+
+  labs(x = expression(nC[T]~(µmol~kg^{-1})),
+       y = "Depth (m)")+
+  scale_fill_viridis_d(labels = cruise_dates$date_ID)+
+  scale_color_viridis_d(labels = cruise_dates$date_ID)+
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        legend.title = element_blank())
+
+p_AT + p_CT + p_nCT
+
+ggsave(here::here("output/Plots/Figures_publication/appendix", "tb_profiles.pdf"),
+       width = 180, height = 80, dpi = 300, units = "mm")
+
+rm(tb_long_mean, p_AT, p_CT, p_nCT, tb_fix, AT_sd)
 
 ```
 
