@@ -669,7 +669,7 @@ rm(th)
 ```
 
 
-# Bottle data / discrete samples (tb)
+# Bottle data CO2 (tb)
 
 Discrete samples were collected with a Niskin bottle and analysed for C[T] and A[T] at IOW CO~2~ lab.
 
@@ -698,6 +698,61 @@ tb <- tb %>%
 tb %>% write_csv(here::here("Data/_summarized_data_files",
                             "tb.csv"))
 rm(tb)
+
+```
+
+
+# Bottle data plankton (tp)
+
+Discrete samples were collected with a Niskin bottle and analysed for phytoplankton composition and biomass at IOW CO~2~ lab.
+
+## Read data
+
+```{r read_tp_phytoplankton_data, eval=FALSE}
+
+
+tp <- read_csv(here::here("Data/TinaV/Bottle/Phytoplankton",
+                          "181205_BloomSail_Plankton_counts.csv"))
+
+#### delete colomns that contain counts, not calculated biomass
+tp <- tp[,-seq(4, 21,1)]
+
+#### assign new column names
+#### for species: nr = size class, HV = Heterocyst per Volume, Hl = Heterocyst per length, t = total
+
+names(tp) <-
+  c("date", "station", "dep",
+    "Aphanizomenon.1",	"Aphanizomenon.2", "Aphanizomenon.3",
+    "Aphanizomenon.t",	"Aphanizomenon.HV",	"Aphanizomenon.Hl",
+    "Dolichospermum.1", "Dolichospermum.2", "Dolichospermum.3", "Dolichospermum.4",
+    "Dolichospermum.t", "Dolichospermum.HV", "Dolichospermum.Hl",
+    "Nodularia.1", "Nodularia.2", "Nodularia.3",
+    "Nodularia.t", "Nodularia.HV", "Nodularia.Hl",
+    "Nodulariadead.1", "Nodulariadead.2", "Nodulariadead.3",
+    "Nodulariadead.t", 
+    "total.t"
+)
+
+
+#### change format of data table and seperate into 2 columns for species and class
+
+tp <- gather(tp, para, value, Aphanizomenon.1:total.t, factor_key=TRUE)
+tp <- separate(tp, col = para, into = c("Species", "class"))
+
+#### change class of columns
+tp <- tp %>% 
+  mutate(ID = date,
+         date = ymd(date))
+
+```
+
+## Write summary file
+
+```{r write_tp_phytoplankton_data, eval=FALSE}
+
+tp %>% write_csv(here::here("Data/_summarized_data_files",
+                            "tp.csv"))
+rm(tp)
 
 ```
 
@@ -923,6 +978,8 @@ fm %>%
 rm(fm)
 
 ```
+
+
 
 
 # Interactive map

@@ -228,6 +228,10 @@ cruise_dates <- tm_profiles %>%
 # inner_join remove P14 observations lacking date_time_ID 
 tm_profiles <- inner_join(cruise_dates, tm_profiles)
 
+cruise_dates %>% 
+    write_csv(here::here("Data/_summarized_data_files",
+                       "cruise_date.csv"))
+
 ```
 
 
