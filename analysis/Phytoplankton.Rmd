@@ -1,0 +1,90 @@
+---
+title: "Phytoplankton dynamics"
+author: "Jens Daniel Müller"
+date:  "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  workflowr::wflow_html:
+    number_sections: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+editor_options:
+  chunk_output_type: console
+---
+
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
+
+```{r packages}
+library(tidyverse)
+```
+
+```{r ggplot_theme, include = FALSE}
+theme_set(theme_bw())
+```
+
+
+# Sensor data
+
+## Data preparation
+
+```{r subsetting_criteria}
+
+max_dep <- 25
+surface_dep <- 6
+
+stations_in <- c("P07", "P10")
+dates_out <- c("180616","180820")
+
+class_in <- "t" # total biomass
+
+```
+
+
+Profile data are prepared by:
+
+Please note that:
+
+- The label ID representm the start date of the cruise ("YYMMDD"), not the exact mean sampling date
+
+
+```{r read_prepare_sensor_data}
+
+
+tp <- read_csv(here::here("Data/_summarized_data_files",
+                            "tp.csv"))
+
+#### calculate mean total phytoplanton biomass in different water depth intervals
+
+tp <- tp %>% 
+  filter(station %in% stations_in,
+         class == class_in)
+
+tp <- tp %>% 
+  mutate(dep_grid = cut(dep,
+                        breaks = c(-1,surface_dep,max_dep),
+                        labels = c("0-6","6-25"))) %>% 
+  drop_na()
+
+tp_ID_grid <- tp %>% 
+  group_by(ID, dep_grid, Species) %>% 
+  summarise(value = mean(value, na.rm = TRUE)) %>% 
+  ungroup()
+  
+tp_ID_grid %>% 
+  ggplot(aes(lubridate::ymd(ID), value, col=dep_grid))+
+  geom_point()+
+  geom_line()+
+  facet_grid(Species~.)+
+  #coord_cartesian(ylim=c(0, 500))+
+  scale_color_brewer(palette = "Set1", name= "Depth (m)")+
+  scale_x_date(date_breaks = "7 day", date_labels = "%b %d", limits = c(as.Date("2018-06-11"),as.Date(NA)))+
+  labs(y=expression(Biomass~(mg/m^3)), x="Datum")+
+  theme_bw()
+
+ggsave(here::here("output/Plots/Figures_publication/appendix", "Phytoplankton_mean_total_biomass.pdf"),
+       width = 180, height = 80, dpi = 300, units = "mm")
+
+```
