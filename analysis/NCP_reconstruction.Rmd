@@ -463,6 +463,97 @@ rm(gt_3d_long)
 
 ```
 
+## Comparison BloomSail
+
+Vertical, 1m-gridded BloomSail CTD profiles were used for comparison with GETM results. Note that the sampling location does match exactly.
+
+GETM results were linearly interpolated to the mean BloomSail time stamp.
+
+### Interpolate gt dep grid
+
+```{r interpolate_gt_3d_dep_grid}
+
+gt_3d_int <- gt_3d %>% 
+  mutate(dep_int = dep + 0.5) %>% 
+  group_by(date_time) %>% 
+  mutate(sal_int = approxfun(dep, sal)(dep_int),
+         tem_int = approxfun(dep, tem)(dep_int)) %>% 
+  ungroup() %>% 
+  select(date_time, dep=dep_int, sal=sal_int, tem=tem_int) %>% 
+  drop_na()
+
+rm(gt_3d)
+
+```
+
+```{r merge_gt_ts_profiles}
+
+
+tm_gt_3d <- full_join(gt_3d_int,
+                      tm_profiles_ID %>% select(date_time = date_time_ID,
+                                                dep, sal, tem),
+                      by = c("date_time", "dep"), suffix=c("_gt", "_tm"))
+
+tm_gt_3d <- tm_gt_3d  %>% 
+  mutate(rho_gt = swSigma(salinity = sal_gt,
+                          temperature = tem_gt,
+                          pressure = dep/10),
+         rho_tm = swSigma(salinity = sal_tm,
+                          temperature = tem_tm,
+                          pressure = dep/10))
+
+tm_gt_3d <- tm_gt_3d %>% 
+  arrange(date_time) %>% 
+  group_by(dep) %>% 
+  mutate(tem_gt = approxfun(date_time, tem_gt)(date_time),
+         sal_gt = approxfun(date_time, sal_gt)(date_time),
+         rho_gt = approxfun(date_time, rho_gt)(date_time)) %>% 
+  ungroup() %>% 
+  drop_na()
+
+```
+
+
+```{r gt_ts_profiles_salt_temp_rho, fig.asp=0.8, fig.cap="STD profiles modeled with GETM (upper panels, gt) and measured during BloomSail campaign (lower panels, ts)"}
+
+tm_gt_3d_long <- tm_gt_3d %>% 
+  pivot_longer(sal_gt:rho_tm,
+               values_to = "value",
+               names_to = c("var", "source"),
+               names_sep = "_")
+
+tm_gt_3d_long %>% 
+  ggplot(aes(value, dep,
+             col=date_time,
+             group=date_time))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0), name="Depth (m)")+
+  scale_color_viridis_c(name="Date", trans = "time")+
+  facet_grid(source~var, scales = "free_x")
+
+```
+
+```{r gt_ts_profiles_diff_salt_temp_rho, fig.asp=0.5}
+
+tm_gt_3d <- tm_gt_3d_long %>% 
+  pivot_wider(values_from = "value", names_from = "source") %>% 
+  mutate(value_diff = gt - tm)
+
+tm_gt_3d %>% 
+  ggplot(aes(value_diff, dep,
+             col=date_time,
+             group=date_time))+
+  geom_vline(xintercept = 0, col="red")+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0), name="Depth (m)")+
+  scale_color_viridis_c(name="Date", trans = "time")+
+  facet_grid(.~var, scales = "free_x")+
+  labs(x="Difference GETM (gt) - Bloomsail (ts)")
+
+rm(tm_gt_3d, tm_gt_3d_long)
+
+```
+
 
 # Finnmaid
 
@@ -637,22 +728,6 @@ fm_tm_ID %>%
 
 # Merge all data sets
 
-## Interpolate gt dep grid
-
-```{r interpolate_gt_3d_dep_grid}
-
-gt_3d_int <- gt_3d %>% 
-  mutate(dep_int = dep + 0.5) %>% 
-  group_by(date_time) %>% 
-  mutate(sal_int = approxfun(dep, sal)(dep_int),
-         tem_int = approxfun(dep, tem)(dep_int)) %>% 
-  ungroup() %>% 
-  select(date_time, dep=dep_int, sal=sal_int, tem=tem_int) %>% 
-  drop_na()
-
-rm(gt_3d)
-
-```
 
 ## Merge fm and gt
 
