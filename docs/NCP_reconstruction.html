@@ -564,16 +564,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeeef261ff43c3b4907417f336df6f7aee4a2dc165targetblankeef261fa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/eef261ff43c3b4907417f336df6f7aee4a2dc165" target="_blank">eef261f</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef7f098369f99d493fd68258d57643284ace4dbb0targetblankf7f0983a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f7f098369f99d493fd68258d57643284ace4dbb0" target="_blank">f7f0983</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeeef261ff43c3b4907417f336df6f7aee4a2dc165targetblankeef261fa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef7f098369f99d493fd68258d57643284ace4dbb0targetblankf7f0983a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/eef261ff43c3b4907417f336df6f7aee4a2dc165" target="_blank">eef261f</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f7f098369f99d493fd68258d57643284ace4dbb0" target="_blank">f7f0983</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -635,6 +635,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f7f098369f99d493fd68258d57643284ace4dbb0/analysis/NCP_reconstruction.Rmd" target="_blank">f7f0983</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-25
+</td>
+<td>
+added gas flux to reconstructed iCT
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/1b366c46b269ae7ffac97ec7c8a9bbf39c8dfd61/docs/NCP_reconstruction.html" target="_blank">1b366c4</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-25
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1929,15 +1963,37 @@ rm(tm_fm_gt_surface)</code></pre>
 <div id="ict" class="section level1">
 <h1><span class="header-section-number">8</span> iC<sub>T</sub></h1>
 <pre class="r"><code>iCT &lt;- iCT %&gt;% 
-  mutate(iCT_diff = nCT_diff * i_dep)
+  mutate(CT_i_diff = nCT_diff * i_dep)
 
 iCT &lt;- iCT %&gt;% 
   group_by(source, i_method, i_res) %&gt;%
   arrange(date_time_ID) %&gt;%
-  mutate(iCT_cum = cumsum(iCT_diff/1000)) %&gt;% 
+  mutate(nCT_i_cum = cumsum(CT_i_diff/1000)) %&gt;% 
   ungroup()</code></pre>
 <pre class="r"><code>tm_NCP_cum &lt;- read_csv(here::here(&quot;Data/_merged_data_files/CT_dynamics&quot;,
                                   &quot;tm_NCP_cum.csv&quot;))</code></pre>
+<pre class="r"><code>tm_NCP_cum_flux &lt;- tm_NCP_cum %&gt;% 
+  select(date_time, flux_cum)
+
+tm_NCP_cum_flux &lt;-
+  expand_grid(tm_NCP_cum_flux, 
+              source = unique(iCT$source),
+              i_method = unique(iCT$i_method),
+              i_res = unique(iCT$i_res))
+
+NCP_flux &lt;- full_join(iCT %&gt;% rename(date_time=date_time_ID),
+                      tm_NCP_cum_flux) %&gt;% 
+  arrange(date_time)
+
+# linear interpolation of cumulative changes to frequency of the flux estimates estimates 
+NCP_flux_int &lt;- NCP_flux %&gt;% 
+  filter(!(i_method == &quot;MLD&quot; &amp; i_res == &quot;cum&quot;)) %&gt;% 
+  group_by(source, i_method, i_res) %&gt;% 
+  mutate(nCT_i_cum = approxfun(date_time, nCT_i_cum)(date_time),
+         flux_cum = approxfun(date_time, flux_cum)(date_time)) %&gt;% 
+    fill(flux_cum) %&gt;% 
+  mutate(nCT_i_flux_cum = nCT_i_cum + flux_cum) %&gt;% 
+  ungroup()</code></pre>
 <pre class="r"><code>p_nCT &lt;- iCT %&gt;% 
   ggplot(aes(date_time_ID, nCT))+
   geom_point()+
@@ -1959,7 +2015,7 @@ p_iCT &lt;- iCT %&gt;%
   ggplot()+
   geom_hline(yintercept = 0)+
   geom_path(data=tm_NCP_cum, aes(date_time, nCT_i_cum), col=&quot;black&quot;)+
-  geom_path(aes(date_time_ID, iCT_cum, col=i_method, linetype=i_res))+
+  geom_path(aes(date_time_ID, nCT_i_cum, col=i_method, linetype=i_res))+
   scale_color_discrete(name = &quot;Reconstruction&quot;)+
   scale_x_datetime(breaks = &quot;week&quot;, date_labels = &quot;%d %b&quot;,
                    sec.axis = dup_axis(),
@@ -1975,7 +2031,33 @@ p_iCT &lt;- iCT %&gt;%
 
 p_nCT / p_hov_dep / p_iCT</code></pre>
 <p><img src="figure/NCP_reconstruction.Rmd/iCT_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>ggsave(here::here(&quot;output/Plots/Figures_publication/article&quot;, &quot;reconstruction_timeseries.pdf&quot;),
+<pre class="r"><code>ggsave(here::here(&quot;output/Plots/Figures_publication/article&quot;, &quot;reconstruction_iCT_timeseries.pdf&quot;),
+       width = 210, height = 220, dpi = 300, units = &quot;mm&quot;)</code></pre>
+<pre class="r"><code>NCP_flux &lt;- NCP_flux %&gt;% 
+  mutate(i_res = fct_recode(i_res, `cumulative` = &quot;cum&quot;)) %&gt;% 
+  mutate(i_res = factor(i_res, c(&quot;mean&quot;, &quot;cumulative&quot;, &quot;daily&quot;)))
+
+p_NCP &lt;- NCP_flux_int %&gt;% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_path(data=tm_NCP_cum, aes(date_time, nCT_i_flux_mix_cum), col=&quot;black&quot;)+
+  geom_path(aes(date_time, nCT_i_flux_cum, col=i_method, linetype=i_res))+
+  scale_color_discrete(name = &quot;Reconstruction&quot;)+
+  scale_x_datetime(breaks = &quot;week&quot;, date_labels = &quot;%d %b&quot;,
+                   sec.axis = dup_axis(),
+                   expand = c(0,0))+
+  scale_linetype(name=&quot;Resolution&quot;)+
+  facet_wrap(~source)+
+  labs(y=expression(atop(integrated~nC[T], (mol~m^{-2}))))+
+  guides(color = guide_legend(order = 1))+
+  theme(axis.title.x = element_blank(),
+        strip.background = element_blank(),
+        strip.text.x = element_blank(),
+        axis.text.x.top = element_blank())
+
+p_nCT / p_hov_dep / p_iCT / p_NCP</code></pre>
+<p><img src="figure/NCP_reconstruction.Rmd/NCP_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(here::here(&quot;output/Plots/Figures_publication/article&quot;, &quot;reconstruction_NCP_timeseries.pdf&quot;),
        width = 210, height = 220, dpi = 300, units = &quot;mm&quot;)</code></pre>
 <br>
 <p>
