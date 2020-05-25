@@ -1197,12 +1197,12 @@ rm(tm_fm_gt_surface)
 ```{r calculate_iCT}
 
 iCT <- iCT %>% 
-  mutate(iCT_diff = nCT_diff * i_dep)
+  mutate(CT_i_diff = nCT_diff * i_dep)
 
 iCT <- iCT %>% 
   group_by(source, i_method, i_res) %>%
   arrange(date_time_ID) %>%
-  mutate(iCT_cum = cumsum(iCT_diff/1000)) %>% 
+  mutate(nCT_i_cum = cumsum(CT_i_diff/1000)) %>% 
   ungroup()
 
 ```
@@ -1213,6 +1213,34 @@ tm_NCP_cum <- read_csv(here::here("Data/_merged_data_files/CT_dynamics",
                                   "tm_NCP_cum.csv"))
 
 ```
+
+```{r add_CO2_flux}
+
+tm_NCP_cum_flux <- tm_NCP_cum %>% 
+  select(date_time, flux_cum)
+
+tm_NCP_cum_flux <-
+  expand_grid(tm_NCP_cum_flux, 
+              source = unique(iCT$source),
+              i_method = unique(iCT$i_method),
+              i_res = unique(iCT$i_res))
+
+NCP_flux <- full_join(iCT %>% rename(date_time=date_time_ID),
+                      tm_NCP_cum_flux) %>% 
+  arrange(date_time)
+
+# linear interpolation of cumulative changes to frequency of the flux estimates estimates 
+NCP_flux_int <- NCP_flux %>% 
+  filter(!(i_method == "MLD" & i_res == "cum")) %>% 
+  group_by(source, i_method, i_res) %>% 
+  mutate(nCT_i_cum = approxfun(date_time, nCT_i_cum)(date_time),
+         flux_cum = approxfun(date_time, flux_cum)(date_time)) %>% 
+    fill(flux_cum) %>% 
+  mutate(nCT_i_flux_cum = nCT_i_cum + flux_cum) %>% 
+  ungroup()
+
+```
+
 
 
 ```{r iCT_time_series}
@@ -1238,7 +1266,7 @@ p_iCT <- iCT %>%
   ggplot()+
   geom_hline(yintercept = 0)+
   geom_path(data=tm_NCP_cum, aes(date_time, nCT_i_cum), col="black")+
-  geom_path(aes(date_time_ID, iCT_cum, col=i_method, linetype=i_res))+
+  geom_path(aes(date_time_ID, nCT_i_cum, col=i_method, linetype=i_res))+
   scale_color_discrete(name = "Reconstruction")+
   scale_x_datetime(breaks = "week", date_labels = "%d %b",
                    sec.axis = dup_axis(),
@@ -1254,9 +1282,38 @@ p_iCT <- iCT %>%
 
 p_nCT / p_hov_dep / p_iCT
 
-ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_timeseries.pdf"),
+ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_iCT_timeseries.pdf"),
        width = 210, height = 220, dpi = 300, units = "mm")
   
 ```
 
+```{r NCP_time_series}
+
+NCP_flux <- NCP_flux %>% 
+  mutate(i_res = fct_recode(i_res, `cumulative` = "cum")) %>% 
+  mutate(i_res = factor(i_res, c("mean", "cumulative", "daily")))
+
+p_NCP <- NCP_flux_int %>% 
+  ggplot()+
+  geom_hline(yintercept = 0)+
+  geom_path(data=tm_NCP_cum, aes(date_time, nCT_i_flux_mix_cum), col="black")+
+  geom_path(aes(date_time, nCT_i_flux_cum, col=i_method, linetype=i_res))+
+  scale_color_discrete(name = "Reconstruction")+
+  scale_x_datetime(breaks = "week", date_labels = "%d %b",
+                   sec.axis = dup_axis(),
+                   expand = c(0,0))+
+  scale_linetype(name="Resolution")+
+  facet_wrap(~source)+
+  labs(y=expression(atop(integrated~nC[T], (mol~m^{-2}))))+
+  guides(color = guide_legend(order = 1))+
+  theme(axis.title.x = element_blank(),
+        strip.background = element_blank(),
+        strip.text.x = element_blank(),
+        axis.text.x.top = element_blank())
+
+p_nCT / p_hov_dep / p_iCT / p_NCP
+
+ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_NCP_timeseries.pdf"),
+       width = 210, height = 220, dpi = 300, units = "mm")
+```
 
