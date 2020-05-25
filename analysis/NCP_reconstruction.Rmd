@@ -1311,7 +1311,7 @@ p_NCP <- NCP_flux_int %>%
         strip.text.x = element_blank(),
         axis.text.x.top = element_blank())
 
-p_nCT / p_hov_dep / p_iCT / p_NCP
+p_nCT / p_hov_dep / p_NCP
 
 ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_NCP_timeseries.pdf"),
        width = 210, height = 220, dpi = 300, units = "mm")
