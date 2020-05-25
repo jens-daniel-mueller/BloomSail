@@ -395,23 +395,9 @@ div.tocify {
 <li>
   <a href="Phytoplankton.html">Phytoplankton</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    NCP reconstruction
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="BloomSail_surface.html">BloomSail surface observations</a>
-    </li>
-    <li>
-      <a href="Finnmaid+GETM.html">Finnmaid + GETM</a>
-    </li>
-    <li>
-      <a href="NCP_reconstruction.html">Both data sets</a>
-    </li>
-  </ul>
+<li class="dropdown-header">NCP reconstruction</li>
+<li>
+  <a href="NCP_reconstruction.html"></a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -564,16 +550,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree2b97ae38d2cd26413b1a712a8c90a49293a928b8targetblank2b97ae3a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/2b97ae38d2cd26413b1a712a8c90a49293a928b8" target="_blank">2b97ae3</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree80a7e08c744bc368f21eb42f4e4e26f7f84ec9bctargetblank80a7e08a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/80a7e08c744bc368f21eb42f4e4e26f7f84ec9bc" target="_blank">80a7e08</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree2b97ae38d2cd26413b1a712a8c90a49293a928b8targetblank2b97ae3a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree80a7e08c744bc368f21eb42f4e4e26f7f84ec9bctargetblank80a7e08a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/2b97ae38d2cd26413b1a712a8c90a49293a928b8" target="_blank">2b97ae3</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/80a7e08c744bc368f21eb42f4e4e26f7f84ec9bc" target="_blank">80a7e08</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -593,6 +579,8 @@ Ignored files:
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
 
 Untracked files:
+    Untracked:  code/BloomSail_surface.Rmd
+    Untracked:  code/Finnmaid+GETM.Rmd
     Untracked:  output/Plots/Figures_publication/Appendix/Phytoplankton_mean_total_biomass.pdf
     Untracked:  output/Plots/Figures_publication/Appendix/TPD_CPD_cumulative.pdf
     Untracked:  output/Plots/Figures_publication/Appendix/tb_profiles.pdf
@@ -636,6 +624,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/80a7e08c744bc368f21eb42f4e4e26f7f84ec9bc/analysis/NCP_reconstruction.Rmd" target="_blank">80a7e08</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-25
+</td>
+<td>
+Removed separate BloomSail and fm+gt reconstruction
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/c5cf8de752ca63028856e0f408a01f14dbb5750e/docs/NCP_reconstruction.html" target="_blank">c5cf8de</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-05-25
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1413,6 +1435,81 @@ gt_3d_long %&gt;%
 <p><img src="figure/NCP_reconstruction.Rmd/gt_profiles_sal_tem-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(gt_3d_long)</code></pre>
 </div>
+<div id="comparison-bloomsail" class="section level2">
+<h2><span class="header-section-number">3.4</span> Comparison BloomSail</h2>
+<p>Vertical, 1m-gridded BloomSail CTD profiles were used for comparison with GETM results. Note that the sampling location does match exactly.</p>
+<p>GETM results were linearly interpolated to the mean BloomSail time stamp.</p>
+<div id="interpolate-gt-dep-grid" class="section level3">
+<h3><span class="header-section-number">3.4.1</span> Interpolate gt dep grid</h3>
+<pre class="r"><code>gt_3d_int &lt;- gt_3d %&gt;% 
+  mutate(dep_int = dep + 0.5) %&gt;% 
+  group_by(date_time) %&gt;% 
+  mutate(sal_int = approxfun(dep, sal)(dep_int),
+         tem_int = approxfun(dep, tem)(dep_int)) %&gt;% 
+  ungroup() %&gt;% 
+  select(date_time, dep=dep_int, sal=sal_int, tem=tem_int) %&gt;% 
+  drop_na()
+
+rm(gt_3d)</code></pre>
+<pre class="r"><code>tm_gt_3d &lt;- full_join(gt_3d_int,
+                      tm_profiles_ID %&gt;% select(date_time = date_time_ID,
+                                                dep, sal, tem),
+                      by = c(&quot;date_time&quot;, &quot;dep&quot;), suffix=c(&quot;_gt&quot;, &quot;_tm&quot;))
+
+tm_gt_3d &lt;- tm_gt_3d  %&gt;% 
+  mutate(rho_gt = swSigma(salinity = sal_gt,
+                          temperature = tem_gt,
+                          pressure = dep/10),
+         rho_tm = swSigma(salinity = sal_tm,
+                          temperature = tem_tm,
+                          pressure = dep/10))
+
+tm_gt_3d &lt;- tm_gt_3d %&gt;% 
+  arrange(date_time) %&gt;% 
+  group_by(dep) %&gt;% 
+  mutate(tem_gt = approxfun(date_time, tem_gt)(date_time),
+         sal_gt = approxfun(date_time, sal_gt)(date_time),
+         rho_gt = approxfun(date_time, rho_gt)(date_time)) %&gt;% 
+  ungroup() %&gt;% 
+  drop_na()</code></pre>
+<pre class="r"><code>tm_gt_3d_long &lt;- tm_gt_3d %&gt;% 
+  pivot_longer(sal_gt:rho_tm,
+               values_to = &quot;value&quot;,
+               names_to = c(&quot;var&quot;, &quot;source&quot;),
+               names_sep = &quot;_&quot;)
+
+tm_gt_3d_long %&gt;% 
+  ggplot(aes(value, dep,
+             col=date_time,
+             group=date_time))+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0), name=&quot;Depth (m)&quot;)+
+  scale_color_viridis_c(name=&quot;Date&quot;, trans = &quot;time&quot;)+
+  facet_grid(source~var, scales = &quot;free_x&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/NCP_reconstruction.Rmd/gt_ts_profiles_salt_temp_rho-1.png" alt="STD profiles modeled with GETM (upper panels, gt) and measured during BloomSail campaign (lower panels, ts)" width="672" />
+<p class="caption">
+STD profiles modeled with GETM (upper panels, gt) and measured during BloomSail campaign (lower panels, ts)
+</p>
+</div>
+<pre class="r"><code>tm_gt_3d &lt;- tm_gt_3d_long %&gt;% 
+  pivot_wider(values_from = &quot;value&quot;, names_from = &quot;source&quot;) %&gt;% 
+  mutate(value_diff = gt - tm)
+
+tm_gt_3d %&gt;% 
+  ggplot(aes(value_diff, dep,
+             col=date_time,
+             group=date_time))+
+  geom_vline(xintercept = 0, col=&quot;red&quot;)+
+  geom_path()+
+  scale_y_reverse(expand = c(0,0), name=&quot;Depth (m)&quot;)+
+  scale_color_viridis_c(name=&quot;Date&quot;, trans = &quot;time&quot;)+
+  facet_grid(.~var, scales = &quot;free_x&quot;)+
+  labs(x=&quot;Difference GETM (gt) - Bloomsail (ts)&quot;)</code></pre>
+<p><img src="figure/NCP_reconstruction.Rmd/gt_ts_profiles_diff_salt_temp_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>rm(tm_gt_3d, tm_gt_3d_long)</code></pre>
+</div>
+</div>
 </div>
 <div id="finnmaid" class="section level1">
 <h1><span class="header-section-number">4</span> Finnmaid</h1>
@@ -1549,21 +1646,8 @@ rm(fm_ID, fm, tm_gap, tm_profiles_ID_long_surface, tm_profiles)</code></pre>
 </div>
 <div id="merge-all-data-sets" class="section level1">
 <h1><span class="header-section-number">5</span> Merge all data sets</h1>
-<div id="interpolate-gt-dep-grid" class="section level2">
-<h2><span class="header-section-number">5.1</span> Interpolate gt dep grid</h2>
-<pre class="r"><code>gt_3d_int &lt;- gt_3d %&gt;% 
-  mutate(dep_int = dep + 0.5) %&gt;% 
-  group_by(date_time) %&gt;% 
-  mutate(sal_int = approxfun(dep, sal)(dep_int),
-         tem_int = approxfun(dep, tem)(dep_int)) %&gt;% 
-  ungroup() %&gt;% 
-  select(date_time, dep=dep_int, sal=sal_int, tem=tem_int) %&gt;% 
-  drop_na()
-
-rm(gt_3d)</code></pre>
-</div>
 <div id="merge-fm-and-gt" class="section level2">
-<h2><span class="header-section-number">5.2</span> Merge fm and gt</h2>
+<h2><span class="header-section-number">5.1</span> Merge fm and gt</h2>
 <pre class="r"><code>fm_tm_ID_wide &lt;- fm_tm_ID %&gt;% 
   filter(var %in% c(&quot;nCT&quot;)) %&gt;% 
   select(date_time_ID, var, value) %&gt;% 
@@ -1579,7 +1663,7 @@ fm_gt &lt;- full_join(fm_gt,
 rm(fm_tm_ID_wide, fm_tm_ID, gt_3d_int)</code></pre>
 </div>
 <div id="interpolate-gt-time-stamp" class="section level2">
-<h2><span class="header-section-number">5.3</span> Interpolate gt time stamp</h2>
+<h2><span class="header-section-number">5.2</span> Interpolate gt time stamp</h2>
 <pre class="r"><code>fm_gt &lt;- fm_gt %&gt;% 
   arrange(date_time_ID) %&gt;% 
   group_by(dep) %&gt;% 
@@ -1590,7 +1674,7 @@ rm(fm_tm_ID_wide, fm_tm_ID, gt_3d_int)</code></pre>
   filter(!is.na(nCT))</code></pre>
 </div>
 <div id="bind-tm-and-fm_gt" class="section level2">
-<h2><span class="header-section-number">5.4</span> Bind tm and fm_gt</h2>
+<h2><span class="header-section-number">5.3</span> Bind tm and fm_gt</h2>
 <pre class="r"><code>tm_profiles_ID &lt;- tm_profiles_ID %&gt;% 
   select(-c(ID, pCO2)) %&gt;% 
   mutate(source = &quot;tm&quot;)
@@ -2134,13 +2218,13 @@ loaded via a namespace (and not attached):
 [29] rmarkdown_2.1      sp_1.4-1           compiler_3.6.3     cellranger_1.1.0  
 [33] pillar_1.4.3       scales_1.1.0       backports_1.1.5    generics_0.0.2    
 [37] jsonlite_1.6.1     httpuv_1.5.2       pkgconfig_2.0.3    rstudioapi_0.11   
-[41] munsell_0.5.0      plyr_1.8.6         httr_1.4.1         tools_3.6.3       
-[45] grid_3.6.3         nlme_3.1-145       data.table_1.12.8  gtable_0.3.0      
-[49] checkmate_2.0.0    utf8_1.1.4         DBI_1.1.0          cli_2.0.2         
-[53] readxl_1.3.1       yaml_2.2.1         crayon_1.3.4       later_1.0.0       
-[57] farver_2.0.3       RColorBrewer_1.1-2 promises_1.1.0     fs_1.4.0          
-[61] vctrs_0.2.4        memoise_1.1.0      glue_1.3.2         evaluate_0.14     
-[65] labeling_0.3       reprex_0.3.0       stringi_1.4.6     </code></pre>
+[41] munsell_0.5.0      plyr_1.8.6         highr_0.8          httr_1.4.1        
+[45] tools_3.6.3        grid_3.6.3         nlme_3.1-145       data.table_1.12.8 
+[49] gtable_0.3.0       checkmate_2.0.0    utf8_1.1.4         DBI_1.1.0         
+[53] cli_2.0.2          readxl_1.3.1       yaml_2.2.1         crayon_1.3.4      
+[57] later_1.0.0        farver_2.0.3       RColorBrewer_1.1-2 promises_1.1.0    
+[61] fs_1.4.0           vctrs_0.2.4        memoise_1.1.0      glue_1.3.2        
+[65] evaluate_0.14      labeling_0.3       reprex_0.3.0       stringi_1.4.6     </code></pre>
 </div>
 </div>
 
