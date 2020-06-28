@@ -190,8 +190,8 @@ p_nCT <-
   geom_path(aes(value_cum, dep))+
   geom_hline(data = TPD %>% filter(var == "nCT"),
              aes(yintercept = TPD, col="Penetration depth"))+
-  geom_vline(data = TPD %>% filter(var == "nCT"),
-             aes(xintercept = value_surface, col="Surface change"))+
+  # geom_vline(data = TPD %>% filter(var == "nCT"),
+  #            aes(xintercept = value_surface, col="Surface change"))+
   scale_fill_manual(values = "black")+
   scale_color_brewer(palette = "Dark2")+
   labs(y = "Depth (m)", x = expression(nC[T]~(µmol~kg^{-1})))+
@@ -215,8 +215,8 @@ p_tem <-
   geom_path(aes(value_cum, dep))+
   geom_hline(data = TPD %>% filter(var == "tem"),
              aes(yintercept = TPD, col="Penetration depth"))+
-  geom_vline(data = TPD %>% filter(var == "tem"),
-             aes(xintercept = value_surface, col="Surface change"))+
+  # geom_vline(data = TPD %>% filter(var == "tem"),
+  #            aes(xintercept = value_surface, col="Surface change"))+
   scale_fill_manual(values = "black")+
   scale_color_brewer(palette = "Dark2")+
   labs(y = "Depth (m)", x = "Temperature (\u00B0C)")+
@@ -227,7 +227,11 @@ p_tem + p_nCT +
 
 ggsave(here::here("output/Plots/Figures_publication/appendix",
                   "TPD_CPD_cumulative.pdf"),
-       width = 210, height = 220, dpi = 300, units = "mm")
+        width = 180, height = 160, dpi = 300, units = "mm")
+
+ggsave(here::here("output/Plots/Figures_publication/appendix",
+                  "TPD_CPD_cumulative.png"),
+       width = 180, height = 160, dpi = 300, units = "mm")
 
 rm(TPD, tm_profiles_ID_long_180723, p_tem, p_nCT)
 
@@ -1200,6 +1204,23 @@ bin <- 2
 CPD <- CPD %>% 
   mutate(source = "tm")
 
+CPD <- CPD %>% 
+  mutate(source = factor(source, c("tm", "fm"))) %>% 
+  mutate(source = fct_recode(source,
+                             `VOS Finnmaid + GETM model` = "fm",
+                             `SY Tina V` = "tm"))
+
+i_dep <- i_dep %>% 
+  mutate(source = factor(source, c("tm", "fm"))) %>% 
+  mutate(source = fct_recode(source,
+                             `VOS Finnmaid + GETM model` = "fm",
+                             `SY Tina V` = "tm"))
+tm_fm_gt <- tm_fm_gt %>%
+  mutate(source = factor(source, c("tm", "fm"))) %>% 
+  mutate(source = fct_recode(source,
+                             `VOS Finnmaid + GETM model` = "fm",
+                             `SY Tina V` = "tm"))
+
 p_hov_dep <- 
   tm_fm_gt %>% 
   ggplot()+
@@ -1320,6 +1341,12 @@ NCP_flux_int <- NCP_flux %>%
 
 ```{r iCT_time_series}
 
+# iCT <- iCT %>%
+#   mutate(source = factor(source, c("tm", "fm"))) %>% 
+#   mutate(source = fct_recode(source,
+#                              `VOS Finnmaid + GETM model` = "fm",
+#                              `SY Tina V` = "tm"))
+
 p_nCT <- iCT %>% 
   ggplot(aes(date_time_ID, nCT))+
   geom_point()+
@@ -1358,7 +1385,10 @@ p_iCT <- iCT %>%
 p_nCT / p_hov_dep / p_iCT
 
 ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_iCT_timeseries.pdf"),
-       width = 210, height = 220, dpi = 300, units = "mm")
+       width = 190, height = 200, dpi = 300, units = "mm")
+  
+ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_iCT_timeseries.png"),
+       width = 190, height = 200, dpi = 300, units = "mm")
   
 ```
 
@@ -1367,6 +1397,11 @@ ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_iC
 NCP_flux <- NCP_flux %>% 
   mutate(i_res = fct_recode(i_res, `cumulative` = "cum")) %>% 
   mutate(i_res = factor(i_res, c("mean", "cumulative", "daily")))
+
+# NCP_flux_int <- NCP_flux_int %>%  
+#   mutate(source = fct_recode(source,
+#                              `VOS Finnmaid + GETM model` = "fm",
+#                              `SY Tina V` = "tm"))
 
 p_NCP <- NCP_flux_int %>% 
   ggplot()+
@@ -1389,6 +1424,9 @@ p_NCP <- NCP_flux_int %>%
 p_nCT / p_hov_dep / p_NCP
 
 ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_NCP_timeseries.pdf"),
-       width = 210, height = 220, dpi = 300, units = "mm")
+       width = 190, height = 200, dpi = 300, units = "mm")
+
+ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_NCP_timeseries.png"),
+       width = 190, height = 200, dpi = 300, units = "mm")
 ```
 

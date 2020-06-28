@@ -420,6 +420,12 @@ th <- th %>%
   arrange(date_time) %>% 
   mutate(deployment = cumsum(c(TRUE,diff(date_time)>=30)))
 
+# th_out <- th %>% 
+#   filter(!(deployment %in% c(2,6,9,14,17,21,23,27,31,33,34,35,37)))
+# 
+# th_out %>% 
+#   filter(Zero == 1)
+
 th <- th %>% 
   filter(deployment %in% c(2,6,9,14,17,21,23,27,31,33,34,35,37))
 
@@ -573,7 +579,7 @@ mixing_duration_lim <- 20
 
 ```{r Identify_Zeroing_Flush_th, eval=FALSE}
 
-# Zeroing ID labelling
+# Zeroing ID labeling
 
 th <- th %>% 
   arrange(date_time) %>% 
@@ -656,8 +662,8 @@ Summarized pCO~2~ date were written to file.
 
 ```{r write_th_summary_file, eval=FALSE}
 
-# th %>% write_csv(here::here("Data/_summarized_data_files",
-#                             "th_full.csv"))
+th %>% write_csv(here::here("Data/_summarized_data_files",
+                            "th_full.csv"))
 
 th %>% 
   select(date_time, Zero, Flush, pCO2_corr, deployment, Zero_counter, duration, mixing) %>% 
@@ -671,7 +677,7 @@ rm(th)
 
 # Bottle data CO2 (tb)
 
-Discrete samples were collected with a Niskin bottle and analysed for C[T] and A[T] at IOW CO~2~ lab.
+Discrete samples were collected with a Niskin bottle and analyzed for C[T] and A[T] at IOW CO~2~ lab.
 
 ## Read data
 

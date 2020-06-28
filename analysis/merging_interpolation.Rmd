@@ -43,12 +43,12 @@ ts <- read_csv(here::here("Data/_summarized_data_files",
                col_types = list("pCO2_analog" = col_double()))
 
 th <- read_csv(here::here("Data/_summarized_data_files",
-                          "th.csv"))
+                          "th_full.csv"))
 
 # Time offset correction ----------------------------------------------
 
 # Time offset was determined by comparing zeroing reads from Sensor and th
-# in the plots produced in the section Time stamp synchronzity below
+# in the plots produced in the section Time stamp synchronicity below
 # before applying this correction
 
 ts <- ts %>% 
@@ -75,7 +75,7 @@ CTD and auxillary recordings (15 sec measurment interval) are interpolated to Hy
 
 ```{r interpolation_to_common_timestamp, eval=FALSE}
 
-# Interpolate Sensor data to HydroC timestamp
+# Interpolate Sensor data to HydroC time stamp
 
 ts_th <- ts_th %>%
   mutate(dep_maxgap = na.approx(dep, na.rm = FALSE, maxgap = 20),
@@ -83,7 +83,7 @@ ts_th <- ts_th %>%
          sal = approxfun(date_time, sal)(date_time),
          tem = approxfun(date_time, tem)(date_time),
          pCO2_analog = approxfun(date_time, pCO2_analog)(date_time)) %>% 
-  filter(!is.na(dep_maxgap)) %>% #remove HC readings not falling in regular transects/profilings
+  filter(!is.na(dep_maxgap)) %>% #remove HC readings not falling in regular transects/profiling
   select(- dep_maxgap) %>% 
   fill(ID, type, station) %>% 
   filter(!is.na(deployment), !is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading
@@ -91,7 +91,7 @@ ts_th <- ts_th %>%
   # filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
 
 
-# Time stamp synchronzity
+# Time stamp synchronicity
 
 ts_th_Zero <- ts_th %>%
   filter(Zero == 1 | Flush == 1 & duration < 120)
@@ -137,8 +137,7 @@ rm(ts_th_Zero, ts_th_Zero_deployment, i_deployment, i_Zero_counter)
 ```{r safe_merged_data_file, eval=FALSE}
 
 ts_th %>% 
-  write_csv(here::here("Data/_merged_data_files/merging_interpolation", "ts_th.csv"))
-#write_csv(ts_th_full, here::here("Data/_merged_data_files", "BloomSail_CTD_HydroC_full.csv"))
+  write_csv(here::here("Data/_merged_data_files/merging_interpolation", "ts_th_full.csv"))
 
 rm(ts_th)
 

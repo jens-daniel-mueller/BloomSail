@@ -103,7 +103,8 @@ stations <- tm_profiles %>%
   group_by(station) %>% 
   summarise(lat = mean(lat),
             lon = mean(lon)) %>% 
-  ungroup()
+  ungroup() %>% 
+  mutate(station = str_sub(station, 2, 3))
 
 tm_profiles <- tm_profiles %>% 
   filter(!(station %in% c("P14", "P13", "P01")))
@@ -251,6 +252,12 @@ lat_hi <- 57.6
 lon_lo <- 18.6
 lon_hi <- 19.7
 
+herrvik_lat <- 57.421658
+herrvik_lon <- 18.914558
+
+ostergarn_lat <- 57.430544
+ostergarn_lon <- 18.984387
+
 ```
 
 ```{r read_subset_fm_data}
@@ -301,6 +308,8 @@ tm_track <- tm %>%
   arrange(date_time) %>% 
   slice(which(row_number() %% 50 == 1))
 
+
+
 ggplot()+
   geom_contour_fill(data = map_low_res,
                     aes(x=lon, y=lat, z=-elev),
@@ -310,10 +319,18 @@ ggplot()+
               aes(lon, lat), fill="darkgrey")+
   geom_path(data = tm_track, aes(lon, lat, group=ID, col="sampled"))+
   geom_path(data = fm, aes(lon, lat, group=ID, col=Area))+
-  geom_label(data = stations %>% filter(!(station %in% c("P14", "P13", "P01"))),
+  geom_label(data = stations %>% filter(!(station %in% c("14", "13", "01"))),
              aes(lon, lat, label=station, col="utilized"))+
-  geom_label(data = stations %>% filter(station %in% c("P14", "P13", "P01")),
+  geom_label(data = stations %>% filter(station %in% c("14", "13", "01")),
              aes(lon, lat, label=station, col="sampled_station"))+
+  geom_point(aes(herrvik_lon, herrvik_lat))+
+  geom_text(aes(herrvik_lon, herrvik_lat, label = "Herrvik"), nudge_x = -0.05)+
+  geom_point(aes(ostergarn_lon, ostergarn_lat))+
+  geom_text(aes(ostergarn_lon, ostergarn_lat, label = "Flux tower"),
+            nudge_x = -0.07,
+            nudge_y = 0.01)+
+  geom_text(aes(19.26, 57.57,label = "VOS Finnmaid"), col="white")+
+  geom_text(aes(19.54, 57.29,label = "SV Tina V"), col="white")+
   coord_quickmap(expand = 0, ylim = c(lat_lo+0.01, lat_hi-0.01))+
   labs(x="Longitude (°E)", y="Latitude (°N)")+
   scale_fill_gradient(low = "lightsteelblue1", high = "dodgerblue4",
@@ -322,6 +339,9 @@ ggplot()+
   scale_color_manual(values = c("white", "darkgrey", "orangered"), guide=FALSE)
 
 ggsave(here::here("output/Plots/Figures_publication/article", "station_map.pdf"),
+       width = 220, height = 150, dpi = 300, units = "mm")
+
+ggsave(here::here("output/Plots/Figures_publication/article", "station_map.png"),
        width = 220, height = 150, dpi = 300, units = "mm")
 
 rm(map, map_low_res,
@@ -342,7 +362,8 @@ cover <- tm_profiles %>%
   group_by(ID, station) %>% 
   summarise(date = mean(date_time),
             date_time_ID = mean(date_time_ID)) %>% 
-  ungroup()
+  ungroup() %>% 
+  mutate(station = str_sub(station, 2, 3))
 
 cover %>% 
   ggplot(aes(date, station, fill=ID))+
@@ -357,6 +378,9 @@ cover %>%
   theme(axis.title.x = element_blank())
 
 ggsave(here::here("output/Plots/Figures_publication/article", "data_coverage.pdf"),
+       width = 130, height = 65, dpi = 300, units = "mm")
+
+ggsave(here::here("output/Plots/Figures_publication/article", "data_coverage.png"),
        width = 130, height = 65, dpi = 300, units = "mm")
 
 rm(cover)
@@ -527,6 +551,9 @@ p_AT + p_CT + p_nCT
 ggsave(here::here("output/Plots/Figures_publication/appendix", "tb_profiles.pdf"),
        width = 180, height = 80, dpi = 300, units = "mm")
 
+ggsave(here::here("output/Plots/Figures_publication/appendix", "tb_profiles.png"),
+       width = 180, height = 80, dpi = 300, units = "mm")
+
 rm(tb_long_mean, p_AT, p_CT, p_nCT, tb_fix, AT_sd)
 
 ```
@@ -632,6 +659,9 @@ p_nCT <-
 p_tem + p_pCO2 + p_nCT
 
 ggsave(here::here("output/Plots/Figures_publication/article", "profiles_all.pdf"),
+       width = 180, height = 80, dpi = 300, units = "mm")
+
+ggsave(here::here("output/Plots/Figures_publication/article", "profiles_all.png"),
        width = 180, height = 80, dpi = 300, units = "mm")
 
 rm( p_tem, p_pCO2, p_nCT)
@@ -1041,7 +1071,8 @@ p_nCT_hov <- tm_profiles_ID_long %>%
   geom_vline(aes(xintercept = date_time_ID), col="white", linetype = "1f")+
   scale_fill_scico(breaks = MakeBreaks(bin_nCT),
                    guide = "colorstrip",
-                   name= expression(nC[T]~(µmol~kg^{-1})),
+                   name= expression(atop(nC[T],
+                                         (µmol~kg^{-1}))),
                    palette = "davos", direction = -1)+
   scale_y_reverse(sec.axis = dup_axis())+
   scale_x_datetime(breaks = "week",
@@ -1065,7 +1096,9 @@ p_tem_hov <- tm_profiles_ID_long %>%
   geom_vline(aes(xintercept = date_time_ID), col="white", linetype = "1f")+
   scale_fill_viridis_c(breaks = MakeBreaks(bin_Tem),
                        guide = "colorstrip",
-                       name="Temperature (\u00B0C)",
+                       name=expression(atop(
+                         Temperature,
+                         ("\u00B0"*C))),
                        option = "inferno")+
   scale_y_reverse(sec.axis = dup_axis())+
   scale_x_datetime(breaks = "week",
@@ -1082,12 +1115,13 @@ p_nCT_ID_cum <-
   tm_profiles_ID_long %>%
   filter(var == "nCT") %>% 
   ggplot(aes(value_cum, dep, col=ID, fill=ID))+
+  geom_hline(yintercept = 12, col="red")+
   geom_path()+
   geom_point(shape=21, col="black")+
   scale_y_reverse(expand = c(0,0),
                   position = "right",
                   sec.axis = dup_axis())+
-  labs(x = expression(nC[T]~cumulative~changes~(µmol~kg^{-1})),
+  labs(x = expression(nC[T]~cum.~changes~(µmol~kg^{-1})),
        y = "Depth (m)")+
   scale_color_viridis_d(labels = cruise_dates$date_ID)+
   scale_fill_viridis_d(labels = cruise_dates$date_ID)+
@@ -1101,12 +1135,13 @@ p_tem_ID_cum <-
   tm_profiles_ID_long %>%
   filter(var == "tem") %>% 
   ggplot(aes(value_cum, dep, col=ID, fill=ID))+
+  geom_hline(yintercept = 12, col="red")+
   geom_path()+
   geom_point(shape=21, col="black")+
   scale_y_reverse(expand = c(0,0),
                   position = "right",
                   sec.axis = dup_axis())+
-  labs(x = "Temperature cumulative changes (\u00B0C)",
+  labs(x = "Temperature cum. changes (\u00B0C)",
        y = "Depth (m)")+
   scale_color_viridis_d(labels = cruise_dates$date_ID, guide = FALSE)+
   scale_fill_viridis_d(labels = cruise_dates$date_ID, guide = FALSE)+
@@ -1116,10 +1151,13 @@ p_tem_ID_cum <-
 
 p_nCT_hov + p_nCT_ID_cum +
 p_tem_hov + p_tem_ID_cum +
-  plot_layout(widths = c(2, 1))
+  plot_layout(widths = c(2, 0.9))
 
 ggsave(here::here("output/Plots/Figures_publication/article", "Hov_abs_profiles_cum.pdf"),
-       width = 300, height = 190, dpi = 300, units = "mm")
+       width = 260, height = 170, dpi = 300, units = "mm")
+
+ggsave(here::here("output/Plots/Figures_publication/article", "Hov_abs_profiles_cum.png"),
+       width = 260, height = 170, dpi = 300, units = "mm")
 
 rm(p_nCT_hov, bin_nCT, p_tem_hov, bin_Tem, p_nCT_ID_cum, p_tem_ID_cum)
 
@@ -2334,6 +2372,9 @@ p_pCO2_surf + p_tem_surf + p_nCT_surf +
               heights = c(rep(1,7), 4))
 
 ggsave(here::here("output/Plots/Figures_publication/article", "atm_water_timeseries.pdf"),
+       width = 140, height = 270, dpi = 300, units = "mm")
+
+ggsave(here::here("output/Plots/Figures_publication/article", "atm_water_timeseries.png"),
        width = 140, height = 270, dpi = 300, units = "mm")
 
 ```

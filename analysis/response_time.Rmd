@@ -159,6 +159,9 @@ augment(fit) %>%
 ggsave(here::here("output/Plots/Figures_publication/appendix", "tau_fit_example.pdf"),
        width = 180, height = 90, dpi = 300, units = "mm")
 
+ggsave(here::here("output/Plots/Figures_publication/appendix", "tau_fit_example.png"),
+       width = 180, height = 90, dpi = 300, units = "mm")
+
 rm(tm_flush_counter, fit, i_Zero_counter, tau,
    pCO2_corr_delta, pCO2_corr_end, pCO2_corr_start,
    resid_abs_mean)
@@ -1248,6 +1251,9 @@ tm_grid_high_res %>%
 
 ggsave(here::here("output/Plots/Figures_publication/appendix", "pCO2_RT_corrected_profile_example.pdf"),
        width = 100, height = 140, dpi = 300, units = "mm")
+
+ggsave(here::here("output/Plots/Figures_publication/appendix", "pCO2_RT_corrected_profile_example.png"),
+       width = 100, height = 140, dpi = 300, units = "mm")
       
 rm(i_ID, i_station, i_tau_factor)
 
@@ -1631,6 +1637,10 @@ tm_grid_shallow_sum_high_res %>%
 
 ggsave(here::here("output/Plots/Figures_publication/appendix",
                   "pCO2_RT_corrected_profile_mean_abs_offset.pdf"),
+       width = 100, height = 140, dpi = 300, units = "mm")
+
+ggsave(here::here("output/Plots/Figures_publication/appendix",
+                  "pCO2_RT_corrected_profile_mean_abs_offset.png"),
        width = 100, height = 140, dpi = 300, units = "mm")
 
 ```

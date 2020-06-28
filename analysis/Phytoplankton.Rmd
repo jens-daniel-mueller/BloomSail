@@ -94,5 +94,8 @@ tp_ID_grid %>%
 ggsave(here::here("output/Plots/Figures_publication/appendix", "Phytoplankton_mean_total_biomass.pdf"),
        width = 180, height = 120, dpi = 300, units = "mm")
 
+ggsave(here::here("output/Plots/Figures_publication/appendix", "Phytoplankton_mean_total_biomass.png"),
+       width = 180, height = 120, dpi = 300, units = "mm")
+
 ```
 
