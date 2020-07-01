@@ -1110,6 +1110,7 @@ p_tem_hov <- tm_profiles_ID_long %>%
         axis.text.y.right = element_blank(),
         legend.position = "left")
 
+
   
 p_nCT_ID_cum <- 
   tm_profiles_ID_long %>%
@@ -1123,12 +1124,11 @@ p_nCT_ID_cum <-
                   sec.axis = dup_axis())+
   labs(x = expression(nC[T]~cum.~changes~(µmol~kg^{-1})),
        y = "Depth (m)")+
-  scale_color_viridis_d(labels = cruise_dates$date_ID)+
-  scale_fill_viridis_d(labels = cruise_dates$date_ID)+
-  theme(legend.position = "top",
-        axis.title.y.left = element_blank(),
-        axis.text.y.left = element_blank(),
-        legend.title = element_blank())
+  scale_color_viridis_d(labels = cruise_dates$date_ID, guide = FALSE)+
+  scale_fill_viridis_d(labels = cruise_dates$date_ID, guide = FALSE)+
+  theme(axis.title.y.left = element_blank(),
+        axis.text.y.left = element_blank())
+
 
 
 p_tem_ID_cum <- 
@@ -1143,14 +1143,15 @@ p_tem_ID_cum <-
                   sec.axis = dup_axis())+
   labs(x = "Temperature cum. changes (\u00B0C)",
        y = "Depth (m)")+
-  scale_color_viridis_d(labels = cruise_dates$date_ID, guide = FALSE)+
-  scale_fill_viridis_d(labels = cruise_dates$date_ID, guide = FALSE)+
-  theme(axis.title.y.left = element_blank(),
-        axis.text.y.left = element_blank())
+  scale_color_viridis_d(labels = cruise_dates$date_ID)+
+  scale_fill_viridis_d(labels = cruise_dates$date_ID)+
+  theme(legend.position = "top",
+        axis.title.y.left = element_blank(),
+        axis.text.y.left = element_blank(),
+        legend.title = element_blank())
 
-
-p_nCT_hov + p_nCT_ID_cum +
 p_tem_hov + p_tem_ID_cum +
+p_nCT_hov + p_nCT_ID_cum +
   plot_layout(widths = c(2, 0.9))
 
 ggsave(here::here("output/Plots/Figures_publication/article", "Hov_abs_profiles_cum.pdf"),
