@@ -240,7 +240,6 @@ th_comparison %>%
   ggplot() +
   geom_path(aes(date_time, pCO2_withoutAW-pCO2_withAW, col = "with - without AW"))+
   scale_color_brewer(palette = "Set1", name = "pCO2 record")+
-  coord_cartesian(ylim = c(0,600))+
   labs(y=expression(pCO[2]~(µatm)), x="")+
   facet_wrap(~ID, scales = "free_x", ncol = 1)
 
