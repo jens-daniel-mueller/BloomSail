@@ -210,7 +210,7 @@ ts_th %>%
 
 ```
 
-```{r compare_processed_hc_files}
+```{r compare_processed_hc_files, fig.asp=3}
 
 
 th_comparison <- full_join(
