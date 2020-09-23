@@ -238,7 +238,15 @@ th_comparison %>%
 th_comparison %>% 
   filter(!is.na(pCO2_corr)) %>% 
   ggplot() +
-  geom_path(aes(date_time, pCO2_withoutAW-pCO2_withAW, col = "with - without AW"))+
+  geom_path(aes(date_time, pCO2_corr-pCO2_withAW, col = "orig - with AW"))+
+  scale_color_brewer(palette = "Set1", name = "pCO2 record")+
+  labs(y=expression(pCO[2]~(µatm)), x="")+
+  facet_wrap(~ID, scales = "free_x", ncol = 1)
+
+th_comparison %>% 
+  filter(!is.na(pCO2_corr)) %>% 
+  ggplot() +
+  geom_path(aes(date_time, pCO2_withoutAW-pCO2_withAW, col = "without - with AW"))+
   scale_color_brewer(palette = "Set1", name = "pCO2 record")+
   labs(y=expression(pCO[2]~(µatm)), x="")+
   facet_wrap(~ID, scales = "free_x", ncol = 1)
