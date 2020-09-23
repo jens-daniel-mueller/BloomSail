@@ -395,7 +395,7 @@ HydroC pCO~2~ data  were provided by KM Contros after applying a drift correctio
 
 ```{r read_th_post_processed_by_manufacturer, eval=FALSE}
 
-# Read Contros corrected data file
+# Read Contros corrected data file, based on all recordings
 
 th <-
   read_csv2(here::here("Data/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
@@ -452,7 +452,7 @@ th_triple_clean <- th %>%
 
 th <- full_join(th_no_triple, th_triple_clean)
 
-rm(list=setdiff(ls(), "th"))
+rm(list=setdiff(ls(), c("th")))
 
 
 # find duplicated time stamps and shift first by one second backward, and merge
@@ -491,7 +491,7 @@ th <- full_join(th_no_duplicated, th_duplicated_clean)
 th %>% 
   distinct(date_time)
 
-rm(list=setdiff(ls(), "th"))
+rm(list=setdiff(ls(), c("th")))
 
 
 
@@ -531,7 +531,7 @@ th <- full_join(th_no_duplicated, th_duplicated_clean)
 th %>% 
   distinct(date_time)
 
-rm(list=setdiff(ls(), "th"))
+rm(list=setdiff(ls(), c("th")))
 
 # remaining duplicates are observations where other observations with a +/- 1 sec timestamp exist
 # for those cases, only the first duplicated observation is selected (similar to triplicate treatment)
@@ -560,7 +560,7 @@ th <- full_join(th_still_no_duplicated, th_still_duplicated_first)
 th %>% 
   distinct(date_time)
 
-rm(list=setdiff(ls(), "th"))
+rm(list=setdiff(ls(), c("th")))
 
 th <- th %>% 
   select(-n)

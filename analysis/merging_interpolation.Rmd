@@ -145,6 +145,41 @@ rm(ts_th)
 
 ## Time series pCO~2~
 
+### Read cleaned processed data
+
+HydroC pCO~2~ data  were provided by KM Contros after applying a drift correction to the raw data, which was based on pre- and post-deployment calibration results. 
+
+```{r read_th_post_processed_by_manufacturer}
+
+# Read Contros corrected data file, based on cleaned recordings
+
+th_new_withAW <-
+  read_csv2(here::here("Data/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
+                       "parameter&pCO2s(method 43)_new_withAW.txt"),
+            col_names = c("date_time", "Zero", "Flush", "p_NDIR",
+                          "p_in", "T_control", "T_gas", "%rH_gas",
+                          "Signal_raw", "Signal_ref", "T_sensor",
+                          "pCO2_corr", "Runtime", "nr.ave")) %>% 
+  mutate(date_time = dmy_hms(date_time),
+         Flush = as.factor(as.character(Flush)),
+         Zero = as.factor(as.character(Zero)))
+
+# Read Contros corrected data file, based on cleaned recordings without water vapor correction
+
+th_new_withoutAW <-
+  read_csv2(here::here("Data/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
+                       "parameter&pCO2s(method 43)_new_withoutAW.txt"),
+            col_names = c("date_time", "Zero", "Flush", "p_NDIR",
+                          "p_in", "T_control", "T_gas", "%rH_gas",
+                          "Signal_raw", "Signal_ref", "T_sensor",
+                          "pCO2_corr", "Runtime", "nr.ave")) %>% 
+  mutate(date_time = dmy_hms(date_time),
+         Flush = as.factor(as.character(Flush)),
+         Zero = as.factor(as.character(Zero)))
+
+```
+
+
 ### Absolute values
 
 ```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µats_th. Zeroing periods are included.", fig.asp = 3}
@@ -172,7 +207,47 @@ ts_th %>%
   labs(y=expression(pCO[2]~(µats_th)), x="")+
   facet_wrap(~ID, scales = "free_x", ncol = 1)
 
+
 ```
+
+```{r compare_processed_hc_files}
+
+
+th_comparison <- full_join(
+  ts_th %>% select(date_time, ID, pCO2_corr),
+  th_new_withAW %>% select(date_time, pCO2_corr) %>% rename(pCO2_withAW = pCO2_corr)
+)
+
+th_comparison <- full_join(
+  th_comparison,
+  th_new_withoutAW %>% select(date_time, pCO2_corr) %>% rename(pCO2_withoutAW = pCO2_corr)
+)
+
+
+th_comparison %>% 
+  filter(!is.na(pCO2_corr)) %>% 
+  ggplot() +
+  geom_path(aes(date_time, pCO2_corr, col = "HydroC, drift corrected"))+
+  geom_path(aes(date_time, pCO2_withAW, col = "withAW"))+
+  geom_path(aes(date_time, pCO2_withoutAW, col = "withoutAW"))+
+  scale_color_brewer(palette = "Set1", name = "pCO2 record")+
+  coord_cartesian(ylim = c(0,600))+
+  labs(y=expression(pCO[2]~(µatm)), x="")+
+  facet_wrap(~ID, scales = "free_x", ncol = 1)
+
+th_comparison %>% 
+  filter(!is.na(pCO2_corr)) %>% 
+  ggplot() +
+  geom_path(aes(date_time, pCO2_withoutAW-pCO2_withAW, col = "with - without AW"))+
+  scale_color_brewer(palette = "Set1", name = "pCO2 record")+
+  coord_cartesian(ylim = c(0,600))+
+  labs(y=expression(pCO[2]~(µatm)), x="")+
+  facet_wrap(~ID, scales = "free_x", ncol = 1)
+
+
+```
+
+
 
 ### Offset analog vs post-processed pCO~2~
 

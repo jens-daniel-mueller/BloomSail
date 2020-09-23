@@ -1172,7 +1172,7 @@ TPD <- TPD %>%
 
 TPD_cum <- TPD_cum %>% 
   select(source, i_dep) %>% 
-  mutate(i_method = "TPD", i_res = "cum")
+  mutate(i_method = "TPD", i_res = "cumulative")
 
 TPD_cum <- full_join(MLD_dates, TPD_cum)
 
@@ -1327,7 +1327,7 @@ NCP_flux <- full_join(iCT %>% rename(date_time=date_time_ID),
 
 # linear interpolation of cumulative changes to frequency of the flux estimates estimates 
 NCP_flux_int <- NCP_flux %>% 
-  filter(!(i_method == "MLD" & i_res == "cum")) %>% 
+  filter(!(i_method == "MLD" & i_res == "cumulative")) %>% 
   group_by(source, i_method, i_res) %>% 
   mutate(nCT_i_cum = approxfun(date_time, nCT_i_cum)(date_time),
          flux_cum = approxfun(date_time, flux_cum)(date_time)) %>% 
@@ -1395,7 +1395,7 @@ ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_iC
 ```{r NCP_time_series}
 
 NCP_flux <- NCP_flux %>% 
-  mutate(i_res = fct_recode(i_res, `cumulative` = "cum")) %>% 
+  #mutate(i_res = fct_recode(i_res, `cumulative` = "cum")) %>% 
   mutate(i_res = factor(i_res, c("mean", "cumulative", "daily")))
 
 # NCP_flux_int <- NCP_flux_int %>%  
@@ -1404,7 +1404,7 @@ NCP_flux <- NCP_flux %>%
 #                              `SY Tina V` = "tm"))
 
 p_NCP <- NCP_flux_int %>% 
-  filter(i_res %in% c("daily", "cum")) %>% 
+  filter(i_res %in% c("daily", "cumulative")) %>% 
   ggplot()+
   geom_hline(yintercept = 0)+
   geom_path(data=tm_NCP_cum, aes(date_time, nCT_i_flux_mix_cum), col="black")+
@@ -1413,7 +1413,7 @@ p_NCP <- NCP_flux_int %>%
   scale_x_datetime(breaks = "week", date_labels = "%d %b",
                    sec.axis = dup_axis(),
                    expand = c(0,0))+
-  scale_linetype(name="Resolution")+
+  scale_linetype(name="Estimate")+
   facet_wrap(~source)+
   labs(y=expression(atop(NCP, (mol~m^{-2}))))+
   guides(color = guide_legend(order = 1))+
