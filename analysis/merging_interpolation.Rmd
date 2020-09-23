@@ -43,7 +43,7 @@ ts <- read_csv(here::here("Data/_summarized_data_files",
                col_types = list("pCO2_analog" = col_double()))
 
 th <- read_csv(here::here("Data/_summarized_data_files",
-                          "th_full.csv"))
+                          "th.csv"))
 
 # Time offset correction ----------------------------------------------
 
@@ -137,7 +137,7 @@ rm(ts_th_Zero, ts_th_Zero_deployment, i_deployment, i_Zero_counter)
 ```{r safe_merged_data_file, eval=FALSE}
 
 ts_th %>% 
-  write_csv(here::here("Data/_merged_data_files/merging_interpolation", "ts_th_full.csv"))
+  write_csv(here::here("Data/_merged_data_files/merging_interpolation", "ts_th.csv"))
 
 rm(ts_th)
 
@@ -254,6 +254,21 @@ th_comparison %>%
 
 ```
 
+### replace pCO2 data
+
+```{r replace_with_clean_pCO2_record}
+
+th_new_withAW <- th_new_withAW %>% 
+  select(date_time, pCO2_corr)
+
+ts_th <- ts_th %>% 
+  select(-pCO2_corr)
+
+
+ts_th <- full_join(ts_th, th_new_withAW) 
+
+rm(th_new_withAW, th_new_withoutAW)
+```
 
 
 ### Offset analog vs post-processed pCO~2~

@@ -514,11 +514,18 @@ But we can also fit response times as a function of water temperature:
 ```{r linear_model_response_time}
 
 tau_fit <- tau_resid %>% 
-  group_by(pump_power) %>% 
-  do(fit = lm(tau ~ tem, data = .)) %>% 
-  tidy(fit) %>% 
+  nest_by(pump_power) %>% 
+  mutate(fit = list(lm(tau ~ tem, data = data))) %>% 
+  summarise(tidy(fit)) %>% 
   select(pump_power, term, estimate) %>% 
   spread(term, estimate)
+
+# tau_fit <- tau_resid %>% 
+#   group_by(pump_power) %>% 
+#   do(fit = lm(tau ~ tem, data = .)) %>% 
+#   tidy(fit) %>% 
+#   select(pump_power, term, estimate) %>% 
+#   spread(term, estimate)
 
 tau_fit
 
