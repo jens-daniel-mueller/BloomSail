@@ -13,7 +13,7 @@ editor_options:
 ---
 
 ```{r global_options, include = FALSE}
-knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 
 
@@ -164,6 +164,9 @@ th_new_withAW <-
          Flush = as.factor(as.character(Flush)),
          Zero = as.factor(as.character(Zero)))
 
+th_new_withAW <- th_new_withAW %>% 
+  slice(seq(1,n(),10))
+
 # Read Contros corrected data file, based on cleaned recordings without water vapor correction
 
 th_new_withoutAW <-
@@ -177,10 +180,14 @@ th_new_withoutAW <-
          Flush = as.factor(as.character(Flush)),
          Zero = as.factor(as.character(Zero)))
 
+th_new_withoutAW <- th_new_withoutAW %>% 
+  slice(seq(1,n(),10))
+
 th_all_data <- read_csv(here::here("Data/_summarized_data_files",
                           "th_all_data.csv"))
 
-
+th_all_data <- th_all_data %>% 
+  slice(seq(1,n(),10))
 
 ts_th <- read_csv(here::here("data/_merged_data_files/merging_interpolation",
                           "ts_th.csv"),
@@ -194,6 +201,9 @@ ts_th <- read_csv(here::here("data/_merged_data_files/merging_interpolation",
                                 duration = col_double(),
                                 mixing = col_character()))
 
+ts_th <- ts_th %>% 
+  slice(seq(1,n(),10))
+
 ```
 
 ### Comparison of preliminary pCO2 data
@@ -204,8 +214,8 @@ ts_th <- read_csv(here::here("data/_merged_data_files/merging_interpolation",
 
 ggplot()+
   geom_path(data = th_all_data, aes(date_time, pCO2_corr, col = "pre cleaning"))+
-  geom_path(data = ts_th, aes(date_time, pCO2_corr, col = "HydroC, drift corrected"))+
-  geom_path(data = ts_th, aes(date_time, pCO2_analog, col = "analog CTD"))+
+  # geom_path(data = ts_th, aes(date_time, pCO2_corr, col = "HydroC, drift corrected"))+
+  # geom_path(data = ts_th, aes(date_time, pCO2_analog, col = "analog CTD"))+
   scale_color_brewer(palette = "Set1", name = "pCO2 record")+
   coord_cartesian(ylim = c(0,600))+
   labs(y=expression(pCO[2]~(µatm)), x="")+
@@ -218,7 +228,7 @@ ggplot()+
 ```{r compare_processed_hc_files, fig.asp=5}
 
 th_comparison <- full_join(
-  ts_th %>% select(date_time, ID, pCO2_corr),
+  ts_th %>% select(date_time, deployment, pCO2_corr),
   th_new_withAW %>% select(date_time, pCO2_corr) %>% rename(pCO2_withAW = pCO2_corr)
 )
 
@@ -245,13 +255,15 @@ th_comparison %>%
 
 
 ```{r water_vapor_correction, fig.asp=5}
+
 th_comparison %>% 
   ggplot() +
-  geom_path(data = th_all_data, aes(date_time, 0, col = "pre runtime"))+
+  geom_path(data = th_all_data %>% slice_sample(prop = 0.1),
+            aes(date_time, 0, col = "pre runtime"))+
   geom_path(aes(date_time, pCO2_corr-pCO2_withAW, col = "orig - with AW"))+
   scale_color_brewer(palette = "Set1", name = "pCO2 record")+
   labs(y=expression(pCO[2]~(µatm)), x="")+
-  facet_wrap(~ID, scales = "free_x", ncol = 1)
+  facet_wrap(~deployment, scales = "free_x", ncol = 1)
 
 ```
 
@@ -266,7 +278,7 @@ th_comparison %>%
   geom_path(aes(date_time, pCO2_withoutAW-pCO2_withAW, col = "without - with AW"))+
   scale_color_brewer(palette = "Set1", name = "pCO2 record")+
   labs(y=expression(pCO[2]~(µatm)), x="")+
-  facet_wrap(~ID, scales = "free_x", ncol = 1)
+  facet_wrap(~deployment, scales = "free_x", ncol = 1)
 ```
 
 
