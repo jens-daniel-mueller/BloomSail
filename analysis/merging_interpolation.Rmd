@@ -177,12 +177,10 @@ th_new_withoutAW <-
          Flush = as.factor(as.character(Flush)),
          Zero = as.factor(as.character(Zero)))
 
-```
+th_all_data <- read_csv(here::here("Data/_summarized_data_files",
+                          "th_all_data.csv"))
 
 
-### Absolute values
-
-```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µats_th. Zeroing periods are included.", fig.asp = 3}
 
 ts_th <- read_csv(here::here("data/_merged_data_files/merging_interpolation",
                           "ts_th.csv"),
@@ -196,22 +194,28 @@ ts_th <- read_csv(here::here("data/_merged_data_files/merging_interpolation",
                                 duration = col_double(),
                                 mixing = col_character()))
 
+```
 
-ts_th %>% 
-  filter(!is.na(pCO2_corr)) %>% 
-  ggplot()+
-  geom_path(aes(date_time, pCO2_corr, col = "HydroC, drift corrected"))+
-  geom_path(aes(date_time, pCO2_analog, col = "analog CTD"))+
+### Comparison of preliminary pCO2 data
+
+#### Analog vs internal
+
+```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µatm. Zeroing periods are included.", fig.asp = 3}
+
+ggplot()+
+  geom_path(data = th_all_data, aes(date_time, pCO2_corr, col = "pre cleaning"))+
+  geom_path(data = ts_th, aes(date_time, pCO2_corr, col = "HydroC, drift corrected"))+
+  geom_path(data = ts_th, aes(date_time, pCO2_analog, col = "analog CTD"))+
   scale_color_brewer(palette = "Set1", name = "pCO2 record")+
   coord_cartesian(ylim = c(0,600))+
-  labs(y=expression(pCO[2]~(µats_th)), x="")+
-  facet_wrap(~ID, scales = "free_x", ncol = 1)
-
+  labs(y=expression(pCO[2]~(µatm)), x="")+
+  facet_wrap(~deployment, scales = "free_x", ncol = 1)
 
 ```
 
-```{r compare_processed_hc_files, fig.asp=3}
+#### Raw vs clean
 
+```{r compare_processed_hc_files, fig.asp=3}
 
 th_comparison <- full_join(
   ts_th %>% select(date_time, ID, pCO2_corr),
@@ -225,7 +229,6 @@ th_comparison <- full_join(
 
 
 th_comparison %>% 
-  filter(!is.na(pCO2_corr)) %>% 
   ggplot() +
   geom_path(aes(date_time, pCO2_corr, col = "HydroC, drift corrected"))+
   geom_path(aes(date_time, pCO2_withAW, col = "withAW"))+
@@ -235,13 +238,24 @@ th_comparison %>%
   labs(y=expression(pCO[2]~(µatm)), x="")+
   facet_wrap(~ID, scales = "free_x", ncol = 1)
 
+```
+
+#### Water vapor correction
+
+
+```{r water_vapor_correction}
 th_comparison %>% 
-  filter(!is.na(pCO2_corr)) %>% 
   ggplot() +
   geom_path(aes(date_time, pCO2_corr-pCO2_withAW, col = "orig - with AW"))+
   scale_color_brewer(palette = "Set1", name = "pCO2 record")+
   labs(y=expression(pCO[2]~(µatm)), x="")+
   facet_wrap(~ID, scales = "free_x", ncol = 1)
+
+```
+
+
+
+```{r water_vapor_correction_offset}
 
 th_comparison %>% 
   filter(!is.na(pCO2_corr)) %>% 
@@ -250,9 +264,10 @@ th_comparison %>%
   scale_color_brewer(palette = "Set1", name = "pCO2 record")+
   labs(y=expression(pCO[2]~(µatm)), x="")+
   facet_wrap(~ID, scales = "free_x", ncol = 1)
-
-
 ```
+
+
+
 
 ### replace pCO2 data
 
