@@ -25,7 +25,6 @@ library(zoo)
 ```
 
 
-
 ```{r ggplot_theme, include = FALSE}
 theme_set(theme_bw())
 ```

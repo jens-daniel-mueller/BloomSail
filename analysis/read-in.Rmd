@@ -44,7 +44,7 @@ CTD sensor data including recordings from auxiliary pH, O~2~, Chla and pCO~2~ se
 ## Read regular profiles and transects
 
 
-```{r read_ts_profile_transect_regular, eval=FALSE}
+```{r read_ts_profile_transect_regular}
 
 files <- list.files(path = "data/TinaV/Sensor/Profiles_Transects/", pattern = "[.]cnv$")
 #file <- files[1]
@@ -90,7 +90,7 @@ rm(dataset, file, files)
 
 ## Read profiles and transects around Ostergarnsholm
 
-```{r read_ts_profile_transect_Ostergarnsholm, eval=FALSE}
+```{r read_ts_profile_transect_Ostergarnsholm}
 
 files <- list.files(path = "data/TinaV/Sensor/Ostergarnsholm/", pattern = "[.]cnv$")
 
@@ -139,7 +139,7 @@ ts_OGB <- ts_OGB %>%
 
 ```
 
-```{r merge_ts_regular_and_Ostergarnsholm, eval=FALSE}
+```{r merge_ts_regular_and_Ostergarnsholm}
 ts <- bind_rows(ts, ts_OGB) %>% 
   arrange(date_time)
 
@@ -164,7 +164,7 @@ The output of an automated Exploratory Data Analysis (EDA) performed with the pa
 
 Sensor recordings were cleaned from obviously erroneous readings, by setting suspecious values to NA. 
 
-```{r clean_ts_data, eval=FALSE}
+```{r clean_ts_data}
 
 class(ts)
 ts <- data.table(ts)
@@ -391,9 +391,9 @@ ts %>%
 
 ## Read data
 
-HydroC pCO~2~ data  were provided by KM Contros after applying a drift correction to the raw data, which was based on pre- and post-deployment calibration results. 
+Originally, HydroC pCO~2~ data  were provided by KM Contros after applying a drift correction to the raw data, which was based on pre- and post-deployment calibration results. Those data are read-in here. However, later, the post-processing was repeated based on a cleaned data set.
 
-```{r read_th_post_processed_by_manufacturer, eval=FALSE}
+```{r read_th_post_processed_by_manufacturer}
 
 # Read Contros corrected data file, based on all recordings
 
@@ -414,7 +414,7 @@ th <-
 
 Individual deployments (periods of observations with less than 30 sec between recordings) were identified and relevant deployment periods were subsetted. This procedure removes only recordings attributable to sensor testing and set-up.
 
-```{r identify_select_th_deployment, eval=FALSE}
+```{r identify_select_th_deployment}
 
 th <- th %>% 
   arrange(date_time) %>% 
@@ -439,7 +439,7 @@ th <- th %>%
 
 ## Removal of duplicated time stamps
 
-```{r remove_duplicated_timestamp_th, eval=FALSE}
+```{r remove_duplicated_timestamp_th}
 
 
 # add counter for date_time observations
@@ -666,7 +666,7 @@ The output of an automated Exploratory Data Analysis (EDA) performed with the pa
 
 Summarized pCO~2~ date were written to file.
 
-```{r write_th_summary_file, eval=FALSE}
+```{r write_th_summary_file}
 
 th %>% write_csv(here::here("Data/_summarized_data_files",
                             "th_full.csv"))
