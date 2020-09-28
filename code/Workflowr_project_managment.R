@@ -110,7 +110,16 @@ wflow_publish("analysis/*", message = "XXX")
 wflow_publish(all = TRUE, message = "XXX")
 
 # commit changes including _site.yml (locally) and rebuild site
-wflow_publish(c("analysis/*.Rmd"), message = "XXX", republish = TRUE)
+wflow_publish(c(
+  "analysis/index.Rmd",
+  "analysis/nomenclature.Rmd",
+  "analysis/read-in.Rmd",
+  "analysis/merging_interpolation.Rmd",
+  "analysis/response_time.Rmd",
+  "analysis/CT_dynamics.Rmd",
+  "analysis/Phytoplankton.Rmd",
+  "analysis/NCP_reconstruction.Rmd"
+), message = "XXX", republish = TRUE)
 
 
 # Push latest version to GitHub
