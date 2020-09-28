@@ -758,7 +758,7 @@ The executed response time correction featured the following aspects:
 * tau_factor: Factor ranging from 0.8 - 1.6 applied to determined tau values
 * Post-smoothing: 30 sec running mean (eg across 15 observations at 2 sec measurement frequency) 
 
-```{r RT_correction, eval=FALSE}
+```{r RT_correction}
 
 # Response time correction approach after Bittig --------------------------
 
@@ -881,133 +881,6 @@ tm_RT %>%
 rm(i_ID, freq, RT_corr, tm_RT, tau_fit, tau_resid)
 
 ```
-
-As an alternative, the high resolution RT correction can be run.
-
-```{r RT_correction_high_res, eval=FALSE}
-
-# Response time correction approach after Bittig --------------------------
-
-RT_corr <- function(c1, c0, dt, tau) {
-  ( 1 / ( 2* (( 1+(2*tau/dt) )^(-1) ))) * (c1 - (1-(2* (( 1+(2*tau/dt) )^(-1) ))) * c0)
-}
-
-
-# Assign mean response time (tau) values ----------------------------------------------
-
-# df_mean <- full_join(df, tau_mean)
-# 
-# df_mean <- df_mean %>% 
-#   mutate(RT = "constant")
-
-# Assign T-dependent response time (tau) values ----------------------------------------------
-
-tau_fit <- tau_fit %>% 
-  rename(tau_intercept = `(Intercept)`, tau_slope=tem)
-
-tm_fit <- full_join(tm, tau_fit)
-
-tm_fit <- tm_fit %>% 
-  mutate(tau = tau_intercept + tau_slope *tem) %>% 
-  select(-tau_intercept, -tau_slope)
-
-# tm_fit <- tm_fit %>% 
-#   mutate(RT = "T-dependent")
-
-
-# Merge data sets with constand and T-dependent tau
-
-tm <- tm_fit
-#tm <- bind_rows(tm_fit, tm_mean)
-
-rm(tm_fit)
-
-# p1 <- tm %>% 
-#   ggplot(aes(tau, dep, col=pump_power))+
-#   geom_point()+
-#   scale_y_reverse()
-# 
-# p2 <- tm %>% 
-#   ggplot(aes(tem, dep, col=pump_power))+
-#   geom_point()+
-#   scale_y_reverse()
-# 
-# p1 | p2
-# 
-# rm(p1, p2)
-
-
-# Prepare data set for RT correction --------------------------------------
-
-tm <- tm %>% 
-  #group_by(RT) %>% 
-  arrange(date_time) %>% 
-  mutate(dt = as.numeric(as.character(date_time - lag(date_time))))
- # ungroup()
-
-# measurement frequency
-
-freq <- tm %>% 
-  filter(dt < 13) %>% 
-  group_by(ID) %>% 
-  summarise(dt_mean = round(mean(dt, na.rm = TRUE),0))
-
-tm <- full_join(tm, freq)
-
-# tau factors
-
-tm <- expand_grid(tm, tau_factor = seq(0.8, 1.6, 0.05))
-
-tm <- tm %>%
-  mutate(tau_test = tau*tau_factor)
-
-
-# Apply RT correction to entire data set
-
-for(i_ID in unique(tm$ID)){
-  
-#i_ID <- "180716"
-  
-  freq_sub <- freq %>% filter(ID == i_ID) %>% pull(dt_mean)
-  
-  window <- 30 / freq_sub
-  rolling_mean   <- rollify(~mean(.x, na.rm = TRUE), window = window)
-
-  tm_sub <- tm %>%
-    filter(ID == i_ID) %>% 
-    group_by(station, tau_factor) %>% 
-    mutate(pCO2_RT = RT_corr(pCO2_corr, lag(pCO2_corr), dt, tau_test),
-           pCO2_RT = if_else(pCO2_RT %in% c(Inf, -Inf), NaN, pCO2_RT),
-           window = window,
-           pCO2 = rolling_mean(pCO2_RT)
-           #pCO2_RT_median = rolling_median(pCO2_RT)
-           ) %>% 
-    ungroup()
-  
-  # time shift RT corrected data
-  shift <- as.integer(as.character(window/2))
-  
-  tm_sub <- tm_sub %>%
-    group_by(station, tau_factor) %>% 
-    mutate(pCO2 = lead(pCO2, shift)) %>% 
-    ungroup()
-  
-  
-  if (exists("tm_RT")){tm_RT <- bind_rows(tm_RT, tm_sub)}
-  else{tm_RT <- tm_sub}
-  
-  rm(tm_sub, freq_sub, rolling_mean, shift, window)
-  
-}
-
-tm_RT %>% 
- write_csv(here::here("data/_merged_data_files/response_time",
-                      "tm_RT_profiles_by_tau_factor_high_res.csv"))
-
-rm(i_ID, freq, RT_corr, tm_RT, tau_fit, tau_resid, tm)
-
-```
-
 
 
 
@@ -1132,33 +1005,6 @@ tm_grid <- tm %>%
          pCO2_delta_rel = 100 * pCO2_delta / pCO2_up_down_average)
 
 
-tm_high_res <- read_csv(here::here("data/_merged_data_files/response_time",
-                          "tm_RT_profiles_by_tau_factor_high_res.csv"),
-               col_types = cols(ID = col_character(),
-                                Zero = col_factor(),
-                                Flush = col_factor(),
-                                p_type = col_factor(),
-                                Zero_counter = col_integer(),
-                                deployment = col_integer()))
-
-
-# pCO2 offset up - down cast
-tm_grid_high_res <- tm_high_res %>% 
-  filter(phase %in% c("down", "up")) %>% 
-  mutate(dep_grid = as.numeric(as.character( cut(dep, seq(0,40,1), seq(0.5,39.5,1)))),
-         tau_factor = as.factor(tau_factor)) %>% 
-  select(ID, station, tau_factor, p_type, dep_grid, phase, pCO2_corr, pCO2) %>% 
-  group_by(ID, station, tau_factor, p_type, dep_grid, phase) %>%
-  summarise_all("mean", na.rm = TRUE) %>% 
-  ungroup() %>% 
-  pivot_longer(cols = c(pCO2_corr, pCO2), names_to = "correction") %>% 
-  pivot_wider(names_from = phase, values_from = value) %>% 
-  mutate(pCO2_delta = up - down,
-         pCO2_up_down_average = (down + up)/2,
-         pCO2_delta_rel = 100 * pCO2_delta / pCO2_up_down_average)
-
-
-
 # descritize depth recordings of equilibrated pCO2 values
 
 tm_pCO2_equi_grid <- tm_pCO2_equi %>%
@@ -1169,10 +1015,6 @@ tm_pCO2_equi_grid <- tm_pCO2_equi %>%
 tm_grid %>% 
  write_csv(here::here("data/_merged_data_files/response_time",
                       "tm_grid.csv"))
-
-tm_grid_high_res %>% 
- write_csv(here::here("data/_merged_data_files/response_time",
-                      "tm_grid_high_res.csv"))
 
 tm_pCO2_equi_grid %>% 
  write_csv(here::here("data/_merged_data_files/response_time",
@@ -1190,11 +1032,6 @@ rm(tm_grid, tm_pCO2_equi_grid, tm_grid_high_res)
 tm_grid <-
  read_csv(here::here("data/_merged_data_files/response_time",
                       "tm_grid.csv"),
-               col_types = cols(ID = col_character()))
-
-tm_grid_high_res <-
- read_csv(here::here("data/_merged_data_files/response_time",
-                      "tm_grid_high_res.csv"),
                col_types = cols(ID = col_character()))
 
 tm_pCO2_equi_grid <-
@@ -1238,9 +1075,9 @@ rm(tm_pCO2_equi_grid_sub, i_ID, i_station)
 
 i_ID <- example_ID
 i_station <- example_station
-i_tau_factor <- 1.25
+i_tau_factor <- 1
 
-tm_grid_high_res %>%
+tm_grid %>%
   filter(ID == i_ID,
          station == i_station,
          tau_factor == i_tau_factor) %>%
@@ -1518,7 +1355,6 @@ tm_grid_stat %>%
   geom_point()
 
 tm_grid <- full_join(tm_grid, tm_grid_stat)
-tm_grid_high_res <- full_join(tm_grid_high_res, tm_grid_stat)
 
 meta <- read_csv(here::here("Data/TinaV/Sensor",
                             "Sensor_meta.csv"),
@@ -1558,31 +1394,7 @@ tm_grid_shallow <- tm_grid %>%
   ungroup() %>% 
   filter(nr_na <= 2)
 
-tm_grid_shallow_high_res <- tm_grid_high_res %>% 
-  filter(dep_max <= dep_max_lim,
-         pCO2_max <= pCO2_max_lim,
-         dep_grid <= dep_lim) %>% 
-  group_by(ID, station, tau_factor, correction) %>% 
-  mutate(nr_na = sum(is.na(pCO2_delta))) %>% 
-  ungroup() %>% 
-  filter(nr_na <= 2)
-
-
 tm_grid_shallow_sum <- tm_grid_shallow %>% 
-  mutate(pCO2_delta_abs = abs(pCO2_delta),
-         pCO2_delta_rel_abs = abs(pCO2_delta_rel)) %>% 
-  group_by(tau_factor, dep_grid, correction) %>% 
-  summarise(mean         = mean(pCO2_delta, na.rm = TRUE),
-            sd           = sd(pCO2_delta, na.rm = TRUE),
-            mean_abs     = mean(pCO2_delta_abs, na.rm = TRUE),
-            mean_rel     = mean(pCO2_delta_rel, na.rm = TRUE),
-            sd_rel       = sd(pCO2_delta_rel, na.rm = TRUE),
-            mean_rel_abs = mean(pCO2_delta_rel_abs, na.rm = TRUE)) %>% 
-  ungroup() %>% 
-  pivot_longer(cols = sd:mean_rel_abs,
-               names_to = "estimate", values_to = "pCO2_delta")
-
-tm_grid_shallow_sum_high_res <- tm_grid_shallow_high_res %>% 
   mutate(pCO2_delta_abs = abs(pCO2_delta),
          pCO2_delta_rel_abs = abs(pCO2_delta_rel)) %>% 
   group_by(tau_factor, dep_grid, correction) %>% 
@@ -1631,10 +1443,10 @@ tm_grid_shallow_sum %>%
 
 ```{r plot_cast_delta_pCO2_example, include=FALSE}
 
-tm_grid_shallow_sum_high_res %>% 
+tm_grid_shallow_sum %>% 
   filter(correction == "pCO2",
          estimate %in% c("mean_abs"),
-         tau_factor == 1.25) %>% 
+         tau_factor == 1) %>% 
   ggplot()+
   geom_path(aes(pCO2_delta, dep_grid))+
   scale_y_reverse()+
@@ -1652,27 +1464,9 @@ ggsave(here::here("output/Plots/Figures_publication/appendix",
 
 ```
 
-
-```{r plot_tau_optimum_cast_delta_pCO2, fig.cap="Mean offset between up- and downcast for all profiles up to 20m water depth. The lines between discrete tau factors result from the same analysis performed with high resolution of the tau factor. Left Panel: Mean absolute offset (µatm). Right panel: Mean relative offset (% of absolute value)."}
-
-
-tm_grid_shallow_sum_mean_high_res <- tm_grid_shallow_sum_high_res %>% 
-  group_by(estimate, correction, tau_factor) %>% 
-  summarise(pCO2_delta_mean = mean(pCO2_delta)) %>% 
-  ungroup()
-
-
-ggplot()+
-  geom_line(data = tm_grid_shallow_sum_mean_high_res %>% filter(estimate %in% c("mean_abs", "mean_rel_abs")),
-             aes(tau_factor, pCO2_delta_mean, linetype=correction, shape=correction))+
-  ylim(0,NA)+
-  facet_wrap(~estimate)
-
-```
-
 Below we determined the tau factor that corresponds to lowest absolute mean offset.
 
-```{r cast_tau_with_minimum_offfset}
+```{r cast_tau_with_minimum_offfset, eval=FALSE}
 
 pCO2_delta_mean_min <- tm_grid_shallow_sum_mean_high_res %>%
   filter(correction == "pCO2", estimate %in% c("mean_abs")) %>% 
@@ -1688,8 +1482,6 @@ tau_factor_min <- tm_grid_shallow_sum_mean_high_res %>%
   pull()
 
 ```
-
-A tau factor of `r tau_factor_min` resulted in the lowest absolute mean offset (`r pCO2_delta_mean_min` µatm) and will be used for response time correction.
 
 Likewise, we analyse the offset from the pCO~2~ reference value:
 
@@ -1941,7 +1733,7 @@ freq <- tm %>%
 tm <- full_join(tm, freq)
 
 # tau factors
-tm <- expand_grid(tm, tau_factor = tau_factor_min)
+tm <- expand_grid(tm, tau_factor = 1)
 
 tm <- tm %>%
   mutate(tau_test = tau*tau_factor)
@@ -2040,8 +1832,3 @@ rm(df, Tem, pCO2)
 ```
 
 
-
-
-# Open tasks / questions
-
-- Clean workspace for plotting code after RT correction

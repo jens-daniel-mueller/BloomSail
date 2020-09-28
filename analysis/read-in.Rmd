@@ -687,7 +687,7 @@ Discrete samples were collected with a Niskin bottle and analyzed for C[T] and A
 
 ## Read data
 
-```{r read_tb_CO2_data, eval=FALSE}
+```{r read_tb_CO2_data}
 
 
 tb <- read_csv(here::here("Data/TinaV/Bottle/Tracegases", "BloomSail_bottle_CO2_all.csv"),
@@ -705,7 +705,7 @@ tb <- tb %>%
 
 ## Write summary file
 
-```{r write_tb_CO2_data, eval=FALSE}
+```{r write_tb_CO2_data}
 
 tb %>% write_csv(here::here("Data/_summarized_data_files",
                             "tb.csv"))
@@ -720,7 +720,7 @@ Discrete samples were collected with a Niskin bottle and analysed for phytoplank
 
 ## Read data
 
-```{r read_tp_phytoplankton_data, eval=FALSE}
+```{r read_tp_phytoplankton_data}
 
 
 tp <- read_csv(here::here("Data/TinaV/Bottle/Phytoplankton",
@@ -760,7 +760,7 @@ tp <- tp %>%
 
 ## Write summary file
 
-```{r write_tp_phytoplankton_data, eval=FALSE}
+```{r write_tp_phytoplankton_data}
 
 tp %>% write_csv(here::here("Data/_summarized_data_files",
                             "tp.csv"))
@@ -776,7 +776,7 @@ GPS track data were recorded with a Samsung Galaxy tablet.
 
 ## Read data
 
-```{r read_tt_data, eval=FALSE}
+```{r read_tt_data}
 
 files <- list.files(path = "data/TinaV/Track/GPS_Logger_Track/", pattern = "[.]txt$")
 
@@ -812,7 +812,7 @@ rm(dataset, file, files)
 
 ## Write summary file
 
-```{r write_tt_data, eval=FALSE}
+```{r write_tt_data}
 
 tt %>% 
   write_csv(here::here("data/_summarized_data_files",
@@ -828,7 +828,7 @@ Atmospheric data were recorded at the ICOS station on Osterganrsholm.
 
 ## Read data
 
-```{r read_wind_Ostergarn_tower, eval=FALSE}
+```{r read_wind_Ostergarn_tower}
 
 og <- read_delim(here::here("Data/Ostergarnsholm/Tower", "Oes_Jens_atm_water_June_to_August_2018.csv"),
                  delim = ";"               )
@@ -852,7 +852,7 @@ og <- og %>%
 
 ## Write summary file
 
-```{r write_og_data, eval=FALSE}
+```{r write_og_data}
 
 og %>% 
   write_csv(here::here("data/_summarized_data_files",
@@ -869,7 +869,7 @@ pCO~2~ data were recorded on VOS Finnmaid in summer 2018.
 
 ## Read data
 
-```{r read_fm_data, eval=FALSE}
+```{r read_fm_data}
 
 
 ### June - August 2018
@@ -942,7 +942,7 @@ rm(temp, files, file)
 
 ## Convert O2 concentration units
 
-```{r convert_O2_Los_Gatos_fm, eval=FALSE}
+```{r convert_O2_Los_Gatos_fm}
 
 source(here::here("code", "O2stoO2c.R"))
 
@@ -954,7 +954,7 @@ rm(O2stoO2c, pH2Osat, sca_T, Scorr, TCorr, R, Vm)
 
 ```
 
-```{r merge_Los_Gatos_LICOR_data_files, eval=FALSE}
+```{r merge_Los_Gatos_LICOR_data_files}
 
 dataset$sensor <- "LICOR"
 dataset.LGR$sensor <- "LosGatos"
@@ -980,7 +980,7 @@ rm(dataset, dataset.LGR, temp)
 
 ## Write summary file
 
-```{r write_fm, eval=FALSE}
+```{r write_fm}
 
 # fm <- fm[complete.cases(fm[,pCO2]),]
 
