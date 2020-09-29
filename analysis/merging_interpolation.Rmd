@@ -24,6 +24,12 @@ library(zoo)
 
 ```
 
+```{r read_parameters, include = FALSE}
+parameters <-
+  read_rds(here::here("data",
+                       "parameters.rds"))
+```
+
 
 ```{r ggplot_theme, include = FALSE}
 theme_set(theme_bw())
@@ -37,11 +43,11 @@ theme_set(theme_bw())
 ```{r load_summarized_data_synchronize_time_stamp}
 
 # Load Sensor and HydroC data ---------------------------------------------
-ts <- read_csv(here::here("Data/_summarized_data_files",
+ts <- read_csv(here::here("data/intermediate/_summarized_data_files",
                           "ts.csv"),
                col_types = list("pCO2_analog" = col_double()))
 
-th <- read_csv(here::here("Data/_summarized_data_files",
+th <- read_csv(here::here("data/intermediate/_summarized_data_files",
                           "th.csv"))
 
 # Time offset correction ----------------------------------------------
@@ -61,9 +67,6 @@ ts <- ts %>%
 ts_th <- full_join(ts, th) %>% 
   arrange(date_time)
 
-# ts_th_full <- full_join(ts, th_full) %>% 
-#   arrange(date_time)
-
 rm(th, ts)
 ```
 
@@ -74,20 +77,23 @@ CTD and auxillary recordings (15 sec measurment interval) are interpolated to Hy
 
 ```{r interpolation_to_common_timestamp}
 
+
 # Interpolate Sensor data to HydroC time stamp
 
 ts_th <- ts_th %>%
-  mutate(dep_maxgap = na.approx(dep, na.rm = FALSE, maxgap = 20),
-         dep = approxfun(date_time, dep)(date_time),
-         sal = approxfun(date_time, sal)(date_time),
-         tem = approxfun(date_time, tem)(date_time),
-         pCO2_analog = approxfun(date_time, pCO2_analog)(date_time)) %>% 
+  mutate(
+    dep_maxgap = na.approx(dep, na.rm = FALSE, maxgap = 20),
+    dep = approxfun(date_time, dep)(date_time),
+    sal = approxfun(date_time, sal)(date_time),
+    tem = approxfun(date_time, tem)(date_time),
+    pCO2_analog = approxfun(date_time, pCO2_analog)(date_time)
+  ) %>%
   filter(!is.na(dep_maxgap)) %>% #remove HC readings not falling in regular transects/profiling
-  select(- dep_maxgap) %>% 
-  fill(ID, type, station) %>% 
-  filter(!is.na(deployment), !is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading
+  select(-dep_maxgap) %>%
+  fill(ID, type, station) %>%
+  filter(!is.na(deployment),!is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading
 
-  # filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
+# filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
 
 
 # Time stamp synchronicity
@@ -95,39 +101,47 @@ ts_th <- ts_th %>%
 ts_th_Zero <- ts_th %>%
   filter(Zero == 1 | Flush == 1 & duration < 120)
 
-pdf(file=here::here("output/Plots/merging_interpolation",
-                    "Zero_time_synchronization.pdf"),
-    onefile = TRUE, width = 5, height = 5)
+pdf(
+  file = here::here(
+    "output/Plots/merging_interpolation",
+    "Zero_time_synchronization.pdf"
+  ),
+  onefile = TRUE,
+  width = 5,
+  height = 5
+)
 
 for (i_deployment in unique(ts_th$deployment)) {
-
   #i_deployment <- unique(ts_th_Zero$deployment)[1]
-
+  
   ts_th_Zero_deployment <- ts_th_Zero %>%
     filter(deployment == i_deployment)
-
+  
   for (i_Zero_counter in unique(ts_th_Zero_deployment$Zero_counter)) {
-
     #i_Zero_counter <- unique(ts_th_Zero_deployment$Zero_counter)[1]
-
+    
     print(
-
-    ts_th_Zero_deployment %>%
-      filter(Zero_counter == i_Zero_counter) %>%
-      ggplot()+
-      geom_point(aes(date_time, pCO2_corr, col="HydroC"))+
-      geom_point(aes(date_time, pCO2_analog, col="analog"))+
-      labs(title = paste("Depl: ",i_deployment,
-                         " | Zero_counter: ", i_Zero_counter))
-
+      ts_th_Zero_deployment %>%
+        filter(Zero_counter == i_Zero_counter) %>%
+        ggplot() +
+        geom_point(aes(date_time, pCO2_corr, col = "HydroC")) +
+        geom_point(aes(date_time, pCO2_analog, col = "analog")) +
+        labs(
+          title = paste("Depl: ", i_deployment,
+                        " | Zero_counter: ", i_Zero_counter)
+        )
+      
     )
-
+    
   }
 }
 
 dev.off()
 
-rm(ts_th_Zero, ts_th_Zero_deployment, i_deployment, i_Zero_counter)
+rm(ts_th_Zero,
+   ts_th_Zero_deployment,
+   i_deployment,
+   i_Zero_counter)
 
 ```
 
@@ -140,47 +154,86 @@ HydroC pCO~2~ data  were provided by KM Contros after applying a drift correctio
 
 ```{r read_th_post_processed_by_manufacturer}
 
+
 # Read Contros corrected data file, based on cleaned recordings
 
 th_new_withAW <-
-  read_csv2(here::here("Data/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
-                       "parameter&pCO2s(method 43)_new_withAW.txt"),
-            col_names = c("date_time", "Zero", "Flush", "p_NDIR",
-                          "p_in", "T_control", "T_gas", "%rH_gas",
-                          "Signal_raw", "Signal_ref", "T_sensor",
-                          "pCO2_corr", "Runtime", "nr.ave")) %>% 
-  mutate(date_time = dmy_hms(date_time),
-         Flush = as.factor(as.character(Flush)),
-         Zero = as.factor(as.character(Zero)))
+  read_csv2(
+    here::here(
+      "data/input/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
+      "parameter&pCO2s(method 43)_new_withAW.txt"
+    ),
+    col_names = c(
+      "date_time",
+      "Zero",
+      "Flush",
+      "p_NDIR",
+      "p_in",
+      "T_control",
+      "T_gas",
+      "%rH_gas",
+      "Signal_raw",
+      "Signal_ref",
+      "T_sensor",
+      "pCO2_corr",
+      "Runtime",
+      "nr.ave"
+    )
+  ) %>%
+  mutate(
+    date_time = dmy_hms(date_time),
+    Flush = as.factor(as.character(Flush)),
+    Zero = as.factor(as.character(Zero))
+  )
 
-th_new_withAW <- th_new_withAW %>% 
-  slice(seq(1,n(),10))
+th_new_withAW <- th_new_withAW %>%
+  slice(seq(1, n(), 10))
 
 # Read Contros corrected data file, based on cleaned recordings without water vapor correction
 
 th_new_withoutAW_all <-
-  read_csv2(here::here("Data/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
-                       "parameter&pCO2s(method 43)_new_withoutAW.txt"),
-            col_names = c("date_time", "Zero", "Flush", "p_NDIR",
-                          "p_in", "T_control", "T_gas", "%rH_gas",
-                          "Signal_raw", "Signal_ref", "T_sensor",
-                          "pCO2_corr", "Runtime", "nr.ave")) %>% 
-  mutate(date_time = dmy_hms(date_time),
-         Flush = as.factor(as.character(Flush)),
-         Zero = as.factor(as.character(Zero)))
+  read_csv2(
+    here::here(
+      "data/input/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
+      "parameter&pCO2s(method 43)_new_withoutAW.txt"
+    ),
+    col_names = c(
+      "date_time",
+      "Zero",
+      "Flush",
+      "p_NDIR",
+      "p_in",
+      "T_control",
+      "T_gas",
+      "%rH_gas",
+      "Signal_raw",
+      "Signal_ref",
+      "T_sensor",
+      "pCO2_corr",
+      "Runtime",
+      "nr.ave"
+    )
+  ) %>%
+  mutate(
+    date_time = dmy_hms(date_time),
+    Flush = as.factor(as.character(Flush)),
+    Zero = as.factor(as.character(Zero))
+  )
 
-th_new_withoutAW <- th_new_withoutAW_all %>% 
-  slice(seq(1,n(),10))
+th_new_withoutAW <- th_new_withoutAW_all %>%
+  slice(seq(1, n(), 10))
 
-th_all_data <- read_csv(here::here("Data/_summarized_data_files",
-                          "th_all_data.csv"))
+th_pre_cleaning <-
+  read_csv(here::here(
+    "data/intermediate/_summarized_data_files",
+    "th_pre_cleaning.csv"
+  ))
 
-th_all_data <- th_all_data %>% 
-  slice(seq(1,n(),10))
+th_pre_cleaning <- th_pre_cleaning %>%
+  slice(seq(1, n(), 10))
 
-ts_th_sub <- ts_th %>% 
-  slice(seq(1,n(),10))
-
+ts_th_sub <- ts_th %>%
+  slice(seq(1, n(), 10))
 
 ```
 
@@ -190,14 +243,14 @@ ts_th_sub <- ts_th %>%
 
 ```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µatm. Zeroing periods are included.", fig.asp = 5}
 
-ggplot()+
-  geom_path(data = th_all_data, aes(date_time, pCO2_corr, col = "pre cleaning"))+
-  geom_path(data = ts_th_sub, aes(date_time, pCO2_corr, col = "HydroC, drift corrected"))+
-  geom_path(data = ts_th_sub, aes(date_time, pCO2_analog, col = "analog CTD"))+
-  scale_color_brewer(palette = "Set1", name = "pCO2 record")+
-  coord_cartesian(ylim = c(0,600))+
-  labs(y=expression(pCO[2]~(µatm)), x="")+
-  facet_wrap(~deployment, scales = "free_x", ncol = 1)
+ggplot() +
+  geom_path(data = th_pre_cleaning, aes(date_time, pCO2_corr, col = "pre cleaning")) +
+  geom_path(data = ts_th_sub, aes(date_time, pCO2_corr, col = "HydroC, drift corrected")) +
+  geom_path(data = ts_th_sub, aes(date_time, pCO2_analog, col = "analog CTD")) +
+  scale_color_brewer(palette = "Set1", name = "pCO2 record") +
+  coord_cartesian(ylim = c(0, 600)) +
+  labs(y = expression(pCO[2] ~ (µatm)), x = "") +
+  facet_wrap( ~ deployment, scales = "free_x", ncol = 1)
 
 ```
 
@@ -216,16 +269,16 @@ th_comparison <- full_join(
 )
 
 
-th_comparison %>% 
+th_comparison %>%
   ggplot() +
-  geom_path(data = th_all_data, aes(date_time, pCO2_corr, col = "pre cleaning"))+
-  geom_path(aes(date_time, pCO2_corr, col = "HydroC, drift corrected"))+
-  geom_path(aes(date_time, pCO2_withAW, col = "withAW"))+
-  geom_path(aes(date_time, pCO2_withoutAW, col = "withoutAW"))+
-  scale_color_brewer(palette = "Set1", name = "pCO2 record")+
-  coord_cartesian(ylim = c(0,600))+
-  labs(y=expression(pCO[2]~(µatm)), x="")+
-  facet_wrap(~deployment, scales = "free_x", ncol = 1)
+  geom_path(data = th_pre_cleaning, aes(date_time, pCO2_corr, col = "pre cleaning")) +
+  geom_path(aes(date_time, pCO2_corr, col = "HydroC, drift corrected")) +
+  geom_path(aes(date_time, pCO2_withAW, col = "withAW")) +
+  geom_path(aes(date_time, pCO2_withoutAW, col = "withoutAW")) +
+  scale_color_brewer(palette = "Set1", name = "pCO2 record") +
+  coord_cartesian(ylim = c(0, 600)) +
+  labs(y = expression(pCO[2] ~ (µatm)), x = "") +
+  facet_wrap( ~ deployment, scales = "free_x", ncol = 1)
 
 ```
 
@@ -234,14 +287,14 @@ th_comparison %>%
 
 ```{r water_vapor_correction, fig.asp=5}
 
-th_comparison %>% 
+th_comparison %>%
   ggplot() +
-  geom_path(data = th_all_data %>% slice_sample(prop = 0.1),
-            aes(date_time, 0, col = "pre runtime"))+
-  geom_path(aes(date_time, pCO2_corr-pCO2_withAW, col = "orig - with AW"))+
-  scale_color_brewer(palette = "Set1", name = "pCO2 record")+
-  labs(y=expression(pCO[2]~(µatm)), x="")+
-  facet_wrap(~deployment, scales = "free_x", ncol = 1)
+  geom_path(data = th_pre_cleaning %>% slice_sample(prop = 0.1),
+            aes(date_time, 0, col = "pre runtime")) +
+  geom_path(aes(date_time, pCO2_corr - pCO2_withAW, col = "orig - with AW")) +
+  scale_color_brewer(palette = "Set1", name = "pCO2 record") +
+  labs(y = expression(pCO[2] ~ (µatm)), x = "") +
+  facet_wrap( ~ deployment, scales = "free_x", ncol = 1)
 
 ```
 
@@ -249,19 +302,21 @@ th_comparison %>%
 
 ```{r water_vapor_correction_offset, fig.asp=5}
 
-th_comparison %>% 
+th_comparison %>%
   ggplot() +
-  geom_path(data = th_all_data, aes(date_time, 0, col = "pre runtime"))+
-  geom_path(aes(date_time, pCO2_withoutAW-pCO2_withAW, col = "without - with AW"))+
-  scale_color_brewer(palette = "Set1", name = "pCO2 record")+
-  labs(y=expression(pCO[2]~(µatm)), x="")+
-  facet_wrap(~deployment, scales = "free_x", ncol = 1)
+  geom_path(data = th_pre_cleaning, aes(date_time, 0, col = "pre runtime")) +
+  geom_path(aes(date_time, pCO2_withoutAW - pCO2_withAW, col = "without - with AW")) +
+  scale_color_brewer(palette = "Set1", name = "pCO2 record") +
+  labs(y = expression(pCO[2] ~ (µatm)), x = "") +
+  facet_wrap( ~ deployment, scales = "free_x", ncol = 1)
 
-rm(ts_th_sub, th_all_data, th_new_withAW, th_new_withoutAW, th_comparison)
+rm(ts_th_sub,
+   th_pre_cleaning,
+   th_new_withAW,
+   th_new_withoutAW,
+   th_comparison)
 
 ```
-
-
 
 
 ### replace pCO2 data
@@ -274,7 +329,6 @@ th_new_withoutAW_all <- th_new_withoutAW_all %>%
 ts_th <- ts_th %>% 
   select(-pCO2_corr)
 
-
 ts_th <- full_join(ts_th, th_new_withoutAW_all) 
 
 rm(th_new_withoutAW_all)
@@ -285,7 +339,7 @@ rm(th_new_withoutAW_all)
 ```{r safe_merged_data_file}
 
 ts_th %>% 
-  write_csv(here::here("Data/_merged_data_files/merging_interpolation", "ts_th.csv"))
+  write_csv(here::here("data/intermediate/_merged_data_files/merging_interpolation", "ts_th.csv"))
 
 ```
 
@@ -294,12 +348,12 @@ ts_th %>%
 
 ```{r pCO2_diff_time_series, fig.cap="pCO~2~ difference betweeb HydroC and drift corrected data provided by Contos. Please note that pCO2 range is restricted to +/- 50  µatm.", fig.asp = 3}
 
-ts_th %>% 
-  ggplot()+
-  geom_path(aes(date_time, pCO2_corr - pCO2_analog))+
-  ylim(-30, 0)+
-  labs(y=expression(pCO[2]~(µats_th)), x="")+
-  facet_wrap(~ID, scales = "free_x", ncol = 1)
+ts_th %>%
+  ggplot() +
+  geom_path(aes(date_time, pCO2_corr - pCO2_analog)) +
+  ylim(-30, 0) +
+  labs(y = expression(pCO[2] ~ (µats_th)), x = "") +
+  facet_wrap( ~ ID, scales = "free_x", ncol = 1)
 
 ```
 
@@ -319,7 +373,7 @@ ts_th %>%
 
 ```{r merge_sensor_track}
 
-tt <- read_csv(here::here("Data/_summarized_data_files",
+tt <- read_csv(here::here("data/intermediate/_summarized_data_files",
                           "tt.csv"))
 
 
@@ -332,7 +386,7 @@ tm <- tm %>%
          lon = approxfun(date_time, lon)(date_time)) %>% 
   filter(!is.na(dep))
 
-tm %>% write_csv(here::here("Data/_merged_data_files/merging_interpolation",
+tm %>% write_csv(here::here("data/intermediate/_merged_data_files/merging_interpolation",
                             "tm.csv"))
 
 rm(tm, ts_th, tt)

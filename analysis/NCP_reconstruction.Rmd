@@ -14,7 +14,7 @@ editor_options:
 
 
 ```{r global_options, include = FALSE}
-knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 
 ```{r packages}
@@ -27,10 +27,17 @@ library(lubridate)
 library(metR)
 ```
 
-
 ```{r ggplot_theme, include = FALSE}
 theme_set(theme_bw())
 ```
+
+
+```{r read_parameters, include = FALSE}
+parameters <-
+  read_rds(here::here("data",
+                       "parameters.rds"))
+```
+
 
 # Approach
 
@@ -44,10 +51,6 @@ Note: The reconstruction of C~T~ profiles and the integration across the tempera
 
 
 ```{r subsetting criteria}
-
-max_dep <- 25
-surface_dep <- 6
-integration_dep <- 12
 
 date_CT_min <- ymd_hms("2018-07-24 07:58:29")
 date_tem_max <- ymd_hms("2018-08-04 00:00:00")
@@ -64,7 +67,7 @@ Mean CO~2~ data from upper 6 metres were used as surface values.
 ```{r read_tm}
 
 tm_profiles_ID <-
-  read_csv(here::here("Data/_merged_data_files/CT_dynamics", "tm_profiles_ID.csv"))
+  read_csv(here::here("data/intermediate/_merged_data_files/CT_dynamics", "tm_profiles_ID.csv"))
 
 tm_profiles_ID <- tm_profiles_ID %>% 
   select(-c(date_ID))
@@ -94,38 +97,42 @@ tm_profiles_ID_long <- tm_profiles_ID %>%
 
 ```{r calculate_TPD_cumulative_tm}
 
-tm_profiles_ID_long_180723 <- tm_profiles_ID_long %>% 
+tm_profiles_ID_long_180723 <- tm_profiles_ID_long %>%
   filter(ID == 180723)
 
-tm_profiles_ID_long_180723_dep <- tm_profiles_ID_long_180723 %>% 
-  select(var, dep, value_cum) %>% 
-  mutate(value_cum = if_else(value_cum > 0 & var == "nCT",
-                             NaN, value_cum),
-         value_cum = if_else(value_cum < 0 & var == "tem",
-                             NaN, value_cum)) %>% 
-  group_by(var) %>% 
-  arrange(dep) %>% 
-  mutate(value_cum_i = sum(value_cum, na.rm = TRUE),
-         value_cum_dep = cumsum(value_cum),
-         value_cum_i_rel = value_cum_dep/value_cum_i*100) %>% 
+tm_profiles_ID_long_180723_dep <- tm_profiles_ID_long_180723 %>%
+  select(var, dep, value_cum) %>%
+  mutate(
+    value_cum = if_else(value_cum > 0 & var == "nCT",
+                        NaN, value_cum),
+    value_cum = if_else(value_cum < 0 & var == "tem",
+                        NaN, value_cum)
+  ) %>%
+  group_by(var) %>%
+  arrange(dep) %>%
+  mutate(
+    value_cum_i = sum(value_cum, na.rm = TRUE),
+    value_cum_dep = cumsum(value_cum),
+    value_cum_i_rel = value_cum_dep / value_cum_i * 100
+  ) %>%
   ungroup()
 
-value_cum <- tm_profiles_ID_long_180723_dep %>% 
-  group_by(var) %>% 
-  summarise(value_cum_i = mean(value_cum_i)) %>% 
+value_cum <- tm_profiles_ID_long_180723_dep %>%
+  group_by(var) %>%
+  summarise(value_cum_i = mean(value_cum_i)) %>%
   ungroup()
 
-value_surface <- tm_profiles_ID_long_180723 %>% 
-  select(var, dep, value_cum) %>% 
-  filter(dep < surface_dep) %>%
-  group_by(var) %>% 
-  summarise(value_surface = mean(value_cum)) %>% 
+value_surface <- tm_profiles_ID_long_180723 %>%
+  select(var, dep, value_cum) %>%
+  filter(dep < parameters$surface_dep) %>%
+  group_by(var) %>%
+  summarise(value_surface = mean(value_cum)) %>%
   ungroup()
 
 TPD <- full_join(value_cum, value_surface)
-TPD <- TPD %>% 
+TPD <- TPD %>%
   mutate(TPD = value_cum_i / value_surface)
-  
+
 rm(value_cum, value_surface)
 
 
@@ -134,32 +141,33 @@ rm(value_cum, value_surface)
 
 ```{r TPD_cumulative_tm_profiles}
 
-p_tm_profiles_ID_long <- tm_profiles_ID_long_180723 %>% 
-  arrange(dep) %>% 
-  ggplot(aes(value_cum, dep))+
-  geom_hline(aes(yintercept = integration_dep, col="integration"))+
-  geom_hline(data = TPD, aes(yintercept = TPD, col="penetration"))+
-  geom_vline(xintercept = 0)+
-  geom_point()+
-  geom_path()+
-  scale_y_reverse()+
-  scale_color_brewer(palette = "Dark2", guide = FALSE)+
-  labs(y = "Depth (m)", x="Cumulative change")+
-  theme(legend.position = "left")+
-  facet_wrap(var~., ncol = 1, scales = "free_x")
 
-p_tm_profiles_ID_long_rel <- tm_profiles_ID_long_180723_dep %>% 
-  ggplot(aes(value_cum_i_rel, dep))+
-  geom_hline(aes(yintercept = integration_dep, col="integration"))+
-  geom_hline(data = TPD, aes(yintercept = TPD, col="penetration"))+
-  geom_vline(xintercept = 90)+
-  geom_point()+
-  geom_line()+
-  scale_y_reverse(limits = c(25,0))+
-  scale_color_brewer(palette = "Dark2", name = "Depth")+
-  scale_x_continuous(limits = c(0, NA))+
-  labs(x = "Relative contribution (%)")+
-  facet_wrap(var~., ncol = 1, scales = "free_x")+
+p_tm_profiles_ID_long <- tm_profiles_ID_long_180723 %>%
+  arrange(dep) %>%
+  ggplot(aes(value_cum, dep)) +
+  geom_hline(aes(yintercept = parameters$i_dep_lim, col = "integration")) +
+  geom_hline(data = TPD, aes(yintercept = TPD, col = "penetration")) +
+  geom_vline(xintercept = 0) +
+  geom_point() +
+  geom_path() +
+  scale_y_reverse() +
+  scale_color_brewer(palette = "Dark2", guide = FALSE) +
+  labs(y = "Depth (m)", x = "Cumulative change") +
+  theme(legend.position = "left") +
+  facet_wrap(var ~ ., ncol = 1, scales = "free_x")
+
+p_tm_profiles_ID_long_rel <- tm_profiles_ID_long_180723_dep %>%
+  ggplot(aes(value_cum_i_rel, dep)) +
+  geom_hline(aes(yintercept = parameters$i_dep_lim, col = "integration")) +
+  geom_hline(data = TPD, aes(yintercept = TPD, col = "penetration")) +
+  geom_vline(xintercept = 90) +
+  geom_point() +
+  geom_line() +
+  scale_y_reverse(limits = c(25, 0)) +
+  scale_color_brewer(palette = "Dark2", name = "Depth") +
+  scale_x_continuous(limits = c(0, NA)) +
+  labs(x = "Relative contribution (%)") +
+  facet_wrap(var ~ ., ncol = 1, scales = "free_x") +
   theme(axis.title.y = element_blank())
 
 p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel
@@ -175,63 +183,86 @@ rm(tm_profiles_ID_long_180723_dep,
 
 ```{r TPD_CPD_cumulative_tm_profiles_example}
 
-p_nCT <-
-  tm_profiles_ID_long_180723 %>% 
-  filter(var == "nCT") %>% 
-  arrange(dep) %>% 
-  ggplot()+
-  geom_col(data = tm_profiles_ID_long_180723 %>% 
-             filter(var == "nCT", value_cum<0),
-           aes(x=value_cum, y=dep, fill="Integrated change"),
-           width = 1, alpha=0.3)+
-  geom_vline(xintercept = 0)+
-  scale_y_reverse(expand = c(0,0))+
-  geom_point(aes(value_cum, dep))+
-  geom_path(aes(value_cum, dep))+
-  geom_hline(data = TPD %>% filter(var == "nCT"),
-             aes(yintercept = TPD, col="Penetration depth"))+
-  # geom_vline(data = TPD %>% filter(var == "nCT"),
-  #            aes(xintercept = value_surface, col="Surface change"))+
-  scale_fill_manual(values = "black")+
-  scale_color_brewer(palette = "Dark2")+
-  labs(y = "Depth (m)", x = expression(nC[T]~(µmol~kg^{-1})))+
-  theme(legend.title = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank())
 
-p_tem <- 
-  tm_profiles_ID_long_180723 %>% 
-  filter(var == "tem") %>% 
-  arrange(dep) %>% 
-  ggplot()+
-  geom_col(data = tm_profiles_ID_long_180723 %>% 
-             filter(var == "tem", value_cum>0),
-           aes(x=value_cum, y=dep, fill="Integrated change"),
-           width = 1, alpha=0.3)+
-  geom_vline(xintercept = 0)+
-  scale_y_reverse(expand = c(0,0))+
-  geom_point(aes(value_cum, dep))+
-  geom_path(aes(value_cum, dep))+
+p_nCT <-
+  tm_profiles_ID_long_180723 %>%
+  filter(var == "nCT") %>%
+  arrange(dep) %>%
+  ggplot() +
+  geom_col(
+    data = tm_profiles_ID_long_180723 %>%
+      filter(var == "nCT", value_cum < 0),
+    aes(x = value_cum, y = dep, fill = "Integrated change"),
+    width = 1,
+    alpha = 0.3,
+    orientation = "y"
+  ) +
+  geom_vline(xintercept = 0) +
+  scale_y_reverse(expand = c(0, 0)) +
+  geom_point(aes(value_cum, dep)) +
+  geom_path(aes(value_cum, dep)) +
+  geom_hline(data = TPD %>% filter(var == "nCT"),
+             aes(yintercept = TPD, col = "Penetration depth")) +
+  scale_fill_manual(values = "black") +
+  scale_color_brewer(palette = "Dark2") +
+  labs(y = "Depth (m)", x = expression(nC[T] ~ (µmol ~ kg ^ {
+    -1
+  }))) +
+  theme(
+    legend.title = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_blank()
+  )
+
+p_tem <-
+  tm_profiles_ID_long_180723 %>%
+  filter(var == "tem") %>%
+  arrange(dep) %>%
+  ggplot() +
+  geom_col(
+    data = tm_profiles_ID_long_180723 %>%
+      filter(var == "tem", value_cum > 0),
+    aes(x = value_cum, y = dep, fill = "Integrated change"),
+    width = 1,
+    alpha = 0.3,
+    orientation = "y"
+  ) +
+  geom_vline(xintercept = 0) +
+  scale_y_reverse(expand = c(0, 0)) +
+  geom_point(aes(value_cum, dep)) +
+  geom_path(aes(value_cum, dep)) +
   geom_hline(data = TPD %>% filter(var == "tem"),
-             aes(yintercept = TPD, col="Penetration depth"))+
-  # geom_vline(data = TPD %>% filter(var == "tem"),
-  #            aes(xintercept = value_surface, col="Surface change"))+
-  scale_fill_manual(values = "black")+
-  scale_color_brewer(palette = "Dark2")+
-  labs(y = "Depth (m)", x = "Temperature (\u00B0C)")+
+             aes(yintercept = TPD, col = "Penetration depth")) +
+  scale_fill_manual(values = "black") +
+  scale_color_brewer(palette = "Dark2") +
+  labs(y = "Depth (m)", x = "Temperature (\u00B0C)") +
   theme(legend.title = element_blank())
 
 p_tem + p_nCT +
   plot_layout(guides = 'collect')
 
-ggsave(here::here("output/Plots/Figures_publication/appendix",
-                  "TPD_CPD_cumulative.pdf"),
-        width = 180, height = 160, dpi = 300, units = "mm")
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/appendix",
+    "TPD_CPD_cumulative.pdf"
+  ),
+  width = 180,
+  height = 160,
+  dpi = 300,
+  units = "mm"
+)
 
-ggsave(here::here("output/Plots/Figures_publication/appendix",
-                  "TPD_CPD_cumulative.png"),
-       width = 180, height = 160, dpi = 300, units = "mm")
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/appendix",
+    "TPD_CPD_cumulative.png"
+  ),
+  width = 180,
+  height = 160,
+  dpi = 300,
+  units = "mm"
+)
 
 rm(TPD, tm_profiles_ID_long_180723, p_tem, p_nCT)
 
@@ -242,37 +273,45 @@ rm(TPD, tm_profiles_ID_long_180723, p_tem, p_nCT)
 
 ```{r calculate_TPD_daily_tm}
 
-# surface values
-diff_surface <- tm_profiles_ID_long %>% 
-  filter(dep < surface_dep) %>% 
-  group_by(ID, var) %>% 
-  summarise(value_diff_surface = mean(value_diff, na.rm = TRUE)) %>% 
-  ungroup() %>% 
-  mutate(value_diff_surface = if_else(value_diff_surface > 0 & var == "nCT",
-                                      NaN, value_diff_surface),
-         value_diff_surface = if_else(value_diff_surface < 0 & var == "tem",
-                                      NaN, value_diff_surface))
 
-tm_profiles_ID_long <- full_join(tm_profiles_ID_long, diff_surface) 
+# surface values
+diff_surface <- tm_profiles_ID_long %>%
+  filter(dep < parameters$surface_dep) %>%
+  group_by(ID, var) %>%
+  summarise(value_diff_surface = mean(value_diff, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(
+    value_diff_surface = if_else(value_diff_surface > 0 & var == "nCT",
+                                 NaN, value_diff_surface),
+    value_diff_surface = if_else(value_diff_surface < 0 &
+                                   var == "tem",
+                                 NaN, value_diff_surface)
+  )
+
+tm_profiles_ID_long <- full_join(tm_profiles_ID_long, diff_surface)
 rm(diff_surface)
 
 # calculate penetration depths
 
-TPD <- tm_profiles_ID_long %>% 
-  mutate(value_diff = if_else(value_diff > 0 & var == "nCT",
-                                      NaN, value_diff),
-         value_diff = if_else(value_diff < 0 & var == "tem",
-                                      NaN, value_diff)) %>% 
-  group_by(var, ID, date_time_ID) %>% 
-  summarise(value_diff_int = sum(value_diff, na.rm = TRUE),
-            value_diff_surface = mean(value_diff_surface, na.rm = TRUE)) %>% 
-  ungroup() %>% 
+TPD <- tm_profiles_ID_long %>%
+  mutate(
+    value_diff = if_else(value_diff > 0 & var == "nCT",
+                         NaN, value_diff),
+    value_diff = if_else(value_diff < 0 & var == "tem",
+                         NaN, value_diff)
+  ) %>%
+  group_by(var, ID, date_time_ID) %>%
+  summarise(
+    value_diff_int = sum(value_diff, na.rm = TRUE),
+    value_diff_surface = mean(value_diff_surface, na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
   mutate(i_dep = value_diff_int / value_diff_surface)
 
-TPD_mean <- TPD %>% 
-  group_by(var) %>% 
-  summarise(i_dep_mean = mean(i_dep, na.rm=TRUE),
-            i_dep_sd = sd(i_dep, na.rm=TRUE)) %>% 
+TPD_mean <- TPD %>%
+  group_by(var) %>%
+  summarise(i_dep_mean = mean(i_dep, na.rm = TRUE),
+            i_dep_sd = sd(i_dep, na.rm = TRUE)) %>%
   ungroup()
 
 
@@ -280,52 +319,55 @@ TPD_mean <- TPD %>%
 
 ```{r TPD_daily_tm_time_series}
 
-p_surface <- TPD %>% 
-  ggplot(aes(date_time_ID, value_diff_surface))+
-  geom_hline(yintercept = 0)+
-  geom_line()+
-  geom_point()+
-  scale_y_reverse(name = "Change surface value")+
-  scale_x_datetime(breaks = "week", date_labels = "%d %b")+
-  scale_color_brewer(palette = "Set1", direction = -1)+
+p_surface <- TPD %>%
+  ggplot(aes(date_time_ID, value_diff_surface)) +
+  geom_hline(yintercept = 0) +
+  geom_line() +
+  geom_point() +
+  scale_y_reverse(name = "Change surface value") +
+  scale_x_datetime(breaks = "week", date_labels = "%d %b") +
+  scale_color_brewer(palette = "Set1", direction = -1) +
   theme(axis.title.x = element_blank(),
-        legend.title = element_blank())+
-  facet_grid(var~., scales = "free_y")
+        legend.title = element_blank()) +
+  facet_grid(var ~ ., scales = "free_y")
 
-p_integrated <- TPD %>% 
-  ggplot(aes(date_time_ID, value_diff_int))+
-  geom_hline(yintercept = 0)+
-  geom_line()+
-  geom_point()+
-  scale_y_reverse(name = "Change integrated value")+
-  scale_x_datetime(breaks = "week", date_labels = "%d %b")+
-  scale_color_brewer(palette = "Set1", direction = -1)+
+p_integrated <- TPD %>%
+  ggplot(aes(date_time_ID, value_diff_int)) +
+  geom_hline(yintercept = 0) +
+  geom_line() +
+  geom_point() +
+  scale_y_reverse(name = "Change integrated value") +
+  scale_x_datetime(breaks = "week", date_labels = "%d %b") +
+  scale_color_brewer(palette = "Set1", direction = -1) +
   theme(axis.title.x = element_blank(),
-        legend.title = element_blank())+
-  facet_grid(var~., scales = "free_y")
+        legend.title = element_blank()) +
+  facet_grid(var ~ ., scales = "free_y")
 
-p_pen_dep <- TPD %>% 
-  ggplot(aes(date_time_ID, i_dep, col=var))+
-  geom_hline(yintercept = 0)+
+p_pen_dep <- TPD %>%
+  ggplot(aes(date_time_ID, i_dep, col = var)) +
+  geom_hline(yintercept = 0) +
   geom_hline(data = TPD_mean,
-             aes(yintercept = i_dep_mean,
-                 col=var, linetype = "mean"))+
-  geom_line(aes(linetype="cruise"))+
-  geom_point()+
-  scale_y_reverse(name = "Penetration depth (m)", breaks = seq(0,20,5))+
-  scale_x_datetime(breaks = "week", date_labels = "%d %b")+
-  scale_color_brewer(palette = "Set1", direction = -1)+
+             aes(
+               yintercept = i_dep_mean,
+               col = var,
+               linetype = "mean"
+             )) +
+  geom_line(aes(linetype = "cruise")) +
+  geom_point() +
+  scale_y_reverse(name = "Penetration depth (m)", breaks = seq(0, 20, 5)) +
+  scale_x_datetime(breaks = "week", date_labels = "%d %b") +
+  scale_color_brewer(palette = "Set1", direction = -1) +
   theme(axis.title.x = element_blank(),
         legend.title = element_blank())
 
 
-p_surface + p_integrated + p_pen_dep + 
+p_surface + p_integrated + p_pen_dep +
   plot_layout(ncol = 1)
 
 TPD_mean
 
-CPD <- TPD %>% 
-  filter(var == "nCT") %>% 
+CPD <- TPD %>%
+  filter(var == "nCT") %>%
   drop_na()
 
 rm(p_surface, p_integrated, p_pen_dep)
@@ -339,21 +381,10 @@ rm(TPD, TPD_mean, tm_profiles_ID_long)
 
 ## Subsetting criteria
 
-```{r gt_subsetting_criteria}
-
-# route
-select_route <- "E"
-
-# latitude limits
-low_lat <- 57.3
-high_lat <- 57.5
-
-# date limits
-start_date <- "2018-06-20"
-end_date <- "2018-08-25"
+```{r load_bottle_data}
 
 fixed_values <- 
-  read_csv(here::here("Data/_summarized_data_files", "tb_fix.csv"))
+  read_csv(here::here("data/intermediate/_summarized_data_files", "tb_fix.csv"))
 
 
 ```
@@ -362,7 +393,7 @@ fixed_values <-
 
 ```{r read_gt_3d_sal_tem_age, eval=FALSE}
 
-nc <- nc_open(here::here("data/GETM", "Finnmaid.E.3d.2018.nc"))
+nc <- nc_open(here::here("data/input/GETM", "Finnmaid.E.3d.2018.nc"))
 #print(nc$var)
 
 lat <- ncvar_get(nc, "latc")
@@ -398,8 +429,8 @@ array[array == fillvalue$value] <- NA
         mutate(dep = -d) %>%
         gather("lat", "value", 1:length(lat)) %>%
         mutate(lat = as.numeric(lat)) %>%
-        filter(lat > low_lat, lat < high_lat,
-               dep <= max_dep) %>%
+        filter(lat > parameters$getm_low_lat, lat < parameters$getm_high_lat,
+               dep <= parameters$max_dep) %>%
         mutate(var = var_3d,
                date_time=t[i]) %>% 
         select(date_time, dep, value, var)
@@ -420,13 +451,13 @@ nc_close(nc)
 rm(nc)
 
 gt_3d_long <- gt_3d %>% 
-  filter(date_time >= start_date & date_time <= end_date) %>% 
+  filter(date_time >= parameters$getm_start_date & date_time <= parameters$getm_end_date) %>% 
   group_by(date_time, var, dep) %>% 
   summarise_all(list(value=~mean(.,na.rm=TRUE))) %>% # regional averaging
   ungroup()
 
 gt_3d_long %>% 
-  write_csv(here::here("data/_summarized_data_files", file = "gt_3d_long.csv"))
+  write_csv(here::here("data/intermediate/_summarized_data_files", file = "gt_3d_long.csv"))
 
 
 rm(gt_3d, gt_3d_long, i, lat, d, t, var_3d)
@@ -437,31 +468,32 @@ rm(gt_3d, gt_3d_long, i, lat, d, t, var_3d)
 
 ```{r re-read_gt_3d}
 
-gt_3d_long <- 
-  read_csv(here::here("data/_summarized_data_files", "gt_3d_long.csv"))
+gt_3d_long <-
+  read_csv(here::here(
+    "data/intermediate/_summarized_data_files",
+    "gt_3d_long.csv"
+  ))
 
-gt_3d <- gt_3d_long %>% 
-  pivot_wider(values_from = value, names_from = var) %>% 
-  select(-SurfaceAge) %>% 
-  rename(sal = salt, tem=temp)
-
-rm(select_route, high_lat, low_lat)
+gt_3d <- gt_3d_long %>%
+  pivot_wider(values_from = value, names_from = var) %>%
+  select(-SurfaceAge) %>%
+  rename(sal = salt, tem = temp)
 
 ```
 
 ```{r gt_profiles_sal_tem}
 
-gt_3d_long <- gt_3d %>% 
+gt_3d_long <- gt_3d %>%
   pivot_longer(c(sal, tem), values_to = "value", names_to = "var")
 
-gt_3d_long %>% 
+gt_3d_long %>%
   ggplot(aes(value, dep,
-             col=date_time,
-             group=date_time))+
-  geom_path()+
-  scale_y_reverse(expand = c(0,0))+
-  scale_color_viridis_c(name="Date", trans = "time")+
-  facet_wrap(~var, scales = "free_x", ncol = 2)
+             col = date_time,
+             group = date_time)) +
+  geom_path() +
+  scale_y_reverse(expand = c(0, 0)) +
+  scale_color_viridis_c(name = "Date", trans = "time") +
+  facet_wrap( ~ var, scales = "free_x", ncol = 2)
 
 rm(gt_3d_long)
 
@@ -477,13 +509,16 @@ GETM results were linearly interpolated to the mean BloomSail time stamp.
 
 ```{r interpolate_gt_3d_dep_grid}
 
-gt_3d_int <- gt_3d %>% 
-  mutate(dep_int = dep + 0.5) %>% 
-  group_by(date_time) %>% 
+gt_3d_int <- gt_3d %>%
+  mutate(dep_int = dep + 0.5) %>%
+  group_by(date_time) %>%
   mutate(sal_int = approxfun(dep, sal)(dep_int),
-         tem_int = approxfun(dep, tem)(dep_int)) %>% 
-  ungroup() %>% 
-  select(date_time, dep=dep_int, sal=sal_int, tem=tem_int) %>% 
+         tem_int = approxfun(dep, tem)(dep_int)) %>%
+  ungroup() %>%
+  select(date_time,
+         dep = dep_int,
+         sal = sal_int,
+         tem = tem_int) %>%
   drop_na()
 
 rm(gt_3d)
@@ -492,27 +527,37 @@ rm(gt_3d)
 
 ```{r merge_gt_ts_profiles}
 
+tm_gt_3d <- full_join(
+  gt_3d_int,
+  tm_profiles_ID %>% select(date_time = date_time_ID,
+                            dep, sal, tem),
+  by = c("date_time", "dep"),
+  suffix = c("_gt", "_tm")
+)
 
-tm_gt_3d <- full_join(gt_3d_int,
-                      tm_profiles_ID %>% select(date_time = date_time_ID,
-                                                dep, sal, tem),
-                      by = c("date_time", "dep"), suffix=c("_gt", "_tm"))
+tm_gt_3d <- tm_gt_3d  %>%
+  mutate(
+    rho_gt = swSigma(
+      salinity = sal_gt,
+      temperature = tem_gt,
+      pressure = dep / 10
+    ),
+    rho_tm = swSigma(
+      salinity = sal_tm,
+      temperature = tem_tm,
+      pressure = dep / 10
+    )
+  )
 
-tm_gt_3d <- tm_gt_3d  %>% 
-  mutate(rho_gt = swSigma(salinity = sal_gt,
-                          temperature = tem_gt,
-                          pressure = dep/10),
-         rho_tm = swSigma(salinity = sal_tm,
-                          temperature = tem_tm,
-                          pressure = dep/10))
-
-tm_gt_3d <- tm_gt_3d %>% 
-  arrange(date_time) %>% 
-  group_by(dep) %>% 
-  mutate(tem_gt = approxfun(date_time, tem_gt)(date_time),
-         sal_gt = approxfun(date_time, sal_gt)(date_time),
-         rho_gt = approxfun(date_time, rho_gt)(date_time)) %>% 
-  ungroup() %>% 
+tm_gt_3d <- tm_gt_3d %>%
+  arrange(date_time) %>%
+  group_by(dep) %>%
+  mutate(
+    tem_gt = approxfun(date_time, tem_gt)(date_time),
+    sal_gt = approxfun(date_time, sal_gt)(date_time),
+    rho_gt = approxfun(date_time, rho_gt)(date_time)
+  ) %>%
+  ungroup() %>%
   drop_na()
 
 ```
@@ -520,39 +565,41 @@ tm_gt_3d <- tm_gt_3d %>%
 
 ```{r gt_ts_profiles_salt_temp_rho, fig.asp=0.8, fig.cap="STD profiles modeled with GETM (upper panels, gt) and measured during BloomSail campaign (lower panels, ts)"}
 
-tm_gt_3d_long <- tm_gt_3d %>% 
-  pivot_longer(sal_gt:rho_tm,
-               values_to = "value",
-               names_to = c("var", "source"),
-               names_sep = "_")
+tm_gt_3d_long <- tm_gt_3d %>%
+  pivot_longer(
+    sal_gt:rho_tm,
+    values_to = "value",
+    names_to = c("var", "source"),
+    names_sep = "_"
+  )
 
-tm_gt_3d_long %>% 
+tm_gt_3d_long %>%
   ggplot(aes(value, dep,
-             col=date_time,
-             group=date_time))+
-  geom_path()+
-  scale_y_reverse(expand = c(0,0), name="Depth (m)")+
-  scale_color_viridis_c(name="Date", trans = "time")+
-  facet_grid(source~var, scales = "free_x")
+             col = date_time,
+             group = date_time)) +
+  geom_path() +
+  scale_y_reverse(expand = c(0, 0), name = "Depth (m)") +
+  scale_color_viridis_c(name = "Date", trans = "time") +
+  facet_grid(source ~ var, scales = "free_x")
 
 ```
 
 ```{r gt_ts_profiles_diff_salt_temp_rho, fig.asp=0.5}
 
-tm_gt_3d <- tm_gt_3d_long %>% 
-  pivot_wider(values_from = "value", names_from = "source") %>% 
+tm_gt_3d <- tm_gt_3d_long %>%
+  pivot_wider(values_from = "value", names_from = "source") %>%
   mutate(value_diff = gt - tm)
 
-tm_gt_3d %>% 
+tm_gt_3d %>%
   ggplot(aes(value_diff, dep,
-             col=date_time,
-             group=date_time))+
-  geom_vline(xintercept = 0, col="red")+
-  geom_path()+
-  scale_y_reverse(expand = c(0,0), name="Depth (m)")+
-  scale_color_viridis_c(name="Date", trans = "time")+
-  facet_grid(.~var, scales = "free_x")+
-  labs(x="Difference GETM (gt) - Bloomsail (ts)")
+             col = date_time,
+             group = date_time)) +
+  geom_vline(xintercept = 0, col = "red") +
+  geom_path() +
+  scale_y_reverse(expand = c(0, 0), name = "Depth (m)") +
+  scale_color_viridis_c(name = "Date", trans = "time") +
+  facet_grid(. ~ var, scales = "free_x") +
+  labs(x = "Difference GETM (gt) - Bloomsail (ts)")
 
 rm(tm_gt_3d, tm_gt_3d_long)
 
@@ -568,12 +615,12 @@ Finnmaid data, including reconstructed data during LICOS operation failure.
 ```{r read_Finnmaid}
 
 fm <-
- read_csv(here::here("Data/_summarized_data_files",
+ read_csv(here::here("data/intermediate/_summarized_data_files",
                       "fm_bloomsail.csv"))
 
 fm <- fm %>% 
-  filter(date_time > start_date,
-         date_time < end_date) %>% 
+  filter(date_time > parameters$getm_start_date,
+         date_time < parameters$getm_end_date) %>% 
   select(ID, date_time, sensor, sal, tem, pCO2) %>% 
   mutate(ID = as.factor(ID))
 
@@ -585,13 +632,20 @@ Calculate nC~T~ based on fixed A~T~ and salinity mean values.
 
 ```{r CT_calculation}
 
-fm <- fm %>% 
-  mutate(nCT = carb(24,
-                   var1=pCO2,
-                   var2=fixed_values$AT*1e-6,
-                   S=fixed_values$sal,
-                   T=tem,
-                   k1k2="m10", kf="dg", ks="d", gas="insitu")[,16]*1e6)
+fm <- fm %>%
+  mutate(
+    nCT = carb(
+      24,
+      var1 = pCO2,
+      var2 = fixed_values$AT * 1e-6,
+      S = fixed_values$sal,
+      T = tem,
+      k1k2 = "m10",
+      kf = "dg",
+      ks = "d",
+      gas = "insitu"
+    )[, 16] * 1e6
+  )
 
 ```
 
@@ -601,16 +655,18 @@ Calculate regional mean and sd values for each crossing of the area.
 
 ```{r timeseries_of_regional_averages}
 
-fm_ID <- fm %>% 
-  pivot_longer(c(pCO2, sal, tem, nCT), values_to = "value", names_to = "var") %>% 
-  group_by(ID) %>% 
+fm_ID <- fm %>%
+  pivot_longer(c(pCO2, sal, tem, nCT),
+               values_to = "value",
+               names_to = "var") %>%
+  group_by(ID) %>%
   mutate(date_time_ID = mean(date_time)) %>%
-  ungroup() %>% 
-  select(-date_time) %>% 
-  group_by(ID, date_time_ID, sensor, var) %>% 
-  summarise_all(list(~mean(.), ~sd(.)), na.rm=TRUE) %>%
-  ungroup() %>% 
-  rename(value=mean)
+  ungroup() %>%
+  select(-date_time) %>%
+  group_by(ID, date_time_ID, sensor, var) %>%
+  summarise_all(list( ~ mean(.), ~ sd(.)), na.rm = TRUE) %>%
+  ungroup() %>%
+  rename(value = mean)
 
 ```
 
@@ -621,15 +677,20 @@ Read original profile data and calculate surface mean and sd values.
 ```{r tm_long_surface}
 
 tm_profiles <-
-  read_csv(here::here("data/_merged_data_files/CT_dynamics", "tm_profiles.csv"))
+  read_csv(
+    here::here(
+      "data/intermediate/_merged_data_files/CT_dynamics",
+      "tm_profiles.csv"
+    )
+  )
 
-tm_profiles_ID_long_surface <- tm_profiles %>% 
-  filter(dep < surface_dep) %>% 
-  select(-c(dep, date_ID, station, date_time, lat, lon, pCO2_corr)) %>% 
-  mutate(ID = as.factor(ID)) %>% 
-  pivot_longer(sal:nCT, values_to = "value", names_to = "var") %>% 
-  group_by(ID, date_time_ID, var) %>% 
-  summarise_all(list(~mean(.), ~sd(.)), na.rm = TRUE) %>% 
+tm_profiles_ID_long_surface <- tm_profiles %>%
+  filter(dep < parameters$surface_dep) %>%
+  select(-c(dep, date_ID, station, date_time, lat, lon, pCO2_corr)) %>%
+  mutate(ID = as.factor(ID)) %>%
+  pivot_longer(sal:nCT, values_to = "value", names_to = "var") %>%
+  group_by(ID, date_time_ID, var) %>%
+  summarise_all(list( ~ mean(.), ~ sd(.)), na.rm = TRUE) %>%
   ungroup()
 
 
@@ -639,23 +700,45 @@ tm_profiles_ID_long_surface <- tm_profiles %>%
 
 ```{r fm_tm_time_series, fig.asp=1.2}
 
-fm_ID %>% 
-  ggplot()+
-  geom_rect(data = fixed_values, aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf), alpha=0.2)+
-  geom_path(aes(x=date_time_ID, y=value))+
-  geom_ribbon(aes(x=date_time_ID, y=value, ymax=value+sd, ymin=value-sd, fill="Finnmaid"), alpha=0.3)+
-  geom_ribbon(data = tm_profiles_ID_long_surface,
-             aes(x=date_time_ID, ymin=mean-sd, ymax=mean+sd, fill="BloomSail"), alpha=0.3)+
-  geom_point(aes(x=date_time_ID, y=value, col=sensor))+
+fm_ID %>%
+  ggplot() +
+  geom_rect(data = fixed_values,
+            aes(
+              xmin = start,
+              xmax = end,
+              ymin = -Inf,
+              ymax = Inf
+            ),
+            alpha = 0.2) +
+  geom_path(aes(x = date_time_ID, y = value)) +
+  geom_ribbon(aes(
+    x = date_time_ID,
+    y = value,
+    ymax = value + sd,
+    ymin = value - sd,
+    fill = "Finnmaid"
+  ),
+  alpha = 0.3) +
+  geom_ribbon(
+    data = tm_profiles_ID_long_surface,
+    aes(
+      x = date_time_ID,
+      ymin = mean - sd,
+      ymax = mean + sd,
+      fill = "BloomSail"
+    ),
+    alpha = 0.3
+  ) +
+  geom_point(aes(x = date_time_ID, y = value, col = sensor)) +
   geom_point(data = tm_profiles_ID_long_surface,
-             aes(x=date_time_ID, y=mean, col="BloomSail"))+
+             aes(x = date_time_ID, y = mean, col = "BloomSail")) +
   geom_line(data = tm_profiles_ID_long_surface,
-             aes(x=date_time_ID, y=mean, col="BloomSail"))+
-  facet_grid(var~., scales = "free_y")+
-  scale_color_brewer(palette = "Set1")+
-  scale_fill_brewer(palette = "Set1", name="+/- SD")+
+            aes(x = date_time_ID, y = mean, col = "BloomSail")) +
+  facet_grid(var ~ ., scales = "free_y") +
+  scale_color_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1", name = "+/- SD") +
   scale_x_datetime(date_breaks = "week",
-                   date_labels = "%b %d")+
+                   date_labels = "%b %d") +
   theme(axis.title.x = element_blank())
 
 ```
@@ -687,28 +770,31 @@ fm_tm_ID <- fm_tm_ID %>%
   ungroup()
 
 rm(tm_start_date)
+
 ```
 
 
 ```{r fm_fill_gap_with_tm}
 
-tm_gap <- tm_profiles_ID_long_surface %>% 
+tm_gap <- tm_profiles_ID_long_surface %>%
   filter(ID %in% c("180718", "180723"),
-         var %in% c("tem", "nCT")) %>% 
-  select(date_time_ID, ID, var, value = mean) %>% 
+         var %in% c("tem", "nCT")) %>%
+  select(date_time_ID, ID, var, value = mean) %>%
   mutate(sensor = "BloomSail")
 
-fm_tm_ID <- full_join(fm_tm_ID, tm_gap) %>% 
-  arrange(date_time_ID) %>% 
-  select(-sd) %>% 
-  filter(var %in% c("tem", "nCT")) %>% 
-  mutate(period = "BloomSail",
-         period = if_else(date_time_ID < fixed_values$start, "pre-BloomSail", period),
-         period = if_else(date_time_ID > fixed_values$end, "post-BloomSail", period))
+fm_tm_ID <- full_join(fm_tm_ID, tm_gap) %>%
+  arrange(date_time_ID) %>%
+  select(-sd) %>%
+  filter(var %in% c("tem", "nCT")) %>%
+  mutate(
+    period = "BloomSail",
+    period = if_else(date_time_ID < fixed_values$start, "pre-BloomSail", period),
+    period = if_else(date_time_ID > fixed_values$end, "post-BloomSail", period)
+  )
 
 
-fm_tm_ID <- fm_tm_ID %>% 
-  filter(period == "BloomSail") %>% 
+fm_tm_ID <- fm_tm_ID %>%
+  filter(period == "BloomSail") %>%
   select(-period)
 
 rm(fm_ID, fm, tm_gap, tm_profiles_ID_long_surface, tm_profiles)
@@ -717,14 +803,14 @@ rm(fm_ID, fm, tm_gap, tm_profiles_ID_long_surface, tm_profiles)
 
 ```{r fm_time_series_filled}
 
-fm_tm_ID %>% 
-  ggplot()+
-  geom_path(aes(date_time_ID, value))+
-  geom_point(aes(date_time_ID, value, col=sensor))+
-  facet_grid(var~., scales = "free_y")+
-  scale_color_brewer(palette = "Set1")+
+fm_tm_ID %>%
+  ggplot() +
+  geom_path(aes(date_time_ID, value)) +
+  geom_point(aes(date_time_ID, value, col = sensor)) +
+  facet_grid(var ~ ., scales = "free_y") +
+  scale_color_brewer(palette = "Set1") +
   scale_x_datetime(date_breaks = "week",
-                   date_labels = "%b %d")+
+                   date_labels = "%b %d") +
   theme(axis.title.x = element_blank())
 
 ```
@@ -737,16 +823,16 @@ fm_tm_ID %>%
 
 ```{r fm_gt_merge}
 
-fm_tm_ID_wide <- fm_tm_ID %>% 
-  filter(var %in% c("nCT")) %>% 
-  select(date_time_ID, var, value) %>% 
+fm_tm_ID_wide <- fm_tm_ID %>%
+  filter(var %in% c("nCT")) %>%
+  select(date_time_ID, var, value) %>%
   pivot_wider(values_from = value, names_from = var)
 
 
 fm_gt <- expand_grid(fm_tm_ID_wide, dep = unique(gt_3d_int$dep))
 
 fm_gt <- full_join(fm_gt,
-                   gt_3d_int %>% rename(date_time_ID = date_time)) %>% 
+                   gt_3d_int %>% rename(date_time_ID = date_time)) %>%
   arrange(date_time_ID)
 
 rm(fm_tm_ID_wide, fm_tm_ID, gt_3d_int)
@@ -757,13 +843,15 @@ rm(fm_tm_ID_wide, fm_tm_ID, gt_3d_int)
 
 ```{r fm_gt_interpolate_time_stamp}
 
-fm_gt <- fm_gt %>% 
-  arrange(date_time_ID) %>% 
-  group_by(dep) %>% 
-  mutate(tem = approxfun(date_time_ID, tem)(date_time_ID),
-         sal = approxfun(date_time_ID, sal)(date_time_ID)) %>% 
-  ungroup() %>% 
-  arrange(dep) %>% 
+fm_gt <- fm_gt %>%
+  arrange(date_time_ID) %>%
+  group_by(dep) %>%
+  mutate(
+    tem = approxfun(date_time_ID, tem)(date_time_ID),
+    sal = approxfun(date_time_ID, sal)(date_time_ID)
+  ) %>%
+  ungroup() %>%
+  arrange(dep) %>%
   filter(!is.na(nCT))
 
 
@@ -773,11 +861,11 @@ fm_gt <- fm_gt %>%
 
 ```{r tm_fm_gt_bind}
 
-tm_profiles_ID <- tm_profiles_ID %>% 
-  select(-c(ID, pCO2)) %>% 
+tm_profiles_ID <- tm_profiles_ID %>%
+  select(-c(ID, pCO2)) %>%
   mutate(source = "tm")
 
-fm_gt <- fm_gt %>% 
+fm_gt <- fm_gt %>%
   mutate(source = "fm")
 
 tm_fm_gt <- bind_rows(tm_profiles_ID, fm_gt)
@@ -789,18 +877,18 @@ rm(fm_gt, tm_profiles_ID)
 
 ```{r tm_fm_gt_time_series}
 
-tm_fm_gt_long <- tm_fm_gt %>% 
+tm_fm_gt_long <- tm_fm_gt %>%
   pivot_longer(sal:nCT, values_to = "value", names_to = "var")
 
 tm_fm_gt_long %>%
-  filter(dep == 3.5) %>% 
-  ggplot(aes(date_time_ID, value, col=source))+
-  geom_path()+
-  geom_point()+
+  filter(dep == 3.5) %>%
+  ggplot(aes(date_time_ID, value, col = source)) +
+  geom_path() +
+  geom_point() +
   scale_x_datetime(date_breaks = "week",
-                   date_labels = "%b %d")+
-  facet_grid(var~., scales = "free_y")+
-  labs(title = "Time series at 3.5 m")+
+                   date_labels = "%b %d") +
+  facet_grid(var ~ ., scales = "free_y") +
+  labs(title = "Time series at 3.5 m") +
   theme(axis.title.x = element_blank())
 
 ```
@@ -809,20 +897,25 @@ tm_fm_gt_long %>%
 
 bin <- 2
 
-tm_fm_gt %>% 
-  ggplot(aes(date_time_ID, dep, z=tem))+
-  geom_contour_fill(breaks = MakeBreaks(bin))+
+tm_fm_gt %>%
+  ggplot(aes(date_time_ID, dep, z = tem)) +
+  geom_contour_fill(breaks = MakeBreaks(bin)) +
   geom_vline(aes(xintercept = date_time_ID),
-             col="white", linetype = "1f")+
-  scale_fill_viridis_c(name="Tem (°C)", option = "B",
-                       guide = "colorstrip", breaks = MakeBreaks(bin))+
-  scale_y_reverse()+
+             col = "white",
+             linetype = "1f") +
+  scale_fill_viridis_c(
+    name = "Tem (°C)",
+    option = "B",
+    guide = "colorstrip",
+    breaks = MakeBreaks(bin)
+  ) +
+  scale_y_reverse() +
   scale_x_datetime(date_breaks = "week",
-                   date_labels = "%b %d")+
-  coord_cartesian(expand = 0)+
-  labs(y="Depth (m)")+
-  theme(axis.title.x = element_blank())+
-  facet_grid(source~.)
+                   date_labels = "%b %d") +
+  coord_cartesian(expand = 0) +
+  labs(y = "Depth (m)") +
+  theme(axis.title.x = element_blank()) +
+  facet_grid(source ~ .)
 
 
 rm(bin)
@@ -836,8 +929,12 @@ rm(bin)
 
 ```{r calculate_density}
 
-tm_fm_gt <- tm_fm_gt %>% 
-  mutate(rho = swSigma(salinity = sal, temperature = tem, pressure = dep/10))
+tm_fm_gt <- tm_fm_gt %>%
+  mutate(rho = swSigma(
+    salinity = sal,
+    temperature = tem,
+    pressure = dep / 10
+  ))
 
 ```
 
@@ -846,22 +943,27 @@ tm_fm_gt <- tm_fm_gt %>%
 
 bin <- 0.5
 
-tm_fm_gt %>% 
-  ggplot()+
-  geom_contour_fill(aes(date_time_ID, dep, z=rho),
-                    breaks = MakeBreaks(bin))+
+tm_fm_gt %>%
+  ggplot() +
+  geom_contour_fill(aes(date_time_ID, dep, z = rho),
+                    breaks = MakeBreaks(bin)) +
   geom_vline(aes(xintercept = date_time_ID),
-             col="white", linetype = "1f")+
-  scale_fill_viridis_c(name="Rho", option = "B",
-                       guide = "colorstrip", breaks = MakeBreaks(bin),
-                       direction = -1)+
-  scale_y_reverse()+
+             col = "white",
+             linetype = "1f") +
+  scale_fill_viridis_c(
+    name = "Rho",
+    option = "B",
+    guide = "colorstrip",
+    breaks = MakeBreaks(bin),
+    direction = -1
+  ) +
+  scale_y_reverse() +
   scale_x_datetime(date_breaks = "week",
-                   date_labels = "%b %d")+
-  coord_cartesian(expand = 0)+
-  labs(y="Depth (m)")+
-  theme(axis.title.x = element_blank())+
-  facet_grid(source~.)
+                   date_labels = "%b %d") +
+  coord_cartesian(expand = 0) +
+  labs(y = "Depth (m)") +
+  theme(axis.title.x = element_blank()) +
+  facet_grid(source ~ .)
 
 rm(bin)
 ```
@@ -870,15 +972,15 @@ rm(bin)
 
 ```{r calculate_MLD}
 
-tm_fm_gt_MLD <- expand_grid(tm_fm_gt, rho_lim = seq(0.1,0.5,0.1))
+tm_fm_gt_MLD <- expand_grid(tm_fm_gt, rho_lim = seq(0.1, 0.5, 0.1))
 
-tm_fm_gt_MLD <- tm_fm_gt_MLD %>% 
-  arrange(dep) %>% 
-  group_by(date_time_ID, source, rho_lim) %>% 
-  mutate(d_rho = rho - first(rho)) %>% 
-  filter(d_rho > rho_lim) %>% 
-  summarise(MLD = min(dep)) %>% 
-  ungroup() %>% 
+tm_fm_gt_MLD <- tm_fm_gt_MLD %>%
+  arrange(dep) %>%
+  group_by(date_time_ID, source, rho_lim) %>%
+  mutate(d_rho = rho - first(rho)) %>%
+  filter(d_rho > rho_lim) %>%
+  summarise(MLD = min(dep)) %>%
+  ungroup() %>%
   mutate(rho_lim = as.factor(rho_lim))
 
 ```
@@ -887,23 +989,26 @@ tm_fm_gt_MLD <- tm_fm_gt_MLD %>%
 
 bin <- 2
 
-tm_fm_gt %>% 
-  ggplot()+
-  geom_contour_fill(aes(date_time_ID, dep, z=tem),
-                    breaks = MakeBreaks(bin))+
-  geom_path(data = tm_fm_gt_MLD, aes(date_time_ID, MLD, col=rho_lim))+
-  scale_fill_gradient(name="Tem (°C)",
-                      guide = "colorstrip", breaks = MakeBreaks(bin),
-                      high = "grey80",
-                      low = "grey5")+
-  scale_color_viridis_d()+
-  scale_y_reverse()+
+tm_fm_gt %>%
+  ggplot() +
+  geom_contour_fill(aes(date_time_ID, dep, z = tem),
+                    breaks = MakeBreaks(bin)) +
+  geom_path(data = tm_fm_gt_MLD, aes(date_time_ID, MLD, col = rho_lim)) +
+  scale_fill_gradient(
+    name = "Tem (°C)",
+    guide = "colorstrip",
+    breaks = MakeBreaks(bin),
+    high = "grey80",
+    low = "grey5"
+  ) +
+  scale_color_viridis_d() +
+  scale_y_reverse() +
   scale_x_datetime(date_breaks = "week",
-                   date_labels = "%b %d")+
-  coord_cartesian(expand = 0)+
-  labs(y="Depth (m)")+
-  theme(axis.title.x = element_blank())+
-  facet_grid(source~.)
+                   date_labels = "%b %d") +
+  coord_cartesian(expand = 0) +
+  labs(y = "Depth (m)") +
+  theme(axis.title.x = element_blank()) +
+  facet_grid(source ~ .)
 
 
 rm(bin)
@@ -912,12 +1017,13 @@ rm(bin)
 
 ```{r filter_rho_lim}
 
+
 rho_lim_value <- 0.1
 
-MLD <- tm_fm_gt_MLD %>% 
-  filter(rho_lim == rho_lim_value) %>% 
-  select(-rho_lim) %>% 
-  rename(i_dep = MLD) %>% 
+MLD <- tm_fm_gt_MLD %>%
+  filter(rho_lim == rho_lim_value) %>%
+  select(-rho_lim) %>%
+  rename(i_dep = MLD) %>%
   mutate(i_method = "MLD", i_res = "daily")
 
 rm(tm_fm_gt_MLD)
@@ -927,14 +1033,14 @@ rm(tm_fm_gt_MLD)
 
 ```{r mean_MLD}
 
-MLD_mean <- MLD %>% 
-  filter(date_time_ID <= date_tem_max) %>% 
-  group_by(source) %>% 
-  summarise(i_dep = mean(i_dep, na.rm = TRUE)) %>% 
-  ungroup() %>% 
+MLD_mean <- MLD %>%
+  filter(date_time_ID <= date_tem_max) %>%
+  group_by(source) %>%
+  summarise(i_dep = mean(i_dep, na.rm = TRUE)) %>%
+  ungroup() %>%
   mutate(i_method = "MLD", i_res = "mean")
 
-MLD_dates <- MLD %>% 
+MLD_dates <- MLD %>%
   select(source, date_time_ID)
 
 MLD_mean <- full_join(MLD_dates, MLD_mean)
@@ -950,45 +1056,41 @@ rm(MLD_mean)
 ```{r calculate_cumulative_changes}
 
 tm_fm_gt_long <- tm_fm_gt %>%
-  select(-c(sal)) %>% 
-  pivot_longer(c("tem", "nCT"), values_to = "value", names_to = "var") %>% 
+  select(-c(sal)) %>%
+  pivot_longer(c("tem", "nCT"), values_to = "value", names_to = "var") %>%
   group_by(source, var, dep) %>%
   arrange(date_time_ID) %>%
-  mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
-         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
-         value_diff = value     - lag(value, default = first(value)),
-         value_diff_daily = value_diff / date_time_ID_diff,
-         value_cum = cumsum(value_diff)) %>% 
+  mutate(
+    date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+    date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID)) /
+      2,
+    value_diff = value     - lag(value, default = first(value)),
+    value_diff_daily = value_diff / date_time_ID_diff,
+    value_cum = cumsum(value_diff)
+  ) %>%
   ungroup()
 
-tm_fm_gt_long <- tm_fm_gt_long %>% 
-  filter(var == "tem") %>% 
+tm_fm_gt_long <- tm_fm_gt_long %>%
+  filter(var == "tem") %>%
   select(-var)
-
-```
-
-
-```{r define_gt_i_dep}
-
-gt_i_dep <- 19
 
 ```
 
 
 ```{r cumulative_tem_profile}
 
-tm_fm_gt_long %>% 
-  filter(date_time_ID == date_CT_min) %>% 
-  arrange(dep) %>% 
-  ggplot(aes(value_cum, dep))+
-  geom_vline(xintercept = 0)+
-  geom_hline(yintercept = gt_i_dep)+
-  geom_point()+
-  geom_path()+
-  scale_y_reverse()+
-  labs(y = "Depth (m)", x="Cumulative change")+
-  theme(legend.position = "left")+
-  facet_grid(.~source, scales = "free_x")
+tm_fm_gt_long %>%
+  filter(date_time_ID == date_CT_min) %>%
+  arrange(dep) %>%
+  ggplot(aes(value_cum, dep)) +
+  geom_vline(xintercept = 0) +
+  geom_hline(yintercept = parameters$getm_i_dep) +
+  geom_point() +
+  geom_path() +
+  scale_y_reverse() +
+  labs(y = "Depth (m)", x = "Cumulative change") +
+  theme(legend.position = "left") +
+  facet_grid(. ~ source, scales = "free_x")
 
 ```
 
@@ -997,38 +1099,43 @@ tm_fm_gt_long %>%
 
 ```{r calculation_TPD_cumulative}
 
-tm_fm_gt_long_180723 <- tm_fm_gt_long %>% 
-  filter(date_time_ID == date_CT_min) %>% 
-    mutate(value_cum = if_else(value_cum < 0,
-                             NaN, value_cum),
-         value_cum = if_else(source == "fm" & dep > gt_i_dep,
-                             NaN, value_cum))
 
-tm_fm_gt_long_180723_dep <- tm_fm_gt_long_180723 %>% 
-  select(source, dep, value_cum) %>% 
-  group_by(source) %>% 
-  arrange(dep) %>% 
-  mutate(value_cum_i = sum(value_cum, na.rm = TRUE),
-         value_cum_dep = cumsum(value_cum),
-         value_cum_i_rel = value_cum_dep/value_cum_i*100) %>% 
+tm_fm_gt_long_180723 <- tm_fm_gt_long %>%
+  filter(date_time_ID == date_CT_min) %>%
+  mutate(
+    value_cum = if_else(value_cum < 0,
+                        NaN, value_cum),
+    value_cum = if_else(source == "fm" & dep > parameters$getm_i_dep,
+                        NaN, value_cum)
+  )
+
+tm_fm_gt_long_180723_dep <- tm_fm_gt_long_180723 %>%
+  select(source, dep, value_cum) %>%
+  group_by(source) %>%
+  arrange(dep) %>%
+  mutate(
+    value_cum_i = sum(value_cum, na.rm = TRUE),
+    value_cum_dep = cumsum(value_cum),
+    value_cum_i_rel = value_cum_dep / value_cum_i * 100
+  ) %>%
   ungroup()
 
-value_cum <- tm_fm_gt_long_180723_dep %>% 
-  group_by(source) %>% 
-  summarise(value_cum_i = mean(value_cum_i)) %>% 
+value_cum <- tm_fm_gt_long_180723_dep %>%
+  group_by(source) %>%
+  summarise(value_cum_i = mean(value_cum_i)) %>%
   ungroup()
 
-value_surface <- tm_fm_gt_long_180723 %>% 
-  select(source, dep, value_cum) %>% 
-  filter(dep < surface_dep) %>%
-  group_by(source) %>% 
-  summarise(value_surface = mean(value_cum)) %>% 
+value_surface <- tm_fm_gt_long_180723 %>%
+  select(source, dep, value_cum) %>%
+  filter(dep < parameters$surface_dep) %>%
+  group_by(source) %>%
+  summarise(value_surface = mean(value_cum)) %>%
   ungroup()
 
 TPD <- full_join(value_cum, value_surface)
-TPD <- TPD %>% 
+TPD <- TPD %>%
   mutate(i_dep = value_cum_i / value_surface)
-  
+
 rm(value_cum, value_surface)
 
 ```
@@ -1038,40 +1145,43 @@ rm(value_cum, value_surface)
 
 ```{r TPD_cumulative_profiles_180723}
 
-p_tm_fm_gt_long <- tm_fm_gt_long_180723 %>% 
-  arrange(dep) %>% 
-  ggplot(aes(value_cum, dep))+
-  geom_hline(aes(yintercept = integration_dep, col="integration"))+
-  geom_hline(data = TPD, aes(yintercept = i_dep, col="penetration"))+
-  geom_vline(xintercept = 0)+
-  geom_point()+
-  geom_path()+
-  scale_y_reverse()+
-  scale_color_brewer(palette = "Dark2", guide = FALSE)+
-  labs(y = "Depth (m)", x="Cumulative change")+
-  theme(legend.position = "left")+
-  facet_wrap(.~source, ncol=1, scales = "free_x")
 
-p_tm_fm_gt_long_rel <- tm_fm_gt_long_180723_dep %>% 
-  ggplot(aes(value_cum_i_rel, dep))+
-  geom_hline(aes(yintercept = integration_dep, col="integration"))+
-  geom_hline(data = TPD, aes(yintercept = i_dep, col="penetration"))+
-  geom_vline(xintercept = 90)+
-  geom_point()+
-  geom_line()+
-  scale_y_reverse(limits = c(25,0))+
-  scale_color_brewer(palette = "Dark2", name = "Depth")+
-  scale_x_continuous(limits = c(0, NA))+
-  labs(x = "Relative contribution (%)")+
-  facet_wrap(.~source, ncol = 1, scales = "free_x")+
+p_tm_fm_gt_long <- tm_fm_gt_long_180723 %>%
+  arrange(dep) %>%
+  ggplot(aes(value_cum, dep)) +
+  geom_hline(aes(yintercept = parameters$i_dep_lim, col = "integration")) +
+  geom_hline(data = TPD, aes(yintercept = i_dep, col = "penetration")) +
+  geom_vline(xintercept = 0) +
+  geom_point() +
+  geom_path() +
+  scale_y_reverse() +
+  scale_color_brewer(palette = "Dark2", guide = FALSE) +
+  labs(y = "Depth (m)", x = "Cumulative change") +
+  theme(legend.position = "left") +
+  facet_wrap(. ~ source, ncol = 1, scales = "free_x")
+
+p_tm_fm_gt_long_rel <- tm_fm_gt_long_180723_dep %>%
+  ggplot(aes(value_cum_i_rel, dep)) +
+  geom_hline(aes(yintercept = parameters$i_dep_lim, col = "integration")) +
+  geom_hline(data = TPD, aes(yintercept = i_dep, col = "penetration")) +
+  geom_vline(xintercept = 90) +
+  geom_point() +
+  geom_line() +
+  scale_y_reverse(limits = c(25, 0)) +
+  scale_color_brewer(palette = "Dark2", name = "Depth") +
+  scale_x_continuous(limits = c(0, NA)) +
+  labs(x = "Relative contribution (%)") +
+  facet_wrap(. ~ source, ncol = 1, scales = "free_x") +
   theme(axis.title.y = element_blank())
 
 p_tm_fm_gt_long + p_tm_fm_gt_long_rel
 
-rm(tm_fm_gt_long_180723,
-   tm_fm_gt_long_180723_dep,
-   p_tm_fm_gt_long,
-   p_tm_fm_gt_long_rel)
+rm(
+  tm_fm_gt_long_180723,
+  tm_fm_gt_long_180723_dep,
+  p_tm_fm_gt_long,
+  p_tm_fm_gt_long_rel
+)
 
 TPD_cum <- TPD
 
@@ -1084,76 +1194,84 @@ rm(TPD)
 
 ```{r TPD_daily}
 
+
 # surface values
-diff_surface <- tm_fm_gt_long %>% 
-  filter(dep < surface_dep) %>% 
-  group_by(date_time_ID, source) %>% 
-  summarise(value_diff_surface = mean(value_diff, na.rm = TRUE)) %>% 
-  ungroup() %>% 
+diff_surface <- tm_fm_gt_long %>%
+  filter(dep < parameters$surface_dep) %>%
+  group_by(date_time_ID, source) %>%
+  summarise(value_diff_surface = mean(value_diff, na.rm = TRUE)) %>%
+  ungroup() %>%
   mutate(value_diff_surface = if_else(value_diff_surface < 0,
                                       NaN, value_diff_surface))
 
-tm_fm_gt_long <- full_join(tm_fm_gt_long, diff_surface) 
+tm_fm_gt_long <- full_join(tm_fm_gt_long, diff_surface)
 rm(diff_surface)
 
 # calculate penetration depths
 
-TPD <- tm_fm_gt_long %>% 
-  mutate(value_diff = if_else(value_diff < 0,
-                                      NaN, value_diff),
-         value_diff = if_else(source == "fm" & dep > 19,
-                              NaN, value_diff)) %>% 
-  group_by(date_time_ID, source) %>% 
-  summarise(value_diff_int = sum(value_diff, na.rm = TRUE),
-            value_diff_surface = mean(value_diff_surface, na.rm = TRUE)) %>% 
-  ungroup() %>% 
+TPD <- tm_fm_gt_long %>%
+  mutate(
+    value_diff = if_else(value_diff < 0,
+                         NaN, value_diff),
+    value_diff = if_else(source == "fm" & dep > 19,
+                         NaN, value_diff)
+  ) %>%
+  group_by(date_time_ID, source) %>%
+  summarise(
+    value_diff_int = sum(value_diff, na.rm = TRUE),
+    value_diff_surface = mean(value_diff_surface, na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
   mutate(i_dep = value_diff_int / value_diff_surface)
 
-TPD_mean <- TPD %>% 
-  filter(date_time_ID <= date_CT_min) %>% 
-  group_by(source) %>% 
-  summarise(i_dep_sd = sd(i_dep, na.rm=TRUE),
-            i_dep = mean(i_dep, na.rm=TRUE)) %>% 
+TPD_mean <- TPD %>%
+  filter(date_time_ID <= date_CT_min) %>%
+  group_by(source) %>%
+  summarise(i_dep_sd = sd(i_dep, na.rm = TRUE),
+            i_dep = mean(i_dep, na.rm = TRUE)) %>%
   ungroup()
 
-p_surface <- TPD %>% 
-  ggplot(aes(date_time_ID, value_diff_surface, col=source))+
-  geom_hline(yintercept = 0)+
-  geom_line()+
-  geom_point()+
-  scale_y_reverse(name = "Change surface value")+
-  scale_x_datetime(breaks = "week", date_labels = "%d %b")+
-  scale_color_brewer(palette = "Set1", direction = -1)+
+p_surface <- TPD %>%
+  ggplot(aes(date_time_ID, value_diff_surface, col = source)) +
+  geom_hline(yintercept = 0) +
+  geom_line() +
+  geom_point() +
+  scale_y_reverse(name = "Change surface value") +
+  scale_x_datetime(breaks = "week", date_labels = "%d %b") +
+  scale_color_brewer(palette = "Set1", direction = -1) +
   theme(axis.title.x = element_blank(),
         legend.title = element_blank())
 
-p_integrated <- TPD %>% 
-  ggplot(aes(date_time_ID, value_diff_int, col=source))+
-  geom_hline(yintercept = 0)+
-  geom_line()+
-  geom_point()+
-  scale_y_reverse(name = "Change integrated value")+
-  scale_x_datetime(breaks = "week", date_labels = "%d %b")+
-  scale_color_brewer(palette = "Set1", direction = -1)+
+p_integrated <- TPD %>%
+  ggplot(aes(date_time_ID, value_diff_int, col = source)) +
+  geom_hline(yintercept = 0) +
+  geom_line() +
+  geom_point() +
+  scale_y_reverse(name = "Change integrated value") +
+  scale_x_datetime(breaks = "week", date_labels = "%d %b") +
+  scale_color_brewer(palette = "Set1", direction = -1) +
   theme(axis.title.x = element_blank(),
         legend.title = element_blank())
 
-p_TPD <- TPD %>% 
-  ggplot(aes(date_time_ID, i_dep, col=source))+
-  geom_hline(yintercept = 0)+
+p_TPD <- TPD %>%
+  ggplot(aes(date_time_ID, i_dep, col = source)) +
+  geom_hline(yintercept = 0) +
   geom_hline(data = TPD_mean,
-             aes(yintercept = i_dep,
-                 col=source, linetype = "mean"))+
-  geom_line(aes(linetype="cruise"))+
-  geom_point()+
-  scale_y_reverse(name = "Penetration depth (m)", breaks = seq(0,20,5))+
-  scale_x_datetime(breaks = "week", date_labels = "%d %b")+
-  scale_color_brewer(palette = "Set1", direction = -1)+
+             aes(
+               yintercept = i_dep,
+               col = source,
+               linetype = "mean"
+             )) +
+  geom_line(aes(linetype = "cruise")) +
+  geom_point() +
+  scale_y_reverse(name = "Penetration depth (m)", breaks = seq(0, 20, 5)) +
+  scale_x_datetime(breaks = "week", date_labels = "%d %b") +
+  scale_color_brewer(palette = "Set1", direction = -1) +
   theme(axis.title.x = element_blank(),
         legend.title = element_blank())
 
 
-p_surface + p_integrated + p_TPD + 
+p_surface + p_integrated + p_TPD +
   plot_layout(ncol = 1)
 
 TPD_mean
@@ -1164,20 +1282,20 @@ rm(p_surface, p_integrated, p_TPD)
 
 ```{r join_TPD_estimates}
 
-TPD <- TPD %>% 
-  select(date_time_ID, source, i_dep) %>% 
-  mutate(i_method = "TPD", i_res = "daily") %>% 
-  filter(date_time_ID < date_tem_max) %>% 
+TPD <- TPD %>%
+  select(date_time_ID, source, i_dep) %>%
+  mutate(i_method = "TPD", i_res = "daily") %>%
+  filter(date_time_ID < date_tem_max) %>%
   mutate(i_dep = if_else(is.na(i_dep), 0, i_dep))
 
-TPD_cum <- TPD_cum %>% 
-  select(source, i_dep) %>% 
+TPD_cum <- TPD_cum %>%
+  select(source, i_dep) %>%
   mutate(i_method = "TPD", i_res = "cumulative")
 
 TPD_cum <- full_join(MLD_dates, TPD_cum)
 
-TPD_mean <- TPD_mean %>% 
-  select(source, i_dep) %>% 
+TPD_mean <- TPD_mean %>%
+  select(source, i_dep) %>%
   mutate(i_method = "TPD", i_res = "mean")
 
 TPD_mean <- full_join(MLD_dates, TPD_mean)
@@ -1185,7 +1303,7 @@ TPD_mean <- full_join(MLD_dates, TPD_mean)
 TPD <- full_join(TPD, TPD_cum)
 TPD <- full_join(TPD, TPD_mean)
 
-rm(TPD_cum, TPD_mean, MLD_mean)
+rm(TPD_cum, TPD_mean)
 
 ```
 
@@ -1199,55 +1317,70 @@ rm(MLD, TPD)
 
 ```{r tm_fm_gt_hovmoeller_tem_MLD_TPD}
 
+
 bin <- 2
 
-CPD <- CPD %>% 
+CPD <- CPD %>%
   mutate(source = "tm")
 
-CPD <- CPD %>% 
-  mutate(source = factor(source, c("tm", "fm"))) %>% 
-  mutate(source = fct_recode(source,
-                             `VOS Finnmaid + GETM model` = "fm",
-                             `SY Tina V` = "tm"))
+CPD <- CPD %>%
+  mutate(source = factor(source, c("tm", "fm"))) %>%
+  mutate(source = fct_recode(
+    source,
+    `VOS Finnmaid + GETM model` = "fm",
+    `SY Tina V` = "tm"
+  ))
 
-i_dep <- i_dep %>% 
-  mutate(source = factor(source, c("tm", "fm"))) %>% 
-  mutate(source = fct_recode(source,
-                             `VOS Finnmaid + GETM model` = "fm",
-                             `SY Tina V` = "tm"))
+i_dep <- i_dep %>%
+  mutate(source = factor(source, c("tm", "fm"))) %>%
+  mutate(source = fct_recode(
+    source,
+    `VOS Finnmaid + GETM model` = "fm",
+    `SY Tina V` = "tm"
+  ))
 tm_fm_gt <- tm_fm_gt %>%
-  mutate(source = factor(source, c("tm", "fm"))) %>% 
-  mutate(source = fct_recode(source,
-                             `VOS Finnmaid + GETM model` = "fm",
-                             `SY Tina V` = "tm"))
+  mutate(source = factor(source, c("tm", "fm"))) %>%
+  mutate(source = fct_recode(
+    source,
+    `VOS Finnmaid + GETM model` = "fm",
+    `SY Tina V` = "tm"
+  ))
 
-p_hov_dep <- 
-  tm_fm_gt %>% 
-  ggplot()+
-  geom_contour_fill(aes(date_time_ID, dep, z=tem),
-                    breaks = MakeBreaks(bin))+
-  geom_path(data = CPD,
-            aes(date_time_ID, i_dep),
-            col="white", linetype = 2)+
+p_hov_dep <-
+  tm_fm_gt %>%
+  ggplot() +
+  geom_contour_fill(aes(date_time_ID, dep, z = tem),
+                    breaks = MakeBreaks(bin)) +
+  geom_path(
+    data = CPD,
+    aes(date_time_ID, i_dep),
+    col = "white",
+    linetype = 2
+  ) +
   geom_path(data = i_dep %>% filter(i_res == "daily" & i_dep != 0),
-            aes(date_time_ID, i_dep, col=i_method))+
-  scale_fill_gradient(name="Tem (°C)",
-                      guide = "colorstrip", breaks = MakeBreaks(bin),
-                      high = "grey90",
-                      low = "grey20")+
-  scale_color_discrete(name = "Reconstruction", guide = FALSE)+
-  scale_y_reverse()+
+            aes(date_time_ID, i_dep, col = i_method)) +
+  scale_fill_gradient(
+    name = "Tem (°C)",
+    guide = "colorstrip",
+    breaks = MakeBreaks(bin),
+    high = "grey90",
+    low = "grey20"
+  ) +
+  scale_color_discrete(name = "Reconstruction", guide = FALSE) +
+  scale_y_reverse() +
   scale_x_datetime(date_breaks = "week",
                    date_labels = "%b %d",
-                   sec.axis = dup_axis())+
-  coord_cartesian(expand = 0)+
-  labs(y=expression(atop(Depth, (m))))+
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
-        strip.background = element_blank(),
-        strip.text.x = element_blank(),
-        axis.text.x.top = element_blank())+
-  facet_wrap(~source)
+                   sec.axis = dup_axis()) +
+  coord_cartesian(expand = 0) +
+  labs(y = expression(atop(Depth, (m)))) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    strip.background = element_blank(),
+    strip.text.x = element_blank(),
+    axis.text.x.top = element_blank()
+  ) +
+  facet_wrap( ~ source)
 
 p_hov_dep
 
@@ -1261,26 +1394,29 @@ rm(bin)
 
 ```{r restrict_to_surface_CO2}
 
-tm_fm_gt_surface <- tm_fm_gt %>% 
-  filter(dep < surface_dep) %>% 
-  select(source, date_time_ID, nCT) %>% 
-  group_by(source, date_time_ID) %>% 
-  summarise(nCT = mean(nCT, na.rm = TRUE)) %>% 
+tm_fm_gt_surface <- tm_fm_gt %>%
+  filter(dep < parameters$surface_dep) %>%
+  select(source, date_time_ID, nCT) %>%
+  group_by(source, date_time_ID) %>%
+  summarise(nCT = mean(nCT, na.rm = TRUE)) %>%
   ungroup()
 
 tm_fm_gt_surface <- tm_fm_gt_surface %>%
   group_by(source) %>%
   arrange(date_time_ID) %>%
-  mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
-         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
-         nCT_diff = nCT - lag(nCT, default = first(nCT)),
-         nCT_cum = cumsum(nCT_diff)) %>% 
+  mutate(
+    date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
+    date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID)) /
+      2,
+    nCT_diff = nCT - lag(nCT, default = first(nCT)),
+    nCT_cum = cumsum(nCT_diff)
+  ) %>%
   ungroup()
 
 
 ```
 
-```{r merge_obs_integration_depth}
+```{r merge_obs_parameters$i_dep_limth}
 
 iCT <- full_join(tm_fm_gt_surface, i_dep)
 rm(tm_fm_gt_surface)
@@ -1305,34 +1441,38 @@ iCT <- iCT %>%
 
 ```{r read_NCP_best_guess}
 
-tm_NCP_cum <- read_csv(here::here("Data/_merged_data_files/CT_dynamics",
+tm_NCP_cum <- read_csv(here::here("data/intermediate/_merged_data_files/CT_dynamics",
                                   "tm_NCP_cum.csv"))
 
 ```
 
 ```{r add_CO2_flux}
 
-tm_NCP_cum_flux <- tm_NCP_cum %>% 
+tm_NCP_cum_flux <- tm_NCP_cum %>%
   select(date_time, flux_cum)
 
 tm_NCP_cum_flux <-
-  expand_grid(tm_NCP_cum_flux, 
-              source = unique(iCT$source),
-              i_method = unique(iCT$i_method),
-              i_res = unique(iCT$i_res))
+  expand_grid(
+    tm_NCP_cum_flux,
+    source = unique(iCT$source),
+    i_method = unique(iCT$i_method),
+    i_res = unique(iCT$i_res)
+  )
 
-NCP_flux <- full_join(iCT %>% rename(date_time=date_time_ID),
-                      tm_NCP_cum_flux) %>% 
+NCP_flux <- full_join(iCT %>% rename(date_time = date_time_ID),
+                      tm_NCP_cum_flux) %>%
   arrange(date_time)
 
-# linear interpolation of cumulative changes to frequency of the flux estimates estimates 
-NCP_flux_int <- NCP_flux %>% 
-  filter(!(i_method == "MLD" & i_res == "cumulative")) %>% 
-  group_by(source, i_method, i_res) %>% 
-  mutate(nCT_i_cum = approxfun(date_time, nCT_i_cum)(date_time),
-         flux_cum = approxfun(date_time, flux_cum)(date_time)) %>% 
-    fill(flux_cum) %>% 
-  mutate(nCT_i_flux_cum = nCT_i_cum + flux_cum) %>% 
+# linear interpolation of cumulative changes to frequency of the flux estimates estimates
+NCP_flux_int <- NCP_flux %>%
+  filter(!(i_method == "MLD" & i_res == "cumulative")) %>%
+  group_by(source, i_method, i_res) %>%
+  mutate(
+    nCT_i_cum = approxfun(date_time, nCT_i_cum)(date_time),
+    flux_cum = approxfun(date_time, flux_cum)(date_time)
+  ) %>%
+  fill(flux_cum) %>%
+  mutate(nCT_i_flux_cum = nCT_i_cum + flux_cum) %>%
   ungroup()
 
 ```
@@ -1341,93 +1481,138 @@ NCP_flux_int <- NCP_flux %>%
 
 ```{r iCT_time_series}
 
-# iCT <- iCT %>%
-#   mutate(source = factor(source, c("tm", "fm"))) %>% 
-#   mutate(source = fct_recode(source,
-#                              `VOS Finnmaid + GETM model` = "fm",
-#                              `SY Tina V` = "tm"))
-
-p_nCT <- iCT %>% 
-  ggplot(aes(date_time_ID, nCT))+
-  geom_point()+
-  geom_path()+
-  scale_color_discrete(name = "Reconstruction")+
-  scale_x_datetime(breaks = "week", date_labels = "%d %b",
-                   expand = c(0,0))+
-  scale_linetype(name="Resolution")+
-  facet_wrap(~source)+
-  labs(y = expression(atop(nC[T], (mu*mol~kg^{-1}))))+
+p_nCT <- iCT %>%
+  ggplot(aes(date_time_ID, nCT)) +
+  geom_point() +
+  geom_path() +
+  scale_color_discrete(name = "Reconstruction") +
+  scale_x_datetime(breaks = "week",
+                   date_labels = "%d %b",
+                   expand = c(0, 0)) +
+  scale_linetype(name = "Resolution") +
+  facet_wrap( ~ source) +
+  labs(y = expression(atop(nC[T], (mu * mol ~ kg ^ {
+    -1
+  })))) +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())
 
-iCT <- iCT %>% 
-  mutate(i_res = fct_recode(i_res, `cumulative` = "cum")) %>% 
+iCT <- iCT %>%
+  mutate(i_res = fct_recode(i_res, `cumulative` = "cum")) %>%
   mutate(i_res = factor(i_res, c("mean", "cumulative", "daily")))
 
-p_iCT <- iCT %>% 
-  ggplot()+
-  geom_hline(yintercept = 0)+
-  geom_path(data=tm_NCP_cum, aes(date_time, nCT_i_cum), col="black")+
-  geom_path(aes(date_time_ID, nCT_i_cum, col=i_method, linetype=i_res))+
-  scale_color_discrete(name = "Reconstruction")+
-  scale_x_datetime(breaks = "week", date_labels = "%d %b",
-                   sec.axis = dup_axis(),
-                   expand = c(0,0))+
-  scale_linetype(name="Resolution")+
-  facet_wrap(~source)+
-  labs(y=expression(atop(integrated~nC[T], (mol~m^{-2}))))+
-  guides(color = guide_legend(order = 1))+
-  theme(axis.title.x = element_blank(),
-        strip.background = element_blank(),
-        strip.text.x = element_blank(),
-        axis.text.x.top = element_blank())
+p_iCT <- iCT %>%
+  ggplot() +
+  geom_hline(yintercept = 0) +
+  geom_path(data = tm_NCP_cum, aes(date_time, nCT_i_cum), col = "black") +
+  geom_path(aes(date_time_ID, nCT_i_cum, col = i_method, linetype = i_res)) +
+  scale_color_discrete(name = "Reconstruction") +
+  scale_x_datetime(
+    breaks = "week",
+    date_labels = "%d %b",
+    sec.axis = dup_axis(),
+    expand = c(0, 0)
+  ) +
+  scale_linetype(name = "Resolution") +
+  facet_wrap( ~ source) +
+  labs(y = expression(atop(integrated ~ nC[T], (mol ~ m ^ {
+    -2
+  })))) +
+  guides(color = guide_legend(order = 1)) +
+  theme(
+    axis.title.x = element_blank(),
+    strip.background = element_blank(),
+    strip.text.x = element_blank(),
+    axis.text.x.top = element_blank()
+  )
 
 p_nCT / p_hov_dep / p_iCT
 
-ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_iCT_timeseries.pdf"),
-       width = 190, height = 200, dpi = 300, units = "mm")
-  
-ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_iCT_timeseries.png"),
-       width = 190, height = 200, dpi = 300, units = "mm")
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/article",
+    "reconstruction_iCT_timeseries.pdf"
+  ),
+  width = 190,
+  height = 200,
+  dpi = 300,
+  units = "mm"
+)
+
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/article",
+    "reconstruction_iCT_timeseries.png"
+  ),
+  width = 190,
+  height = 200,
+  dpi = 300,
+  units = "mm"
+)
   
 ```
 
 ```{r NCP_time_series}
 
-NCP_flux <- NCP_flux %>% 
-  #mutate(i_res = fct_recode(i_res, `cumulative` = "cum")) %>% 
+
+NCP_flux <- NCP_flux %>%
   mutate(i_res = factor(i_res, c("mean", "cumulative", "daily")))
 
-# NCP_flux_int <- NCP_flux_int %>%  
-#   mutate(source = fct_recode(source,
-#                              `VOS Finnmaid + GETM model` = "fm",
-#                              `SY Tina V` = "tm"))
-
-p_NCP <- NCP_flux_int %>% 
-  filter(i_res %in% c("daily", "cumulative")) %>% 
-  ggplot()+
-  geom_hline(yintercept = 0)+
-  geom_path(data=tm_NCP_cum, aes(date_time, nCT_i_flux_mix_cum), col="black")+
-  geom_path(aes(date_time, nCT_i_flux_cum, col=i_method, linetype=i_res))+
-  scale_color_discrete(name = "Integration depth")+
-  scale_x_datetime(breaks = "week", date_labels = "%d %b",
-                   sec.axis = dup_axis(),
-                   expand = c(0,0))+
-  scale_linetype(name="Estimate")+
-  facet_wrap(~source)+
-  labs(y=expression(atop(NCP, (mol~m^{-2}))))+
-  guides(color = guide_legend(order = 1))+
-  theme(axis.title.x = element_blank(),
-        strip.background = element_blank(),
-        strip.text.x = element_blank(),
-        axis.text.x.top = element_blank())
+p_NCP <- NCP_flux_int %>%
+  filter(i_res %in% c("daily", "cumulative")) %>%
+  ggplot() +
+  geom_hline(yintercept = 0) +
+  geom_path(data = tm_NCP_cum,
+            aes(date_time, nCT_i_flux_mix_cum),
+            col = "black") +
+  geom_path(aes(
+    date_time,
+    nCT_i_flux_cum,
+    col = i_method,
+    linetype = i_res
+  )) +
+  scale_color_discrete(name = "Integration depth") +
+  scale_x_datetime(
+    breaks = "week",
+    date_labels = "%d %b",
+    sec.axis = dup_axis(),
+    expand = c(0, 0)
+  ) +
+  scale_linetype(name = "Estimate") +
+  facet_wrap( ~ source) +
+  labs(y = expression(atop(NCP, (mol ~ m ^ {
+    -2
+  })))) +
+  guides(color = guide_legend(order = 1)) +
+  theme(
+    axis.title.x = element_blank(),
+    strip.background = element_blank(),
+    strip.text.x = element_blank(),
+    axis.text.x.top = element_blank()
+  )
 
 p_nCT / p_hov_dep / p_NCP
 
-ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_NCP_timeseries.pdf"),
-       width = 220, height = 200, dpi = 300, units = "mm")
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/article",
+    "reconstruction_NCP_timeseries.pdf"
+  ),
+  width = 220,
+  height = 200,
+  dpi = 300,
+  units = "mm"
+)
 
-ggsave(here::here("output/Plots/Figures_publication/article", "reconstruction_NCP_timeseries.png"),
-       width = 220, height = 200, dpi = 300, units = "mm")
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/article",
+    "reconstruction_NCP_timeseries.png"
+  ),
+  width = 220,
+  height = 200,
+  dpi = 300,
+  units = "mm"
+)
 ```
 

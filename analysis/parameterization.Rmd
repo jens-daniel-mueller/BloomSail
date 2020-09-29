@@ -1,0 +1,90 @@
+---
+title: "Parameterization"
+author: "Jens Daniel Müller"
+date:  "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  workflowr::wflow_html:
+    number_sections: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+```{r library, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(lubridate)
+```
+
+```{r ggplot_theme, include = FALSE}
+theme_set(theme_bw())
+```
+
+
+# Definition
+
+Following parameterizations were chosen to run analysis and display results:
+
+```{r define_parameters}
+parameters <-
+  lst(
+    HC_flush_duration = 600,
+    HC_mixing_duration = 20,
+    pump_switch = ymd_hms("2018-07-17;13:08:34"),
+    duration_intervals = seq(150,500,50),
+    pCO2_resid_lim = 1,
+    example_ID = "180802",
+    example_station = "P03",
+    smoothing_duration = 30,
+    tau_factors = seq(0.8, 1.6, 0.2),
+    tau_factor_used = 1,
+    dep_grid = 1,
+    max_dep = 25,
+    max_dep_gap = 20,
+    max_gap = 3,
+    surface_dep = 6,
+    i_dep_lim = 12,
+    i_dep_mix_lim = 17,
+    fixed_integration_depths = seq(9,13,1),
+    stations_out = c("PX1", "PX2", "P14", "P13", "P01"),
+    dates_out = c("180616","180820"),
+    phases_in = c("down", "up"),
+    fm_box_lon = c(18.9, 19.5, 19.5, 18.9),
+    fm_box_lat = c(57.4, 57.2, 57.45, 57.61),
+    map_lat_lo = 57.25,
+    map_lat_hi = 57.6,
+    map_lon_lo = 18.6,
+    map_lon_hi = 19.7,
+    herrvik_lat = 57.421658,
+    herrvik_lon = 18.914558,
+    ostergarn_lat = 57.430544,
+    ostergarn_lon = 18.984387,
+    stations_in_phytoplankton = c("P07", "P10"),
+    class_in_phytoplankton = "t",
+    getm_select_route = "E",
+    getm_low_lat = 57.3,
+    getm_high_lat = 57.5,
+    getm_start_date = "2018-06-20",
+    getm_end_date = "2018-08-25",
+    getm_i_dep = 19
+  )
+
+parameters
+
+```
+
+# Write file
+
+```{r write_parameters}
+
+parameters %>%
+  write_rds(here::here("data",
+                       "parameters.rds"))
+
+
+```

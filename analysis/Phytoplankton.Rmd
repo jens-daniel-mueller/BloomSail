@@ -25,77 +25,98 @@ library(tidyverse)
 theme_set(theme_bw())
 ```
 
+```{r read_parameters, include = FALSE}
+parameters <-
+  read_rds(here::here("data",
+                       "parameters.rds"))
+```
+
 
 # Phytoplankton cell counts
 
 ## Data preparation
 
-```{r subsetting_criteria}
-
-max_dep <- 25
-surface_dep <- 6
-
-stations_in <- c("P07", "P10")
-
-class_in <- "t" # using total biomass per Species class only
-
-```
-
 
 ```{r read_prepare_sensor_data}
 
-tp <- read_csv(here::here("Data/_summarized_data_files",
-                            "tp.csv"),
-           col_types = cols(ID = col_character()))
+tp <- read_csv(
+  here::here("data/intermediate/_summarized_data_files",
+             "tp.csv"),
+  col_types = cols(ID = col_character())
+)
 
-cruise_dates <- read_csv(here::here("Data/_summarized_data_files",
-                            "cruise_date.csv"),
-           col_types = cols(ID = col_character()))
+cruise_dates <-
+  read_csv(
+    here::here(
+      "data/intermediate/_summarized_data_files",
+      "cruise_date.csv"
+    ),
+    col_types = cols(ID = col_character())
+  )
 
 
 #### calculate mean total phytoplanton biomass in different water depth intervals
 
-tp <- tp %>% 
-  filter(station %in% stations_in,
-         class == class_in,
-         Species != "Nodulariadead") %>% 
+tp <- tp %>%
+  filter(
+    station %in% parameters$stations_in_phytoplankton,
+    class == parameters$class_in_phytoplankton,
+    Species != "Nodulariadead"
+  ) %>%
   mutate(ID = if_else(ID == "180722", "180723", ID))
 
-tp <- tp %>% 
-  mutate(dep_grid = cut(dep,
-                        breaks = c(-1,surface_dep,max_dep),
-                        labels = c("0-6","6-25"))) %>% 
+tp <- tp %>%
+  mutate(dep_grid = cut(
+    dep,
+    breaks = c(-1, parameters$surface_dep, parameters$max_dep),
+    labels = c("0-6", "6-25")
+  )) %>%
   drop_na()
 
-tp_ID_grid <- tp %>% 
-  group_by(ID, dep_grid, Species) %>% 
-  summarise(value = mean(value, na.rm = TRUE)) %>% 
+tp_ID_grid <- tp %>%
+  group_by(ID, dep_grid, Species) %>%
+  summarise(value = mean(value, na.rm = TRUE)) %>%
   ungroup()
 
 
 tp_ID_grid <- full_join(cruise_dates, tp_ID_grid)
 
-
 ```
 
 ```{r phytoplankton_time_series}
 
-tp_ID_grid %>% 
-  filter(Species != "total") %>% 
-  ggplot(aes(date_time_ID, value, col=dep_grid))+
-  geom_point()+
-  geom_line()+
-  facet_grid(Species~.)+
-  scale_color_brewer(palette = "Set1", name= "Depth (m)")+
-  scale_x_datetime(breaks = "week", date_labels = "%d %b")+
-  labs(y=expression(Biomass~(mg/m^3)))+
+tp_ID_grid %>%
+  filter(Species != "total") %>%
+  ggplot(aes(date_time_ID, value, col = dep_grid)) +
+  geom_point() +
+  geom_line() +
+  facet_grid(Species ~ .) +
+  scale_color_brewer(palette = "Set1", name = "Depth (m)") +
+  scale_x_datetime(breaks = "week", date_labels = "%d %b") +
+  labs(y = expression(Biomass ~ (mg / m ^ 3))) +
   theme(axis.title.x = element_blank())
 
-ggsave(here::here("output/Plots/Figures_publication/appendix", "Phytoplankton_mean_total_biomass.pdf"),
-       width = 180, height = 120, dpi = 300, units = "mm")
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/appendix",
+    "Phytoplankton_mean_total_biomass.pdf"
+  ),
+  width = 180,
+  height = 120,
+  dpi = 300,
+  units = "mm"
+)
 
-ggsave(here::here("output/Plots/Figures_publication/appendix", "Phytoplankton_mean_total_biomass.png"),
-       width = 180, height = 120, dpi = 300, units = "mm")
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/appendix",
+    "Phytoplankton_mean_total_biomass.png"
+  ),
+  width = 180,
+  height = 120,
+  dpi = 300,
+  units = "mm"
+)
 
 ```
 
