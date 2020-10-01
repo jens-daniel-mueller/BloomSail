@@ -893,6 +893,10 @@ og <- og %>%
     "RIS [W/m^2]"
   )
 
+# conversion from GMT+1 to UTC
+og <- og %>%
+  mutate(date_time = date_time - 60^2)
+
 og <- og %>%
   select(date_time, pCO2_atm = "CO2 12m [ppm]", wind = "WS 12m [m/s]")
 
