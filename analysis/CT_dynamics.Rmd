@@ -28,6 +28,7 @@ library(lubridate)
 library(zoo)
 library(tibbletime)
 library(sp)
+library(LakeMetabolizer)
 
 ```
 
@@ -1987,6 +1988,19 @@ og <- og %>%
 rm(end, start)
 
 ```
+
+### Conversion to U10
+
+Wind speed was determined at 12 and converted to 10 m above sea level, to be used for gas exchange calculation.
+
+```{r wind_speed_conversion}
+
+og <- og %>%
+  mutate(wind = wind.scale.base(wnd = wind, wnd.z = 12))
+
+```
+
+
 
 Data sets for atmospheric and seawater observations were merged and interpolated to a common time stamp.
 
