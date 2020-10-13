@@ -1426,7 +1426,6 @@ In order to decide, which conditions resulted in the best response correction th
 Summary statistics were restricted to complete shallow profiles (not more than 2 observations missing from 1m depth intervals, maximum depth 20m). 
 
 
-
 ```{r identify_max_dep_pCO2_within_profiles}
 
 tm_grid_stat <- tm_grid %>% 
@@ -1458,7 +1457,11 @@ rm(tm_grid_stat, meta)
 ```
 
 
-Summary metric are restricted to profiles that did not exceed a maximum sampling depth of `r parameters$RT_stats_dep_max` m and pCO2 of `r parameters$RT_stats_pCO2_max` µatm.
+Summary metric are restricted to profiles that did not exceed:
+
+- maximum sampling depth of `r parameters$RT_stats_dep_max` m
+- pCO2 of `r parameters$RT_stats_pCO2_max` µatm
+- Nr of missing depth grid levels of `r parameters$max_gap-1`
 
 ```{r calculate_performance_metrics}
 
@@ -1469,7 +1472,7 @@ tm_grid_shallow <- tm_grid %>%
   group_by(ID, station, tau_factor, correction) %>% 
   mutate(nr_na = sum(is.na(pCO2_delta))) %>% 
   ungroup() %>% 
-  filter(nr_na <= 2)
+  filter(nr_na < parameters$max_gap)
 
 tm_grid_shallow_sum <- tm_grid_shallow %>% 
   mutate(pCO2_delta_abs = abs(pCO2_delta),
@@ -1554,6 +1557,27 @@ ggsave(
 )
 
 ```
+
+```{r RT_stats_offset}
+
+tm_grid_shallow_sum %>%
+  filter(correction == "pCO2",
+         estimate %in% c("mean_abs"),
+         tau_factor == parameters$tau_factor_used,
+         dep_grid < 5) %>% 
+  summarise(dep_lim = 5,
+            mean(pCO2_delta))
+
+tm_grid_shallow_sum %>%
+  filter(correction == "pCO2",
+         estimate %in% c("mean_abs"),
+         tau_factor == parameters$tau_factor_used,
+         dep_grid < 20) %>% 
+  summarise(dep_lim = 20,
+            mean(pCO2_delta))
+```
+
+
 
 Below we determined the tau factor that corresponds to lowest absolute mean offset.
 
