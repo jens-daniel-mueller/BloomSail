@@ -241,7 +241,7 @@ ts_th_sub <- ts_th %>%
 
 #### Analog vs internal
 
-```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µatm. Zeroing periods are included.", fig.asp = 3}
+```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µatm. Zeroing periods are included.", fig.asp = 2}
 
 ggplot() +
   #geom_path(data = th_pre_cleaning, aes(date_time, pCO2_corr, col = "pre cleaning")) +
