@@ -769,6 +769,34 @@ rm(cast_dep, cast_dep_equi, cast_dep_equi_sub, max_duration)
 
 A pdf with all timeseries plots of profiling depth and pCO~2~ can be accessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/time_series_depth_pCO2_corr_by_profile.pdf){target="_blank"}.
 
+### Profiling speed
+
+```{r calculate_downcast_speed}
+
+downcast <- tm %>%
+  filter(phase == "down")
+
+downcast_speed <- downcast %>%
+  group_by(ID, station) %>%
+  summarise(
+    duration = as.numeric(max(date_time) - min(date_time)),
+    distance = max(dep) - min(dep),
+    speed = distance / duration
+  ) %>%
+  ungroup()
+
+downcast_speed %>% 
+  ggplot(aes(speed)) +
+  geom_histogram()
+
+downcast_speed %>% 
+  summarise(mean(speed),
+            sd(speed))
+  
+
+```
+
+
 
 ```{r plot_profiling_timeseries, eval=FALSE}
 
