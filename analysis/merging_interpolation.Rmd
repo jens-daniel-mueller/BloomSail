@@ -241,10 +241,10 @@ ts_th_sub <- ts_th %>%
 
 #### Analog vs internal
 
-```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µatm. Zeroing periods are included.", fig.asp = 5}
+```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µatm. Zeroing periods are included.", fig.asp = 3}
 
 ggplot() +
-  geom_path(data = th_pre_cleaning, aes(date_time, pCO2_corr, col = "pre cleaning")) +
+  #geom_path(data = th_pre_cleaning, aes(date_time, pCO2_corr, col = "pre cleaning")) +
   geom_path(data = ts_th_sub, aes(date_time, pCO2_corr, col = "HydroC, drift corrected")) +
   geom_path(data = ts_th_sub, aes(date_time, pCO2_analog, col = "analog CTD")) +
   scale_color_brewer(palette = "Set1", name = "pCO2 record") +
@@ -256,7 +256,7 @@ ggplot() +
 
 #### Raw vs clean
 
-```{r compare_processed_hc_files, fig.asp=5}
+```{r compare_processed_hc_files, fig.asp=5, eval=FALSE}
 
 th_comparison <- full_join(
   ts_th_sub %>% select(date_time, deployment, pCO2_corr),
@@ -285,7 +285,7 @@ th_comparison %>%
 #### Water vapor correction
 
 
-```{r water_vapor_correction, fig.asp=5}
+```{r water_vapor_correction, fig.asp=5, eval=FALSE}
 
 th_comparison %>%
   ggplot() +
@@ -300,7 +300,7 @@ th_comparison %>%
 
 
 
-```{r water_vapor_correction_offset, fig.asp=5}
+```{r water_vapor_correction_offset, fig.asp=5, eval=FALSE}
 
 th_comparison %>%
   ggplot() +
