@@ -39,7 +39,14 @@ parameters <-
 theme_set(theme_bw())
 ```
 
-In this document, raw data files are read, merged into one file with harmonized column names and written as summarized data file.
+# Scope
+
+For each data source:  
+
+- read raw data files
+- harmonized column names
+- merged into one file
+- write summary file
 
 # Sea-Bird SBE 16 sensor data (ts)
 
@@ -211,7 +218,7 @@ Sensor recordings were cleaned from obviously erroneous readings, by setting sus
 
 ```{r clean_ts_data}
 
-class(ts)
+# class(ts)
 ts <- data.table(ts)
 
 # Profiling data
@@ -465,6 +472,14 @@ th %>%
     "th_pre_cleaning.csv"
   ))
 
+
+# th_deployment <- th %>% 
+#   group_by(deployment) %>% 
+#   summarise(deployment_duration = max(date_time) - min(date_time)) %>% 
+#   ungroup() %>% 
+#   arrange(deployment_duration)
+
+
 th <- th %>%
   filter(deployment %in% c(2, 6, 9, 14, 17, 21, 23, 27, 31, 33, 34, 35, 37))
 
@@ -496,14 +511,14 @@ rm(list = setdiff(ls(), c("th", "parameters")))
 
 # find duplicated time stamps and shift first by one second backward, and merge
 
-th %>%
-  distinct(date_time)
+# th %>%
+#   distinct(date_time)
 
 th <- th %>%
   select(-n) %>%
   add_count(date_time)
 
-unique(th$n)
+# unique(th$n)
 
 th_no_duplicated <- th %>%
   filter(n == 1)
@@ -528,8 +543,8 @@ th_duplicated_clean <-
 
 th <- full_join(th_no_duplicated, th_duplicated_clean)
 
-th %>%
-  distinct(date_time)
+# th %>%
+#   distinct(date_time)
 
 rm(list = setdiff(ls(), c("th", "parameters")))
 
@@ -537,14 +552,14 @@ rm(list = setdiff(ls(), c("th", "parameters")))
 
 # find duplicated time stamps and shift first by two seconds forward, and merge
 
-th %>%
-  distinct(date_time)
+# th %>%
+#   distinct(date_time)
 
 th <- th %>%
   select(-n) %>%
   add_count(date_time)
 
-unique(th$n)
+# unique(th$n)
 
 th_no_duplicated <- th %>%
   filter(n == 1)
@@ -569,8 +584,8 @@ th_duplicated_clean <-
 
 th <- full_join(th_no_duplicated, th_duplicated_clean)
 
-th %>%
-  distinct(date_time)
+# th %>%
+#   distinct(date_time)
 
 rm(list = setdiff(ls(), c("th", "parameters")))
 
@@ -578,14 +593,14 @@ rm(list = setdiff(ls(), c("th", "parameters")))
 # for those cases, only the first duplicated observation is selected (similar to triplicate treatment)
 
 
-th %>%
-  distinct(date_time)
+# th %>%
+#   distinct(date_time)
 
 th <- th %>%
   select(-n) %>%
   add_count(date_time)
 
-unique(th$n)
+# unique(th$n)
 
 
 th_still_no_duplicated <- th %>%
@@ -598,8 +613,8 @@ th_still_duplicated_first <- th %>%
 
 th <- full_join(th_still_no_duplicated, th_still_duplicated_first)
 
-th %>%
-  distinct(date_time)
+# th %>%
+#   distinct(date_time)
 
 rm(list = setdiff(ls(), c("th", "parameters")))
 
@@ -623,7 +638,7 @@ th <- th %>%
   )))) %>%
   ungroup()
 
-unique(th$Zero_counter)
+# unique(th$Zero_counter)
 
 # Flush: Identification
 
