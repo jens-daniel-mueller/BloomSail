@@ -7,6 +7,8 @@ navbar:
     menu:
     - text: Nomenclature
       href: nomenclature.html
+    - text: Parameterization
+      href: parameterization.html
     - text: Read-in
       href: read-in.html
     - text: Merging and interpolation

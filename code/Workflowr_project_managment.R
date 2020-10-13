@@ -113,6 +113,7 @@ wflow_publish(all = TRUE, message = "XXX")
 wflow_publish(c(
   "analysis/index.Rmd",
   "analysis/nomenclature.Rmd",
+  "analysis/parameterization.Rmd",
   "analysis/read-in.Rmd",
   "analysis/merging_interpolation.Rmd",
   "analysis/response_time.Rmd",
