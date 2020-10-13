@@ -75,7 +75,6 @@ parameters <-
   )
 
 parameters
-knitr::kable(parameters)
 
 ```
 
