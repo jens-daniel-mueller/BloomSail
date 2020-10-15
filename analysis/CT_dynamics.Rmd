@@ -607,7 +607,7 @@ ggsave(
   units = "mm"
 )
 
-rm(tb_long_mean, p_AT, p_CT, p_nCT, tb_fix, AT_sd)
+rm(tb_long_mean, p_AT, p_CT, p_nCT, tb_fix)
 
 ```
 
@@ -667,6 +667,22 @@ tm_profiles <- tm_profiles %>%
       24,
       var1 = pCO2,
       var2 = AT_mean * 1e-6,
+      S = sal_mean,
+      T = tem,
+      P = dep / 10,
+      k1k2 = "m10",
+      kf = "dg",
+      ks = "d",
+      gas = "insitu"
+    )[, 16] * 1e6
+  )
+
+tm_profiles <- tm_profiles %>%
+  mutate(
+    nCT_test = carb(
+      24,
+      var1 = pCO2,
+      var2 = (AT_mean + 2*AT_sd) * 1e-6,
       S = sal_mean,
       T = tem,
       P = dep / 10,
@@ -784,13 +800,24 @@ tm_profiles_ID_sd <- tm_profiles %>%
   ungroup()
 
 tm_profiles_ID_sd_long <- tm_profiles_ID_sd %>%
-  pivot_longer(sal:nCT, names_to = "var", values_to = "sd")
+  pivot_longer(sal:nCT_test, names_to = "var", values_to = "sd")
 
 tm_profiles_ID_mean_long <- tm_profiles_ID_mean %>%
-  pivot_longer(sal:nCT, names_to = "var", values_to = "value")
+  pivot_longer(sal:nCT_test, names_to = "var", values_to = "value")
 
-tm_profiles_ID_long <-
+tm_profiles_ID_long_test <-
   inner_join(tm_profiles_ID_mean_long, tm_profiles_ID_sd_long)
+
+tm_profiles_ID_long <- tm_profiles_ID_long_test %>% 
+  filter(var != "nCT_test")
+
+tm_profiles_ID_mean_test <- tm_profiles_ID_mean
+
+tm_profiles_ID_mean_test <- tm_profiles_ID_mean_test %>% 
+  mutate(nCT_delta = nCT - nCT_test)
+
+tm_profiles_ID_mean <- tm_profiles_ID_mean %>%
+  select(-nCT_test)
 
 tm_profiles_ID_mean %>%
   write_csv(here::here("data/intermediate/_merged_data_files/CT_dynamics", "tm_profiles_ID.csv"))
@@ -814,6 +841,19 @@ tm_profiles_ID_long %>%
   scale_y_reverse() +
   scale_color_viridis_d() +
   facet_wrap( ~ var, scales = "free_x")
+  
+```
+
+### nCT sensitivity to AT
+
+```{r nCT_profiles_delta, fig.cap="Mean vertical profiles per cruise day across all stations."}
+
+tm_profiles_ID_mean_test %>%
+  ggplot(aes(nCT_delta - mean(nCT_delta), dep, col = ID)) +
+  geom_point() +
+  geom_path() +
+  scale_y_reverse() +
+  scale_color_viridis_d()
   
 ```
 
@@ -1091,6 +1131,30 @@ tm_profiles_ID_long_grid <- tm_profiles_ID_long %>%
   summarise_all(list(mean), na.rm = TRUE)
 
 tm_profiles_ID_long_grid %>%
+  ggplot(aes(date_time_ID, value, col = as.factor(dep))) +
+  geom_path() +
+  geom_point() +
+  scale_color_viridis_d(name = "Depth (m)") +
+  scale_x_datetime(breaks = "week", date_labels = "%d %b") +
+  facet_wrap( ~ var, scales = "free_y", ncol = 1) +
+  theme(axis.title.x = element_blank())
+
+rm(tm_profiles_ID_long_grid)
+```
+
+### Test AT sensitivity
+
+Mean seawater CT were calculated for 5m depth intervals based on two AT values.
+
+```{r observed_timeseries_nCT_delta}
+
+tm_profiles_ID_long_grid <- tm_profiles_ID_long_test %>%
+  mutate(dep = cut(dep, seq(0, 30, 5))) %>%
+  group_by(ID, date_time_ID, dep, var)  %>%
+  summarise_all(list(mean), na.rm = TRUE)
+
+tm_profiles_ID_long_grid %>%
+  filter(var %in% c("nCT", "nCT_test")) %>% 
   ggplot(aes(date_time_ID, value, col = as.factor(dep))) +
   geom_path() +
   geom_point() +
