@@ -1216,10 +1216,11 @@ nCT_delta_mean <- nCT_sens %>%
 
 nCT_sens <- nCT_sens %>%
   mutate(nCT_delta_offset = nCT_delta - nCT_delta_mean,
+         nCT_delta_offset_rel = nCT_delta / nCT_delta_mean *100,
          AT_offset = AT - AT_mean)
 
 nCT_delta_sd <- nCT_sens %>%
-  filter(factor %in% c(1)) %>% 
+  filter(factor == 1) %>% 
   pull(nCT_delta_offset)
 
 
