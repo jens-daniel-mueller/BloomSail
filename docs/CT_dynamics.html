@@ -436,7 +436,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">CT dynamics</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">15 October, 2020</h4>
+<h4 class="date">19 October, 2020</h4>
 
 </div>
 
@@ -461,7 +461,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-10-15
+<strong>Last updated:</strong> 2020-10-19
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -552,16 +552,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreedcfd745ca9e6cbd877eda425c6084c010348cd44targetblankdcfd745a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/dcfd745ca9e6cbd877eda425c6084c010348cd44" target="_blank">dcfd745</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree2c6f290040d9ad8901956ff61f2686d0e43bc2fetargetblank2c6f290a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/2c6f290040d9ad8901956ff61f2686d0e43bc2fe" target="_blank">2c6f290</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreedcfd745ca9e6cbd877eda425c6084c010348cd44targetblankdcfd745a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree2c6f290040d9ad8901956ff61f2686d0e43bc2fetargetblank2c6f290a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/dcfd745ca9e6cbd877eda425c6084c010348cd44" target="_blank">dcfd745</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/2c6f290040d9ad8901956ff61f2686d0e43bc2fe" target="_blank">2c6f290</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -574,6 +574,10 @@ Ignored files:
     Ignored:    data/intermediate/
     Ignored:    data/output_submission/
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
+
+Untracked files:
+    Untracked:  output/Plots/Figures_publication/Appendix/nCT_sensitivity_to_AT.pdf
+    Untracked:  output/Plots/Figures_publication/Appendix/nCT_sensitivity_to_AT.png
 
 </code></pre>
 <p>
@@ -612,6 +616,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/2c6f290040d9ad8901956ff61f2686d0e43bc2fe/analysis/CT_dynamics.Rmd" target="_blank">2c6f290</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-10-19
+</td>
+<td>
+relative CT* sensitivity to AT bias
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/fba2b061cc11054e71c996fee24e645ddf5a9053/docs/CT_dynamics.html" target="_blank">fba2b06</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-10-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -4030,7 +4068,6 @@ tm_profiles &lt;- tm_profiles %&gt;%
     )[, 16] * 1e6
   )
 
-rm(sal_mean)
 
 tm_profiles %&gt;%
   write_csv(
@@ -4440,6 +4477,120 @@ tm_profiles_ID_long_grid %&gt;%
   theme(axis.title.x = element_blank())</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/observed_timeseries_nCT_delta-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(tm_profiles_ID_long_grid)</code></pre>
+<p>Calculate CT* changes for range of AT errors</p>
+<pre class="r"><code>nCT_sens &lt;- tm_profiles %&gt;%
+  filter(dep &lt; parameters$surface_dep,
+         date_ID %in% c(&quot;Jul 06&quot;, &quot;Jul 24&quot;)) %&gt;%
+  select(date_ID, tem, pCO2) %&gt;%
+  group_by(date_ID) %&gt;%
+  summarise_all(mean, na.rm = TRUE) %&gt;%
+  ungroup()
+
+nCT_sens &lt;- expand_grid(nCT_sens, factor = seq(-3, 3, 0.2))
+
+nCT_sens &lt;- nCT_sens %&gt;%
+  mutate(AT = (AT_mean + factor * AT_sd) * 1e-6)
+
+nCT_sens &lt;- nCT_sens %&gt;%
+  mutate(
+    nCT = carb(
+      24,
+      var1 = pCO2,
+      var2 = AT,
+      S = sal_mean,
+      T = tem,
+      k1k2 = &quot;m10&quot;,
+      kf = &quot;dg&quot;,
+      ks = &quot;d&quot;,
+      gas = &quot;insitu&quot;
+    )[, 16] * 1e6
+  )
+
+nCT_sens &lt;- nCT_sens %&gt;%
+  mutate(AT = AT * 1e6) %&gt;%
+  select(date_ID, factor, AT, nCT) %&gt;%
+  pivot_wider(names_from = &quot;date_ID&quot;,
+              values_from = c(&quot;nCT&quot;))
+
+nCT_sens &lt;- nCT_sens %&gt;%
+  mutate(nCT_delta = `Jul 24` - `Jul 06`) %&gt;%
+  select(factor, AT, nCT_delta)
+
+nCT_delta_mean &lt;- nCT_sens %&gt;%
+  filter(factor == 0) %&gt;%
+  pull(nCT_delta)
+
+nCT_sens &lt;- nCT_sens %&gt;%
+  mutate(nCT_delta_offset = nCT_delta - nCT_delta_mean,
+         AT_offset = AT - AT_mean)
+
+nCT_delta_sd &lt;- nCT_sens %&gt;%
+  filter(factor %in% c(1)) %&gt;% 
+  pull(nCT_delta_offset)
+
+
+nCT_sens %&gt;%
+  ggplot(aes(AT_offset, nCT_delta_offset)) +
+  annotate(
+    &quot;rect&quot;,
+    xmin = -AT_sd,
+    xmax = +AT_sd,
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.3
+  ) +
+  annotate(
+    &quot;rect&quot;,
+    xmin = -Inf,
+    xmax = Inf,
+    ymin = -nCT_delta_sd,
+    ymax = +nCT_delta_sd,
+    alpha = 0.3
+  ) +
+  geom_vline(xintercept = 0, linetype = 2) +
+  geom_hline(yintercept = 0, linetype = 2) +
+  geom_line(col=&quot;red&quot;) +
+  scale_y_continuous(
+    expression(paste(
+      &quot;absolute bias &quot;, Delta ~ C[T], &quot;*&quot;,  ~ (µmol ~ kg ^ {
+        -1
+      })
+    )),
+    sec.axis = sec_axis(
+      ~ . / nCT_delta_mean * 100,
+      name = expression(paste(&quot;relative bias &quot;, Delta ~ C[T], &quot;* (%)&quot;)),
+      breaks = seq(-10, 10, 1)
+    )
+  ) +
+  scale_x_continuous(expression(paste(&quot;absolute bias &quot;, A[T]  ~ (µmol ~ kg ^ {
+    -1
+  }))),
+  sec.axis = sec_axis(~ . / AT_mean * 100,
+                      name = expression(paste(
+                        &quot;relative bias &quot;, A[T], &quot; (%)&quot;)),
+      breaks = seq(-10, 10, 1)))</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/CT_calculation_sensitivity-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(
+  here::here(
+    &quot;output/Plots/Figures_publication/appendix&quot;,
+    &quot;nCT_sensitivity_to_AT.pdf&quot;
+  ),
+  width = 120,
+  height = 80,
+  dpi = 300,
+  units = &quot;mm&quot;
+)
+
+ggsave(
+  here::here(
+    &quot;output/Plots/Figures_publication/appendix&quot;,
+    &quot;nCT_sensitivity_to_AT.png&quot;
+  ),
+  width = 120,
+  height = 80,
+  dpi = 300,
+  units = &quot;mm&quot;
+)</code></pre>
 </div>
 </div>
 <div id="hovmoeller-plots" class="section level2">
