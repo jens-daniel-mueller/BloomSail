@@ -693,7 +693,6 @@ tm_profiles <- tm_profiles %>%
     )[, 16] * 1e6
   )
 
-rm(sal_mean)
 
 tm_profiles %>%
   write_csv(
@@ -704,6 +703,8 @@ tm_profiles %>%
   )
 
 ```
+
+
 
 ## Plot all profiles
 
@@ -1165,6 +1166,129 @@ tm_profiles_ID_long_grid %>%
 
 rm(tm_profiles_ID_long_grid)
 ```
+
+Calculate CT* changes for range of AT errors
+
+
+```{r CT_calculation_sensitivity}
+
+nCT_sens <- tm_profiles %>%
+  filter(dep < parameters$surface_dep,
+         date_ID %in% c("Jul 06", "Jul 24")) %>%
+  select(date_ID, tem, pCO2) %>%
+  group_by(date_ID) %>%
+  summarise_all(mean, na.rm = TRUE) %>%
+  ungroup()
+
+nCT_sens <- expand_grid(nCT_sens, factor = seq(-3, 3, 0.2))
+
+nCT_sens <- nCT_sens %>%
+  mutate(AT = (AT_mean + factor * AT_sd) * 1e-6)
+
+nCT_sens <- nCT_sens %>%
+  mutate(
+    nCT = carb(
+      24,
+      var1 = pCO2,
+      var2 = AT,
+      S = sal_mean,
+      T = tem,
+      k1k2 = "m10",
+      kf = "dg",
+      ks = "d",
+      gas = "insitu"
+    )[, 16] * 1e6
+  )
+
+nCT_sens <- nCT_sens %>%
+  mutate(AT = AT * 1e6) %>%
+  select(date_ID, factor, AT, nCT) %>%
+  pivot_wider(names_from = "date_ID",
+              values_from = c("nCT"))
+
+nCT_sens <- nCT_sens %>%
+  mutate(nCT_delta = `Jul 24` - `Jul 06`) %>%
+  select(factor, AT, nCT_delta)
+
+nCT_delta_mean <- nCT_sens %>%
+  filter(factor == 0) %>%
+  pull(nCT_delta)
+
+nCT_sens <- nCT_sens %>%
+  mutate(nCT_delta_offset = nCT_delta - nCT_delta_mean,
+         AT_offset = AT - AT_mean)
+
+nCT_delta_sd <- nCT_sens %>%
+  filter(factor %in% c(1)) %>% 
+  pull(nCT_delta_offset)
+
+
+nCT_sens %>%
+  ggplot(aes(AT_offset, nCT_delta_offset)) +
+  annotate(
+    "rect",
+    xmin = -AT_sd,
+    xmax = +AT_sd,
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.3
+  ) +
+  annotate(
+    "rect",
+    xmin = -Inf,
+    xmax = Inf,
+    ymin = -nCT_delta_sd,
+    ymax = +nCT_delta_sd,
+    alpha = 0.3
+  ) +
+  geom_vline(xintercept = 0, linetype = 2) +
+  geom_hline(yintercept = 0, linetype = 2) +
+  geom_line(col="red") +
+  scale_y_continuous(
+    expression(paste(
+      "absolute bias ", Delta ~ C[T], "*",  ~ (µmol ~ kg ^ {
+        -1
+      })
+    )),
+    sec.axis = sec_axis(
+      ~ . / nCT_delta_mean * 100,
+      name = expression(paste("relative bias ", Delta ~ C[T], "* (%)")),
+      breaks = seq(-10, 10, 1)
+    )
+  ) +
+  scale_x_continuous(expression(paste("absolute bias ", A[T]  ~ (µmol ~ kg ^ {
+    -1
+  }))),
+  sec.axis = sec_axis(~ . / AT_mean * 100,
+                      name = expression(paste(
+                        "relative bias ", A[T], " (%)")),
+      breaks = seq(-10, 10, 1)))
+
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/appendix",
+    "nCT_sensitivity_to_AT.pdf"
+  ),
+  width = 120,
+  height = 80,
+  dpi = 300,
+  units = "mm"
+)
+
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/appendix",
+    "nCT_sensitivity_to_AT.png"
+  ),
+  width = 120,
+  height = 80,
+  dpi = 300,
+  units = "mm"
+)
+
+```
+
+
 
 
 ## Hovmoeller plots
