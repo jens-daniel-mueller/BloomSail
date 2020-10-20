@@ -1129,7 +1129,8 @@ Mean seawater parameters were calculated for 5m depth intervals.
 tm_profiles_ID_long_grid <- tm_profiles_ID_long %>%
   mutate(dep = cut(dep, seq(0, 30, 5))) %>%
   group_by(ID, date_time_ID, dep, var)  %>%
-  summarise_all(list(mean), na.rm = TRUE)
+  summarise_all(list(mean), na.rm = TRUE) %>% 
+  ungroup()
 
 tm_profiles_ID_long_grid %>%
   ggplot(aes(date_time_ID, value, col = as.factor(dep))) +
@@ -1140,8 +1141,21 @@ tm_profiles_ID_long_grid %>%
   facet_wrap( ~ var, scales = "free_y", ncol = 1) +
   theme(axis.title.x = element_blank())
 
-rm(tm_profiles_ID_long_grid)
 ```
+
+```{r timeseries_table}
+
+
+kableExtra::kable(
+  tm_profiles_ID_long_grid %>% 
+  select(date_time_ID, dep, var, value) %>% 
+  pivot_wider(values_from = value, names_from = var)
+)
+
+rm(tm_profiles_ID_long_grid)
+
+```
+
 
 ### Test AT sensitivity
 
