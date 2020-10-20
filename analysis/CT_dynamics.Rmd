@@ -678,6 +678,16 @@ tm_profiles <- tm_profiles %>%
     )[, 16] * 1e6
   )
 
+
+
+tm_profiles %>%
+  write_csv(
+    here::here(
+      "data/intermediate/_merged_data_files/CT_dynamics",
+      "tm_profiles.csv"
+    )
+  )
+
 tm_profiles <- tm_profiles %>%
   mutate(
     nCT_test = carb(
@@ -694,14 +704,6 @@ tm_profiles <- tm_profiles %>%
     )[, 16] * 1e6
   )
 
-
-tm_profiles %>%
-  write_csv(
-    here::here(
-      "data/intermediate/_merged_data_files/CT_dynamics",
-      "tm_profiles.csv"
-    )
-  )
 
 ```
 
