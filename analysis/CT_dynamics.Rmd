@@ -28,6 +28,7 @@ library(lubridate)
 library(zoo)
 library(tibbletime)
 library(sp)
+library(kableExtra)
 library(LakeMetabolizer)
 
 ```
@@ -1145,12 +1146,14 @@ tm_profiles_ID_long_grid %>%
 
 ```{r timeseries_table}
 
-
-kableExtra::kable(
-  tm_profiles_ID_long_grid %>% 
-  select(date_time_ID, dep, var, value) %>% 
-  pivot_wider(values_from = value, names_from = var)
-)
+tm_profiles_ID_long_grid %>%
+  mutate(value = round(value, 1),
+         date_ID = as.Date(date_time_ID)) %>%
+  select(date_ID, dep, var, value) %>%
+  pivot_wider(values_from = value, names_from = var) %>%
+  kable() %>%
+  add_header_above() %>%
+  kable_styling(full_width = FALSE)
 
 rm(tm_profiles_ID_long_grid)
 
