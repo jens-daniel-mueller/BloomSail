@@ -436,7 +436,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">CT dynamics</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">19 October, 2020</h4>
+<h4 class="date">20 October, 2020</h4>
 
 </div>
 
@@ -461,7 +461,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-10-19
+<strong>Last updated:</strong> 2020-10-20
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -552,16 +552,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree26101c9c1d2d9fb70db879bead1e8020607306fatargetblank26101c9a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/26101c9c1d2d9fb70db879bead1e8020607306fa" target="_blank">26101c9</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb83e97e3b0de7eca62ff68bd2985301bb0493d5etargetblankb83e97ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b83e97e3b0de7eca62ff68bd2985301bb0493d5e" target="_blank">b83e97e</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree26101c9c1d2d9fb70db879bead1e8020607306fatargetblank26101c9a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb83e97e3b0de7eca62ff68bd2985301bb0493d5etargetblankb83e97ea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/26101c9c1d2d9fb70db879bead1e8020607306fa" target="_blank">26101c9</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b83e97e3b0de7eca62ff68bd2985301bb0493d5e" target="_blank">b83e97e</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -616,6 +616,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b83e97e3b0de7eca62ff68bd2985301bb0493d5e/analysis/CT_dynamics.Rmd" target="_blank">b83e97e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-10-20
+</td>
+<td>
+table of timeseries in depth intervals added
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/f8a9f90646dad8718a3f3a7656385bdcc4809589/docs/CT_dynamics.html" target="_blank">f8a9f90</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-10-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -4480,7 +4514,8 @@ rm(i_ID, tm_profiles_long)</code></pre>
 <pre class="r"><code>tm_profiles_ID_long_grid &lt;- tm_profiles_ID_long %&gt;%
   mutate(dep = cut(dep, seq(0, 30, 5))) %&gt;%
   group_by(ID, date_time_ID, dep, var)  %&gt;%
-  summarise_all(list(mean), na.rm = TRUE)
+  summarise_all(list(mean), na.rm = TRUE) %&gt;% 
+  ungroup()
 
 tm_profiles_ID_long_grid %&gt;%
   ggplot(aes(date_time_ID, value, col = as.factor(dep))) +
@@ -4491,6 +4526,837 @@ tm_profiles_ID_long_grid %&gt;%
   facet_wrap( ~ var, scales = &quot;free_y&quot;, ncol = 1) +
   theme(axis.title.x = element_blank())</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/observed_timeseries-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>kableExtra::kable(
+  tm_profiles_ID_long_grid %&gt;% 
+  select(date_time_ID, dep, var, value) %&gt;% 
+  pivot_wider(values_from = value, names_from = var)
+)</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+date_time_ID
+</th>
+<th style="text-align:left;">
+dep
+</th>
+<th style="text-align:right;">
+nCT
+</th>
+<th style="text-align:right;">
+pCO2
+</th>
+<th style="text-align:right;">
+sal
+</th>
+<th style="text-align:right;">
+tem
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2018-07-06 11:14:37
+</td>
+<td style="text-align:left;">
+(0,5]
+</td>
+<td style="text-align:right;">
+1528.361
+</td>
+<td style="text-align:right;">
+98.26712
+</td>
+<td style="text-align:right;">
+6.869037
+</td>
+<td style="text-align:right;">
+15.41443
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-06 11:14:37
+</td>
+<td style="text-align:left;">
+(5,10]
+</td>
+<td style="text-align:right;">
+1541.931
+</td>
+<td style="text-align:right;">
+106.02162
+</td>
+<td style="text-align:right;">
+6.887794
+</td>
+<td style="text-align:right;">
+14.65659
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-06 11:14:37
+</td>
+<td style="text-align:left;">
+(10,15]
+</td>
+<td style="text-align:right;">
+1562.905
+</td>
+<td style="text-align:right;">
+123.33273
+</td>
+<td style="text-align:right;">
+6.907591
+</td>
+<td style="text-align:right;">
+14.12168
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-06 11:14:37
+</td>
+<td style="text-align:left;">
+(15,20]
+</td>
+<td style="text-align:right;">
+1575.041
+</td>
+<td style="text-align:right;">
+136.45040
+</td>
+<td style="text-align:right;">
+6.971442
+</td>
+<td style="text-align:right;">
+13.89434
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-06 11:14:37
+</td>
+<td style="text-align:left;">
+(20,25]
+</td>
+<td style="text-align:right;">
+1589.119
+</td>
+<td style="text-align:right;">
+153.48971
+</td>
+<td style="text-align:right;">
+7.038421
+</td>
+<td style="text-align:right;">
+13.68872
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-10 08:45:37
+</td>
+<td style="text-align:left;">
+(0,5]
+</td>
+<td style="text-align:right;">
+1500.258
+</td>
+<td style="text-align:right;">
+86.06024
+</td>
+<td style="text-align:right;">
+6.882711
+</td>
+<td style="text-align:right;">
+17.04476
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-10 08:45:37
+</td>
+<td style="text-align:left;">
+(5,10]
+</td>
+<td style="text-align:right;">
+1517.005
+</td>
+<td style="text-align:right;">
+93.37944
+</td>
+<td style="text-align:right;">
+6.878968
+</td>
+<td style="text-align:right;">
+15.94041
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-10 08:45:37
+</td>
+<td style="text-align:left;">
+(10,15]
+</td>
+<td style="text-align:right;">
+1561.017
+</td>
+<td style="text-align:right;">
+124.64785
+</td>
+<td style="text-align:right;">
+6.890807
+</td>
+<td style="text-align:right;">
+14.41135
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-10 08:45:37
+</td>
+<td style="text-align:left;">
+(15,20]
+</td>
+<td style="text-align:right;">
+1584.362
+</td>
+<td style="text-align:right;">
+148.48854
+</td>
+<td style="text-align:right;">
+6.915945
+</td>
+<td style="text-align:right;">
+13.95763
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-10 08:45:37
+</td>
+<td style="text-align:left;">
+(20,25]
+</td>
+<td style="text-align:right;">
+1596.118
+</td>
+<td style="text-align:right;">
+163.76198
+</td>
+<td style="text-align:right;">
+6.969741
+</td>
+<td style="text-align:right;">
+13.47190
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-19 10:01:48
+</td>
+<td style="text-align:left;">
+(0,5]
+</td>
+<td style="text-align:right;">
+1466.777
+</td>
+<td style="text-align:right;">
+79.07466
+</td>
+<td style="text-align:right;">
+6.928630
+</td>
+<td style="text-align:right;">
+20.45289
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-19 10:01:48
+</td>
+<td style="text-align:left;">
+(5,10]
+</td>
+<td style="text-align:right;">
+1479.275
+</td>
+<td style="text-align:right;">
+81.45160
+</td>
+<td style="text-align:right;">
+6.968344
+</td>
+<td style="text-align:right;">
+18.97577
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-19 10:01:48
+</td>
+<td style="text-align:left;">
+(10,15]
+</td>
+<td style="text-align:right;">
+1553.875
+</td>
+<td style="text-align:right;">
+124.44871
+</td>
+<td style="text-align:right;">
+7.036825
+</td>
+<td style="text-align:right;">
+15.46663
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-19 10:01:48
+</td>
+<td style="text-align:left;">
+(15,20]
+</td>
+<td style="text-align:right;">
+1586.900
+</td>
+<td style="text-align:right;">
+154.98172
+</td>
+<td style="text-align:right;">
+7.109951
+</td>
+<td style="text-align:right;">
+14.35367
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-19 10:01:48
+</td>
+<td style="text-align:left;">
+(20,25]
+</td>
+<td style="text-align:right;">
+1597.799
+</td>
+<td style="text-align:right;">
+168.29532
+</td>
+<td style="text-align:right;">
+7.164260
+</td>
+<td style="text-align:right;">
+13.90024
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-24 07:58:29
+</td>
+<td style="text-align:left;">
+(0,5]
+</td>
+<td style="text-align:right;">
+1439.884
+</td>
+<td style="text-align:right;">
+69.04490
+</td>
+<td style="text-align:right;">
+6.972610
+</td>
+<td style="text-align:right;">
+21.47903
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-24 07:58:29
+</td>
+<td style="text-align:left;">
+(5,10]
+</td>
+<td style="text-align:right;">
+1453.404
+</td>
+<td style="text-align:right;">
+73.24850
+</td>
+<td style="text-align:right;">
+6.981843
+</td>
+<td style="text-align:right;">
+20.65268
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-24 07:58:29
+</td>
+<td style="text-align:left;">
+(10,15]
+</td>
+<td style="text-align:right;">
+1565.544
+</td>
+<td style="text-align:right;">
+141.77181
+</td>
+<td style="text-align:right;">
+7.016451
+</td>
+<td style="text-align:right;">
+15.81889
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-24 07:58:29
+</td>
+<td style="text-align:left;">
+(15,20]
+</td>
+<td style="text-align:right;">
+1609.315
+</td>
+<td style="text-align:right;">
+190.82108
+</td>
+<td style="text-align:right;">
+7.070447
+</td>
+<td style="text-align:right;">
+14.27601
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-24 07:58:29
+</td>
+<td style="text-align:left;">
+(20,25]
+</td>
+<td style="text-align:right;">
+1618.683
+</td>
+<td style="text-align:right;">
+206.08901
+</td>
+<td style="text-align:right;">
+7.126725
+</td>
+<td style="text-align:right;">
+13.60659
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-31 03:46:19
+</td>
+<td style="text-align:left;">
+(0,5]
+</td>
+<td style="text-align:right;">
+1474.733
+</td>
+<td style="text-align:right;">
+100.32999
+</td>
+<td style="text-align:right;">
+6.785656
+</td>
+<td style="text-align:right;">
+24.34570
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-31 03:46:19
+</td>
+<td style="text-align:left;">
+(5,10]
+</td>
+<td style="text-align:right;">
+1484.381
+</td>
+<td style="text-align:right;">
+99.19558
+</td>
+<td style="text-align:right;">
+6.819932
+</td>
+<td style="text-align:right;">
+22.34957
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-31 03:46:19
+</td>
+<td style="text-align:left;">
+(10,15]
+</td>
+<td style="text-align:right;">
+1582.553
+</td>
+<td style="text-align:right;">
+165.64486
+</td>
+<td style="text-align:right;">
+6.885713
+</td>
+<td style="text-align:right;">
+16.00836
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-31 03:46:19
+</td>
+<td style="text-align:left;">
+(15,20]
+</td>
+<td style="text-align:right;">
+1626.742
+</td>
+<td style="text-align:right;">
+226.57536
+</td>
+<td style="text-align:right;">
+6.961323
+</td>
+<td style="text-align:right;">
+14.03424
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-31 03:46:19
+</td>
+<td style="text-align:left;">
+(20,25]
+</td>
+<td style="text-align:right;">
+1645.511
+</td>
+<td style="text-align:right;">
+277.03050
+</td>
+<td style="text-align:right;">
+7.051886
+</td>
+<td style="text-align:right;">
+12.96012
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-03 05:15:01
+</td>
+<td style="text-align:left;">
+(0,5]
+</td>
+<td style="text-align:right;">
+1458.213
+</td>
+<td style="text-align:right;">
+91.11329
+</td>
+<td style="text-align:right;">
+6.893407
+</td>
+<td style="text-align:right;">
+24.87677
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-03 05:15:01
+</td>
+<td style="text-align:left;">
+(5,10]
+</td>
+<td style="text-align:right;">
+1471.536
+</td>
+<td style="text-align:right;">
+93.40595
+</td>
+<td style="text-align:right;">
+6.897838
+</td>
+<td style="text-align:right;">
+23.24516
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-03 05:15:01
+</td>
+<td style="text-align:left;">
+(10,15]
+</td>
+<td style="text-align:right;">
+1590.129
+</td>
+<td style="text-align:right;">
+177.31537
+</td>
+<td style="text-align:right;">
+6.875157
+</td>
+<td style="text-align:right;">
+15.88710
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-03 05:15:01
+</td>
+<td style="text-align:left;">
+(15,20]
+</td>
+<td style="text-align:right;">
+1634.927
+</td>
+<td style="text-align:right;">
+246.06399
+</td>
+<td style="text-align:right;">
+6.927203
+</td>
+<td style="text-align:right;">
+13.92691
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-03 05:15:01
+</td>
+<td style="text-align:left;">
+(20,25]
+</td>
+<td style="text-align:right;">
+1651.489
+</td>
+<td style="text-align:right;">
+290.63680
+</td>
+<td style="text-align:right;">
+7.016860
+</td>
+<td style="text-align:right;">
+12.81705
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-07 09:27:12
+</td>
+<td style="text-align:left;">
+(0,5]
+</td>
+<td style="text-align:right;">
+1473.132
+</td>
+<td style="text-align:right;">
+92.06228
+</td>
+<td style="text-align:right;">
+6.907064
+</td>
+<td style="text-align:right;">
+22.96378
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-07 09:27:12
+</td>
+<td style="text-align:left;">
+(5,10]
+</td>
+<td style="text-align:right;">
+1483.385
+</td>
+<td style="text-align:right;">
+98.55787
+</td>
+<td style="text-align:right;">
+6.910156
+</td>
+<td style="text-align:right;">
+22.46336
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-07 09:27:12
+</td>
+<td style="text-align:left;">
+(10,15]
+</td>
+<td style="text-align:right;">
+1605.188
+</td>
+<td style="text-align:right;">
+200.06081
+</td>
+<td style="text-align:right;">
+6.925692
+</td>
+<td style="text-align:right;">
+15.50010
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-07 09:27:12
+</td>
+<td style="text-align:left;">
+(15,20]
+</td>
+<td style="text-align:right;">
+1638.797
+</td>
+<td style="text-align:right;">
+257.32883
+</td>
+<td style="text-align:right;">
+7.022284
+</td>
+<td style="text-align:right;">
+13.95699
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-07 09:27:12
+</td>
+<td style="text-align:left;">
+(20,25]
+</td>
+<td style="text-align:right;">
+1650.676
+</td>
+<td style="text-align:right;">
+291.83817
+</td>
+<td style="text-align:right;">
+7.106771
+</td>
+<td style="text-align:right;">
+12.78687
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-16 00:06:57
+</td>
+<td style="text-align:left;">
+(0,5]
+</td>
+<td style="text-align:right;">
+1555.915
+</td>
+<td style="text-align:right;">
+140.63445
+</td>
+<td style="text-align:right;">
+6.973208
+</td>
+<td style="text-align:right;">
+18.63764
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-16 00:06:57
+</td>
+<td style="text-align:left;">
+(5,10]
+</td>
+<td style="text-align:right;">
+1561.276
+</td>
+<td style="text-align:right;">
+146.78115
+</td>
+<td style="text-align:right;">
+6.978174
+</td>
+<td style="text-align:right;">
+18.46579
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-16 00:06:57
+</td>
+<td style="text-align:left;">
+(10,15]
+</td>
+<td style="text-align:right;">
+1581.827
+</td>
+<td style="text-align:right;">
+173.51677
+</td>
+<td style="text-align:right;">
+6.983199
+</td>
+<td style="text-align:right;">
+17.73897
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-16 00:06:57
+</td>
+<td style="text-align:left;">
+(15,20]
+</td>
+<td style="text-align:right;">
+1638.887
+</td>
+<td style="text-align:right;">
+276.86286
+</td>
+<td style="text-align:right;">
+6.997862
+</td>
+<td style="text-align:right;">
+14.79524
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-08-16 00:06:57
+</td>
+<td style="text-align:left;">
+(20,25]
+</td>
+<td style="text-align:right;">
+1679.173
+</td>
+<td style="text-align:right;">
+404.03895
+</td>
+<td style="text-align:right;">
+7.081853
+</td>
+<td style="text-align:right;">
+11.62785
+</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>rm(tm_profiles_ID_long_grid)</code></pre>
 <div id="test-at-sensitivity" class="section level3">
 <h3><span class="header-section-number">4.1.1</span> Test AT sensitivity</h3>
@@ -5957,23 +6823,23 @@ other attached packages:
 [25] workflowr_1.6.2       
 
 loaded via a namespace (and not attached):
- [1] fs_1.4.2           RColorBrewer_1.1-2 httr_1.4.2         rprojroot_1.3-2   
- [5] tools_4.0.2        backports_1.1.8    R6_2.4.1           DBI_1.1.0         
- [9] colorspace_1.4-1   withr_2.2.0        tidyselect_1.1.0   compiler_4.0.2    
-[13] git2r_0.27.1       cli_2.0.2          rvest_0.3.6        xml2_1.3.2        
-[17] labeling_0.3       scales_1.1.1       checkmate_2.0.0    digest_0.6.25     
-[21] rmarkdown_2.3      pkgconfig_2.0.3    htmltools_0.5.0    dbplyr_1.4.4      
-[25] highr_0.8          rlang_0.4.7        readxl_1.3.1       rstudioapi_0.11   
-[29] generics_0.0.2     farver_2.0.3       jsonlite_1.7.0     magrittr_1.5      
-[33] Rcpp_1.0.5         munsell_0.5.0      fansi_0.4.1        lifecycle_0.2.0   
-[37] stringi_1.4.6      whisker_0.4        yaml_2.2.1         plyr_1.8.6        
-[41] grid_4.0.2         blob_1.2.1         promises_1.1.1     crayon_1.3.4      
-[45] lattice_0.20-41    haven_2.3.1        hms_0.5.3          knitr_1.30        
-[49] pillar_1.4.6       reprex_0.3.0       glue_1.4.1         evaluate_0.14     
-[53] data.table_1.13.0  modelr_0.1.8       vctrs_0.3.2        httpuv_1.5.4      
-[57] cellranger_1.1.0   gtable_0.3.0       assertthat_0.2.1   xfun_0.16         
-[61] broom_0.7.0        later_1.1.0.1      viridisLite_0.3.0  memoise_1.1.0     
-[65] ellipsis_0.3.1     here_0.1          </code></pre>
+ [1] fs_1.4.2           webshot_0.5.2      RColorBrewer_1.1-2 httr_1.4.2        
+ [5] rprojroot_1.3-2    tools_4.0.2        backports_1.1.8    R6_2.4.1          
+ [9] DBI_1.1.0          colorspace_1.4-1   withr_2.2.0        tidyselect_1.1.0  
+[13] compiler_4.0.2     git2r_0.27.1       cli_2.0.2          rvest_0.3.6       
+[17] xml2_1.3.2         labeling_0.3       scales_1.1.1       checkmate_2.0.0   
+[21] digest_0.6.25      rmarkdown_2.3      pkgconfig_2.0.3    htmltools_0.5.0   
+[25] dbplyr_1.4.4       highr_0.8          rlang_0.4.7        readxl_1.3.1      
+[29] rstudioapi_0.11    generics_0.0.2     farver_2.0.3       jsonlite_1.7.0    
+[33] magrittr_1.5       kableExtra_1.1.0   Rcpp_1.0.5         munsell_0.5.0     
+[37] fansi_0.4.1        lifecycle_0.2.0    stringi_1.4.6      whisker_0.4       
+[41] yaml_2.2.1         plyr_1.8.6         grid_4.0.2         blob_1.2.1        
+[45] promises_1.1.1     crayon_1.3.4       lattice_0.20-41    haven_2.3.1       
+[49] hms_0.5.3          knitr_1.30         pillar_1.4.6       reprex_0.3.0      
+[53] glue_1.4.1         evaluate_0.14      data.table_1.13.0  modelr_0.1.8      
+[57] vctrs_0.3.2        httpuv_1.5.4       cellranger_1.1.0   gtable_0.3.0      
+[61] assertthat_0.2.1   xfun_0.16          broom_0.7.0        later_1.1.0.1     
+[65] viridisLite_0.3.0  memoise_1.1.0      ellipsis_0.3.1     here_0.1          </code></pre>
 </div>
 </div>
 
