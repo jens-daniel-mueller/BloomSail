@@ -1153,7 +1153,8 @@ tm_profiles_ID_long_grid %>%
   pivot_wider(values_from = value, names_from = var) %>%
   kable() %>%
   add_header_above() %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = FALSE) %>% 
+  scroll_box(height = "400px")
 
 rm(tm_profiles_ID_long_grid)
 
