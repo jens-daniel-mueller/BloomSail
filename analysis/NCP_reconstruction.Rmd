@@ -1033,6 +1033,13 @@ rm(tm_fm_gt_MLD)
 
 ```{r mean_MLD}
 
+MLD %>%
+  filter(date_time_ID <= date_tem_max) %>%
+  group_by(source) %>%
+  summarise(MLD_mean = mean(i_dep, na.rm = TRUE),
+            MLD_sd = sd(i_dep, na.rm = TRUE)) %>%
+  ungroup()
+
 MLD_mean <- MLD %>%
   filter(date_time_ID <= date_tem_max) %>%
   group_by(source) %>%
