@@ -552,16 +552,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree5fd3472eebed7f671026439c305d8c162cf81412targetblank5fd3472a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/5fd3472eebed7f671026439c305d8c162cf81412" target="_blank">5fd3472</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree58406a94133e02559e87c8ef66d72dafa4906bb2targetblank58406a9a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/58406a94133e02559e87c8ef66d72dafa4906bb2" target="_blank">58406a9</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree5fd3472eebed7f671026439c305d8c162cf81412targetblank5fd3472a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree58406a94133e02559e87c8ef66d72dafa4906bb2targetblank58406a9a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/5fd3472eebed7f671026439c305d8c162cf81412" target="_blank">5fd3472</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/58406a94133e02559e87c8ef66d72dafa4906bb2" target="_blank">58406a9</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -616,6 +616,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/58406a94133e02559e87c8ef66d72dafa4906bb2/analysis/Phytoplankton.Rmd" target="_blank">58406a9</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-10-24
+</td>
+<td>
+unit conversion biomass
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/c9a293537cb78a3ef90f0e80c44b2ff71683f485/docs/Phytoplankton.html" target="_blank">c9a2935</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-10-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -981,7 +1015,7 @@ tp_ID_grid &lt;- full_join(cruise_dates, tp_ID_grid)</code></pre>
   ggplot(aes(date_time_ID, value, col = dep_grid)) +
   geom_point() +
   geom_line() +
-  facet_grid(Species ~ .) +
+  facet_wrap(~ Species) +
   scale_color_brewer(palette = &quot;Set1&quot;, name = &quot;Depth (m)&quot;) +
   scale_x_datetime(breaks = &quot;week&quot;, date_labels = &quot;%d %b&quot;) +
   scale_y_continuous(sec.axis = sec_axis(~ . * 0.16 / 12,
