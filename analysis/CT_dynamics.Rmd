@@ -2484,16 +2484,35 @@ The aim is to approximate the CT entrainment flux between Aug 06 and 15. The rel
 
 ```{r profiles_entrainment}
 
+CT_mix <- tm_profiles_ID_long %>%
+      filter(ID %in% c("180806"),
+             var %in% c("nCT"),
+             dep < 17) %>% 
+  summarise(mean(value)) %>% 
+  pull()
+
 tm_profiles_ID_long %>%
   filter(ID %in% c("180806", "180815"),
-         var %in% c("nCT", "tem")) %>%
+         var %in% c("nCT")) %>%
   ggplot(aes(value, dep, col = ID)) +
   geom_hline(yintercept = c(12, 17)) +
+  geom_vline(xintercept = CT_mix) +
+  geom_rect(
+    data = tm_profiles_ID_long %>%
+      filter(ID %in% c("180806"),
+             var %in% c("nCT"),
+             dep < 17, dep > 12),
+    aes(
+      xmax = value,
+      xmin = CT_mix,
+      ymax = dep + 0.5,
+      ymin = dep - 0.5
+    )
+  ) +
   geom_point() +
   geom_path() +
   scale_y_reverse() +
-  scale_color_viridis_d() +
-  facet_wrap( ~ var, scales = "free_x")
+  scale_color_viridis_d()
 
 ```
 
