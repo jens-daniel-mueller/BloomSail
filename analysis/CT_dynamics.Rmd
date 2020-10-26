@@ -2524,7 +2524,6 @@ p_nCT <- CT_profile %>%
     axis.title.y = element_blank(),
     legend.position = "none"
   )
-p_nCT
 
 p_tem <- tm_profiles_ID_long %>%
   filter(ID %in% c("180806", "180815"),
