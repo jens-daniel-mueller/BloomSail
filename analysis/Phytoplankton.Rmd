@@ -95,7 +95,7 @@ tp_ID_grid <- tp_ID_grid
 ```{r phytoplankton_time_series, fig.asp=0.8}
 
 tp_ID_grid %>%
-  filter(Species != "total") %>%
+  #filter(Species != "total") %>%
   ggplot(aes(date_time_ID, value, col = dep_grid)) +
   geom_point() +
   geom_line() +
