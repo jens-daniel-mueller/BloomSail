@@ -553,16 +553,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree7ee1f3459e455ad7f55a5e10203ef02ddcb3ebfetargetblank7ee1f34a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/7ee1f3459e455ad7f55a5e10203ef02ddcb3ebfe" target="_blank">7ee1f34</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree67495814c9df3983c04dabda174f8699df73add0targetblank6749581a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/67495814c9df3983c04dabda174f8699df73add0" target="_blank">6749581</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree7ee1f3459e455ad7f55a5e10203ef02ddcb3ebfetargetblank7ee1f34a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree67495814c9df3983c04dabda174f8699df73add0targetblank6749581a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/7ee1f3459e455ad7f55a5e10203ef02ddcb3ebfe" target="_blank">7ee1f34</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/67495814c9df3983c04dabda174f8699df73add0" target="_blank">6749581</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -619,6 +619,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/67495814c9df3983c04dabda174f8699df73add0/analysis/CT_dynamics.Rmd" target="_blank">6749581</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-10-26
+</td>
+<td>
+vertical entrainment plot generated
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/f8895feb18212176f848f01311ef510fc08dc7af/docs/CT_dynamics.html" target="_blank">f8895fe</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-10-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -6673,9 +6707,8 @@ p_nCT &lt;- CT_profile %&gt;%
     axis.title.y = element_blank(),
     legend.position = &quot;none&quot;
   )
-p_nCT</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/profiles_entrainment-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>p_tem &lt;- tm_profiles_ID_long %&gt;%
+
+p_tem &lt;- tm_profiles_ID_long %&gt;%
   filter(ID %in% c(&quot;180806&quot;, &quot;180815&quot;),
          var %in% c(&quot;tem&quot;)) %&gt;%
   ggplot(aes(value, dep, col = ID)) +
@@ -6691,7 +6724,7 @@ p_nCT</code></pre>
 
 p_tem + p_nCT +
   plot_layout(guides = &#39;collect&#39;)</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/profiles_entrainment-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/CT_dynamics.Rmd/profiles_entrainment-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggsave(
   here::here(
     &quot;output/Plots/Figures_publication/appendix&quot;,
