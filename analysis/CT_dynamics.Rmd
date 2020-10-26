@@ -829,8 +829,7 @@ tm_profiles_ID_mean %>%
 rm(
   tm_profiles_ID_sd_long,
   tm_profiles_ID_sd,
-  tm_profiles_ID_mean_long,
-  tm_profiles_ID_mean
+  tm_profiles_ID_mean_long
 )
 
 ```
@@ -2491,28 +2490,84 @@ CT_mix <- tm_profiles_ID_long %>%
   summarise(mean(value)) %>% 
   pull()
 
-tm_profiles_ID_long %>%
-  filter(ID %in% c("180806", "180815"),
-         var %in% c("nCT")) %>%
-  ggplot(aes(value, dep, col = ID)) +
-  geom_hline(yintercept = c(12, 17)) +
-  geom_vline(xintercept = CT_mix) +
+CT_profile <- tm_profiles_ID_mean %>%
+  filter(ID %in% c("180806"))
+
+p_nCT <- CT_profile %>% 
+  ggplot() +
   geom_rect(
-    data = tm_profiles_ID_long %>%
-      filter(ID %in% c("180806"),
-             var %in% c("nCT"),
-             dep < 17, dep > 12),
+    data = CT_profile %>% filter(dep > 12, dep < 17),
     aes(
-      xmax = value,
+      xmax = nCT,
       xmin = CT_mix,
       ymax = dep + 0.5,
       ymin = dep - 0.5
     )
   ) +
+  geom_hline(yintercept = c(12, 17)) +
+  geom_segment(aes(x = CT_mix, xend = CT_mix,
+              y = -Inf, yend = 17),
+              linetype = 2) +
+  annotate("text", label = as.character(expression(paste(C[T],"*",mix))),
+           parse = TRUE, x = 1560, y = 3) +
+  geom_point(aes(nCT, dep, col = ID)) +
+  geom_path(aes(nCT, dep, col = ID)) +
+  scale_y_reverse() +
+  scale_color_viridis_d() +
+    labs(y = "Depth (m)", x = expression(paste(C[T],"*", ~ (µmol ~ kg ^ {
+    -1
+  })))) +
+  theme(
+    legend.title = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none"
+  )
+p_nCT
+
+p_tem <- tm_profiles_ID_long %>%
+  filter(ID %in% c("180806", "180815"),
+         var %in% c("tem")) %>%
+  ggplot(aes(value, dep, col = ID)) +
+  geom_hline(yintercept = c(12, 17)) +
   geom_point() +
   geom_path() +
   scale_y_reverse() +
-  scale_color_viridis_d()
+  scale_color_viridis_d() +
+    labs(y = "Depth (m)", x = expression(paste(Temperature ~ (degree*C)))) +
+  theme(
+    legend.title = element_blank()
+  )
+
+p_tem + p_nCT +
+  plot_layout(guides = 'collect')
+
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/appendix",
+    "CT_entrainment.pdf"
+  ),
+  width = 180,
+  height = 160,
+  dpi = 300,
+  units = "mm"
+)
+
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/appendix",
+    "CT_entrainment.png"
+  ),
+  width = 180,
+  height = 160,
+  dpi = 300,
+  units = "mm"
+)
+
+
+rm(p_tem, p_nCT, CT_mix, CT_profile)
+
 
 ```
 
