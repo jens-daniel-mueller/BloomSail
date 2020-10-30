@@ -1343,14 +1343,14 @@ i_dep <- i_dep %>%
   mutate(source = fct_recode(
     source,
     `VOS Finnmaid + GETM model` = "fm",
-    `SY Tina V` = "tm"
+    `BloomSail (surface only)` = "tm"
   ))
 tm_fm_gt <- tm_fm_gt %>%
   mutate(source = factor(source, c("tm", "fm"))) %>%
   mutate(source = fct_recode(
     source,
     `VOS Finnmaid + GETM model` = "fm",
-    `SY Tina V` = "tm"
+    `BloomSail (surface only)` = "tm"
   ))
 
 p_hov_dep <-
