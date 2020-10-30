@@ -1605,7 +1605,7 @@ p_nCT / p_hov_dep / p_NCP
 ggsave(
   here::here(
     "output/Plots/Figures_publication/article",
-    "reconstruction_NCP_timeseries.pdf"
+    "Fig_6.pdf"
   ),
   width = 220,
   height = 200,
@@ -1616,7 +1616,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/article",
-    "reconstruction_NCP_timeseries.png"
+    "Fig_6.png"
   ),
   width = 220,
   height = 200,
