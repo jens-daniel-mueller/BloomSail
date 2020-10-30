@@ -338,7 +338,7 @@ ggplot() +
 ggsave(
   here::here(
     "output/Plots/Figures_publication/article",
-    "station_map.pdf"
+    "Fig_1.pdf"
   ),
   width = 220,
   height = 150,
@@ -349,7 +349,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/article",
-    "station_map.png"
+    "Fig_1.png"
   ),
   width = 220,
   height = 150,
@@ -386,12 +386,13 @@ cover %>%
                         name = "Mean cruise date") +
   scale_x_datetime(date_breaks = "week",
                    date_labels = "%b %d") +
+  labs(y = "Station") +
   theme(axis.title.x = element_blank())
 
 ggsave(
   here::here(
     "output/Plots/Figures_publication/article",
-    "data_coverage.pdf"
+    "Fig_2.pdf"
   ),
   width = 130,
   height = 65,
@@ -402,7 +403,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/article",
-    "data_coverage.png"
+    "Fig_2.png"
   ),
   width = 130,
   height = 65,
