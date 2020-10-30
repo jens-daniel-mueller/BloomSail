@@ -742,14 +742,13 @@ p_pCO2 <-
     axis.ticks.y = element_blank()
   )
 
+
 p_nCT <-
   tm_profiles %>%
   ggplot(aes(nCT, dep, col = ID, group = interaction(station, ID))) +
   geom_path() +
   scale_y_reverse(expand = c(0, 0)) +
-  labs(x = expression(nC[T] ~ (µmol ~ kg ^ {
-    -1
-  }))) +
+  labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {-1})))) +
   scale_color_viridis_d(labels = cruise_dates$date_ID) +
   theme(
     legend.title = element_blank(),
@@ -763,7 +762,7 @@ p_tem + p_pCO2 + p_nCT
 ggsave(
   here::here(
     "output/Plots/Figures_publication/article",
-    "profiles_all.pdf"
+    "Fig_3.pdf"
   ),
   width = 180,
   height = 80,
@@ -774,7 +773,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/article",
-    "profiles_all.png"
+    "Fig_3.png"
   ),
   width = 180,
   height = 80,
@@ -1399,13 +1398,18 @@ p_nCT_hov <- tm_profiles_ID_long %>%
   scale_fill_scico(
     breaks = MakeBreaks(bin_nCT),
     guide = "colorstrip",
-    name = expression(atop(nC[T],
+    name = expression(atop(paste(C[T],"*"),
                            (µmol ~ kg ^ {
                              -1
                            }))),
     palette = "davos",
     direction = -1
   ) +
+  guides(fill = guide_colorsteps(barheight = unit(4.5, "cm"),
+                                 frame.colour = "black",
+                                 show.limits = TRUE,
+                                 ticks = TRUE,
+                                 ticks.colour = "black")) +
   scale_y_reverse(sec.axis = dup_axis()) +
   scale_x_datetime(breaks = "week",
                    date_labels = "%b %d") +
@@ -1437,6 +1441,11 @@ p_tem_hov <- tm_profiles_ID_long %>%
                            ("\u00B0" * C))),
     option = "inferno"
   ) +
+  guides(fill = guide_colorsteps(barheight = unit(4.5, "cm"),
+                                 frame.colour = "black",
+                                 show.limits = TRUE,
+                                 ticks = TRUE,
+                                 ticks.colour = "black")) +
   scale_y_reverse(sec.axis = dup_axis()) +
   scale_x_datetime(breaks = "week",
                    date_labels = "%b %d") +
@@ -1461,9 +1470,9 @@ p_nCT_ID_cum <-
   scale_y_reverse(expand = c(0, 0),
                   position = "right",
                   sec.axis = dup_axis()) +
-  labs(x = expression(nC[T] ~ cum. ~ changes ~ (µmol ~ kg ^ {
+  labs(x = expression(paste(C[T],"*", ~ cum. ~ changes ~ (µmol ~ kg ^ {
     -1
-  })),
+  }))),
   y = "Depth (m)") +
   scale_color_viridis_d(labels = cruise_dates$date_ID, guide = FALSE) +
   scale_fill_viridis_d(labels = cruise_dates$date_ID, guide = FALSE) +
@@ -1497,11 +1506,28 @@ p_tem_hov + p_tem_ID_cum +
 p_nCT_hov + p_nCT_ID_cum +
   plot_layout(widths = c(2, 0.9))
 
-ggsave(here::here("output/Plots/Figures_publication/article", "Hov_abs_profiles_cum.pdf"),
-       width = 260, height = 170, dpi = 300, units = "mm")
 
-ggsave(here::here("output/Plots/Figures_publication/article", "Hov_abs_profiles_cum.png"),
-       width = 260, height = 170, dpi = 300, units = "mm")
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/article",
+    "Fig_4.pdf"
+  ),
+  width = 260,
+  height = 170,
+  dpi = 300,
+  units = "mm"
+)
+
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/article",
+    "Fig_4.png"
+  ),
+  width = 260,
+  height = 170,
+  dpi = 300,
+  units = "mm"
+)
 
 rm(p_nCT_hov, bin_nCT, p_tem_hov, bin_Tem, p_nCT_ID_cum, p_tem_ID_cum)
 
