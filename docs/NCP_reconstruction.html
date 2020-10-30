@@ -552,16 +552,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0b9ca4794b5b45255a5cde5a0ebd316688c32407targetblank0b9ca47a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/0b9ca4794b5b45255a5cde5a0ebd316688c32407" target="_blank">0b9ca47</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree37582a4113fe570d66fb17857272247e4405af16targetblank37582a4a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/37582a4113fe570d66fb17857272247e4405af16" target="_blank">37582a4</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0b9ca4794b5b45255a5cde5a0ebd316688c32407targetblank0b9ca47a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree37582a4113fe570d66fb17857272247e4405af16targetblank37582a4a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/0b9ca4794b5b45255a5cde5a0ebd316688c32407" target="_blank">0b9ca47</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/37582a4113fe570d66fb17857272247e4405af16" target="_blank">37582a4</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -618,6 +618,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/37582a4113fe570d66fb17857272247e4405af16/analysis/NCP_reconstruction.Rmd" target="_blank">37582a4</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-10-30
+</td>
+<td>
+updated plot
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/bef182de2c0a07fe93777a489c009d735910da98/docs/NCP_reconstruction.html" target="_blank">bef182d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2020-10-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2531,14 +2565,14 @@ i_dep &lt;- i_dep %&gt;%
   mutate(source = fct_recode(
     source,
     `VOS Finnmaid + GETM model` = &quot;fm&quot;,
-    `SY Tina V` = &quot;tm&quot;
+    `BloomSail (surface only)` = &quot;tm&quot;
   ))
 tm_fm_gt &lt;- tm_fm_gt %&gt;%
   mutate(source = factor(source, c(&quot;tm&quot;, &quot;fm&quot;))) %&gt;%
   mutate(source = fct_recode(
     source,
     `VOS Finnmaid + GETM model` = &quot;fm&quot;,
-    `SY Tina V` = &quot;tm&quot;
+    `BloomSail (surface only)` = &quot;tm&quot;
   ))
 
 p_hov_dep &lt;-
