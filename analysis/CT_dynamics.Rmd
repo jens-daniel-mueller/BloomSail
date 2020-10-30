@@ -322,6 +322,7 @@ ggplot() +
     expand = 0,
     ylim = c(parameters$map_lat_lo + 0.01, parameters$map_lat_hi - 0.01)
   ) +
+  scale_x_continuous(breaks = seq(10,30,0.1)) +
   labs(x = "Longitude (°E)", y = "Latitude (°N)") +
   scale_fill_gradient(
     low = "lightsteelblue1",
@@ -330,6 +331,7 @@ ggplot() +
     breaks = seq(0, 180, 30),
     guide = "colorstrip"
   ) +
+  guides(fill = guide_colorsteps(barheight = unit(5.5, "cm"))) +
   scale_color_manual(values = c("white", "darkgrey", "orangered"),
                      guide = FALSE)
 
