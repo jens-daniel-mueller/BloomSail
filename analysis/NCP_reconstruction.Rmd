@@ -93,12 +93,12 @@ tm_profiles_ID_long <- tm_profiles_ID %>%
 
 ## C~T~ and tem penetration depth
 
-### Cumulative on July 23
+### Cumulative on July 09
 
 ```{r calculate_TPD_cumulative_tm}
 
 tm_profiles_ID_long_180723 <- tm_profiles_ID_long %>%
-  filter(ID == 180723)
+  filter(ID == 180709)
 
 tm_profiles_ID_long_180723_dep <- tm_profiles_ID_long_180723 %>%
   select(var, dep, value_cum) %>%
@@ -191,21 +191,21 @@ p_nCT <-
   ggplot() +
   geom_col(
     data = tm_profiles_ID_long_180723 %>%
-      filter(var == "nCT", value_cum < 0),
-    aes(x = value_cum, y = dep, fill = "Integrated change"),
+      filter(var == "nCT", value_diff_daily < 0),
+    aes(x = value_diff_daily, y = dep, fill = "Integrated change"),
     width = 1,
     alpha = 0.3,
     orientation = "y"
   ) +
   geom_vline(xintercept = 0) +
   scale_y_reverse(expand = c(0, 0)) +
-  geom_point(aes(value_cum, dep)) +
-  geom_path(aes(value_cum, dep)) +
+  geom_point(aes(value_diff_daily, dep)) +
+  geom_path(aes(value_diff_daily, dep)) +
   geom_hline(data = TPD %>% filter(var == "nCT"),
              aes(yintercept = TPD, col = "Penetration depth")) +
   scale_fill_manual(values = "black") +
   scale_color_brewer(palette = "Dark2") +
-  labs(y = "Depth (m)", x = expression(nC[T] ~ (µmol ~ kg ^ {
+  labs(y = "Depth (m)", x = expression(paste(Delta~C[T],"*") ~ (µmol ~ kg ^ {
     -1
   }))) +
   theme(
@@ -222,21 +222,21 @@ p_tem <-
   ggplot() +
   geom_col(
     data = tm_profiles_ID_long_180723 %>%
-      filter(var == "tem", value_cum > 0),
-    aes(x = value_cum, y = dep, fill = "Integrated change"),
+      filter(var == "tem", value_diff_daily > 0),
+    aes(x = value_diff_daily, y = dep, fill = "Integrated change"),
     width = 1,
     alpha = 0.3,
     orientation = "y"
   ) +
   geom_vline(xintercept = 0) +
   scale_y_reverse(expand = c(0, 0)) +
-  geom_point(aes(value_cum, dep)) +
-  geom_path(aes(value_cum, dep)) +
+  geom_point(aes(value_diff_daily, dep)) +
+  geom_path(aes(value_diff_daily, dep)) +
   geom_hline(data = TPD %>% filter(var == "tem"),
              aes(yintercept = TPD, col = "Penetration depth")) +
   scale_fill_manual(values = "black") +
   scale_color_brewer(palette = "Dark2") +
-  labs(y = "Depth (m)", x = "Temperature (\u00B0C)") +
+  labs(y = "Depth (m)", x = expression(Delta ~ Temperature ~ (degree*C))) +
   theme(legend.title = element_blank())
 
 p_tem + p_nCT +
@@ -245,7 +245,7 @@ p_tem + p_nCT +
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "TPD_CPD_cumulative.pdf"
+    "Fig_S8.pdf"
   ),
   width = 180,
   height = 160,
@@ -256,7 +256,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "TPD_CPD_cumulative.png"
+    "Fig_S8.png"
   ),
   width = 180,
   height = 160,

@@ -592,7 +592,7 @@ p_AT + p_CT + p_nCT
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "tb_profiles.pdf"
+    "Fig_S4.pdf"
   ),
   width = 180,
   height = 80,
@@ -603,7 +603,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "tb_profiles.png"
+    "Fig_S4.png"
   ),
   width = 180,
   height = 80,
@@ -1268,28 +1268,28 @@ nCT_sens %>%
   geom_line(col="red") +
   scale_y_continuous(
     expression(paste(
-      "absolute bias ", Delta ~ C[T], "*",  ~ (µmol ~ kg ^ {
+      "Absolute bias ", Delta ~ C[T], "*",  ~ (µmol ~ kg ^ {
         -1
       })
     )),
     sec.axis = sec_axis(
       ~ . / nCT_delta_mean * 100,
-      name = expression(paste("relative bias ", Delta ~ C[T], "* (%)")),
+      name = expression(paste("Relative bias ", Delta ~ C[T], "* (%)")),
       breaks = seq(-10, 10, 1)
     )
   ) +
-  scale_x_continuous(expression(paste("absolute bias ", A[T]  ~ (µmol ~ kg ^ {
+  scale_x_continuous(expression(paste("Absolute bias ", A[T]  ~ (µmol ~ kg ^ {
     -1
   }))),
   sec.axis = sec_axis(~ . / AT_mean * 100,
                       name = expression(paste(
-                        "relative bias ", A[T], " (%)")),
+                        "Relative bias ", A[T], " (%)")),
       breaks = seq(-10, 10, 1)))
 
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "nCT_sensitivity_to_AT.pdf"
+    "Fig_S6.pdf"
   ),
   width = 120,
   height = 80,
@@ -1300,7 +1300,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "nCT_sensitivity_to_AT.png"
+    "Fig_S6.png"
   ),
   width = 120,
   height = 80,
@@ -2539,6 +2539,8 @@ p_nCT <- CT_profile %>%
               linetype = 2) +
   annotate("text", label = as.character(expression(paste(C[T],"*",mix))),
            parse = TRUE, x = 1560, y = 3) +
+  annotate("text", label = as.character(expression(paste(C[T],"*")~flux)),
+           parse = TRUE, x = 1580, y = 14.5, col = "white") +
   geom_point(aes(nCT, dep, col = ID)) +
   geom_path(aes(nCT, dep, col = ID)) +
   scale_y_reverse() +
@@ -2574,7 +2576,7 @@ p_tem + p_nCT +
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "CT_entrainment.pdf"
+    "Fig_S7.pdf"
   ),
   width = 180,
   height = 160,
@@ -2585,7 +2587,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "CT_entrainment.png"
+    "Fig_S7.png"
   ),
   width = 180,
   height = 160,

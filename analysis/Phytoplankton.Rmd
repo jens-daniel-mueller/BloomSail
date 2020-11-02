@@ -95,7 +95,7 @@ tp_ID_grid <- tp_ID_grid
 ```{r phytoplankton_time_series, fig.asp=0.8}
 
 tp_ID_grid %>%
-  #filter(Species != "total") %>%
+  filter(Species != "total") %>%
   ggplot(aes(date_time_ID, value, col = dep_grid)) +
   geom_point() +
   geom_line() +
@@ -110,7 +110,7 @@ tp_ID_grid %>%
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Phytoplankton_mean_total_biomass.pdf"
+    "Fig_S5.pdf"
   ),
   width = 180,
   height = 120,
@@ -121,7 +121,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Phytoplankton_mean_total_biomass.png"
+    "Fig_S5.png"
   ),
   width = 180,
   height = 120,

@@ -170,12 +170,12 @@ augment(fit) %>%
   geom_line(aes(y = .fitted), col = "red") +
   geom_vline(xintercept = tau) +
   geom_hline(yintercept = pCO2_corr_start + 0.63 * (pCO2_corr_delta)) +
-  labs(y = expression(pCO[2] ~ (µatm)), x = "t (sec)")
+  labs(y = expression(pCO[2] ~ (µatm)), x = "time (sec)")
 
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "tau_fit_example.pdf"
+    "Fig_S1.pdf"
   ),
   width = 180,
   height = 90,
@@ -186,7 +186,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "tau_fit_example.png"
+    "Fig_S1.png"
   ),
   width = 180,
   height = 90,
@@ -1170,14 +1170,13 @@ tm_grid %>%
   ) %>%
   arrange(dep_grid) %>%
   ggplot() +
-  geom_path(aes(down, dep_grid, col = correction, linetype = "down")) +
-  geom_path(aes(up, dep_grid, col = correction, linetype = "up")) +
+  geom_path(aes(down, dep_grid, col = correction, linetype = "downcast")) +
+  geom_path(aes(up, dep_grid, col = correction, linetype = "upcast")) +
   scale_y_reverse() +
-  scale_linetype(labels = c("upcast", "downcast")) +
   scale_color_brewer(
     palette = "Set1",
     direction = -1,
-    labels = c("raw", "corrected")
+    labels = c("corrected", "raw")
   ) +
   labs(y = "Depth (m)", x = expression(pCO[2] ~ (µatm))) +
   theme(
@@ -1189,7 +1188,7 @@ tm_grid %>%
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "pCO2_RT_corrected_profile_example.pdf"
+    "Fig_S2.pdf"
   ),
   width = 100,
   height = 140,
@@ -1200,7 +1199,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "pCO2_RT_corrected_profile_example.png"
+    "Fig_S2.png"
   ),
   width = 100,
   height = 140,
@@ -1552,20 +1551,28 @@ tm_grid_shallow_sum %>%
 ```{r plot_cast_delta_pCO2_example, include=FALSE}
 
 tm_grid_shallow_sum %>%
-  filter(correction == "pCO2",
-         estimate %in% c("mean_abs"),
+  filter(estimate %in% c("mean_abs"),
          tau_factor == parameters$tau_factor_used) %>%
   ggplot() +
-  geom_path(aes(pCO2_delta, dep_grid)) +
+  geom_path(aes(pCO2_delta, dep_grid, col = correction)) +
   scale_y_reverse() +
-  scale_color_discrete(name = "Tau factor") +
+  scale_color_brewer(
+    palette = "Set1",
+    direction = -1,
+    labels = c("corrected", "raw")
+  ) +
   labs(x = expression(Mean ~ "|" ~ Delta ~ pCO[2] ~ "|" ~ (µatm)), y = "Depth (m)") +
-  xlim(0, NA)
+  xlim(0, NA) +
+  theme(
+    legend.title = element_blank(),
+    legend.position = c(0.8, 0.8),
+    legend.background = element_rect(colour = "black")
+  )
 
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "pCO2_RT_corrected_profile_mean_abs_offset.pdf"
+    "Fig_S3.pdf"
   ),
   width = 100,
   height = 140,
@@ -1576,7 +1583,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "pCO2_RT_corrected_profile_mean_abs_offset.png"
+    "Fig_S3.png"
   ),
   width = 100,
   height = 140,
