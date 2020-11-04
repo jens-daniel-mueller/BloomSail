@@ -30,6 +30,8 @@ library(tibbletime)
 library(sp)
 library(kableExtra)
 library(LakeMetabolizer)
+# library(raster)
+library(rgdal)
 
 ```
 
@@ -252,6 +254,60 @@ fm %>%
 ```
 
 
+```{r read_MODIS_image}
+
+# https://shekeine.github.io/visualization/2014/09/27/sfcc_rgb_in_R
+
+
+EGS  <-
+  raster::stack(here::here("data/input/Maps",
+                   "MODIS_2018_07_26_EGS.tiff"))
+
+EGS <- raster::as.data.frame(EGS, xy = T)
+
+EGS <- as_tibble(EGS)
+
+EGS <- EGS %>%
+  rename(lat = y,
+         lon = x) %>% 
+  filter(lat >= 56.4, lat <= 58.3) %>% 
+  mutate(
+    RGB = rgb(
+      MODIS_2018_07_26_EGS.1,
+      MODIS_2018_07_26_EGS.2,
+      MODIS_2018_07_26_EGS.3,
+      maxColorValue = 255
+    )
+  ) %>%
+  dplyr::select(-c(
+    MODIS_2018_07_26_EGS.1,
+    MODIS_2018_07_26_EGS.2,
+    MODIS_2018_07_26_EGS.3
+  ))
+
+p_MODIS <-
+  ggplot(data = EGS,
+         aes(lon, lat, fill = RGB)) +
+  coord_quickmap(expand = 0) +
+  geom_raster() +
+  scale_fill_identity() +
+  annotate(
+    "rect",
+    ymax = parameters$map_lat_hi,
+    ymin = parameters$map_lat_lo,
+    xmax = parameters$map_lon_hi,
+    xmin = parameters$map_lon_lo,
+    fill = NA,
+    color = "orangered"
+  ) +
+  scale_x_continuous(breaks = seq(10,30,1)) +
+  labs(x = "Longitude (°E)", y = "Latitude (°N)") +
+  theme(axis.title.x = element_blank())
+
+
+```
+
+
 ```{r map, fig.cap="Location of stations sampled between the east coast of Gotland and Gotland deep."}
 
 map <-
@@ -288,8 +344,8 @@ tm_track <- tm %>%
   arrange(date_time) %>%
   slice(which(row_number() %% 50 == 1))
 
-
-ggplot() +
+p_map <-
+  ggplot() +
   geom_contour_fill(
     data = map_low_res,
     aes(x = lon, y = lat, z = -elev),
@@ -335,13 +391,17 @@ ggplot() +
   scale_color_manual(values = c("white", "darkgrey", "orangered"),
                      guide = FALSE)
 
+p_MODIS + p_map +
+  plot_layout(ncol = 1) +
+  plot_annotation(tag_levels = 'A')
+
 ggsave(
   here::here(
     "output/Plots/Figures_publication/article",
     "Fig_1.pdf"
   ),
   width = 220,
-  height = 150,
+  height = 250,
   dpi = 300,
   units = "mm"
 )
@@ -352,7 +412,7 @@ ggsave(
     "Fig_1.png"
   ),
   width = 220,
-  height = 150,
+  height = 250,
   dpi = 300,
   units = "mm"
 )
@@ -3010,3 +3070,4 @@ ggsave(
 - Significance of changes in AT for calculated nCT changes
   - Calculate AT-S ratios, reconstruct AT profiles, calculate true nCT profiles, normalize nCT profiles to mean AT
 - demonstrate strong permanent thermocline at around 25 m
+- calculate oxygen demand for mineralization (4.68*10^9*1.2 / (300e-6*10^3) / 10^9)
