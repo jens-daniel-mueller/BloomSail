@@ -308,7 +308,7 @@ p_MODIS <-
 ```
 
 
-```{r map, fig.cap="Location of stations sampled between the east coast of Gotland and Gotland deep.", fig.asp=1.5}
+```{r map, fig.cap="Location of stations sampled between the east coast of Gotland and Gotland deep.", fig.asp=1}
 
 map <-
   read_csv(here::here("data/input/Maps", "Bathymetry_Gotland_east_small.csv"))
