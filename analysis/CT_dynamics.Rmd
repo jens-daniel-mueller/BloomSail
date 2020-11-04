@@ -647,7 +647,8 @@ p_nCT <- tb_long_mean %>%
     legend.title = element_blank()
   )
 
-p_AT + p_CT + p_nCT
+p_AT + p_CT + p_nCT +
+  plot_annotation(tag_levels = 'A')
 
 ggsave(
   here::here(
@@ -817,7 +818,8 @@ p_nCT <-
     axis.title.y = element_blank()
   )
 
-p_tem + p_pCO2 + p_nCT
+p_tem + p_pCO2 + p_nCT +
+  plot_annotation(tag_levels = 'A')
 
 ggsave(
   here::here(
@@ -1562,10 +1564,13 @@ p_tem_ID_cum <-
     legend.title = element_blank()
   )
 
-p_tem_hov + p_tem_ID_cum +
-p_nCT_hov + p_nCT_ID_cum +
-  plot_layout(widths = c(2, 0.9))
+# p_tem_hov + p_tem_ID_cum +
+# p_nCT_hov + p_nCT_ID_cum +
+#   plot_layout(widths = c(2, 0.9))
 
+(p_tem_hov | p_tem_ID_cum) / ((p_nCT_hov | p_nCT_ID_cum ) + plot_layout(tag_level = 'new')) +
+  plot_annotation(tag_levels = c('A', '1')) +
+  plot_layout(widths = c(2, 0.9))
 
 ggsave(
   here::here(
@@ -2631,7 +2636,8 @@ p_tem <- tm_profiles_ID_long %>%
   )
 
 p_tem + p_nCT +
-  plot_layout(guides = 'collect')
+  plot_layout(guides = 'collect') +
+  plot_annotation(tag_levels = 'A')
 
 ggsave(
   here::here(
@@ -3037,7 +3043,8 @@ p_pCO2_surf + p_tem_surf + p_nCT_surf +
   p_pCO2_atm + p_wind + p_flux_daily + p_flux_cum +
   p_inCT +
   plot_layout(ncol = 1,
-              heights = c(rep(1.35, 7), 4))
+              heights = c(rep(1.35, 7), 4)) +
+  plot_annotation(tag_levels = 'A')
 
 ggsave(
   here::here(
