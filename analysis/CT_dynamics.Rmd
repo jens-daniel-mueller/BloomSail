@@ -1568,9 +1568,9 @@ p_tem_ID_cum <-
 # p_nCT_hov + p_nCT_ID_cum +
 #   plot_layout(widths = c(2, 0.9))
 
-(p_tem_hov | p_tem_ID_cum) / ((p_nCT_hov | p_nCT_ID_cum ) + plot_layout(tag_level = 'new')) +
-  plot_annotation(tag_levels = c('A', '1')) +
-  plot_layout(widths = c(2, 0.9))
+((p_tem_hov | p_tem_ID_cum ) + plot_layout(tag_level = 'new', widths = c(2, 0.9))) / 
+((p_nCT_hov | p_nCT_ID_cum ) + plot_layout(tag_level = 'new', widths = c(2, 0.9))) +
+  plot_annotation(tag_levels = c('A', '1'))
 
 ggsave(
   here::here(
