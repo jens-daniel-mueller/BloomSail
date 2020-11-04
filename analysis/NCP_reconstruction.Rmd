@@ -240,7 +240,8 @@ p_tem <-
   theme(legend.title = element_blank())
 
 p_tem + p_nCT +
-  plot_layout(guides = 'collect')
+  plot_layout(guides = 'collect')+
+  plot_annotation(tag_levels = 'A')
 
 ggsave(
   here::here(
@@ -1600,7 +1601,8 @@ p_NCP <- NCP_flux_int %>%
     axis.text.x.top = element_blank()
   )
 
-p_nCT / p_hov_dep / p_NCP
+p_nCT / p_hov_dep / p_NCP +
+  plot_annotation(tag_levels = 'A')
 
 ggsave(
   here::here(
