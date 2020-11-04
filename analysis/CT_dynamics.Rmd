@@ -254,7 +254,7 @@ fm %>%
 ```
 
 
-```{r read_MODIS_image}
+```{r read_plot_MODIS_image}
 
 # https://shekeine.github.io/visualization/2014/09/27/sfcc_rgb_in_R
 
@@ -308,7 +308,7 @@ p_MODIS <-
 ```
 
 
-```{r map, fig.cap="Location of stations sampled between the east coast of Gotland and Gotland deep."}
+```{r map, fig.cap="Location of stations sampled between the east coast of Gotland and Gotland deep.", fig.asp=1.5}
 
 map <-
   read_csv(here::here("data/input/Maps", "Bathymetry_Gotland_east_small.csv"))
