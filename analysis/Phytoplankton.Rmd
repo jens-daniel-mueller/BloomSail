@@ -102,8 +102,8 @@ tp_ID_grid %>%
   facet_wrap(~ Species, ncol=1) +
   scale_color_brewer(palette = "Set1", name = "Depth (m)") +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  scale_y_continuous(sec.axis = sec_axis(~ . * 0.16 / 12,
-                                         name = expression(Biomass ~ (mu~mol-C~kg^-1)))) +
+  # scale_y_continuous(sec.axis = sec_axis(~ . * 0.16 / 12,
+  #                                        name = expression(Biomass ~ (mu~mol-C~kg^-1)))) +
   labs(y = expression(Biomass ~ (mg~m^-3))) +
   theme(axis.title.x = element_blank())
 
