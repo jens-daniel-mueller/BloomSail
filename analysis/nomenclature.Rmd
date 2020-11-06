@@ -109,3 +109,20 @@ Preset subsetting values are identified by postfix _lim and coded seperately
 - calc_: perform calculations, mutate variables, etc
 - chunks for plotting are labeled according to plot content, because name controls plot file name
 
+
+
+# ToD0
+
+Github repo
+Explain subsetting of deployments
+Explain metadata creation
+
+CT dynamics 
+Map data preparation in read-in file
+
+Reconstruction 
+fm + gt in read_in und merging section
+implement exact subsetting coordinated for getm data
+
+Open questions
+Los Gates data correction

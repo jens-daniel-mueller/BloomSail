@@ -263,6 +263,7 @@ EGS  <-
   raster::stack(here::here("data/input/Maps",
                    "MODIS_2018_07_26_EGS.tiff"))
 
+
 EGS <- raster::as.data.frame(EGS, xy = T)
 
 EGS <- as_tibble(EGS)
@@ -270,7 +271,9 @@ EGS <- as_tibble(EGS)
 EGS <- EGS %>%
   rename(lat = y,
          lon = x) %>% 
-  filter(lat >= 56.4, lat <= 58.3) %>% 
+  filter(lat >= 56.4, lat <= 58.3)
+
+EGS <- EGS %>%
   mutate(
     RGB = rgb(
       MODIS_2018_07_26_EGS.1,
@@ -847,6 +850,15 @@ rm(p_tem, p_pCO2, p_nCT)
 
 ```
 
+Number of profiles:
+
+```{r total_number_profiles}
+
+tm_profiles %>% 
+  count(date_ID, station) %>% 
+  nrow()
+
+```
 
 
 ## Mean profiles
