@@ -969,9 +969,9 @@ Important notes:
 ## Individual profiles
 
 C~T~, pCO~2~, S, and T profiles were plotted individually 
-[pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plotm/CT_dynamics/tm_profiles_pCO2_tem_sal_CT.pdf){target="_blank"} 
+[pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_pCO2_tem_sal_CT.pdf){target="_blank"} 
 and grouped by ID 
-[pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plotm/CT_dynamics/tm_profiles_ID_pCO2_tem_sal_CT.pdf){target="_blank"}. The later gives an idea of the differences between stations at one point in time.
+[pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_ID_pCO2_tem_sal_CT.pdf){target="_blank"}. The later gives an idea of the differences between stations at one point in time.
 
 ```{r plot_all_discretized_profiles_individual, eval=FALSE}
 
@@ -1058,7 +1058,7 @@ for(i_ID in unique(tm_profiles$ID)){
 
 dev.off()
 
-rm(i_ID, i_station, tm_profiles_highres)
+rm(i_ID, i_station)
 
 ```
 
