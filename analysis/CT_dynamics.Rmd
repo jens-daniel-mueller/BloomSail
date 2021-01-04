@@ -258,11 +258,9 @@ fm %>%
 
 # https://shekeine.github.io/visualization/2014/09/27/sfcc_rgb_in_R
 
-
 EGS  <-
   raster::stack(here::here("data/input/Maps",
                    "MODIS_2018_07_26_EGS.tiff"))
-
 
 EGS <- raster::as.data.frame(EGS, xy = T)
 
@@ -273,19 +271,52 @@ EGS <- EGS %>%
          lon = x) %>% 
   filter(lat >= 56.4, lat <= 58.3)
 
+# hist(EGS$MODIS_2018_07_26_EGS.1)
+# hist(EGS$MODIS_2018_07_26_EGS.2)
+# hist(EGS$MODIS_2018_07_26_EGS.3)
+
 EGS <- EGS %>%
   mutate(
-    RGB = rgb(
-      MODIS_2018_07_26_EGS.1,
-      MODIS_2018_07_26_EGS.2,
-      MODIS_2018_07_26_EGS.3,
-      maxColorValue = 255
-    )
+    MODIS_2018_07_26_EGS.1_s = MODIS_2018_07_26_EGS.1 * 2.5,
+    MODIS_2018_07_26_EGS.2_s = MODIS_2018_07_26_EGS.2 * 2.5,
+    MODIS_2018_07_26_EGS.3_s = MODIS_2018_07_26_EGS.3 * 2.5
   ) %>%
+  mutate(
+    MODIS_2018_07_26_EGS.1_s =
+      if_else(MODIS_2018_07_26_EGS.1_s > 255,
+              255,
+              MODIS_2018_07_26_EGS.1_s),
+    MODIS_2018_07_26_EGS.2_s =
+      if_else(MODIS_2018_07_26_EGS.2_s > 255,
+              255,
+              MODIS_2018_07_26_EGS.2_s),
+    MODIS_2018_07_26_EGS.3_s =
+      if_else(MODIS_2018_07_26_EGS.3_s > 255,
+              255,
+              MODIS_2018_07_26_EGS.3_s)) %>%
+      mutate(
+        RGB = rgb(
+          MODIS_2018_07_26_EGS.1_s,
+          MODIS_2018_07_26_EGS.2_s,
+          MODIS_2018_07_26_EGS.3_s,
+          maxColorValue = 255
+        )
+      )
+
+# hist(EGS$MODIS_2018_07_26_EGS.1_s)
+# hist(EGS$MODIS_2018_07_26_EGS.2_s)
+# hist(EGS$MODIS_2018_07_26_EGS.3_s)
+
+EGS <- EGS %>%
   dplyr::select(-c(
     MODIS_2018_07_26_EGS.1,
     MODIS_2018_07_26_EGS.2,
     MODIS_2018_07_26_EGS.3
+  )) %>% 
+  dplyr::select(-c(
+    MODIS_2018_07_26_EGS.1_s,
+    MODIS_2018_07_26_EGS.2_s,
+    MODIS_2018_07_26_EGS.3_s
   ))
 
 p_MODIS <-
@@ -301,7 +332,8 @@ p_MODIS <-
     xmax = parameters$map_lon_hi,
     xmin = parameters$map_lon_lo,
     fill = NA,
-    color = "orangered"
+    color = "orangered",
+    size = 1.5
   ) +
   scale_x_continuous(breaks = seq(10,30,1)) +
   labs(x = "Longitude (°E)", y = "Latitude (°N)") +
@@ -387,10 +419,15 @@ p_map <-
     low = "lightsteelblue1",
     high = "dodgerblue4",
     name = "Depth (m)",
-    breaks = seq(0, 180, 30),
+    breaks = seq(30, 150, 30),
+    limits = c(0,180),
     guide = "colorstrip"
   ) +
-  guides(fill = guide_colorsteps(barheight = unit(5.5, "cm"))) +
+  guides(fill = guide_colorsteps(barheight = unit(5.5, "cm"),
+                                 show.limits = TRUE,
+                                 frame.colour = "black",
+                                 ticks = TRUE,
+                                 ticks.colour = "black")) +
   scale_color_manual(values = c("white", "darkgrey", "orangered"),
                      guide = FALSE)
 
@@ -638,10 +675,8 @@ p_nCT <- tb_long_mean %>%
   geom_path(aes(col = ID)) +
   geom_point(aes(fill = ID), shape = 21) +
   scale_y_reverse(sec.axis = dup_axis()) +
-  labs(x = expression(nC[T] ~ (µmol ~ kg ^ {
-    -1
-  })),
-  y = "Depth (m)") +
+  labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {-1}))),
+       y = "Depth (m)") +
   scale_fill_viridis_d(labels = cruise_dates$date_ID) +
   scale_color_viridis_d(labels = cruise_dates$date_ID) +
   theme(
@@ -656,7 +691,7 @@ p_AT + p_CT + p_nCT +
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S4.pdf"
+    "Fig_A4.pdf"
   ),
   width = 180,
   height = 80,
@@ -667,7 +702,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S4.png"
+    "Fig_A4.png"
   ),
   width = 180,
   height = 80,
@@ -936,16 +971,26 @@ tm_profiles_ID_mean_test %>%
   
 ```
 
-```{r nCT_profiles_individual, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
+```{r nCT_profiles_individual_pub, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
 
-all <- tm_profiles_ID_long %>%
-  filter(var %in% c("nCT", "tem")) %>%
-  rename(group = ID)
 
-tm_profiles_ID_long %>%
-  filter(var %in% c("nCT", "tem")) %>%
+profiles_min_max <- tm_profiles %>%
+  group_by(dep) %>%
+  summarise(max_CT = max(nCT),
+            min_CT = min(nCT),
+            max_tem = max(tem),
+            min_tem = min(tem)) %>%
+  ungroup()
+
+p_CT <-
+  tm_profiles_ID_long %>%
+  filter(var %in% c("nCT")) %>%
   ggplot() +
-  geom_path(data = all, aes(value, dep, group = group)) +
+  geom_ribbon(data = profiles_min_max,
+              aes(xmin = min_CT,
+                  xmax = max_CT,
+                  y = dep),
+              alpha = 0.5) +
   geom_ribbon(aes(
     xmin = value - sd,
     xmax = value + sd,
@@ -954,11 +999,69 @@ tm_profiles_ID_long %>%
   ), alpha = 0.5) +
   geom_path(aes(value, dep, col = ID)) +
   scale_y_reverse() +
-  scale_color_viridis_d() +
-  scale_fill_viridis_d() +
-  facet_grid(ID ~ var, scales = "free_x")
+  scale_color_viridis_d(labels = cruise_dates$date_ID,
+                        name = "Mean cruise date") +
+  scale_fill_viridis_d(labels = cruise_dates$date_ID,
+                       name = "Mean cruise date") +
+  facet_grid(ID ~ .) +
+  labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {-1}))),
+  y = "Depth (m)") +
+  theme(strip.background = element_blank(),
+        strip.text = element_blank(),
+        legend.position = "none")
 
-rm(all)
+p_tem <-
+  tm_profiles_ID_long %>%
+  filter(var %in% c("tem")) %>%
+  ggplot() +
+  geom_ribbon(data = profiles_min_max,
+              aes(xmin = min_tem,
+                  xmax = max_tem,
+                  y = dep),
+              alpha = 0.5) +
+  geom_ribbon(aes(
+    xmin = value - sd,
+    xmax = value + sd,
+    y = dep,
+    fill = ID
+  ), alpha = 0.5) +
+  geom_path(aes(value, dep, col = ID)) +
+  scale_y_reverse() +
+  scale_color_viridis_d(labels = cruise_dates$date_ID,
+                        name = "Mean cruise date") +
+  scale_fill_viridis_d(labels = cruise_dates$date_ID,
+                       name = "Mean cruise date") +
+  facet_grid(ID ~ .) +
+  labs(x = "Temperature (\u00B0C)",
+       y = "Depth (m)") +
+  theme(strip.background = element_blank(),
+        strip.text = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+
+p_CT | p_tem
+
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/appendix",
+    "Fig_A5.pdf"
+  ),
+  width = 140,
+  height = 250,
+  dpi = 300,
+  units = "mm"
+)
+
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/appendix",
+    "Fig_A5.png"
+  ),
+  width = 140,
+  height = 250,
+  dpi = 300,
+  units = "mm"
+)
 
 ```
 
@@ -1363,7 +1466,7 @@ nCT_sens %>%
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S6.pdf"
+    "Fig_A7.pdf"
   ),
   width = 120,
   height = 80,
@@ -1374,7 +1477,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S6.png"
+    "Fig_A7.png"
   ),
   width = 120,
   height = 80,
@@ -2654,7 +2757,7 @@ p_tem + p_nCT +
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S7.pdf"
+    "Fig_A8.pdf"
   ),
   width = 180,
   height = 160,
@@ -2665,7 +2768,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S7.png"
+    "Fig_A8.png"
   ),
   width = 180,
   height = 160,
