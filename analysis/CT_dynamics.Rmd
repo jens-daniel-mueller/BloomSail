@@ -971,8 +971,7 @@ tm_profiles_ID_mean_test %>%
   
 ```
 
-```{r nCT_profiles_individual_pub, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
-
+```{r nCT_profiles_individual_pub_V1, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
 
 profiles_min_max <- tm_profiles %>%
   group_by(dep) %>%
@@ -982,6 +981,7 @@ profiles_min_max <- tm_profiles %>%
             min_tem = min(tem)) %>%
   ungroup()
 
+
 p_CT <-
   tm_profiles_ID_long %>%
   filter(var %in% c("nCT")) %>%
@@ -990,7 +990,7 @@ p_CT <-
               aes(xmin = min_CT,
                   xmax = max_CT,
                   y = dep),
-              alpha = 0.5) +
+              alpha = 0.2) +
   geom_ribbon(aes(
     xmin = value - sd,
     xmax = value + sd,
@@ -1000,9 +1000,9 @@ p_CT <-
   geom_path(aes(value, dep, col = ID)) +
   scale_y_reverse() +
   scale_color_viridis_d(labels = cruise_dates$date_ID,
-                        name = "Mean cruise date") +
+                        name = "Cruise mean +/- SD") +
   scale_fill_viridis_d(labels = cruise_dates$date_ID,
-                       name = "Mean cruise date") +
+                       name = "Cruise mean +/- SD") +
   facet_grid(ID ~ .) +
   labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {-1}))),
   y = "Depth (m)") +
@@ -1018,7 +1018,7 @@ p_tem <-
               aes(xmin = min_tem,
                   xmax = max_tem,
                   y = dep),
-              alpha = 0.5) +
+              alpha = 0.2) +
   geom_ribbon(aes(
     xmin = value - sd,
     xmax = value + sd,
@@ -1028,9 +1028,9 @@ p_tem <-
   geom_path(aes(value, dep, col = ID)) +
   scale_y_reverse() +
   scale_color_viridis_d(labels = cruise_dates$date_ID,
-                        name = "Mean cruise date") +
+                        name = "Cruise mean +/- SD") +
   scale_fill_viridis_d(labels = cruise_dates$date_ID,
-                       name = "Mean cruise date") +
+                       name = "Cruise mean +/- SD") +
   facet_grid(ID ~ .) +
   labs(x = "Temperature (\u00B0C)",
        y = "Depth (m)") +
@@ -1044,7 +1044,7 @@ p_CT | p_tem
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A5.pdf"
+    "Fig_A5_V1.pdf"
   ),
   width = 140,
   height = 250,
@@ -1055,13 +1055,88 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A5.png"
+    "Fig_A5_V1.png"
   ),
   width = 140,
   height = 250,
   dpi = 300,
   units = "mm"
 )
+
+```
+
+```{r nCT_profiles_individual_pub_V2, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
+
+p_CT <-
+  tm_profiles %>%
+  ggplot() +
+  geom_ribbon(data = profiles_min_max,
+              aes(xmin = min_CT,
+                  xmax = max_CT,
+                  y = dep),
+              alpha = 0.2) +
+   geom_path(aes(nCT, dep, col = station)) +
+  scale_y_reverse() +
+  facet_grid(ID ~ .) +
+  labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {-1}))),
+  y = "Depth (m)") +
+  theme(strip.background = element_blank(),
+        strip.text = element_blank(),
+        legend.position = "none")
+
+cruise_labels <- c(
+  `180705` = cruise_dates$date_ID[1],
+  `180709` = cruise_dates$date_ID[2],
+  `180718` = cruise_dates$date_ID[3],
+  `180723` = cruise_dates$date_ID[4],
+  `180730` = cruise_dates$date_ID[5],
+  `180802` = cruise_dates$date_ID[6],
+  `180806` = cruise_dates$date_ID[7],
+  `180815` = cruise_dates$date_ID[8]
+)
+
+p_tem <-
+  tm_profiles %>%
+  ggplot() +
+  geom_ribbon(data = profiles_min_max,
+              aes(xmin = min_tem,
+                  xmax = max_tem,
+                  y = dep),
+              alpha = 0.2) +
+  geom_path(aes(tem, dep, col = station)) +
+  scale_y_reverse() +
+  facet_grid(ID ~ .,
+             labeller = labeller(ID = cruise_labels)) +
+  labs(x = "Temperature (\u00B0C)",
+       y = "Depth (m)") +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+
+p_CT | p_tem
+
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/appendix",
+    "Fig_A5_V2.pdf"
+  ),
+  width = 140,
+  height = 250,
+  dpi = 300,
+  units = "mm"
+)
+
+ggsave(
+  here::here(
+    "output/Plots/Figures_publication/appendix",
+    "Fig_A5_V2.png"
+  ),
+  width = 140,
+  height = 250,
+  dpi = 300,
+  units = "mm"
+)
+
+rm(p_nCT, p_tem, cruise_labels, profiles_min_max)
 
 ```
 

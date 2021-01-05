@@ -175,7 +175,7 @@ augment(fit) %>%
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S1.pdf"
+    "Fig_A1.pdf"
   ),
   width = 180,
   height = 90,
@@ -186,7 +186,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S1.png"
+    "Fig_A1.png"
   ),
   width = 180,
   height = 90,
@@ -1188,7 +1188,7 @@ tm_grid %>%
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S2.pdf"
+    "Fig_A2.pdf"
   ),
   width = 100,
   height = 140,
@@ -1199,7 +1199,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S2.png"
+    "Fig_A2.png"
   ),
   width = 100,
   height = 140,
@@ -1572,7 +1572,7 @@ tm_grid_shallow_sum %>%
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S3.pdf"
+    "Fig_A3.pdf"
   ),
   width = 100,
   height = 140,
@@ -1583,7 +1583,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S3.png"
+    "Fig_A3.png"
   ),
   width = 100,
   height = 140,

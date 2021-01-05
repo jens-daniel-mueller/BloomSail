@@ -246,7 +246,7 @@ p_tem + p_nCT +
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S8.pdf"
+    "Fig_A9.pdf"
   ),
   width = 180,
   height = 160,
@@ -257,7 +257,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S8.png"
+    "Fig_A9.png"
   ),
   width = 180,
   height = 160,

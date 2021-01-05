@@ -110,7 +110,7 @@ tp_ID_grid %>%
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S5.pdf"
+    "Fig_A6.pdf"
   ),
   width = 180,
   height = 120,
@@ -121,7 +121,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_S5.png"
+    "Fig_A6.png"
   ),
   width = 180,
   height = 120,
