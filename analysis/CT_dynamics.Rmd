@@ -1041,27 +1041,27 @@ p_tem <-
 
 p_CT | p_tem
 
-ggsave(
-  here::here(
-    "output/Plots/Figures_publication/appendix",
-    "Fig_A5_V1.pdf"
-  ),
-  width = 140,
-  height = 250,
-  dpi = 300,
-  units = "mm"
-)
-
-ggsave(
-  here::here(
-    "output/Plots/Figures_publication/appendix",
-    "Fig_A5_V1.png"
-  ),
-  width = 140,
-  height = 250,
-  dpi = 300,
-  units = "mm"
-)
+# ggsave(
+#   here::here(
+#     "output/Plots/Figures_publication/appendix",
+#     "Fig_A5_V1.pdf"
+#   ),
+#   width = 140,
+#   height = 250,
+#   dpi = 300,
+#   units = "mm"
+# )
+# 
+# ggsave(
+#   here::here(
+#     "output/Plots/Figures_publication/appendix",
+#     "Fig_A5_V1.png"
+#   ),
+#   width = 140,
+#   height = 250,
+#   dpi = 300,
+#   units = "mm"
+# )
 
 ```
 
@@ -1117,7 +1117,7 @@ p_CT | p_tem
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A5_V2.pdf"
+    "Fig_A5.pdf"
   ),
   width = 140,
   height = 250,
@@ -1128,7 +1128,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A5_V2.png"
+    "Fig_A5.png"
   ),
   width = 140,
   height = 250,
