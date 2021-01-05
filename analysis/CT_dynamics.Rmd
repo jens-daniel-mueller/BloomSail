@@ -1643,7 +1643,8 @@ p_nCT_hov <- tm_profiles_ID_long %>%
   ggplot() +
   geom_contour_fill(aes(x = date_time_ID, y = dep, z = value),
                     breaks = MakeBreaks(bin_nCT),
-                    col = "black") +
+                    col = "black",
+                    size = 0.1) +
   geom_vline(aes(xintercept = date_time_ID),
              col = "white",
              linetype = "1f") +
@@ -1682,7 +1683,8 @@ p_tem_hov <- tm_profiles_ID_long %>%
   ggplot() +
   geom_contour_fill(aes(x = date_time_ID, y = dep, z = value),
                     breaks = MakeBreaks(bin_Tem),
-                    col = "black") +
+                    col = "black",
+                    size = 0.1) +
   geom_vline(aes(xintercept = date_time_ID),
              col = "white",
              linetype = "1f") +
@@ -1753,10 +1755,6 @@ p_tem_ID_cum <-
     axis.text.y.left = element_blank(),
     legend.title = element_blank()
   )
-
-# p_tem_hov + p_tem_ID_cum +
-# p_nCT_hov + p_nCT_ID_cum +
-#   plot_layout(widths = c(2, 0.9))
 
 ((p_tem_hov | p_tem_ID_cum ) + plot_layout(tag_level = 'new', widths = c(2, 0.9))) / 
 ((p_nCT_hov | p_nCT_ID_cum ) + plot_layout(tag_level = 'new', widths = c(2, 0.9))) +

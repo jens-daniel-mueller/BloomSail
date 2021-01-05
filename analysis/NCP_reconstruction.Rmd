@@ -1361,9 +1361,9 @@ p_hov_dep <-
   tm_fm_gt %>%
   ggplot() +
   geom_contour_fill(aes(date_time_ID, dep, z = tem),
-                    breaks = MakeBreaks(bin)) +
-  geom_contour2(aes(date_time_ID, dep, z = tem),
-                    breaks = MakeBreaks(bin)) +
+                    breaks = MakeBreaks(bin),
+                    col = "black",
+                    size = 0.1) +
   geom_path(data = i_dep %>% filter(i_res == "daily" & i_dep != 0),
             aes(date_time_ID, i_dep, col = i_method)) +
   scale_fill_gradient(
