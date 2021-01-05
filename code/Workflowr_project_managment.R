@@ -107,7 +107,7 @@ wflow_build()
 wflow_publish("analysis/*", message = "XXX")
 
 # commit regular changes (locally) and rebuild site
-wflow_publish(all = TRUE, message = "revised figures")
+wflow_publish(all = TRUE, message = "revised figure 6")
 
 # commit changes including _site.yml (locally) and rebuild site
 wflow_publish(c(
@@ -120,7 +120,7 @@ wflow_publish(c(
   "analysis/CT_dynamics.Rmd",
   "analysis/Phytoplankton.Rmd",
   "analysis/NCP_reconstruction.Rmd"
-), message = "XXX", republish = TRUE)
+), message = "new Fig_AX names, A5 added", republish = TRUE)
 
 
 # Push latest version to GitHub

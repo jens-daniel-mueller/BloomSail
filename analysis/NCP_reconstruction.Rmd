@@ -826,7 +826,7 @@ fm_tm_ID %>%
 
 fm_tm_ID_wide <- fm_tm_ID %>%
   filter(var %in% c("nCT")) %>%
-  select(date_time_ID, var, value) %>%
+  select(date_time_ID, var, sensor, value) %>%
   pivot_wider(values_from = value, names_from = var)
 
 
@@ -868,6 +868,9 @@ tm_profiles_ID <- tm_profiles_ID %>%
 
 fm_gt <- fm_gt %>%
   mutate(source = "fm")
+
+tm_profiles_ID <- tm_profiles_ID %>% 
+  mutate(sensor = "BloomSail")
 
 tm_fm_gt <- bind_rows(tm_profiles_ID, fm_gt)
 
@@ -1359,12 +1362,8 @@ p_hov_dep <-
   ggplot() +
   geom_contour_fill(aes(date_time_ID, dep, z = tem),
                     breaks = MakeBreaks(bin)) +
-  # geom_path(
-  #   data = CPD,
-  #   aes(date_time_ID, i_dep),
-  #   col = "white",
-  #   linetype = 2
-  # ) +
+  geom_contour2(aes(date_time_ID, dep, z = tem),
+                    breaks = MakeBreaks(bin)) +
   geom_path(data = i_dep %>% filter(i_res == "daily" & i_dep != 0),
             aes(date_time_ID, i_dep, col = i_method)) +
   scale_fill_gradient(
@@ -1374,7 +1373,11 @@ p_hov_dep <-
     high = "grey90",
     low = "grey20"
   ) +
-  guides(fill = guide_colorsteps(barheight = unit(5.5, "cm"))) +
+  guides(fill = guide_colorsteps(barheight = unit(5.5, "cm"),
+                                 frame.colour = "black",
+                                 show.limits = TRUE,
+                                 ticks = TRUE,
+                                 ticks.colour = "black")) +
   scale_color_discrete(name = "Reconstruction", guide = FALSE) +
   scale_y_reverse() +
   scale_x_datetime(date_breaks = "week",
@@ -1405,13 +1408,13 @@ rm(bin)
 
 tm_fm_gt_surface <- tm_fm_gt %>%
   filter(dep < parameters$surface_dep) %>%
-  select(source, date_time_ID, nCT) %>%
-  group_by(source, date_time_ID) %>%
+  select(source, date_time_ID, sensor, nCT) %>%
+  group_by(source, date_time_ID, sensor) %>%
   summarise(nCT = mean(nCT, na.rm = TRUE)) %>%
   ungroup()
 
 tm_fm_gt_surface <- tm_fm_gt_surface %>%
-  group_by(source) %>%
+  group_by(source, sensor) %>%
   arrange(date_time_ID) %>%
   mutate(
     date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
@@ -1425,7 +1428,7 @@ tm_fm_gt_surface <- tm_fm_gt_surface %>%
 
 ```
 
-```{r merge_obs_parameters$i_dep_limth}
+```{r merge_obs_i_dep_lim}
 
 iCT <- full_join(tm_fm_gt_surface, i_dep)
 rm(tm_fm_gt_surface)
@@ -1441,7 +1444,7 @@ iCT <- iCT %>%
   mutate(CT_i_diff = nCT_diff * i_dep)
 
 iCT <- iCT %>% 
-  group_by(source, i_method, i_res) %>%
+  group_by(source, sensor, i_method, i_res) %>%
   arrange(date_time_ID) %>%
   mutate(nCT_i_cum = cumsum(CT_i_diff/1000)) %>% 
   ungroup()
@@ -1490,11 +1493,16 @@ NCP_flux_int <- NCP_flux %>%
 
 ```{r iCT_time_series}
 
+iCT <- iCT %>% 
+  mutate(sensor = if_else(sensor == "BloomSail", sensor, "VOS"))
+
 p_nCT <- iCT %>%
-  ggplot(aes(date_time_ID, nCT)) +
-  geom_point() +
-  geom_path() +
+  ggplot() +
+  geom_path(aes(date_time_ID, nCT)) +
+  geom_point(aes(date_time_ID, nCT, fill = sensor), shape = 21) +
   scale_color_discrete(name = "Reconstruction") +
+  scale_fill_manual(values = c("white", "black"),
+                    name = "") +
   scale_x_datetime(breaks = "week",
                    date_labels = "%d %b",
                    expand = c(0, 0)) +
@@ -1572,7 +1580,7 @@ p_NCP <- NCP_flux_int %>%
   ggplot() +
   geom_hline(yintercept = 0) +
   geom_path(data = tm_NCP_cum,
-            aes(date_time, nCT_i_flux_mix_cum, linetype = "best guess"),
+            aes(date_time, nCT_i_flux_mix_cum, linetype = "best-guess"),
             col = "black") +
   geom_path(aes(
     date_time,
@@ -1587,7 +1595,7 @@ p_NCP <- NCP_flux_int %>%
     sec.axis = dup_axis(),
     expand = c(0, 0)
   ) +
-  scale_linetype_manual(name = "Estimate",
+  scale_linetype_manual(name = "NCP estimate",
                         values = c(2,1)) +
   facet_wrap( ~ source) +
   labs(y = expression(atop(NCP, (mol ~ m ^ {
