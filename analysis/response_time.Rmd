@@ -1162,11 +1162,12 @@ rm(tm_pCO2_equi_grid_sub)
 
 ```{r plot_corrected_discretized_pCO2_profiles_appendix, include=FALSE}
 
-tm_grid %>%
+p_profile_corr <- tm_grid %>%
   filter(
     ID == parameters$example_ID,
     station == parameters$example_station,
-    tau_factor == parameters$tau_factor_used
+    tau_factor == parameters$tau_factor_used,
+    dep_grid < 20
   ) %>%
   arrange(dep_grid) %>%
   ggplot() +
@@ -1185,27 +1186,27 @@ tm_grid %>%
     legend.background = element_rect(colour = "black")
   )
 
-ggsave(
-  here::here(
-    "output/Plots/Figures_publication/appendix",
-    "Fig_A2.pdf"
-  ),
-  width = 100,
-  height = 140,
-  dpi = 300,
-  units = "mm"
-)
-
-ggsave(
-  here::here(
-    "output/Plots/Figures_publication/appendix",
-    "Fig_A2.png"
-  ),
-  width = 100,
-  height = 140,
-  dpi = 300,
-  units = "mm"
-)
+# ggsave(
+#   here::here(
+#     "output/Plots/Figures_publication/appendix",
+#     "Fig_A2.pdf"
+#   ),
+#   width = 100,
+#   height = 140,
+#   dpi = 300,
+#   units = "mm"
+# )
+# 
+# ggsave(
+#   here::here(
+#     "output/Plots/Figures_publication/appendix",
+#     "Fig_A2.png"
+#   ),
+#   width = 100,
+#   height = 140,
+#   dpi = 300,
+#   units = "mm"
+# )
       
 ```
 
@@ -1550,7 +1551,7 @@ tm_grid_shallow_sum %>%
 
 ```{r plot_cast_delta_pCO2_example, include=FALSE}
 
-tm_grid_shallow_sum %>%
+p_delta_pCO2 <- tm_grid_shallow_sum %>%
   filter(estimate %in% c("mean_abs"),
          tau_factor == parameters$tau_factor_used) %>%
   ggplot() +
@@ -1566,15 +1567,20 @@ tm_grid_shallow_sum %>%
   theme(
     legend.title = element_blank(),
     legend.position = c(0.8, 0.8),
-    legend.background = element_rect(colour = "black")
+    legend.background = element_rect(colour = "black"),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
   )
+
+p_profile_corr + p_delta_pCO2 +
+  plot_annotation(tag_levels = 'A')
 
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A3.pdf"
+    "Fig_A2.pdf"
   ),
-  width = 100,
+  width = 200,
   height = 140,
   dpi = 300,
   units = "mm"
@@ -1583,9 +1589,9 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A3.png"
+    "Fig_A2.png"
   ),
-  width = 100,
+  width = 200,
   height = 140,
   dpi = 300,
   units = "mm"
