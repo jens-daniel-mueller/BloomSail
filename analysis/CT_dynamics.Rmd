@@ -30,13 +30,16 @@ library(tibbletime)
 library(sp)
 library(kableExtra)
 library(LakeMetabolizer)
-# library(raster)
 library(rgdal)
+library(ggnewscale)
 
 ```
 
 ```{r ggplot_theme, include = FALSE}
-theme_set(theme_bw())
+
+geom_text_size <- (25.4 / 72.27) * 9
+theme_set(theme_bw(base_size = 9))
+
 ```
 
 ```{r read_parameters, include = FALSE}
@@ -303,10 +306,6 @@ EGS <- EGS %>%
         )
       )
 
-# hist(EGS$MODIS_2018_07_26_EGS.1_s)
-# hist(EGS$MODIS_2018_07_26_EGS.2_s)
-# hist(EGS$MODIS_2018_07_26_EGS.3_s)
-
 EGS <- EGS %>%
   dplyr::select(-c(
     MODIS_2018_07_26_EGS.1,
@@ -336,14 +335,14 @@ p_MODIS <-
     size = 1.5
   ) +
   scale_x_continuous(breaks = seq(10,30,1)) +
-  labs(x = "Longitude (°E)", y = "Latitude (°N)") +
-  theme(axis.title.x = element_blank())
+  labs(x = "Longitude (°E)", y = "Latitude (°N)")
 
 
 ```
 
 
 ```{r map, fig.cap="Location of stations sampled between the east coast of Gotland and Gotland deep.", fig.asp=1}
+
 
 map <-
   read_csv(here::here("data/input/Maps", "Bathymetry_Gotland_east_small.csv"))
@@ -379,6 +378,7 @@ tm_track <- tm %>%
   arrange(date_time) %>%
   slice(which(row_number() %% 50 == 1))
 
+
 p_map <-
   ggplot() +
   geom_contour_fill(
@@ -390,69 +390,85 @@ p_map <-
   geom_raster(data = map %>% filter(is.na(elev)),
               aes(lon, lat),
               fill = "darkgrey") +
+  geom_path(data = tm_track, aes(lon, lat, group = ID, col = "Data\nused")) +
+  scale_color_manual(values = c("orangered"),
+                     name = "") +
+  new_scale_color() +
   geom_path(data = tm_track, aes(lon, lat, group = ID, col = "sampled")) +
   geom_path(data = fm, aes(lon, lat, group = ID, col = Area)) +
-  geom_label(data = stations %>% filter(!(station %in% c("14", "13", "01"))),
-             aes(lon, lat, label = station, col = "utilized")) +
-  geom_label(data = stations %>% filter(station %in% c("14", "13", "01")),
-             aes(lon, lat, label = station, col = "sampled_station")) +
+  geom_label(
+    data = stations %>% filter(!(station %in% c("14", "13", "01"))),
+    aes(lon, lat, label = station, col = "utilized"),
+    size = geom_text_size
+  ) +
+  geom_label(
+    data = stations %>% filter(station %in% c("14", "13", "01")),
+    aes(lon, lat, label = station, col = "sampled_station"),
+    size = geom_text_size
+  ) +
   geom_point(aes(parameters$herrvik_lon, parameters$herrvik_lat)) +
   geom_text(
     aes(parameters$herrvik_lon, parameters$herrvik_lat, label = "Herrvik"),
-    nudge_x = -0.05
+    nudge_x = -0.05,
+    size = geom_text_size
   ) +
   geom_point(aes(parameters$ostergarn_lon, parameters$ostergarn_lat)) +
   geom_text(
     aes(parameters$ostergarn_lon, parameters$ostergarn_lat, label = "Flux tower"),
     nudge_x = -0.07,
-    nudge_y = 0.01
+    nudge_y = 0.01,
+    size = geom_text_size
   ) +
-  geom_text(aes(19.26, 57.57, label = "VOS Finnmaid"), col = "white") +
-  geom_text(aes(19.54, 57.29, label = "SV Tina V"), col = "white") +
+  geom_text(aes(19.26, 57.57, label = "VOS Finnmaid"),
+            col = "white",
+            size = geom_text_size) +
+  geom_text(aes(19.54, 57.29, label = "SV Tina V"),
+            col = "white",
+            size = geom_text_size) +
   coord_quickmap(
     expand = 0,
     ylim = c(parameters$map_lat_lo + 0.01, parameters$map_lat_hi - 0.01)
   ) +
-  scale_x_continuous(breaks = seq(10,30,0.1)) +
+  scale_x_continuous(breaks = seq(10, 30, 0.1)) +
   labs(x = "Longitude (°E)", y = "Latitude (°N)") +
   scale_fill_gradient(
     low = "lightsteelblue1",
     high = "dodgerblue4",
-    name = "Depth (m)",
+    name = "Depth (m)\n",
     breaks = seq(30, 150, 30),
-    limits = c(0,180),
+    limits = c(0, 180),
     guide = "colorstrip"
   ) +
-  guides(fill = guide_colorsteps(barheight = unit(5.5, "cm"),
-                                 show.limits = TRUE,
-                                 frame.colour = "black",
-                                 ticks = TRUE,
-                                 ticks.colour = "black")) +
+  guides(
+    fill = guide_colorsteps(
+      barheight = unit(4.5, "cm"),
+      show.limits = TRUE,
+      frame.colour = "black",
+      ticks = TRUE,
+      ticks.colour = "black"
+    )
+  ) +
   scale_color_manual(values = c("white", "darkgrey", "orangered"),
                      guide = FALSE)
 
 p_MODIS + p_map +
   plot_layout(ncol = 1) +
-  plot_annotation(tag_levels = 'A')
+  plot_annotation(tag_levels = 'a')
 
 ggsave(
-  here::here(
-    "output/Plots/Figures_publication/article",
-    "Fig_1.pdf"
-  ),
-  width = 220,
-  height = 250,
+  here::here("output/Plots/Figures_publication/article",
+             "Fig_1.pdf"),
+  width = 175,
+  height = 200,
   dpi = 300,
   units = "mm"
 )
 
 ggsave(
-  here::here(
-    "output/Plots/Figures_publication/article",
-    "Fig_1.png"
-  ),
-  width = 220,
-  height = 250,
+  here::here("output/Plots/Figures_publication/article",
+             "Fig_1.png"),
+  width = 160,
+  height = 170,
   dpi = 300,
   units = "mm"
 )
@@ -481,9 +497,9 @@ cover %>%
   geom_vline(aes(xintercept = date_time_ID, col = ID)) +
   geom_point(shape = 21) +
   scale_fill_viridis_d(labels = cruise_dates$date_ID,
-                       name = "Mean cruise date") +
+                       name = "Mean\ncruise date") +
   scale_color_viridis_d(labels = cruise_dates$date_ID,
-                        name = "Mean cruise date") +
+                        name = "Mean\ncruise date") +
   scale_x_datetime(date_breaks = "week",
                    date_labels = "%b %d") +
   labs(y = "Station") +
@@ -494,7 +510,7 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_2.pdf"
   ),
-  width = 130,
+  width = 100,
   height = 65,
   dpi = 300,
   units = "mm"
@@ -505,7 +521,7 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_2.png"
   ),
-  width = 130,
+  width = 100,
   height = 65,
   dpi = 300,
   units = "mm"
@@ -677,23 +693,24 @@ p_nCT <- tb_long_mean %>%
   scale_y_reverse(sec.axis = dup_axis()) +
   labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {-1}))),
        y = "Depth (m)") +
-  scale_fill_viridis_d(labels = cruise_dates$date_ID) +
-  scale_color_viridis_d(labels = cruise_dates$date_ID) +
+  scale_fill_viridis_d(labels = cruise_dates$date_ID,
+                        name = "Mean\ncruise date") +
+  scale_color_viridis_d(labels = cruise_dates$date_ID,
+                        name = "Mean\ncruise date") +
   theme(
     axis.text.y = element_blank(),
-    axis.title.y = element_blank(),
-    legend.title = element_blank()
+    axis.title.y = element_blank()
   )
 
 p_AT + p_CT + p_nCT +
-  plot_annotation(tag_levels = 'A')
+  plot_annotation(tag_levels = 'a')
 
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
     "Fig_A4.pdf"
   ),
-  width = 180,
+  width = 150,
   height = 80,
   dpi = 300,
   units = "mm"
@@ -704,7 +721,7 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_A4.png"
   ),
-  width = 180,
+  width = 150,
   height = 80,
   dpi = 300,
   units = "mm"
@@ -848,23 +865,23 @@ p_nCT <-
   geom_path() +
   scale_y_reverse(expand = c(0, 0)) +
   labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {-1})))) +
-  scale_color_viridis_d(labels = cruise_dates$date_ID) +
+  scale_color_viridis_d(labels = cruise_dates$date_ID,
+                        name = "Mean\ncruise date") +
   theme(
-    legend.title = element_blank(),
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
     axis.title.y = element_blank()
   )
 
 p_tem + p_pCO2 + p_nCT +
-  plot_annotation(tag_levels = 'A')
+  plot_annotation(tag_levels = 'a')
 
 ggsave(
   here::here(
     "output/Plots/Figures_publication/article",
     "Fig_3.pdf"
   ),
-  width = 180,
+  width = 150,
   height = 80,
   dpi = 300,
   units = "mm"
@@ -875,7 +892,7 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_3.png"
   ),
-  width = 180,
+  width = 150,
   height = 80,
   dpi = 300,
   units = "mm"
@@ -1105,6 +1122,7 @@ p_tem <-
               alpha = 0.2) +
   geom_path(aes(tem, dep, col = station)) +
   scale_y_reverse() +
+  scale_color_discrete(name = "Station") +
   facet_grid(ID ~ .,
              labeller = labeller(ID = cruise_labels)) +
   labs(x = "Temperature (\u00B0C)",
@@ -1119,8 +1137,8 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_A5.pdf"
   ),
-  width = 140,
-  height = 250,
+  width = 120,
+  height = 200,
   dpi = 300,
   units = "mm"
 )
@@ -1130,8 +1148,8 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_A5.png"
   ),
-  width = 140,
-  height = 250,
+  width = 120,
+  height = 200,
   dpi = 300,
   units = "mm"
 )
@@ -1543,8 +1561,8 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_A7.pdf"
   ),
-  width = 120,
-  height = 80,
+  width = 83,
+  height = 60,
   dpi = 300,
   units = "mm"
 )
@@ -1554,8 +1572,8 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_A7.png"
   ),
-  width = 120,
-  height = 80,
+  width = 83,
+  height = 60,
   dpi = 300,
   units = "mm"
 )
@@ -1651,14 +1669,12 @@ p_nCT_hov <- tm_profiles_ID_long %>%
   scale_fill_scico(
     breaks = MakeBreaks(bin_nCT),
     guide = "colorstrip",
-    name = expression(atop(paste(C[T],"*"),
-                           (µmol ~ kg ^ {
-                             -1
-                           }))),
+    name = expression(paste(C[T],"*")~(µmol ~ kg ^ {-1})~" "),
     palette = "davos",
     direction = -1
   ) +
-  guides(fill = guide_colorsteps(barheight = unit(4.5, "cm"),
+  guides(fill = guide_colorsteps(barheight = unit(3, "mm"),
+                                 barwidth = unit(65, "mm"),
                                  frame.colour = "black",
                                  show.limits = TRUE,
                                  ticks = TRUE,
@@ -1666,14 +1682,15 @@ p_nCT_hov <- tm_profiles_ID_long %>%
   scale_y_reverse(sec.axis = dup_axis()) +
   scale_x_datetime(breaks = "week",
                    date_labels = "%b %d") +
-  theme_bw() +
   labs(y = "Depth (m)") +
   coord_cartesian(expand = 0) +
   theme(
     axis.title.x = element_blank(),
     axis.title.y.right = element_blank(),
     axis.text.y.right = element_blank(),
-    legend.position = "left"
+    legend.position = "bottom",
+    legend.margin = margin(0, 0, 0, 0),
+    legend.box.margin = margin(0, 0, 0, 0)
   )
 
 bin_Tem <- 2
@@ -1691,11 +1708,11 @@ p_tem_hov <- tm_profiles_ID_long %>%
   scale_fill_viridis_c(
     breaks = MakeBreaks(bin_Tem),
     guide = "colorstrip",
-    name = expression(atop(Temperature,
-                           ("\u00B0" * C))),
+    name = expression(Temperature~("\u00B0" * C)),
     option = "inferno"
   ) +
-  guides(fill = guide_colorsteps(barheight = unit(4.5, "cm"),
+  guides(fill = guide_colorsteps(barheight = unit(3, "mm"),
+                                 barwidth = unit(55, "mm"),
                                  frame.colour = "black",
                                  show.limits = TRUE,
                                  ticks = TRUE,
@@ -1709,7 +1726,9 @@ p_tem_hov <- tm_profiles_ID_long %>%
     axis.title.x = element_blank(),
     axis.title.y.right = element_blank(),
     axis.text.y.right = element_blank(),
-    legend.position = "left"
+    legend.position = "top",
+    legend.margin = margin(0, 0, 0, 0),
+    legend.box.margin = margin(0, 0, 0, 0)
   )
 
 
@@ -1753,20 +1772,22 @@ p_tem_ID_cum <-
     legend.position = "top",
     axis.title.y.left = element_blank(),
     axis.text.y.left = element_blank(),
-    legend.title = element_blank()
+    legend.title = element_blank(),
+    legend.key.size = unit(4, "mm"),
+    legend.key.width = unit(4,"mm") 
   )
 
-((p_tem_hov | p_tem_ID_cum ) + plot_layout(tag_level = 'new', widths = c(2, 0.9))) / 
-((p_nCT_hov | p_nCT_ID_cum ) + plot_layout(tag_level = 'new', widths = c(2, 0.9))) +
-  plot_annotation(tag_levels = c('A', '1'))
+((p_tem_hov | p_tem_ID_cum ) + plot_layout(tag_level = 'new', widths = c(2.3, 1))) / 
+((p_nCT_hov | p_nCT_ID_cum ) + plot_layout(tag_level = 'new', widths = c(2.3, 1))) +
+  plot_annotation(tag_levels = c('a', '1'))
 
 ggsave(
   here::here(
     "output/Plots/Figures_publication/article",
     "Fig_4.pdf"
   ),
-  width = 260,
-  height = 170,
+  width = 175,
+  height = 150,
   dpi = 300,
   units = "mm"
 )
@@ -1776,8 +1797,8 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_4.png"
   ),
-  width = 260,
-  height = 170,
+  width = 175,
+  height = 140,
   dpi = 300,
   units = "mm"
 )
