@@ -448,7 +448,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">CT dynamics</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">05 January, 2021</h4>
+<h4 class="date">21 January, 2021</h4>
 
 </div>
 
@@ -473,7 +473,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-01-05
+<strong>Last updated:</strong> 2021-01-21
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -564,16 +564,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec5d47f730ce1d248296a2c3d9a9c9854dedcbcaftargetblankc5d47f7a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c5d47f730ce1d248296a2c3d9a9c9854dedcbcaf" target="_blank">c5d47f7</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreefd08dfedc7be5183c952d6cf8ee98ff01aa56f31targetblankfd08dfea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/fd08dfedc7be5183c952d6cf8ee98ff01aa56f31" target="_blank">fd08dfe</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec5d47f730ce1d248296a2c3d9a9c9854dedcbcaftargetblankc5d47f7a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreefd08dfedc7be5183c952d6cf8ee98ff01aa56f31targetblankfd08dfea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c5d47f730ce1d248296a2c3d9a9c9854dedcbcaf" target="_blank">c5d47f7</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/fd08dfedc7be5183c952d6cf8ee98ff01aa56f31" target="_blank">fd08dfe</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -627,6 +627,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/fd08dfedc7be5183c952d6cf8ee98ff01aa56f31/analysis/CT_dynamics.Rmd" target="_blank">fd08dfe</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-01-21
+</td>
+<td>
+modified figs
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/0a46411d15c007b1b441a64ad0f567d9ec1f063b/docs/CT_dynamics.html" target="_blank">0a46411</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-01-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -4369,8 +4403,8 @@ library(tibbletime)
 library(sp)
 library(kableExtra)
 library(LakeMetabolizer)
-# library(raster)
-library(rgdal)</code></pre>
+library(rgdal)
+library(ggnewscale)</code></pre>
 <div id="sensor-data" class="section level1">
 <h1><span class="header-section-number">1</span> Sensor data</h1>
 <div id="data-preparation" class="section level2">
@@ -4607,10 +4641,6 @@ EGS &lt;- EGS %&gt;%
         )
       )
 
-# hist(EGS$MODIS_2018_07_26_EGS.1_s)
-# hist(EGS$MODIS_2018_07_26_EGS.2_s)
-# hist(EGS$MODIS_2018_07_26_EGS.3_s)
-
 EGS &lt;- EGS %&gt;%
   dplyr::select(-c(
     MODIS_2018_07_26_EGS.1,
@@ -4640,8 +4670,7 @@ p_MODIS &lt;-
     size = 1.5
   ) +
   scale_x_continuous(breaks = seq(10,30,1)) +
-  labs(x = &quot;Longitude (°E)&quot;, y = &quot;Latitude (°N)&quot;) +
-  theme(axis.title.x = element_blank())</code></pre>
+  labs(x = &quot;Longitude (°E)&quot;, y = &quot;Latitude (°N)&quot;)</code></pre>
 <pre class="r"><code>map &lt;-
   read_csv(here::here(&quot;data/input/Maps&quot;, &quot;Bathymetry_Gotland_east_small.csv&quot;))
 
@@ -4676,6 +4705,7 @@ tm_track &lt;- tm %&gt;%
   arrange(date_time) %&gt;%
   slice(which(row_number() %% 50 == 1))
 
+
 p_map &lt;-
   ggplot() +
   geom_contour_fill(
@@ -4687,50 +4717,70 @@ p_map &lt;-
   geom_raster(data = map %&gt;% filter(is.na(elev)),
               aes(lon, lat),
               fill = &quot;darkgrey&quot;) +
+  geom_path(data = tm_track, aes(lon, lat, group = ID, col = &quot;Data\nused&quot;)) +
+  scale_color_manual(values = c(&quot;orangered&quot;),
+                     name = &quot;&quot;) +
+  new_scale_color() +
   geom_path(data = tm_track, aes(lon, lat, group = ID, col = &quot;sampled&quot;)) +
   geom_path(data = fm, aes(lon, lat, group = ID, col = Area)) +
-  geom_label(data = stations %&gt;% filter(!(station %in% c(&quot;14&quot;, &quot;13&quot;, &quot;01&quot;))),
-             aes(lon, lat, label = station, col = &quot;utilized&quot;)) +
-  geom_label(data = stations %&gt;% filter(station %in% c(&quot;14&quot;, &quot;13&quot;, &quot;01&quot;)),
-             aes(lon, lat, label = station, col = &quot;sampled_station&quot;)) +
+  geom_label(
+    data = stations %&gt;% filter(!(station %in% c(&quot;14&quot;, &quot;13&quot;, &quot;01&quot;))),
+    aes(lon, lat, label = station, col = &quot;utilized&quot;),
+    size = geom_text_size
+  ) +
+  geom_label(
+    data = stations %&gt;% filter(station %in% c(&quot;14&quot;, &quot;13&quot;, &quot;01&quot;)),
+    aes(lon, lat, label = station, col = &quot;sampled_station&quot;),
+    size = geom_text_size
+  ) +
   geom_point(aes(parameters$herrvik_lon, parameters$herrvik_lat)) +
   geom_text(
     aes(parameters$herrvik_lon, parameters$herrvik_lat, label = &quot;Herrvik&quot;),
-    nudge_x = -0.05
+    nudge_x = -0.05,
+    size = geom_text_size
   ) +
   geom_point(aes(parameters$ostergarn_lon, parameters$ostergarn_lat)) +
   geom_text(
     aes(parameters$ostergarn_lon, parameters$ostergarn_lat, label = &quot;Flux tower&quot;),
     nudge_x = -0.07,
-    nudge_y = 0.01
+    nudge_y = 0.01,
+    size = geom_text_size
   ) +
-  geom_text(aes(19.26, 57.57, label = &quot;VOS Finnmaid&quot;), col = &quot;white&quot;) +
-  geom_text(aes(19.54, 57.29, label = &quot;SV Tina V&quot;), col = &quot;white&quot;) +
+  geom_text(aes(19.26, 57.57, label = &quot;VOS Finnmaid&quot;),
+            col = &quot;white&quot;,
+            size = geom_text_size) +
+  geom_text(aes(19.54, 57.29, label = &quot;SV Tina V&quot;),
+            col = &quot;white&quot;,
+            size = geom_text_size) +
   coord_quickmap(
     expand = 0,
     ylim = c(parameters$map_lat_lo + 0.01, parameters$map_lat_hi - 0.01)
   ) +
-  scale_x_continuous(breaks = seq(10,30,0.1)) +
+  scale_x_continuous(breaks = seq(10, 30, 0.1)) +
   labs(x = &quot;Longitude (°E)&quot;, y = &quot;Latitude (°N)&quot;) +
   scale_fill_gradient(
     low = &quot;lightsteelblue1&quot;,
     high = &quot;dodgerblue4&quot;,
-    name = &quot;Depth (m)&quot;,
+    name = &quot;Depth (m)\n&quot;,
     breaks = seq(30, 150, 30),
-    limits = c(0,180),
+    limits = c(0, 180),
     guide = &quot;colorstrip&quot;
   ) +
-  guides(fill = guide_colorsteps(barheight = unit(5.5, &quot;cm&quot;),
-                                 show.limits = TRUE,
-                                 frame.colour = &quot;black&quot;,
-                                 ticks = TRUE,
-                                 ticks.colour = &quot;black&quot;)) +
+  guides(
+    fill = guide_colorsteps(
+      barheight = unit(4.5, &quot;cm&quot;),
+      show.limits = TRUE,
+      frame.colour = &quot;black&quot;,
+      ticks = TRUE,
+      ticks.colour = &quot;black&quot;
+    )
+  ) +
   scale_color_manual(values = c(&quot;white&quot;, &quot;darkgrey&quot;, &quot;orangered&quot;),
                      guide = FALSE)
 
 p_MODIS + p_map +
   plot_layout(ncol = 1) +
-  plot_annotation(tag_levels = &#39;A&#39;)</code></pre>
+  plot_annotation(tag_levels = &#39;a&#39;)</code></pre>
 <div class="figure" style="text-align: center">
 <img src="figure/CT_dynamics.Rmd/map-1.png" alt="Location of stations sampled between the east coast of Gotland and Gotland deep." width="672" />
 <p class="caption">
@@ -4738,23 +4788,19 @@ Location of stations sampled between the east coast of Gotland and Gotland deep.
 </p>
 </div>
 <pre class="r"><code>ggsave(
-  here::here(
-    &quot;output/Plots/Figures_publication/article&quot;,
-    &quot;Fig_1.pdf&quot;
-  ),
-  width = 220,
-  height = 250,
+  here::here(&quot;output/Plots/Figures_publication/article&quot;,
+             &quot;Fig_1.pdf&quot;),
+  width = 175,
+  height = 200,
   dpi = 300,
   units = &quot;mm&quot;
 )
 
 ggsave(
-  here::here(
-    &quot;output/Plots/Figures_publication/article&quot;,
-    &quot;Fig_1.png&quot;
-  ),
-  width = 220,
-  height = 250,
+  here::here(&quot;output/Plots/Figures_publication/article&quot;,
+             &quot;Fig_1.png&quot;),
+  width = 160,
+  height = 170,
   dpi = 300,
   units = &quot;mm&quot;
 )
@@ -4778,9 +4824,9 @@ cover %&gt;%
   geom_vline(aes(xintercept = date_time_ID, col = ID)) +
   geom_point(shape = 21) +
   scale_fill_viridis_d(labels = cruise_dates$date_ID,
-                       name = &quot;Mean cruise date&quot;) +
+                       name = &quot;Mean\ncruise date&quot;) +
   scale_color_viridis_d(labels = cruise_dates$date_ID,
-                        name = &quot;Mean cruise date&quot;) +
+                        name = &quot;Mean\ncruise date&quot;) +
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    date_labels = &quot;%b %d&quot;) +
   labs(y = &quot;Station&quot;) +
@@ -4796,7 +4842,7 @@ Spatio-temporal data coverage, indicated as station visits over time.
     &quot;output/Plots/Figures_publication/article&quot;,
     &quot;Fig_2.pdf&quot;
   ),
-  width = 130,
+  width = 100,
   height = 65,
   dpi = 300,
   units = &quot;mm&quot;
@@ -4807,7 +4853,7 @@ ggsave(
     &quot;output/Plots/Figures_publication/article&quot;,
     &quot;Fig_2.png&quot;
   ),
-  width = 130,
+  width = 100,
   height = 65,
   dpi = 300,
   units = &quot;mm&quot;
@@ -4947,23 +4993,24 @@ p_nCT &lt;- tb_long_mean %&gt;%
   scale_y_reverse(sec.axis = dup_axis()) +
   labs(x = expression(paste(C[T], &quot;*&quot;, ~ (µmol ~ kg ^ {-1}))),
        y = &quot;Depth (m)&quot;) +
-  scale_fill_viridis_d(labels = cruise_dates$date_ID) +
-  scale_color_viridis_d(labels = cruise_dates$date_ID) +
+  scale_fill_viridis_d(labels = cruise_dates$date_ID,
+                        name = &quot;Mean\ncruise date&quot;) +
+  scale_color_viridis_d(labels = cruise_dates$date_ID,
+                        name = &quot;Mean\ncruise date&quot;) +
   theme(
     axis.text.y = element_blank(),
-    axis.title.y = element_blank(),
-    legend.title = element_blank()
+    axis.title.y = element_blank()
   )
 
 p_AT + p_CT + p_nCT +
-  plot_annotation(tag_levels = &#39;A&#39;)</code></pre>
+  plot_annotation(tag_levels = &#39;a&#39;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/bottle_CO2_profiles_mean-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggsave(
   here::here(
     &quot;output/Plots/Figures_publication/appendix&quot;,
     &quot;Fig_A4.pdf&quot;
   ),
-  width = 180,
+  width = 150,
   height = 80,
   dpi = 300,
   units = &quot;mm&quot;
@@ -4974,7 +5021,7 @@ ggsave(
     &quot;output/Plots/Figures_publication/appendix&quot;,
     &quot;Fig_A4.png&quot;
   ),
-  width = 180,
+  width = 150,
   height = 80,
   dpi = 300,
   units = &quot;mm&quot;
@@ -5103,23 +5150,23 @@ p_nCT &lt;-
   geom_path() +
   scale_y_reverse(expand = c(0, 0)) +
   labs(x = expression(paste(C[T], &quot;*&quot;, ~ (µmol ~ kg ^ {-1})))) +
-  scale_color_viridis_d(labels = cruise_dates$date_ID) +
+  scale_color_viridis_d(labels = cruise_dates$date_ID,
+                        name = &quot;Mean\ncruise date&quot;) +
   theme(
-    legend.title = element_blank(),
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
     axis.title.y = element_blank()
   )
 
 p_tem + p_pCO2 + p_nCT +
-  plot_annotation(tag_levels = &#39;A&#39;)</code></pre>
+  plot_annotation(tag_levels = &#39;a&#39;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/profiles_all_by_date-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggsave(
   here::here(
     &quot;output/Plots/Figures_publication/article&quot;,
     &quot;Fig_3.pdf&quot;
   ),
-  width = 180,
+  width = 150,
   height = 80,
   dpi = 300,
   units = &quot;mm&quot;
@@ -5130,7 +5177,7 @@ ggsave(
     &quot;output/Plots/Figures_publication/article&quot;,
     &quot;Fig_3.png&quot;
   ),
-  width = 180,
+  width = 150,
   height = 80,
   dpi = 300,
   units = &quot;mm&quot;
@@ -5345,6 +5392,7 @@ p_tem &lt;-
               alpha = 0.2) +
   geom_path(aes(tem, dep, col = station)) +
   scale_y_reverse() +
+  scale_color_discrete(name = &quot;Station&quot;) +
   facet_grid(ID ~ .,
              labeller = labeller(ID = cruise_labels)) +
   labs(x = &quot;Temperature (\u00B0C)&quot;,
@@ -5364,8 +5412,8 @@ Mean vertical profiles per cruise day across all stations plotted indivdually. R
     &quot;output/Plots/Figures_publication/appendix&quot;,
     &quot;Fig_A5.pdf&quot;
   ),
-  width = 140,
-  height = 250,
+  width = 120,
+  height = 200,
   dpi = 300,
   units = &quot;mm&quot;
 )
@@ -5375,8 +5423,8 @@ ggsave(
     &quot;output/Plots/Figures_publication/appendix&quot;,
     &quot;Fig_A5.png&quot;
   ),
-  width = 140,
-  height = 250,
+  width = 120,
+  height = 200,
   dpi = 300,
   units = &quot;mm&quot;
 )
@@ -6553,8 +6601,8 @@ nCT_sens %&gt;%
     &quot;output/Plots/Figures_publication/appendix&quot;,
     &quot;Fig_A7.pdf&quot;
   ),
-  width = 120,
-  height = 80,
+  width = 83,
+  height = 60,
   dpi = 300,
   units = &quot;mm&quot;
 )
@@ -6564,8 +6612,8 @@ ggsave(
     &quot;output/Plots/Figures_publication/appendix&quot;,
     &quot;Fig_A7.png&quot;
   ),
-  width = 120,
-  height = 80,
+  width = 83,
+  height = 60,
   dpi = 300,
   units = &quot;mm&quot;
 )</code></pre>
@@ -7965,15 +8013,16 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] rgdal_1.5-18           LakeMetabolizer_1.5.0  rLakeAnalyzer_1.11.4.1
- [4] kableExtra_1.3.1       sp_1.4-4               tibbletime_0.1.6      
- [7] zoo_1.8-8              lubridate_1.7.9.2      scico_1.2.0           
-[10] metR_0.9.0             marelac_2.1.10         shape_1.4.5           
-[13] seacarb_3.2.14         oce_1.2-0              gsw_1.0-5             
-[16] testthat_3.0.1         patchwork_1.1.1        forcats_0.5.0         
-[19] stringr_1.4.0          dplyr_1.0.2            purrr_0.3.4           
-[22] readr_1.4.0            tidyr_1.1.2            tibble_3.0.4          
-[25] ggplot2_3.3.3          tidyverse_1.3.0        workflowr_1.6.2       
+ [1] ggnewscale_0.4.5       rgdal_1.5-18           LakeMetabolizer_1.5.0 
+ [4] rLakeAnalyzer_1.11.4.1 kableExtra_1.3.1       sp_1.4-4              
+ [7] tibbletime_0.1.6       zoo_1.8-8              lubridate_1.7.9.2     
+[10] scico_1.2.0            metR_0.9.0             marelac_2.1.10        
+[13] shape_1.4.5            seacarb_3.2.14         oce_1.2-0             
+[16] gsw_1.0-5              testthat_3.0.1         patchwork_1.1.1       
+[19] forcats_0.5.0          stringr_1.4.0          dplyr_1.0.2           
+[22] purrr_0.3.4            readr_1.4.0            tidyr_1.1.2           
+[25] tibble_3.0.4           ggplot2_3.3.3          tidyverse_1.3.0       
+[28] workflowr_1.6.2       
 
 loaded via a namespace (and not attached):
  [1] fs_1.5.0           RColorBrewer_1.1-2 webshot_0.5.2      httr_1.4.2        
