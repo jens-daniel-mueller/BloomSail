@@ -28,7 +28,8 @@ library(metR)
 ```
 
 ```{r ggplot_theme, include = FALSE}
-theme_set(theme_bw())
+geom_text_size <- (25.4 / 72.27) * 9
+theme_set(theme_bw(base_size = 9))
 ```
 
 
@@ -1363,7 +1364,7 @@ CPD <- CPD %>%
   mutate(source = fct_recode(
     source,
     `VOS Finnmaid + GETM model` = "fm",
-    `BloomSail (surface only)` = "tm"
+    `SV Tina V (surface only)` = "tm"
   ))
 
 i_dep <- i_dep %>%
@@ -1371,14 +1372,15 @@ i_dep <- i_dep %>%
   mutate(source = fct_recode(
     source,
     `VOS Finnmaid + GETM model` = "fm",
-    `BloomSail (surface only)` = "tm"
+    `SV Tina V (surface only)` = "tm"
   ))
+
 tm_fm_gt <- tm_fm_gt %>%
   mutate(source = factor(source, c("tm", "fm"))) %>%
   mutate(source = fct_recode(
     source,
     `VOS Finnmaid + GETM model` = "fm",
-    `BloomSail (surface only)` = "tm"
+    `SV Tina V (surface only)` = "tm"
   ))
 
 p_hov_dep <-
@@ -1391,13 +1393,14 @@ p_hov_dep <-
   geom_path(data = i_dep %>% filter(i_res == "daily" & i_dep != 0),
             aes(date_time_ID, i_dep, col = i_method)) +
   scale_fill_gradient(
-    name = "Tem (°C)",
+    name = "Temperature\n(\u00B0C)",
     guide = "colorstrip",
     breaks = MakeBreaks(bin),
     high = "grey90",
     low = "grey20"
   ) +
-  guides(fill = guide_colorsteps(barheight = unit(5.5, "cm"),
+  guides(fill = guide_colorsteps(barheight = unit(40, "mm"),
+                                 barwidth = unit(4, "mm"),
                                  frame.colour = "black",
                                  show.limits = TRUE,
                                  ticks = TRUE,
@@ -1438,7 +1441,7 @@ tm_fm_gt_surface <- tm_fm_gt %>%
   ungroup()
 
 tm_fm_gt_surface <- tm_fm_gt_surface %>%
-  group_by(source, sensor) %>%
+  group_by(source) %>%
   arrange(date_time_ID) %>%
   mutate(
     date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
@@ -1468,7 +1471,7 @@ iCT <- iCT %>%
   mutate(CT_i_diff = nCT_diff * i_dep)
 
 iCT <- iCT %>% 
-  group_by(source, sensor, i_method, i_res) %>%
+  group_by(source, i_method, i_res) %>%
   arrange(date_time_ID) %>%
   mutate(nCT_i_cum = cumsum(CT_i_diff/1000)) %>% 
   ungroup()
@@ -1524,13 +1527,13 @@ p_nCT <- iCT %>%
   ggplot() +
   geom_path(aes(date_time_ID, nCT)) +
   geom_point(aes(date_time_ID, nCT, fill = sensor), shape = 21) +
-  scale_color_discrete(name = "Reconstruction") +
+  # scale_color_discrete(name = "Reconstruction") +
   scale_fill_manual(values = c("white", "black"),
-                    name = "") +
+                    guide = FALSE) +
   scale_x_datetime(breaks = "week",
                    date_labels = "%d %b",
                    expand = c(0, 0)) +
-  scale_linetype(name = "Resolution") +
+  # scale_linetype(name = "Resolution") +
   facet_wrap( ~ source) +
   labs(y = expression(atop(paste(C[T],"*"), (mu * mol ~ kg ^ {
     -1
@@ -1538,9 +1541,9 @@ p_nCT <- iCT %>%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())
 
-iCT <- iCT %>%
-  mutate(i_res = fct_recode(i_res, `cumulative` = "cum")) %>%
-  mutate(i_res = factor(i_res, c("mean", "cumulative", "daily")))
+# iCT <- iCT %>%
+#   mutate(i_res = fct_recode(i_res, `cumulative` = "cum")) %>%
+#   mutate(i_res = factor(i_res, c("mean", "cumulative", "daily")))
 
 p_iCT <- iCT %>%
   ggplot() +
@@ -1556,7 +1559,7 @@ p_iCT <- iCT %>%
   ) +
   scale_linetype(name = "Resolution") +
   facet_wrap( ~ source) +
-  labs(y = expression(atop(integrated ~ nC[T], (mol ~ m ^ {
+  labs(y = expression(atop(Integrated ~ nC[T], (mol ~ m ^ {
     -2
   })))) +
   guides(color = guide_legend(order = 1)) +
@@ -1634,15 +1637,15 @@ p_NCP <- NCP_flux_int %>%
   )
 
 p_nCT / p_hov_dep / p_NCP +
-  plot_annotation(tag_levels = 'A')
+  plot_annotation(tag_levels = 'a')
 
 ggsave(
   here::here(
     "output/Plots/Figures_publication/article",
     "Fig_6.pdf"
   ),
-  width = 220,
-  height = 200,
+  width = 175,
+  height = 175,
   dpi = 300,
   units = "mm"
 )
@@ -1652,8 +1655,8 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_6.png"
   ),
-  width = 220,
-  height = 200,
+  width = 175,
+  height = 175,
   dpi = 300,
   units = "mm"
 )

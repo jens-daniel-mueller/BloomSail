@@ -2427,7 +2427,7 @@ p_tem_surf <- tm_profiles_surface_long_ID %>%
   scale_fill_discrete(guide = FALSE) +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
-  labs(y = "temperature \n (\u00B0C)") +
+  labs(y = expression(atop("Temperature","(\u00B0C)"))) +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())
 
@@ -2471,7 +2471,9 @@ p_nCT_surf <-
     legend.title = element_blank(),
     legend.direction = "horizontal",
     legend.background = element_rect(fill = "transparent"),
-    legend.key = element_rect(colour = "black", fill = "white")
+    legend.key = element_rect(colour = "black", fill = "white"),
+    legend.key.height = unit(4, "mm"),
+    legend.key.width = unit(4,"mm") 
   )
 
 
@@ -2569,7 +2571,7 @@ p_wind <- tm_og %>%
   geom_path(aes(y = wind)) +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(wind~speed, (m ~ s ^ {
+  labs(y = expression(atop(Wind~speed, (m ~ s ^ {
     -1
   })))) +
   theme(
@@ -2726,7 +2728,6 @@ date_180806 <- unique(NCP$date_time)[7]
 ### Air-sea fluxes
 
 ```{r calculate_flux_correction}
-
 
 # calculate cumulative air-sea fluxes affecting surface water column
 tm_og_flux <- tm_og %>%
@@ -2972,9 +2973,9 @@ p_inCT <- NCP_flux_mix_long %>%
   scale_x_datetime(date_breaks = "week",
                    date_labels = "%b %d",
                    sec.axis = dup_axis()) +
-  scale_fill_brewer(palette = "Dark2", name = "incremental changes") +
-  scale_color_brewer(palette = "Dark2", name = "cumulative changes") +
-  labs(y = expression(atop(integrated ~ nC[T], (mol ~ m ^ {
+  scale_fill_brewer(palette = "Dark2", name = "Incremental changes") +
+  scale_color_brewer(palette = "Dark2", name = "Cumulative changes") +
+  labs(y = expression(atop(Integrated ~ paste(C[T],"*"), (mol ~ m ^ {
     -2
   }))),
   title = "Water column inventory changes") +
@@ -3209,9 +3210,9 @@ p_inCT <- NCP_flux_mix_long %>%
   scale_x_datetime(date_breaks = "week",
                    date_labels = "%b %d",
                    sec.axis = dup_axis()) +
-  scale_fill_brewer(palette = "Dark2", name = "incremental changes") +
-  scale_color_brewer(palette = "Dark2", name = "cumulative changes") +
-  labs(y = expression(atop(integrated ~ paste(C[T],"*"), (mol ~ m ^ {
+  scale_fill_brewer(palette = "Dark2", name = "Incremental changes") +
+  scale_color_brewer(palette = "Dark2", name = "Cumulative changes") +
+  labs(y = expression(atop(Integrated ~ paste(C[T],"*"), (mol ~ m ^ {
     -2
   }))),
   title = "Water column inventory changes") +
@@ -3253,7 +3254,7 @@ p_pCO2_surf + p_tem_surf + p_nCT_surf +
   p_inCT +
   plot_layout(ncol = 1,
               heights = c(rep(1.35, 7), 4)) +
-  plot_annotation(tag_levels = 'A')
+  plot_annotation(tag_levels = 'a')
 
 ggsave(
   here::here(
@@ -3271,8 +3272,8 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_5.png"
   ),
-  width = 160,
-  height = 340,
+  width = 140,
+  height = 260,
   dpi = 300,
   units = "mm"
 )
