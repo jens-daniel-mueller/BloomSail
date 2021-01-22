@@ -120,7 +120,7 @@ wflow_publish(c(
   "analysis/CT_dynamics.Rmd",
   "analysis/Phytoplankton.Rmd",
   "analysis/NCP_reconstruction.Rmd"
-), message = "new Fig_AX names, A5 added", republish = TRUE)
+), message = "all figs revised", republish = TRUE)
 
 
 # Push latest version to GitHub
