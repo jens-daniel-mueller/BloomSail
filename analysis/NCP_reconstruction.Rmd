@@ -270,11 +270,11 @@ p_tem <-
 
 p_tem + p_nCT +
   plot_layout(guides = 'collect') +
-  plot_annotation(tag_levels = 'A')
+  plot_annotation(tag_levels = 'a')
 
 ggsave(
   here::here("output/Plots/Figures_publication/appendix",
-             "Fig_A9.pdf"),
+             "Fig_A8.pdf"),
   width = 150,
   height = 150,
   dpi = 300,
@@ -283,7 +283,7 @@ ggsave(
 
 ggsave(
   here::here("output/Plots/Figures_publication/appendix",
-             "Fig_A9.png"),
+             "Fig_A8.png"),
   width = 150,
   height = 150,
   dpi = 300,

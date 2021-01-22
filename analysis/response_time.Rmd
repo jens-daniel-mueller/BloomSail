@@ -178,8 +178,8 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_A1.pdf"
   ),
-  width = 180,
-  height = 90,
+  width = 83,
+  height = 50,
   dpi = 300,
   units = "mm"
 )
@@ -189,8 +189,8 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_A1.png"
   ),
-  width = 180,
-  height = 90,
+  width = 83,
+  height = 50,
   dpi = 300,
   units = "mm"
 )
@@ -1574,15 +1574,15 @@ p_delta_pCO2 <- tm_grid_shallow_sum %>%
   )
 
 p_profile_corr + p_delta_pCO2 +
-  plot_annotation(tag_levels = 'A')
+  plot_annotation(tag_levels = 'a')
 
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
     "Fig_A2.pdf"
   ),
-  width = 200,
-  height = 140,
+  width = 175,
+  height = 120,
   dpi = 300,
   units = "mm"
 )
@@ -1592,8 +1592,8 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_A2.png"
   ),
-  width = 200,
-  height = 140,
+  width = 175,
+  height = 120,
   dpi = 300,
   units = "mm"
 )

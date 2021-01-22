@@ -99,21 +99,19 @@ tp_ID_grid %>%
   ggplot(aes(date_time_ID, value, col = dep_grid)) +
   geom_point() +
   geom_line() +
-  facet_wrap(~ Species, ncol=1) +
+  facet_wrap(~ Species, ncol = 1) +
   scale_color_brewer(palette = "Set1", name = "Depth (m)") +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  # scale_y_continuous(sec.axis = sec_axis(~ . * 0.16 / 12,
-  #                                        name = expression(Biomass ~ (mu~mol-C~kg^-1)))) +
   labs(y = expression(Biomass ~ (mg~m^-3))) +
   theme(axis.title.x = element_blank())
 
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A6.pdf"
+    "Fig_A5.pdf"
   ),
-  width = 180,
-  height = 120,
+  width = 140,
+  height = 90,
   dpi = 300,
   units = "mm"
 )
@@ -121,10 +119,10 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A6.png"
+    "Fig_A5.png"
   ),
-  width = 180,
-  height = 120,
+  width = 140,
+  height = 90,
   dpi = 300,
   units = "mm"
 )
