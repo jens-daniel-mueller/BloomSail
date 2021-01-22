@@ -2427,7 +2427,7 @@ p_tem_surf <- tm_profiles_surface_long_ID %>%
   scale_fill_discrete(guide = FALSE) +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop("Temperature","(\u00B0C)"))) +
+  labs(y = expression(atop("SST","(\u00B0C)"))) +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())
 
