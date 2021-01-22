@@ -446,7 +446,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">NCP reconstruction</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">08 January, 2021</h4>
+<h4 class="date">22 January, 2021</h4>
 
 </div>
 
@@ -471,7 +471,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-01-08
+<strong>Last updated:</strong> 2021-01-22
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -562,16 +562,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree7cd025c313458acfe2f7487ff5446379b0a8751dtargetblank7cd025ca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/7cd025c313458acfe2f7487ff5446379b0a8751d" target="_blank">7cd025c</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree88fcb0042ed7a6165f703ef5b56cec07d4f69698targetblank88fcb00a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/88fcb0042ed7a6165f703ef5b56cec07d4f69698" target="_blank">88fcb00</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree7cd025c313458acfe2f7487ff5446379b0a8751dtargetblank7cd025ca" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree88fcb0042ed7a6165f703ef5b56cec07d4f69698targetblank88fcb00a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/7cd025c313458acfe2f7487ff5446379b0a8751d" target="_blank">7cd025c</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/88fcb0042ed7a6165f703ef5b56cec07d4f69698" target="_blank">88fcb00</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -587,6 +587,18 @@ Ignored files:
 
 Untracked files:
     Untracked:  output/Plots/Figures_publication/Appendix/
+
+Unstaged changes:
+    Modified:   output/Plots/Figures_publication/Article/Fig_1.pdf
+    Modified:   output/Plots/Figures_publication/Article/Fig_1.png
+    Modified:   output/Plots/Figures_publication/Article/Fig_2.pdf
+    Modified:   output/Plots/Figures_publication/Article/Fig_2.png
+    Modified:   output/Plots/Figures_publication/Article/Fig_3.pdf
+    Modified:   output/Plots/Figures_publication/Article/Fig_3.png
+    Modified:   output/Plots/Figures_publication/Article/Fig_4.pdf
+    Modified:   output/Plots/Figures_publication/Article/Fig_4.png
+    Modified:   output/Plots/Figures_publication/Article/Fig_5.pdf
+    Modified:   output/Plots/Figures_publication/Article/Fig_5.png
 
 </code></pre>
 <p>
@@ -625,6 +637,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/88fcb0042ed7a6165f703ef5b56cec07d4f69698/analysis/NCP_reconstruction.Rmd" target="_blank">88fcb00</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-01-22
+</td>
+<td>
+modified figs
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/cde4f1d49041c50932173b6b944d8023de9af704/docs/NCP_reconstruction.html" target="_blank">cde4f1d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-01-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2830,7 +2876,7 @@ CPD &lt;- CPD %&gt;%
   mutate(source = fct_recode(
     source,
     `VOS Finnmaid + GETM model` = &quot;fm&quot;,
-    `BloomSail (surface only)` = &quot;tm&quot;
+    `SV Tina V (surface only)` = &quot;tm&quot;
   ))
 
 i_dep &lt;- i_dep %&gt;%
@@ -2838,14 +2884,15 @@ i_dep &lt;- i_dep %&gt;%
   mutate(source = fct_recode(
     source,
     `VOS Finnmaid + GETM model` = &quot;fm&quot;,
-    `BloomSail (surface only)` = &quot;tm&quot;
+    `SV Tina V (surface only)` = &quot;tm&quot;
   ))
+
 tm_fm_gt &lt;- tm_fm_gt %&gt;%
   mutate(source = factor(source, c(&quot;tm&quot;, &quot;fm&quot;))) %&gt;%
   mutate(source = fct_recode(
     source,
     `VOS Finnmaid + GETM model` = &quot;fm&quot;,
-    `BloomSail (surface only)` = &quot;tm&quot;
+    `SV Tina V (surface only)` = &quot;tm&quot;
   ))
 
 p_hov_dep &lt;-
@@ -2858,13 +2905,14 @@ p_hov_dep &lt;-
   geom_path(data = i_dep %&gt;% filter(i_res == &quot;daily&quot; &amp; i_dep != 0),
             aes(date_time_ID, i_dep, col = i_method)) +
   scale_fill_gradient(
-    name = &quot;Tem (°C)&quot;,
+    name = &quot;Temperature\n(\u00B0C)&quot;,
     guide = &quot;colorstrip&quot;,
     breaks = MakeBreaks(bin),
     high = &quot;grey90&quot;,
     low = &quot;grey20&quot;
   ) +
-  guides(fill = guide_colorsteps(barheight = unit(5.5, &quot;cm&quot;),
+  guides(fill = guide_colorsteps(barheight = unit(40, &quot;mm&quot;),
+                                 barwidth = unit(4, &quot;mm&quot;),
                                  frame.colour = &quot;black&quot;,
                                  show.limits = TRUE,
                                  ticks = TRUE,
@@ -2901,7 +2949,7 @@ p_hov_dep</code></pre>
   ungroup()
 
 tm_fm_gt_surface &lt;- tm_fm_gt_surface %&gt;%
-  group_by(source, sensor) %&gt;%
+  group_by(source) %&gt;%
   arrange(date_time_ID) %&gt;%
   mutate(
     date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
@@ -2920,7 +2968,7 @@ rm(tm_fm_gt_surface)</code></pre>
   mutate(CT_i_diff = nCT_diff * i_dep)
 
 iCT &lt;- iCT %&gt;% 
-  group_by(source, sensor, i_method, i_res) %&gt;%
+  group_by(source, i_method, i_res) %&gt;%
   arrange(date_time_ID) %&gt;%
   mutate(nCT_i_cum = cumsum(CT_i_diff/1000)) %&gt;% 
   ungroup()</code></pre>
@@ -2959,13 +3007,13 @@ p_nCT &lt;- iCT %&gt;%
   ggplot() +
   geom_path(aes(date_time_ID, nCT)) +
   geom_point(aes(date_time_ID, nCT, fill = sensor), shape = 21) +
-  scale_color_discrete(name = &quot;Reconstruction&quot;) +
+  # scale_color_discrete(name = &quot;Reconstruction&quot;) +
   scale_fill_manual(values = c(&quot;white&quot;, &quot;black&quot;),
-                    name = &quot;&quot;) +
+                    guide = FALSE) +
   scale_x_datetime(breaks = &quot;week&quot;,
                    date_labels = &quot;%d %b&quot;,
                    expand = c(0, 0)) +
-  scale_linetype(name = &quot;Resolution&quot;) +
+  # scale_linetype(name = &quot;Resolution&quot;) +
   facet_wrap( ~ source) +
   labs(y = expression(atop(paste(C[T],&quot;*&quot;), (mu * mol ~ kg ^ {
     -1
@@ -2973,9 +3021,9 @@ p_nCT &lt;- iCT %&gt;%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())
 
-iCT &lt;- iCT %&gt;%
-  mutate(i_res = fct_recode(i_res, `cumulative` = &quot;cum&quot;)) %&gt;%
-  mutate(i_res = factor(i_res, c(&quot;mean&quot;, &quot;cumulative&quot;, &quot;daily&quot;)))
+# iCT &lt;- iCT %&gt;%
+#   mutate(i_res = fct_recode(i_res, `cumulative` = &quot;cum&quot;)) %&gt;%
+#   mutate(i_res = factor(i_res, c(&quot;mean&quot;, &quot;cumulative&quot;, &quot;daily&quot;)))
 
 p_iCT &lt;- iCT %&gt;%
   ggplot() +
@@ -2991,7 +3039,7 @@ p_iCT &lt;- iCT %&gt;%
   ) +
   scale_linetype(name = &quot;Resolution&quot;) +
   facet_wrap( ~ source) +
-  labs(y = expression(atop(integrated ~ nC[T], (mol ~ m ^ {
+  labs(y = expression(atop(Integrated ~ nC[T], (mol ~ m ^ {
     -2
   })))) +
   guides(color = guide_legend(order = 1)) +
@@ -3063,15 +3111,15 @@ p_NCP &lt;- NCP_flux_int %&gt;%
   )
 
 p_nCT / p_hov_dep / p_NCP +
-  plot_annotation(tag_levels = &#39;A&#39;)</code></pre>
+  plot_annotation(tag_levels = &#39;a&#39;)</code></pre>
 <p><img src="figure/NCP_reconstruction.Rmd/NCP_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggsave(
   here::here(
     &quot;output/Plots/Figures_publication/article&quot;,
     &quot;Fig_6.pdf&quot;
   ),
-  width = 220,
-  height = 200,
+  width = 175,
+  height = 175,
   dpi = 300,
   units = &quot;mm&quot;
 )
@@ -3081,8 +3129,8 @@ ggsave(
     &quot;output/Plots/Figures_publication/article&quot;,
     &quot;Fig_6.png&quot;
   ),
-  width = 220,
-  height = 200,
+  width = 175,
+  height = 175,
   dpi = 300,
   units = &quot;mm&quot;
 )</code></pre>
