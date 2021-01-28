@@ -197,7 +197,7 @@ p_nCT <-
       filter(var == "nCT", value_diff_daily < 0),
     aes(x = value_diff_daily, y = dep),
     width = 1,
-    alpha = 0.5,
+    alpha = 0.2,
     orientation = "y"
   ) +
   geom_vline(xintercept = 0) +
@@ -213,8 +213,7 @@ p_nCT <-
     "text",
     x = -3.5,
     y = 2.5,
-    label = "Integrated change",
-    col = "white"
+    label = "Integrated change"
   ) +
   geom_point(aes(value_diff_daily, dep)) +
   geom_path(aes(value_diff_daily, dep)) +
@@ -241,7 +240,7 @@ p_tem <-
       filter(var == "tem", value_diff_daily > 0),
     aes(x = value_diff_daily, y = dep),
     width = 1,
-    alpha = 0.5,
+    alpha = 0.2,
     orientation = "y"
   ) +
   geom_vline(xintercept = 0) +
@@ -257,8 +256,7 @@ p_tem <-
     "text",
     x = 0.2,
     y = 2.5,
-    label = "Integrated change",
-    col = "white"
+    label = "Integrated change"
   ) +
   geom_point(aes(value_diff_daily, dep)) +
   geom_path(aes(value_diff_daily, dep)) +

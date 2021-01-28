@@ -12,7 +12,6 @@ editor_options:
   chunk_output_type: console
 ---
 
-
 ```{r global_options, include = FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
@@ -48,28 +47,25 @@ parameters <-
                        "parameters.rds"))
 ```
 
-
-
 # Sensor data
 
 ## Data preparation
 
 Profile data are prepared by:
 
-- Ignoring those made on June 16 (pCO2 sensor not in operation)
-- Removing HydroC Flush and Zeroing periods
-- Selecting only continous downcast periods
-- Gridding profiles to `r parameters$dep_grid`m depth intervals
-- removing grids with pCO2 < 0 µatm (presumably RT correction artefact after zeroing)
-- Discarding profiles with `r parameters$max_dep_gap` or more observation missing within upper `r parameters$max_dep`m
-- assigning mean date_time_ID value to all profiles belonging to one cruise
-- discarding "coastal" station P01, P13, P14
-- Restricting profiles to upper `r parameters$max_dep`m
+-   Ignoring those made on June 16 (pCO2 sensor not in operation)
+-   Removing HydroC Flush and Zeroing periods
+-   Selecting only continous downcast periods
+-   Gridding profiles to `r parameters$dep_grid`m depth intervals
+-   removing grids with pCO2 \< 0 µatm (presumably RT correction artefact after zeroing)
+-   Discarding profiles with `r parameters$max_dep_gap` or more observation missing within upper `r parameters$max_dep`m
+-   assigning mean date_time_ID value to all profiles belonging to one cruise
+-   discarding "coastal" station P01, P13, P14
+-   Restricting profiles to upper `r parameters$max_dep`m
 
 Please note that:
 
-- The label ID representm the start date of the cruise ("YYMMDD"), not the exact mean sampling date
-
+-   The label ID represents the start date of the cruise ("YYMMDD"), not the exact mean sampling date
 
 ```{r read_prepare_sensor_data}
 
@@ -227,8 +223,6 @@ cruise_dates %>%
 
 ```
 
-
-
 ## Station map
 
 ```{r read_subset_fm_data}
@@ -256,7 +250,6 @@ fm %>%
 
 ```
 
-
 ```{r read_plot_MODIS_image}
 
 # https://shekeine.github.io/visualization/2014/09/27/sfcc_rgb_in_R
@@ -273,10 +266,6 @@ EGS <- EGS %>%
   rename(lat = y,
          lon = x) %>% 
   filter(lat >= 56.4, lat <= 58.3)
-
-# hist(EGS$MODIS_2018_07_26_EGS.1)
-# hist(EGS$MODIS_2018_07_26_EGS.2)
-# hist(EGS$MODIS_2018_07_26_EGS.3)
 
 EGS <- EGS %>%
   mutate(
@@ -339,7 +328,6 @@ p_MODIS <-
 
 
 ```
-
 
 ```{r map, fig.cap="Location of stations sampled between the east coast of Gotland and Gotland deep.", fig.asp=1}
 
@@ -479,7 +467,6 @@ rm(map, map_low_res,
 rm(tm)
 
 ```
-
 
 ## Data coverage
 
@@ -731,7 +718,6 @@ rm(tb_long_mean, p_AT, p_CT, p_nCT, tb_fix)
 
 ```
 
-
 ## Surface time series
 
 ```{r plot_bottle_CO2_surface_timeseries, fig.cap="Time series of bottle data. Shown are mean values of samples collected at water depths < 10m (usually collected at 0 and 5 m).", fig.asp=1.1}
@@ -768,10 +754,7 @@ tb_long %>%
 rm(tb_long, tb_surface, tb)
 ```
 
-
-Important notes:
-- nC~T~ drop and temporal patterns agree well with those found in the nC~T~ time series derived from pCO~2~ measurements (below).
-
+Important notes: - nC~T~ drop and temporal patterns agree well with those found in the nC~T~ time series derived from pCO~2~ measurements (below).
 
 # nC~T~ profiles
 
@@ -825,8 +808,6 @@ tm_profiles <- tm_profiles %>%
 
 
 ```
-
-
 
 ## Plot all profiles
 
@@ -912,7 +893,6 @@ tm_profiles %>%
 
 ```
 
-
 ## Mean profiles
 
 Mean vertical profiles were calculated for each cruise day (ID).
@@ -961,7 +941,6 @@ rm(
 )
 
 ```
-
 
 ```{r nCT_profiles_all, fig.cap="Mean vertical profiles per cruise day across all stations."}
 
@@ -1160,14 +1139,11 @@ rm(p_nCT, p_tem, cruise_labels, profiles_min_max)
 
 Important notes:
 
-- the standard deviation of C~T~ in the upper 10m increases on June 30.
+-   the standard deviation of C~T~ in the upper 10m increases on June 30.
 
 ## Individual profiles
 
-C~T~, pCO~2~, S, and T profiles were plotted individually 
-[pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_pCO2_tem_sal_CT.pdf){target="_blank"} 
-and grouped by ID 
-[pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_ID_pCO2_tem_sal_CT.pdf){target="_blank"}. The later gives an idea of the differences between stations at one point in time.
+C~T~, pCO~2~, S, and T profiles were plotted individually [pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_pCO2_tem_sal_CT.pdf){target="_blank"} and grouped by ID [pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_ID_pCO2_tem_sal_CT.pdf){target="_blank"}. The later gives an idea of the differences between stations at one point in time.
 
 ```{r plot_all_discretized_profiles_individual, eval=FALSE}
 
@@ -1298,8 +1274,6 @@ rm(i_ID, tm_profiles_long)
 
 ```
 
-
-
 ## Profiles of incremental changes
 
 Changes of seawater vars at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.
@@ -1356,13 +1330,11 @@ tm_profiles_ID_long %>%
 
 ```
 
-
 Important notes:
 
-- Salinity in the upper 10m decreases by >0.1 on June 30, and returns to average conditions already on Aug 02.
+-   Salinity in the upper 10m decreases by \>0.1 on June 30, and returns to average conditions already on Aug 02.
 
 Cumulative positive and negative changes of seawater vars were calculated separately at each depth relative to the first cruise day on July 5.
-
 
 ```{r calculate_profiles_directional_changes}
 
@@ -1374,7 +1346,6 @@ tm_profiles_ID_long <- tm_profiles_ID_long %>%
   ungroup()
 
 ```
-
 
 ```{r cumulative_directional_changes_profiles}
 
@@ -1433,7 +1404,6 @@ rm(tm_profiles_ID_long_grid)
 
 ```
 
-
 ### Test AT sensitivity
 
 Mean seawater CT were calculated for 5m depth intervals based on two AT values.
@@ -1458,8 +1428,7 @@ tm_profiles_ID_long_grid %>%
 rm(tm_profiles_ID_long_grid)
 ```
 
-Calculate CT* changes for range of AT errors
-
+Calculate CT\* changes for range of AT errors
 
 ```{r CT_calculation_sensitivity}
 
@@ -1579,9 +1548,6 @@ ggsave(
 )
 
 ```
-
-
-
 
 ## Hovmoeller plots
 
@@ -1807,7 +1773,6 @@ rm(p_nCT_hov, bin_nCT, p_tem_hov, bin_Tem, p_nCT_ID_cum, p_tem_ID_cum)
 
 ```
 
-
 ### Incremental changes
 
 ```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plotm of daily changes in C~T~ and temperature. Note that calculated  value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period."}
@@ -1870,7 +1835,6 @@ nCT_hov / Tem_hov
 rm(nCT_hov, bin_nCT, Tem_hov, bin_Tem)
 
 ```
-
 
 ### Cumulative changes
 
@@ -1935,14 +1899,12 @@ rm(nCT_hov, bin_nCT, Tem_hov, bin_Tem)
 
 ```
 
-
-
 # Depth-integration C~T~
 
 A critical first step for the determination of net community production (NCP) is the integration of observed changes in nC~T~ over depth. Two approaches were tested:
 
-- Integration of changes in nC~T~ over a predefined, fixed water depth
-- Integration of changes in nC~T~ over a mixed layer depth (MLD)
+-   Integration of changes in nC~T~ over a predefined, fixed water depth
+-   Integration of changes in nC~T~ over a mixed layer depth (MLD)
 
 Both aproaches deliver depth-integrated, incremental changes of C~T~ inbetween cruise dates. Those were summed up to derive a trajectory of cummulative integrated nC~T~ changes.
 
@@ -2166,7 +2128,6 @@ MLD %>%
 
 ```
 
-
 ### inCT calculation
 
 ```{r calculate_inCT_MLD}
@@ -2220,8 +2181,6 @@ inCT_MLD %>%
 
 ```
 
-
-
 ## Comparison of approaches
 
 In the following, all cummulative iC~T~ trajectories are displayed. Highlighted are those obtained for the fixed depth approach with 10 m limit, and the MLD approach with a high density threshold of 0.5 kg/m3.
@@ -2262,16 +2221,17 @@ rm(inCT, inCT_MLD)
 
 In order to derive an estimate of the net community production NCP (which is equivalent to the formed organic matter that can be exported from the investigated surface layer), two steps are required:
 
-- decision about the most appropiate iC~T~ trajectory
-- correction of quantifyable CO~2~ fluxes in and out of the investigated water volume during the period of interest, this includes:
-  - Air-sea CO~2~ fluxes
-  - CO~2~ fluxes due to vertical mixing
-  - CO~2~ fluxes due to lateral transport of water masses (not corrected here)
+-   decision about the most appropiate iC~T~ trajectory
+
+-   correction of quantifyable CO~2~ fluxes in and out of the investigated water volume during the period of interest, this includes:
+
+    -   Air-sea CO~2~ fluxes
+    -   CO~2~ fluxes due to vertical mixing
+    -   CO~2~ fluxes due to lateral transport of water masses (not corrected here)
 
 ## Best iC~T~ estimate
 
 To determine the optimum depth for the nC~T~ integration we investigated the vertical distribution of cumulative temperature and nC~T~ changes on the peak of the productivity signal on June 23:
-
 
 ```{r nCT_cum_profiles_180723}
 
@@ -2323,7 +2283,6 @@ rm(
 
 ```
 
-
 ```{r tem_cum_profiles_180723}
 
 
@@ -2374,20 +2333,21 @@ rm(
 
 ```
 
-
 The cummulative iC~T~ trajectory determined by integration of C~T~ to a fixed water depth of 12 m was used for NCP calculation for the following reasons:
 
-- During the first productivity pulse that lasted until July 23:
-  - no negative nC~T~ changes were detected below that depth
-  - cumulative nC~T~ switch sign at that depth
-  - 95% of the cumulative warming signal appears across that depth
-- MLD were too shallow to cover all observed negative C~T~ changes
-  
+-   During the first productivity pulse that lasted until July 23:
+
+    -   no negative nC~T~ changes were detected below that depth
+    -   cumulative nC~T~ switch sign at that depth
+    -   95% of the cumulative warming signal appears across that depth
+
+-   MLD were too shallow to cover all observed negative C~T~ changes
+
 ## Air-Sea CO~2~ flux
 
 ### Surface water data
 
-The cruise mean pCO~2~ recorded in profiling-mode (stations only) and depths < 6m was used for gas exchange calcualtions.
+The cruise mean pCO~2~ recorded in profiling-mode (stations only) and depths \< 6m was used for gas exchange calculations.
 
 ```{r surface_water_time_series}
 
@@ -2407,39 +2367,60 @@ rm(tm_profiles_surface_long)
 p_pCO2_surf <- tm_profiles_surface_long_ID %>%
   filter(var == "pCO2") %>%
   ggplot(aes(x = date_time)) +
-  geom_ribbon(aes(ymin = mean - sd, ymax = mean + sd), alpha = 0.2) +
+  geom_ribbon(aes(ymin = mean - sd, ymax = mean + sd,
+                  fill = "+/- SD"), alpha = 0.2) +
   geom_path(aes(y = mean)) +
   geom_point(aes(y = mean)) +
-  scale_fill_discrete(guide = FALSE) +
+  scale_color_manual(name = "", values = "black", guide = FALSE) +
+  scale_fill_manual(name = "", values = "black", guide = FALSE) +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
   labs(y = expression(atop(pCO[2], (mu * atm))),
        title = "Surface water observations") +
   theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+        axis.text.x = element_blank(),
+    legend.title = element_blank())
 
 p_tem_surf <- tm_profiles_surface_long_ID %>%
   filter(var == "tem") %>%
   ggplot(aes(x = date_time)) +
-  geom_ribbon(aes(ymin = mean - sd, ymax = mean + sd), alpha = 0.2) +
-  geom_path(aes(y = mean)) +
-  geom_point(aes(y = mean)) +
-  scale_fill_discrete(guide = FALSE) +
+  geom_ribbon(aes(
+    ymin = mean - sd,
+    ymax = mean + sd,
+    fill = "Mean +/- SD"
+  ),
+  alpha = 0.2) +
+  geom_path(aes(y = mean, col = "Mean +/- SD")) +
+  geom_point(aes(y = mean, col = "Mean +/- SD")) +
+  scale_color_manual(name = "Sensor data", values = "black") +
+  scale_fill_manual(name = "Sensor data", values = "black") +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop("SST","(\u00B0C)"))) +
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+  labs(y = expression(atop("SST", "(\u00B0C)"))) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    legend.key.height = unit(5, "mm"),
+    legend.key.width = unit(5,"mm")
+  )
+
 
 p_nCT_surf <-
   tm_profiles_surface_long_ID %>%
   filter(var == "nCT") %>%
   ggplot() +
-  geom_point(data = tb_surface_station_mean %>%
-               filter(var == "nCT"),
-             aes(x = date_time_ID,
-                 y = value_mean,
-                 color = "discrete")) +
+  geom_ribbon(aes(
+    x = date_time,
+    ymin = mean - sd,
+    ymax = mean + sd,
+    fill = "+/- SD"
+  ),
+  alpha = 0.2) +
+  geom_path(aes(x = date_time, y = mean)) +
+  geom_point(aes(x = date_time, y = mean)) +
+  scale_color_manual(name = "", values = "black", guide = FALSE) +
+  scale_fill_manual(name = "", values = "black", guide = FALSE) +
+  new_scale_color() +
   geom_linerange(
     data = tb_surface_station_mean %>%
       filter(var == "nCT"),
@@ -2447,33 +2428,28 @@ p_nCT_surf <-
       x = date_time_ID,
       ymin = value_mean - value_sd,
       ymax = value_mean + value_sd,
-      color = "discrete"
+      color = "Mean +/- SD"
     )
   ) +
-  geom_ribbon(aes(
-    x = date_time,
-    ymin = mean - sd,
-    ymax = mean + sd
-  ), alpha = 0.2) +
-  geom_path(aes(x = date_time, y = mean)) +
-  geom_point(aes(x = date_time, y = mean)) +
-  scale_color_manual(values = "red") +
+  geom_point(
+    data = tb_surface_station_mean %>%
+      filter(var == "nCT"),
+    aes(x = date_time_ID,
+        y = value_mean,
+        color = "Mean +/- SD")
+  ) +
+  scale_color_manual(name = "Bottle data", values = "red") +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(paste(C[T],"*"),
+  labs(y = expression(atop(paste(C[T], "*"),
                            (mu * mol ~ kg ^ {
                              -1
                            })))) +
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
-    legend.position = c(0.35, 0.75),
-    legend.title = element_blank(),
-    legend.direction = "horizontal",
-    legend.background = element_rect(fill = "transparent"),
-    legend.key = element_rect(colour = "black", fill = "white"),
-    legend.key.height = unit(4, "mm"),
-    legend.key.width = unit(4,"mm") 
+    legend.key.height = unit(5, "mm"),
+    legend.key.width = unit(5,"mm")
   )
 
 
@@ -2513,8 +2489,6 @@ og <- og %>%
 
 ```
 
-
-
 Data sets for atmospheric and seawater observations were merged and interpolated to a common time stamp.
 
 ```{r join_interpolate_wind_water_data}
@@ -2541,17 +2515,6 @@ rm(tm_profiles_surface_ID, og)
 
 ```
 
-```{r calculate_running_mean, eval=FALSE}
-
-rolling_mean   <- rollify( ~ mean(.x, na.rm = TRUE), window = 48)
-
-tm_og <- tm_og %>%
-  mutate(wind_daily = rolling_mean(wind),
-         pCO2_atm_daily = rolling_mean(pCO2_atm))
-
-```
-
-
 
 ```{r Ostergarn_tower_time_series}
 
@@ -2571,7 +2534,7 @@ p_wind <- tm_og %>%
   geom_path(aes(y = wind)) +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(Wind~speed, (m ~ s ^ {
+  labs(y = expression(atop(U["10"], (m ~ s ^ {
     -1
   })))) +
   theme(
@@ -2588,29 +2551,31 @@ p_pCO2_atm + p_wind +
 
 ### Air-sea fluxes
 
-F = k * dCO2
+F = k \* dCO2
 
 with
 
-dCO2 = K0 * dpCO2 and 
+dCO2 = K0 \* dpCO2 and
 
-k = coeff * U^2 * (660/Sc)^0.5
-
+k = coeff \* U\^2 \* (660/Sc)\^0.5
 
 Unitm used here are:
 
-- dpCO~2~: µatm
-- K0: mol atm-1 kg-1
-- dCO~2~: µmol kg-1
+-   dpCO~2~: µatm
 
-- wind speed U: m s-1
+-   K0: mol atm-1 kg-1
 
-- coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2 
-- gas transfer velocities k: cm hr-1 (= 60 x 60 x 100 m s-1)
+-   dCO~2~: µmol kg-1
 
-- air sea CO~2~ flux F: mol m–2 d–1
+-   wind speed U: m s-1
 
-- conversion between the unit of k * dCO2 and F requires a factor of 10-5 * 24
+-   coeff for k calculation (eg 0.251 in W14): cm hr-1 (m s-1)-2
+
+-   gas transfer velocities k: cm hr-1 (= 60 x 60 x 100 m s-1)
+
+-   air sea CO~2~ flux F: mol m--2 d--1
+
+-   conversion between the unit of k \* dCO2 and F requires a factor of 10-5 \* 24
 
 ```{r gas_exchange_calc}
 
@@ -2702,9 +2667,9 @@ Correction of inCT for air-sea CO2 fluxes will be based on estimates derived fro
 
 To derive an integrated NCP estimated, the observed change in inCT must be corrected for the air-sea flux of CO2. inCT was determined for the upper 12m of the water column. The MLD was always shallower 12m, except for the last cruise day. Therefore:
 
-- Cumulative air-sea fluxes can be added completely to inCT before Aug 7.
-- Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO2 flux was homogenously mixed down to the deepend thermocline at 17m. The flux correction applied to the upper 12m can therefore be scaled with a factor 12/17.
-    
+-   Cumulative air-sea fluxes can be added completely to inCT before Aug 7.
+-   Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO2 flux was homogenously mixed down to the deepend thermocline at 17m. The flux correction applied to the upper 12m can therefore be scaled with a factor 12/17.
+
 During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased inCT at 0-12 m and a decrease of inCT in 12-17m. The loss of nCT in 12-17m can be assumed to be entirely cause by mixing with low-nCT surface water. However, some of the observed nCT loss is balanced through nCT input attributable to the air-sea flux. Therefore, the observed loss, corrected for 5/17 of the air-sea-flux, was added to the integrated nCT changes in 0-12m.
 
 ```{r prepare_NCP_data_set}
@@ -2723,7 +2688,6 @@ NCP <- NCP %>%
 date_180806 <- unique(NCP$date_time)[7]
 
 ```
-
 
 ### Air-sea fluxes
 
@@ -2806,19 +2770,23 @@ p_nCT <- CT_profile %>%
       xmin = CT_mix,
       ymax = dep + 0.5,
       ymin = dep - 0.5
-    )
+    ),
+    alpha = 0.2
   ) +
   geom_hline(yintercept = c(12, 17)) +
   geom_segment(aes(x = CT_mix, xend = CT_mix,
               y = -Inf, yend = 17),
               linetype = 2) +
-  annotate("text", label = as.character(expression(paste(C[T],"*",mix))),
-           parse = TRUE, x = 1560, y = 3) +
+  annotate("text", label = as.character(expression(paste(C[T],"*")~mix)),
+           parse = TRUE, x = 1560, y = 3,
+           size = geom_text_size) +
   annotate("text", label = as.character(expression(paste(C[T],"*")~flux)),
-           parse = TRUE, x = 1580, y = 14.5, col = "white") +
-  geom_point(aes(nCT, dep, col = ID)) +
+           parse = TRUE, x = 1580, y = 14.5,
+           size = geom_text_size) +
+  geom_point(aes(nCT, dep, fill = ID), shape = 21) +
   geom_path(aes(nCT, dep, col = ID)) +
   scale_y_reverse() +
+  scale_fill_viridis_d() +
   scale_color_viridis_d() +
     labs(y = "Depth (m)", x = expression(paste(C[T],"*", ~ (µmol ~ kg ^ {
     -1
@@ -2831,19 +2799,23 @@ p_nCT <- CT_profile %>%
     legend.position = "none"
   )
 
-p_tem <- tm_profiles_ID_long %>%
-  filter(ID %in% c("180806", "180815"),
-         var %in% c("tem")) %>%
-  ggplot(aes(value, dep, col = ID)) +
+tm_profiles_ID_long_temp <-
+  left_join(tm_profiles_ID_long %>%
+              filter(ID %in% c("180806", "180815"),
+                     var %in% c("tem")) %>% 
+              select(-date_ID),
+            cruise_dates)
+
+
+p_tem <- tm_profiles_ID_long_temp  %>%
+  ggplot() +
   geom_hline(yintercept = c(12, 17)) +
-  geom_point() +
-  geom_path() +
+  geom_path(aes(value, dep, col = date_ID)) +
+  geom_point(aes(value, dep, fill = date_ID), shape = 21) +
   scale_y_reverse() +
-  scale_color_viridis_d() +
-    labs(y = "Depth (m)", x = expression(paste(Temperature ~ (degree*C)))) +
-  theme(
-    legend.title = element_blank()
-  )
+  scale_color_viridis_d(name = "Mean\ncruise date") +
+  scale_fill_viridis_d(name = "Mean\ncruise date") +
+    labs(y = "Depth (m)", x = expression(paste(Temperature ~ "(\u00B0C)")))
 
 p_tem + p_nCT +
   plot_layout(guides = 'collect') +
@@ -2872,144 +2844,14 @@ ggsave(
 )
 
 
-rm(p_tem, p_nCT, CT_mix, CT_profile)
+rm(p_tem, p_nCT, CT_mix, CT_profile, tm_profiles_ID_long_temp)
 
 
 ```
 
 The effect of mixing was derived from the mean concentration difference on Aug 06.
 
-```{r calculate_mixing_correction_concentration_gradient_t1, eval=FALSE}
-
-
-# calculate mixing with deep waters, corrected for air sea fluxes
-nCT_surface <- tm_profiles_ID_long %>%
-  filter(ID == "180806",
-         var == "nCT",
-         dep < parameters$i_dep_lim) %>%
-  group_by(ID) %>%
-  summarise(nCT_surface = mean(value)) %>%
-  ungroup()
-
-nCT_ML <- tm_profiles_ID_long %>%
-  filter(ID == "180806",
-         var == "nCT",
-         dep < parameters$i_dep_mix_lim,
-         dep > parameters$i_dep_lim) %>%
-  group_by(ID) %>%
-  summarise(nCT_ML = mean(value)) %>%
-  ungroup()
-
-NCP_mix <- full_join(nCT_surface, nCT_ML)
-
-NCP_mix <- NCP_mix %>%
-  mutate(
-    value_diff = (nCT_surface - nCT_ML) * 1e-3 * parameters$i_dep_lim * (parameters$i_dep_mix_lim - parameters$i_dep_lim) / parameters$i_dep_mix_lim,
-    ID = "180815"
-  ) %>%
-  select(-c(nCT_surface, nCT_ML))
-
-rm(tm_og_flux_dep)
-rm(nCT_ML, nCT_surface)
-
-NCP_mix_diff <- NCP_mix %>%
-  mutate(var = "mixing")
-
-NCP_flux_mix_diff <-
-  full_join(NCP_flux_diff, NCP_mix_diff) %>% #
-  arrange(ID) %>%
-  fill(date_time_ID_ref)
-
-NCP_mix <- NCP_mix %>%
-  rename(mix_cum = value_diff) %>%
-  select(ID, mix_cum)
-
-NCP_flux_mix <-
-  full_join(NCP_flux,
-            NCP_mix)
-
-rm(NCP_mix, NCP_mix_diff, NCP_flux, NCP_flux_diff, date_180806)
-
-NCP_flux_mix <- NCP_flux_mix %>%
-  arrange(date_time) %>%
-  fill(ID) %>%
-  mutate(
-    mix_cum = if_else(ID %in% c("180806", 180815), mix_cum, 0),
-    mix_cum = na.approx(mix_cum),
-    nCT_i_flux_mix_cum = nCT_i_flux_cum + mix_cum
-  )
-
-# reorder factors for plotting
-NCP_flux_mix_diff <- NCP_flux_mix_diff %>%
-  mutate(var = factor(var, c("observed", "flux correction", "mixing correction")))
-
-NCP_flux_mix_long <- NCP_flux_mix %>%
-  select(date_time, nCT_i_cum, nCT_i_flux_cum, nCT_i_flux_mix_cum) %>%
-  pivot_longer(nCT_i_cum:nCT_i_flux_mix_cum,
-               values_to = "value",
-               names_to = "var") %>%
-  mutate(
-    var = fct_recode(
-      var,
-      observed = "nCT_i_cum",
-      `flux corrected` = "nCT_i_flux_cum",
-      `flux + mixing corrected (NCP)` = "nCT_i_flux_mix_cum"
-    )
-  )
-
-
-p_inCT <- NCP_flux_mix_long %>%
-  arrange(date_time) %>%
-  ggplot() +
-  geom_col(
-    data = NCP_flux_mix_diff,
-    aes(date_time_ID_ref, value_diff, fill = var),
-    position = position_dodge2(preserve = "single"),
-    alpha = 0.5
-  ) +
-  geom_hline(yintercept = 0) +
-  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
-  geom_line(aes(date_time, value, col = var)) +
-  scale_x_datetime(date_breaks = "week",
-                   date_labels = "%b %d",
-                   sec.axis = dup_axis()) +
-  scale_fill_brewer(palette = "Dark2", name = "Incremental changes") +
-  scale_color_brewer(palette = "Dark2", name = "Cumulative changes") +
-  labs(y = expression(atop(Integrated ~ paste(C[T],"*"), (mol ~ m ^ {
-    -2
-  }))),
-  title = "Water column inventory changes") +
-  guides(guide_colourbar(order = 1)) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.text.x.top = element_blank(),
-    legend.position = "bottom",
-    legend.direction = "vertical"
-  )
-
-p_inCT
-
-NCP_flux_mix %>%
-  write_csv(
-    here::here(
-      "data/intermediate/_merged_data_files/CT_dynamics",
-      "tm_NCP_cum.csv"
-    )
-  )
-
-NCP_flux_mix_diff %>%
-  write_csv(
-    here::here(
-      "data/intermediate/_merged_data_files/CT_dynamics",
-      "tm_NCP_inc.csv"
-    )
-  )
-
-```
-
-
 ```{r calculate_mixing_mass_conservation}
-
 
 # calculate mixing with deep waters, corrected for air sea fluxes
 nCT_inventory_mean <- tm_profiles_ID_long %>%
@@ -3083,114 +2925,7 @@ NCP_flux_mix_long <- NCP_flux_mix %>%
       var,
       observed = "nCT_i_cum",
       `flux corrected` = "nCT_i_flux_cum",
-      `flux + mixing corrected (NCP)` = "nCT_i_flux_mix_cum"
-    )
-  )
-
-
-p_inCT <- NCP_flux_mix_long %>%
-  arrange(date_time) %>%
-  ggplot() +
-  geom_col(
-    data = NCP_flux_mix_diff,
-    aes(date_time_ID_ref, value_diff, fill = var),
-    position = position_dodge2(preserve = "single"),
-    alpha = 0.5
-  ) +
-  geom_hline(yintercept = 0) +
-  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
-  geom_line(aes(date_time, value, col = var)) +
-  scale_x_datetime(date_breaks = "week",
-                   date_labels = "%b %d",
-                   sec.axis = dup_axis()) +
-  scale_fill_brewer(palette = "Dark2", name = "incremental changes") +
-  scale_color_brewer(palette = "Dark2", name = "cumulative changes") +
-  labs(y = expression(atop(integrated ~ nC[T], (mol ~ m ^ {
-    -2
-  }))),
-  title = "Water column inventory changes") +
-  guides(guide_colourbar(order = 1)) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.text.x.top = element_blank(),
-    legend.position = "bottom",
-    legend.direction = "vertical"
-  )
-
-p_inCT
-
-NCP_flux_mix %>%
-  write_csv(
-    here::here(
-      "data/intermediate/_merged_data_files/CT_dynamics",
-      "tm_NCP_cum.csv"
-    )
-  )
-
-NCP_flux_mix_diff %>%
-  write_csv(
-    here::here(
-      "data/intermediate/_merged_data_files/CT_dynamics",
-      "tm_NCP_inc.csv"
-    )
-  )
-
-```
-
-
-```{r calculate_mixing_correction_concentration_change_t1_t2, eval=FALSE}
-
-
-# calculate mixing with deep waters, corrected for air sea fluxes
-NCP_mix <- tm_profiles_ID_long %>%
-  filter(ID == "180815",
-         var == "nCT",
-         dep < parameters$i_dep_mix_lim,
-         dep > parameters$i_dep_lim) %>%
-  group_by(ID, date_time_ID, date_time_ID_ref) %>%
-  summarise(value_diff =
-              sum(value_diff) / 1000 + min(tm_og_flux_dep$flux_cum)) %>%
-  ungroup()
-
-rm(tm_og_flux_dep)
-
-NCP_mix_diff <- NCP_mix %>%
-  select(date_time_ID_ref, value_diff) %>%
-  mutate(var = "mixing")
-
-NCP_flux_mix_diff <-
-  full_join(NCP_flux_diff, NCP_mix_diff)
-
-NCP_flux_mix <-
-  full_join(NCP_flux,
-            NCP_mix %>% rename(mix_cum = value_diff))
-
-rm(NCP_mix, NCP_mix_diff, NCP_flux, NCP_flux_diff, date_180806)
-
-NCP_flux_mix <- NCP_flux_mix %>%
-  arrange(date_time) %>%
-  fill(ID) %>%
-  mutate(
-    mix_cum = if_else(ID %in% c("180806", 180815), mix_cum, 0),
-    mix_cum = na.approx(mix_cum),
-    nCT_i_flux_mix_cum = nCT_i_flux_cum + mix_cum
-  )
-
-# reorder factors for plotting
-NCP_flux_mix_diff <- NCP_flux_mix_diff %>%
-  mutate(var = factor(var, c("observed", "flux", "mixing")))
-
-NCP_flux_mix_long <- NCP_flux_mix %>%
-  select(date_time, nCT_i_cum, nCT_i_flux_cum, nCT_i_flux_mix_cum) %>%
-  pivot_longer(nCT_i_cum:nCT_i_flux_mix_cum,
-               values_to = "value",
-               names_to = "var") %>%
-  mutate(
-    var = fct_recode(
-      var,
-      observed = "nCT_i_cum",
-      `flux corrected` = "nCT_i_flux_cum",
-      `flux + mixing corrected (NCP)` = "nCT_i_flux_mix_cum"
+      `flux + mixing\ncorrected (NCP)` = "nCT_i_flux_mix_cum"
     )
   )
 
@@ -3216,12 +2951,12 @@ p_inCT <- NCP_flux_mix_long %>%
     -2
   }))),
   title = "Water column inventory changes") +
-  guides(guide_colourbar(order = 1)) +
+  guides(fill = guide_legend(order = 2)) +
   theme(
     axis.title.x = element_blank(),
     axis.text.x.top = element_blank(),
-    legend.position = "bottom",
-    legend.direction = "vertical"
+    legend.key.height = unit(5, "mm"),
+    legend.key.width = unit(5,"mm")
   )
 
 p_inCT
@@ -3244,8 +2979,6 @@ NCP_flux_mix_diff %>%
 
 ```
 
-
-
 ```{r plot_inCT_time_series, include=FALSE}
 
 
@@ -3253,7 +2986,7 @@ p_pCO2_surf + p_tem_surf + p_nCT_surf +
   p_pCO2_atm + p_wind + p_flux_daily + p_flux_cum +
   p_inCT +
   plot_layout(ncol = 1,
-              heights = c(rep(1.35, 7), 4)) +
+              heights = c(rep(1.35, 7), 4.5)) +
   plot_annotation(tag_levels = 'a')
 
 ggsave(
@@ -3261,8 +2994,8 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_5.pdf"
   ),
-  width = 160,
-  height = 340,
+  width = 140,
+  height = 260,
   dpi = 300,
   units = "mm"
 )
@@ -3272,8 +3005,8 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_5.png"
   ),
-  width = 140,
-  height = 260,
+  width = 175,
+  height = 240,
   dpi = 300,
   units = "mm"
 )
@@ -3282,9 +3015,14 @@ ggsave(
 
 # Open tasks / questions
 
-- clean and harmonize chunk labeling (label: plot, 1 plot per chunk, etc)
-- included removed stations in coverage plot
-- Significance of changes in AT for calculated nCT changes
-  - Calculate AT-S ratios, reconstruct AT profiles, calculate true nCT profiles, normalize nCT profiles to mean AT
-- demonstrate strong permanent thermocline at around 25 m
-- calculate oxygen demand for mineralization (4.68*10^9*1.2 / (300e-6*10^3) / 10^9)
+-   clean and harmonize chunk labeling (label: plot, 1 plot per chunk, etc)
+
+-   included removed stations in coverage plot
+
+-   Significance of changes in AT for calculated nCT changes
+
+    -   Calculate AT-S ratios, reconstruct AT profiles, calculate true nCT profiles, normalize nCT profiles to mean AT
+
+-   demonstrate strong permanent thermocline at around 25 m
+
+-   calculate oxygen demand for mineralization (4.68\*10^9*1.2\ /\ (300e-6*10^3) / 10\^9)
