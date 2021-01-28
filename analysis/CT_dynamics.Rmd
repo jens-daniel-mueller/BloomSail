@@ -2461,6 +2461,38 @@ end   <- max(tm_profiles_surface_long_ID$date_time)
 
 ```
 
+The regional variability of surface water parameters was:
+
+```{r surface_data_standard_deviation}
+
+tm_profiles_surface_long_ID %>%
+  arrange(var) %>%
+  kable() %>%
+  add_header_above() %>%
+  kable_styling(full_width = FALSE) %>%
+  scroll_box(height = "400px")
+
+
+```
+
+For the production pulse from July 6 - 24, this can be summarized as:
+
+```{r surface_data_mean_standard_deviation}
+
+tm_profiles_surface_long_ID %>%
+  filter(date_time < ymd("2018-07-26")) %>% 
+  group_by(var) %>%
+  summarise(SD_mean = mean(sd)) %>% 
+  ungroup() %>% 
+  kable() %>%
+  add_header_above() %>%
+  kable_styling(full_width = FALSE) %>%
+  scroll_box(height = "400px")
+
+
+```
+
+
 ### Wind and atm. pCO~2~
 
 Metrological data were recorded on the flux tower located on Ostergarnsholm island.
@@ -2647,7 +2679,7 @@ p_flux_cum <- tm_og %>%
   scale_fill_discrete(guide = FALSE) +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(F["cumulative"],
+  labs(y = expression(atop(F["cum"],
                            (mol ~ m ^ {
                              -2
                            })))) +
