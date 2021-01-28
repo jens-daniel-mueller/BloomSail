@@ -14,6 +14,7 @@
 
 <title>NCP reconstruction</title>
 
+<script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
@@ -37,6 +38,8 @@ div.section {
   padding-top: 12px;
 }
 </style>
+
+
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -446,7 +449,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">NCP reconstruction</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">22 January, 2021</h4>
+<h4 class="date">28 January, 2021</h4>
 
 </div>
 
@@ -471,7 +474,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-01-22
+<strong>Last updated:</strong> 2021-01-28
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -562,16 +565,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef656a730e27fc19d0287bd9363990fd9d3157c46targetblankf656a73a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f656a730e27fc19d0287bd9363990fd9d3157c46" target="_blank">f656a73</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3eae87b95414702fb00c65d9207b3cccbc710327targetblank3eae87ba"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/3eae87b95414702fb00c65d9207b3cccbc710327" target="_blank">3eae87b</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef656a730e27fc19d0287bd9363990fd9d3157c46targetblankf656a73a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3eae87b95414702fb00c65d9207b3cccbc710327targetblank3eae87ba" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f656a730e27fc19d0287bd9363990fd9d3157c46" target="_blank">f656a73</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/3eae87b95414702fb00c65d9207b3cccbc710327" target="_blank">3eae87b</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -583,13 +586,19 @@ Ignored files:
     Ignored:    data/input/
     Ignored:    data/intermediate/
     Ignored:    data/output_submission/
-    Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
 
 Untracked files:
-    Untracked:  output/Plots/Figures_publication/Appendix/
+    Untracked:  output/Plots/Figures_publication/.tmp.drivedownload/
 
 Unstaged changes:
-    Modified:   code/Workflowr_project_managment.R
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_A3.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_A3.png
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_A4.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_A4.png
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_A6.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_A6.png
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_A7.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_A7.png
     Modified:   output/Plots/Figures_publication/Article/Fig_1.pdf
     Modified:   output/Plots/Figures_publication/Article/Fig_1.png
     Modified:   output/Plots/Figures_publication/Article/Fig_2.pdf
@@ -600,10 +609,6 @@ Unstaged changes:
     Modified:   output/Plots/Figures_publication/Article/Fig_4.png
     Modified:   output/Plots/Figures_publication/Article/Fig_5.pdf
     Modified:   output/Plots/Figures_publication/Article/Fig_5.png
-    Deleted:    output/Plots/Figures_publication/Article/Fig_6.pdf
-    Deleted:    output/Plots/Figures_publication/Article/Fig_6.png
-    Modified:   output/Plots/merging_interpolation/Zero_time_synchronization.pdf
-    Modified:   output/Plots/response_time/tau_determination_pCO2_corr_flushperiods_nls.pdf
 
 </code></pre>
 <p>
@@ -642,6 +647,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/3eae87b95414702fb00c65d9207b3cccbc710327/analysis/NCP_reconstruction.Rmd" target="_blank">3eae87b</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-01-28
+</td>
+<td>
+modified figs
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/c5fc34c79baf7b0f01d9f326f0d22514b82c447e/docs/NCP_reconstruction.html" target="_blank">c5fc34c</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-01-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1795,8 +1834,8 @@ library(oce)
 library(patchwork)
 library(lubridate)
 library(metR)</code></pre>
-<div id="approach" class="section level1">
-<h1><span class="header-section-number">1</span> Approach</h1>
+<div id="approach" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Approach</h1>
 <p>In order to test how (and how well) the depth-integrated C<sub>T</sub> estimates can be reproduced if only surface CO<sub>2</sub> data were available, the BloomSail observations were restricted to those made in surface water and following reconstruction approaches were tested:</p>
 <ul>
 <li>Mixed layer depth: Integration of surface observation across the MLD, assuming homogenious vertical patterns</li>
@@ -1807,8 +1846,8 @@ library(metR)</code></pre>
 <pre class="r"><code>date_CT_min &lt;- ymd_hms(&quot;2018-07-24 07:58:29&quot;)
 date_tem_max &lt;- ymd_hms(&quot;2018-08-04 00:00:00&quot;)</code></pre>
 </div>
-<div id="bloomsail-data" class="section level1">
-<h1><span class="header-section-number">2</span> BloomSail data</h1>
+<div id="bloomsail-data" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> BloomSail data</h1>
 <p>1m gridded, downcast profiles were used. Mean CO<sub>2</sub> data from upper 6 metres were used as surface values.</p>
 <pre class="r"><code>tm_profiles_ID &lt;-
   read_csv(here::here(&quot;data/intermediate/_merged_data_files/CT_dynamics&quot;, &quot;tm_profiles_ID.csv&quot;))
@@ -1826,10 +1865,10 @@ tm_profiles_ID &lt;- tm_profiles_ID %&gt;%
          value_diff_daily = value_diff / date_time_ID_diff,
          value_cum = cumsum(value_diff)) %&gt;% 
   ungroup()</code></pre>
-<div id="ct-and-tem-penetration-depth" class="section level2">
-<h2><span class="header-section-number">2.1</span> C<sub>T</sub> and tem penetration depth</h2>
-<div id="cumulative-on-july-09" class="section level3">
-<h3><span class="header-section-number">2.1.1</span> Cumulative on July 09</h3>
+<div id="ct-and-tem-penetration-depth" class="section level2" number="2.1">
+<h2 number="2.1"><span class="header-section-number">2.1</span> C<sub>T</sub> and tem penetration depth</h2>
+<div id="cumulative-on-july-09" class="section level3" number="2.1.1">
+<h3 number="2.1.1"><span class="header-section-number">2.1.1</span> Cumulative on July 09</h3>
 <pre class="r"><code>tm_profiles_ID_long_180723 &lt;- tm_profiles_ID_long %&gt;%
   filter(ID == 180709)
 
@@ -1918,7 +1957,7 @@ p_nCT &lt;-
       filter(var == &quot;nCT&quot;, value_diff_daily &lt; 0),
     aes(x = value_diff_daily, y = dep),
     width = 1,
-    alpha = 0.5,
+    alpha = 0.2,
     orientation = &quot;y&quot;
   ) +
   geom_vline(xintercept = 0) +
@@ -1934,8 +1973,7 @@ p_nCT &lt;-
     &quot;text&quot;,
     x = -3.5,
     y = 2.5,
-    label = &quot;Integrated change&quot;,
-    col = &quot;white&quot;
+    label = &quot;Integrated change&quot;
   ) +
   geom_point(aes(value_diff_daily, dep)) +
   geom_path(aes(value_diff_daily, dep)) +
@@ -1962,7 +2000,7 @@ p_tem &lt;-
       filter(var == &quot;tem&quot;, value_diff_daily &gt; 0),
     aes(x = value_diff_daily, y = dep),
     width = 1,
-    alpha = 0.5,
+    alpha = 0.2,
     orientation = &quot;y&quot;
   ) +
   geom_vline(xintercept = 0) +
@@ -1978,8 +2016,7 @@ p_tem &lt;-
     &quot;text&quot;,
     x = 0.2,
     y = 2.5,
-    label = &quot;Integrated change&quot;,
-    col = &quot;white&quot;
+    label = &quot;Integrated change&quot;
   ) +
   geom_point(aes(value_diff_daily, dep)) +
   geom_path(aes(value_diff_daily, dep)) +
@@ -2013,8 +2050,8 @@ ggsave(
 
 rm(TPD, tm_profiles_ID_long_180723, p_tem, p_nCT)</code></pre>
 </div>
-<div id="daily" class="section level3">
-<h3><span class="header-section-number">2.1.2</span> Daily</h3>
+<div id="daily" class="section level3" number="2.1.2">
+<h3 number="2.1.2"><span class="header-section-number">2.1.2</span> Daily</h3>
 <pre class="r"><code># surface values
 diff_surface &lt;- tm_profiles_ID_long %&gt;%
   filter(dep &lt; parameters$surface_dep) %&gt;%
@@ -2114,15 +2151,15 @@ rm(TPD, TPD_mean, tm_profiles_ID_long)</code></pre>
 </div>
 </div>
 </div>
-<div id="getm" class="section level1">
-<h1><span class="header-section-number">3</span> GETM</h1>
-<div id="subsetting-criteria" class="section level2">
-<h2><span class="header-section-number">3.1</span> Subsetting criteria</h2>
+<div id="getm" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> GETM</h1>
+<div id="subsetting-criteria" class="section level2" number="3.1">
+<h2 number="3.1"><span class="header-section-number">3.1</span> Subsetting criteria</h2>
 <pre class="r"><code>fixed_values &lt;- 
   read_csv(here::here(&quot;data/intermediate/_summarized_data_files&quot;, &quot;tb_fix.csv&quot;))</code></pre>
 </div>
-<div id="read-netcdf-file" class="section level2">
-<h2><span class="header-section-number">3.2</span> Read netcdf file</h2>
+<div id="read-netcdf-file" class="section level2" number="3.2">
+<h2 number="3.2"><span class="header-section-number">3.2</span> Read netcdf file</h2>
 <pre class="r"><code>nc &lt;- nc_open(here::here(&quot;data/input/GETM&quot;, &quot;Finnmaid.E.3d.2018.nc&quot;))
 #print(nc$var)
 
@@ -2192,8 +2229,8 @@ gt_3d_long %&gt;%
 
 rm(gt_3d, gt_3d_long, i, lat, d, t, var_3d)</code></pre>
 </div>
-<div id="sal-and-tem-profiles" class="section level2">
-<h2><span class="header-section-number">3.3</span> Sal and tem profiles</h2>
+<div id="sal-and-tem-profiles" class="section level2" number="3.3">
+<h2 number="3.3"><span class="header-section-number">3.3</span> Sal and tem profiles</h2>
 <pre class="r"><code>gt_3d_long &lt;-
   read_csv(here::here(
     &quot;data/intermediate/_summarized_data_files&quot;,
@@ -2218,12 +2255,12 @@ gt_3d_long %&gt;%
 <p><img src="figure/NCP_reconstruction.Rmd/gt_profiles_sal_tem-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(gt_3d_long)</code></pre>
 </div>
-<div id="comparison-bloomsail" class="section level2">
-<h2><span class="header-section-number">3.4</span> Comparison BloomSail</h2>
+<div id="comparison-bloomsail" class="section level2" number="3.4">
+<h2 number="3.4"><span class="header-section-number">3.4</span> Comparison BloomSail</h2>
 <p>Vertical, 1m-gridded BloomSail CTD profiles were used for comparison with GETM results. Note that the sampling location does match exactly.</p>
 <p>GETM results were linearly interpolated to the mean BloomSail time stamp.</p>
-<div id="interpolate-gt-dep-grid" class="section level3">
-<h3><span class="header-section-number">3.4.1</span> Interpolate gt dep grid</h3>
+<div id="interpolate-gt-dep-grid" class="section level3" number="3.4.1">
+<h3 number="3.4.1"><span class="header-section-number">3.4.1</span> Interpolate gt dep grid</h3>
 <pre class="r"><code>gt_3d_int &lt;- gt_3d %&gt;%
   mutate(dep_int = dep + 0.5) %&gt;%
   group_by(date_time) %&gt;%
@@ -2310,10 +2347,10 @@ tm_gt_3d %&gt;%
 </div>
 </div>
 </div>
-<div id="finnmaid" class="section level1">
-<h1><span class="header-section-number">4</span> Finnmaid</h1>
-<div id="data-preparation" class="section level2">
-<h2><span class="header-section-number">4.1</span> Data preparation</h2>
+<div id="finnmaid" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Finnmaid</h1>
+<div id="data-preparation" class="section level2" number="4.1">
+<h2 number="4.1"><span class="header-section-number">4.1</span> Data preparation</h2>
 <p>Finnmaid data, including reconstructed data during LICOS operation failure.</p>
 <pre class="r"><code>fm &lt;-
  read_csv(here::here(&quot;data/intermediate/_summarized_data_files&quot;,
@@ -2324,8 +2361,8 @@ fm &lt;- fm %&gt;%
          date_time &lt; parameters$getm_end_date) %&gt;% 
   select(ID, date_time, sensor, sal, tem, pCO2) %&gt;% 
   mutate(ID = as.factor(ID))</code></pre>
-<div id="ct-calculation" class="section level3">
-<h3><span class="header-section-number">4.1.1</span> C<sub>T</sub> calculation</h3>
+<div id="ct-calculation" class="section level3" number="4.1.1">
+<h3 number="4.1.1"><span class="header-section-number">4.1.1</span> C<sub>T</sub> calculation</h3>
 <p>Calculate nC<sub>T</sub> based on fixed A<sub>T</sub> and salinity mean values.</p>
 <pre class="r"><code>fm &lt;- fm %&gt;%
   mutate(
@@ -2342,8 +2379,8 @@ fm &lt;- fm %&gt;%
     )[, 16] * 1e6
   )</code></pre>
 </div>
-<div id="regional-averaging" class="section level3">
-<h3><span class="header-section-number">4.1.2</span> Regional averaging</h3>
+<div id="regional-averaging" class="section level3" number="4.1.2">
+<h3 number="4.1.2"><span class="header-section-number">4.1.2</span> Regional averaging</h3>
 <p>Calculate regional mean and sd values for each crossing of the area.</p>
 <pre class="r"><code>fm_ID &lt;- fm %&gt;%
   pivot_longer(c(pCO2, sal, tem, nCT),
@@ -2358,8 +2395,8 @@ fm &lt;- fm %&gt;%
   ungroup() %&gt;%
   rename(value = mean)</code></pre>
 </div>
-<div id="read-tm-profile-data" class="section level3">
-<h3><span class="header-section-number">4.1.3</span> Read tm profile data</h3>
+<div id="read-tm-profile-data" class="section level3" number="4.1.3">
+<h3 number="4.1.3"><span class="header-section-number">4.1.3</span> Read tm profile data</h3>
 <p>Read original profile data and calculate surface mean and sd values.</p>
 <pre class="r"><code>tm_profiles &lt;-
   read_csv(
@@ -2378,8 +2415,8 @@ tm_profiles_ID_long_surface &lt;- tm_profiles %&gt;%
   summarise_all(list( ~ mean(.), ~ sd(.)), na.rm = TRUE) %&gt;%
   ungroup()</code></pre>
 </div>
-<div id="timeseries" class="section level3">
-<h3><span class="header-section-number">4.1.4</span> Timeseries</h3>
+<div id="timeseries" class="section level3" number="4.1.4">
+<h3 number="4.1.4"><span class="header-section-number">4.1.4</span> Timeseries</h3>
 <pre class="r"><code>fm_ID %&gt;%
   ggplot() +
   geom_rect(data = fixed_values,
@@ -2423,8 +2460,8 @@ tm_profiles_ID_long_surface &lt;- tm_profiles %&gt;%
 <p><img src="figure/NCP_reconstruction.Rmd/fm_tm_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="missing-observations" class="section level2">
-<h2><span class="header-section-number">4.2</span> Missing observations</h2>
+<div id="missing-observations" class="section level2" number="4.2">
+<h2 number="4.2"><span class="header-section-number">4.2</span> Missing observations</h2>
 <p>The observational gaps in the Finnmaid SST and C<sub>T</sub> time series were filled with:</p>
 <ul>
 <li>two BloomSail observations</li>
@@ -2481,10 +2518,10 @@ rm(fm_ID, fm, tm_gap, tm_profiles_ID_long_surface, tm_profiles)</code></pre>
 <p><img src="figure/NCP_reconstruction.Rmd/fm_time_series_filled-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="merge-all-data-sets" class="section level1">
-<h1><span class="header-section-number">5</span> Merge all data sets</h1>
-<div id="merge-fm-and-gt" class="section level2">
-<h2><span class="header-section-number">5.1</span> Merge fm and gt</h2>
+<div id="merge-all-data-sets" class="section level1" number="5">
+<h1 number="5"><span class="header-section-number">5</span> Merge all data sets</h1>
+<div id="merge-fm-and-gt" class="section level2" number="5.1">
+<h2 number="5.1"><span class="header-section-number">5.1</span> Merge fm and gt</h2>
 <pre class="r"><code>fm_tm_ID_wide &lt;- fm_tm_ID %&gt;%
   filter(var %in% c(&quot;nCT&quot;)) %&gt;%
   select(date_time_ID, var, sensor, value) %&gt;%
@@ -2499,8 +2536,8 @@ fm_gt &lt;- full_join(fm_gt,
 
 rm(fm_tm_ID_wide, fm_tm_ID, gt_3d_int)</code></pre>
 </div>
-<div id="interpolate-gt-time-stamp" class="section level2">
-<h2><span class="header-section-number">5.2</span> Interpolate gt time stamp</h2>
+<div id="interpolate-gt-time-stamp" class="section level2" number="5.2">
+<h2 number="5.2"><span class="header-section-number">5.2</span> Interpolate gt time stamp</h2>
 <pre class="r"><code>fm_gt &lt;- fm_gt %&gt;%
   arrange(date_time_ID) %&gt;%
   group_by(dep) %&gt;%
@@ -2512,8 +2549,8 @@ rm(fm_tm_ID_wide, fm_tm_ID, gt_3d_int)</code></pre>
   arrange(dep) %&gt;%
   filter(!is.na(nCT))</code></pre>
 </div>
-<div id="bind-tm-and-fm_gt" class="section level2">
-<h2><span class="header-section-number">5.3</span> Bind tm and fm_gt</h2>
+<div id="bind-tm-and-fm_gt" class="section level2" number="5.3">
+<h2 number="5.3"><span class="header-section-number">5.3</span> Bind tm and fm_gt</h2>
 <pre class="r"><code>tm_profiles_ID &lt;- tm_profiles_ID %&gt;%
   select(-c(ID, pCO2)) %&gt;%
   mutate(source = &quot;tm&quot;)
@@ -2567,12 +2604,12 @@ tm_fm_gt %&gt;%
 <pre class="r"><code>rm(bin)</code></pre>
 </div>
 </div>
-<div id="integration-depths" class="section level1">
-<h1><span class="header-section-number">6</span> Integration depths</h1>
-<div id="mld" class="section level2">
-<h2><span class="header-section-number">6.1</span> MLD</h2>
-<div id="density" class="section level3">
-<h3><span class="header-section-number">6.1.1</span> Density</h3>
+<div id="integration-depths" class="section level1" number="6">
+<h1 number="6"><span class="header-section-number">6</span> Integration depths</h1>
+<div id="mld" class="section level2" number="6.1">
+<h2 number="6.1"><span class="header-section-number">6.1</span> MLD</h2>
+<div id="density" class="section level3" number="6.1.1">
+<h3 number="6.1.1"><span class="header-section-number">6.1.1</span> Density</h3>
 <pre class="r"><code>tm_fm_gt &lt;- tm_fm_gt %&gt;%
   mutate(rho = swSigma(
     salinity = sal,
@@ -2605,8 +2642,8 @@ tm_fm_gt %&gt;%
 <p><img src="figure/NCP_reconstruction.Rmd/tm_fm_gt_hovmoeller_rho-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>rm(bin)</code></pre>
 </div>
-<div id="mld-1" class="section level3">
-<h3><span class="header-section-number">6.1.2</span> MLD</h3>
+<div id="mld-1" class="section level3" number="6.1.2">
+<h3 number="6.1.2"><span class="header-section-number">6.1.2</span> MLD</h3>
 <pre class="r"><code>tm_fm_gt_MLD &lt;- expand_grid(tm_fm_gt, rho_lim = seq(0.1, 0.5, 0.1))
 
 tm_fm_gt_MLD &lt;- tm_fm_gt_MLD %&gt;%
@@ -2677,8 +2714,8 @@ MLD &lt;- full_join(MLD, MLD_mean)
 rm(MLD_mean)</code></pre>
 </div>
 </div>
-<div id="penetration-depth" class="section level2">
-<h2><span class="header-section-number">6.2</span> Penetration depth</h2>
+<div id="penetration-depth" class="section level2" number="6.2">
+<h2 number="6.2"><span class="header-section-number">6.2</span> Penetration depth</h2>
 <pre class="r"><code>tm_fm_gt_long &lt;- tm_fm_gt %&gt;%
   select(-c(sal)) %&gt;%
   pivot_longer(c(&quot;tem&quot;, &quot;nCT&quot;), values_to = &quot;value&quot;, names_to = &quot;var&quot;) %&gt;%
@@ -2710,8 +2747,8 @@ tm_fm_gt_long &lt;- tm_fm_gt_long %&gt;%
   theme(legend.position = &quot;left&quot;) +
   facet_grid(. ~ source, scales = &quot;free_x&quot;)</code></pre>
 <p><img src="figure/NCP_reconstruction.Rmd/cumulative_tem_profile-1.png" width="672" style="display: block; margin: auto;" /></p>
-<div id="cumulative-changes" class="section level3">
-<h3><span class="header-section-number">6.2.1</span> Cumulative changes</h3>
+<div id="cumulative-changes" class="section level3" number="6.2.1">
+<h3 number="6.2.1"><span class="header-section-number">6.2.1</span> Cumulative changes</h3>
 <pre class="r"><code>tm_fm_gt_long_180723 &lt;- tm_fm_gt_long %&gt;%
   filter(date_time_ID == date_CT_min) %&gt;%
   mutate(
@@ -2750,8 +2787,8 @@ TPD &lt;- TPD %&gt;%
 
 rm(value_cum, value_surface)</code></pre>
 </div>
-<div id="cumulative-on-july-23" class="section level3">
-<h3><span class="header-section-number">6.2.2</span> Cumulative on July 23</h3>
+<div id="cumulative-on-july-23" class="section level3" number="6.2.2">
+<h3 number="6.2.2"><span class="header-section-number">6.2.2</span> Cumulative on July 23</h3>
 <pre class="r"><code>p_tm_fm_gt_long &lt;- tm_fm_gt_long_180723 %&gt;%
   arrange(dep) %&gt;%
   ggplot(aes(value_cum, dep)) +
@@ -2793,8 +2830,8 @@ TPD_cum &lt;- TPD
 
 rm(TPD)</code></pre>
 </div>
-<div id="daily-1" class="section level3">
-<h3><span class="header-section-number">6.2.3</span> Daily</h3>
+<div id="daily-1" class="section level3" number="6.2.3">
+<h3 number="6.2.3"><span class="header-section-number">6.2.3</span> Daily</h3>
 <pre class="r"><code># surface values
 diff_surface &lt;- tm_fm_gt_long %&gt;%
   filter(dep &lt; parameters$surface_dep) %&gt;%
@@ -2978,8 +3015,8 @@ p_hov_dep</code></pre>
 </div>
 </div>
 </div>
-<div id="surface-obs-integration-depths" class="section level1">
-<h1><span class="header-section-number">7</span> Surface obs + integration depths</h1>
+<div id="surface-obs-integration-depths" class="section level1" number="7">
+<h1 number="7"><span class="header-section-number">7</span> Surface obs + integration depths</h1>
 <pre class="r"><code>tm_fm_gt_surface &lt;- tm_fm_gt %&gt;%
   filter(dep &lt; parameters$surface_dep) %&gt;%
   select(source, date_time_ID, sensor, nCT) %&gt;%
@@ -3001,8 +3038,8 @@ tm_fm_gt_surface &lt;- tm_fm_gt_surface %&gt;%
 <pre class="r"><code>iCT &lt;- full_join(tm_fm_gt_surface, i_dep)
 rm(tm_fm_gt_surface)</code></pre>
 </div>
-<div id="ict" class="section level1">
-<h1><span class="header-section-number">8</span> iC<sub>T</sub></h1>
+<div id="ict" class="section level1" number="8">
+<h1 number="8"><span class="header-section-number">8</span> iC<sub>T</sub></h1>
 <pre class="r"><code>iCT &lt;- iCT %&gt;% 
   mutate(CT_i_diff = nCT_diff * i_dep)
 
@@ -3235,6 +3272,8 @@ footer is added to webpages before the MathJax javascript. -->
     "HTML-CSS": { availableFonts: ["TeX"] }
   });
 </script>
+
+
 
 
 </div>

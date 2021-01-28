@@ -14,6 +14,7 @@
 
 <title>CT dynamics</title>
 
+<script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
@@ -39,6 +40,8 @@ div.section {
   padding-top: 12px;
 }
 </style>
+
+
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -448,7 +451,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">CT dynamics</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">22 January, 2021</h4>
+<h4 class="date">28 January, 2021</h4>
 
 </div>
 
@@ -473,7 +476,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-01-22
+<strong>Last updated:</strong> 2021-01-28
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -564,16 +567,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree5492ad570b48413ac5d397049ac82eb7c5137128targetblank5492ad5a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/5492ad570b48413ac5d397049ac82eb7c5137128" target="_blank">5492ad5</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3eae87b95414702fb00c65d9207b3cccbc710327targetblank3eae87ba"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/3eae87b95414702fb00c65d9207b3cccbc710327" target="_blank">3eae87b</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree5492ad570b48413ac5d397049ac82eb7c5137128targetblank5492ad5a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree3eae87b95414702fb00c65d9207b3cccbc710327targetblank3eae87ba" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/5492ad570b48413ac5d397049ac82eb7c5137128" target="_blank">5492ad5</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/3eae87b95414702fb00c65d9207b3cccbc710327" target="_blank">3eae87b</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -624,6 +627,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/3eae87b95414702fb00c65d9207b3cccbc710327/analysis/CT_dynamics.Rmd" target="_blank">3eae87b</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-01-28
+</td>
+<td>
+modified figs
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/6490f5a3ec025b4892149d2984eb7c431af91f1d/docs/CT_dynamics.html" target="_blank">6490f5a</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-01-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -4504,10 +4541,10 @@ library(kableExtra)
 library(LakeMetabolizer)
 library(rgdal)
 library(ggnewscale)</code></pre>
-<div id="sensor-data" class="section level1">
-<h1><span class="header-section-number">1</span> Sensor data</h1>
-<div id="data-preparation" class="section level2">
-<h2><span class="header-section-number">1.1</span> Data preparation</h2>
+<div id="sensor-data" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Sensor data</h1>
+<div id="data-preparation" class="section level2" number="1.1">
+<h2 number="1.1"><span class="header-section-number">1.1</span> Data preparation</h2>
 <p>Profile data are prepared by:</p>
 <ul>
 <li>Ignoring those made on June 16 (pCO2 sensor not in operation)</li>
@@ -4522,7 +4559,7 @@ library(ggnewscale)</code></pre>
 </ul>
 <p>Please note that:</p>
 <ul>
-<li>The label ID representm the start date of the cruise (“YYMMDD”), not the exact mean sampling date</li>
+<li>The label ID represents the start date of the cruise (“YYMMDD”), not the exact mean sampling date</li>
 </ul>
 <pre class="r"><code>tm &lt;-
  read_csv(here::here(&quot;data/intermediate/_merged_data_files/response_time&quot;,
@@ -4627,8 +4664,8 @@ profiles_in &lt;- tm_profiles %&gt;%
 tm_profiles &lt;- full_join(tm_profiles, profiles_in)
 rm(profiles_in)</code></pre>
 </div>
-<div id="pco2-profile-overview" class="section level2">
-<h2><span class="header-section-number">1.2</span> pCO<sub>2</sub> profile overview</h2>
+<div id="pco2-profile-overview" class="section level2" number="1.2">
+<h2 number="1.2"><span class="header-section-number">1.2</span> pCO<sub>2</sub> profile overview</h2>
 <pre class="r"><code>tm_profiles %&gt;%
   arrange(date_time) %&gt;%
   ggplot(aes(pCO2, dep, col = select, linetype = phase)) +
@@ -4646,16 +4683,16 @@ Overview pCO<sub>2</sub> profiles at stations (P02-P12) and cruise dates (ID). y
 </p>
 </div>
 </div>
-<div id="subset" class="section level2">
-<h2><span class="header-section-number">1.3</span> Subset</h2>
+<div id="subset" class="section level2" number="1.3">
+<h2 number="1.3"><span class="header-section-number">1.3</span> Subset</h2>
 <pre class="r"><code>tm_profiles &lt;- tm_profiles %&gt;%
   filter(select == &quot;in&quot;,
          phase == &quot;down&quot;) %&gt;%
   select(-c(select, phase)) %&gt;% 
   filter(dep &lt; parameters$max_dep)</code></pre>
 </div>
-<div id="cruise-dates" class="section level2">
-<h2><span class="header-section-number">1.4</span> Cruise dates</h2>
+<div id="cruise-dates" class="section level2" number="1.4">
+<h2 number="1.4"><span class="header-section-number">1.4</span> Cruise dates</h2>
 <pre class="r"><code># assign mean date_time stamp
 
 cruise_dates &lt;- tm_profiles %&gt;% 
@@ -4671,8 +4708,8 @@ cruise_dates %&gt;%
     write_csv(here::here(&quot;data/intermediate/_summarized_data_files&quot;,
                        &quot;cruise_date.csv&quot;))</code></pre>
 </div>
-<div id="station-map" class="section level2">
-<h2><span class="header-section-number">1.5</span> Station map</h2>
+<div id="station-map" class="section level2" number="1.5">
+<h2 number="1.5"><span class="header-section-number">1.5</span> Station map</h2>
 <pre class="r"><code>fm &lt;-
   read_csv(here::here(&quot;data/intermediate/_summarized_data_files&quot;,
                        &quot;fm.csv&quot;))
@@ -4707,10 +4744,6 @@ EGS &lt;- EGS %&gt;%
   rename(lat = y,
          lon = x) %&gt;% 
   filter(lat &gt;= 56.4, lat &lt;= 58.3)
-
-# hist(EGS$MODIS_2018_07_26_EGS.1)
-# hist(EGS$MODIS_2018_07_26_EGS.2)
-# hist(EGS$MODIS_2018_07_26_EGS.3)
 
 EGS &lt;- EGS %&gt;%
   mutate(
@@ -4909,8 +4942,8 @@ rm(map, map_low_res,
 
 rm(tm)</code></pre>
 </div>
-<div id="data-coverage" class="section level2">
-<h2><span class="header-section-number">1.6</span> Data coverage</h2>
+<div id="data-coverage" class="section level2" number="1.6">
+<h2 number="1.6"><span class="header-section-number">1.6</span> Data coverage</h2>
 <pre class="r"><code>cover &lt;- tm_profiles %&gt;%
   group_by(ID, station) %&gt;%
   summarise(date = mean(date_time),
@@ -4961,8 +4994,8 @@ ggsave(
 rm(cover)</code></pre>
 </div>
 </div>
-<div id="bottle-ct-and-at" class="section level1">
-<h1><span class="header-section-number">2</span> Bottle C<sub>T</sub> and A<sub>T</sub></h1>
+<div id="bottle-ct-and-at" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Bottle C<sub>T</sub> and A<sub>T</sub></h1>
 <p>At stations P07 and P10 discrete samples for lab measurmentm of C<sub>T</sub> and A<sub>T</sub> were collected. Please note that - in contrast to the pCO<sub>2</sub> profiles - samples were taken on June 16, but removed here for harmonization of results.</p>
 <pre class="r"><code>tb &lt;-
   read_csv(here::here(&quot;data/intermediate/_summarized_data_files&quot;, &quot;tb.csv&quot;),
@@ -4974,8 +5007,8 @@ tb &lt;- tb %&gt;%
   mutate(ID = if_else(ID == &quot;180722&quot;, &quot;180723&quot;, ID))
 
 tb &lt;- inner_join(tb, cruise_dates)</code></pre>
-<div id="mean-alkalinity" class="section level2">
-<h2><span class="header-section-number">2.1</span> Mean alkalinity</h2>
+<div id="mean-alkalinity" class="section level2" number="2.1">
+<h2 number="2.1"><span class="header-section-number">2.1</span> Mean alkalinity</h2>
 <p>In order to derive C<sub>T</sub> from measured pCO<sub>2</sub> profiles, the alkalinity mean + sd in the upper 25m and both stations was calculated as:</p>
 <pre class="r"><code>AT_mean &lt;- tb %&gt;% 
   filter(dep &lt;= parameters$max_dep) %&gt;% 
@@ -5008,16 +5041,16 @@ sal_mean</code></pre>
 tb_fix %&gt;% 
   write_csv(here::here(&quot;data/intermediate/_summarized_data_files&quot;, &quot;tb_fix.csv&quot;))</code></pre>
 </div>
-<div id="nct-calculation" class="section level2">
-<h2><span class="header-section-number">2.2</span> nC<sub>T</sub> calculation</h2>
+<div id="nct-calculation" class="section level2" number="2.2">
+<h2 number="2.2"><span class="header-section-number">2.2</span> nC<sub>T</sub> calculation</h2>
 <p>The alkalinity-normalized C<sub>T</sub>, nC<sub>T</sub>, was calculated.</p>
 <pre class="r"><code>tb &lt;- tb %&gt;% 
   mutate(nCT = CT/AT * AT_mean)</code></pre>
 </div>
-<div id="vertical-profiles" class="section level2">
-<h2><span class="header-section-number">2.3</span> Vertical profiles</h2>
-<div id="stations" class="section level3">
-<h3><span class="header-section-number">2.3.1</span> Stations</h3>
+<div id="vertical-profiles" class="section level2" number="2.3">
+<h2 number="2.3"><span class="header-section-number">2.3</span> Vertical profiles</h2>
+<div id="stations" class="section level3" number="2.3.1">
+<h3 number="2.3.1"><span class="header-section-number">2.3.1</span> Stations</h3>
 <pre class="r"><code>tb_long &lt;- tb %&gt;%
   pivot_longer(c(sal:AT, nCT), names_to = &quot;var&quot;, values_to = &quot;value&quot;)
 
@@ -5033,8 +5066,8 @@ tb_long %&gt;%
         legend.title = element_blank())</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/bottle_CO2_profiles_station-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="mean" class="section level3">
-<h3><span class="header-section-number">2.3.2</span> Mean</h3>
+<div id="mean" class="section level3" number="2.3.2">
+<h3 number="2.3.2"><span class="header-section-number">2.3.2</span> Mean</h3>
 <pre class="r"><code>tb_long_mean &lt;- tb_long %&gt;%
   mutate(dep_grid = as.numeric(as.character(cut(
     dep,
@@ -5129,8 +5162,8 @@ ggsave(
 rm(tb_long_mean, p_AT, p_CT, p_nCT, tb_fix)</code></pre>
 </div>
 </div>
-<div id="surface-time-series" class="section level2">
-<h2><span class="header-section-number">2.4</span> Surface time series</h2>
+<div id="surface-time-series" class="section level2" number="2.4">
+<h2 number="2.4"><span class="header-section-number">2.4</span> Surface time series</h2>
 <pre class="r"><code>tb_surface &lt;- tb_long %&gt;%
   filter(dep &lt; parameters$surface_dep) %&gt;%
   group_by(ID, date_time_ID, var, station) %&gt;%
@@ -5168,10 +5201,10 @@ Time series of bottle data. Shown are mean values of samples collected at water 
 <p>Important notes: - nC<sub>T</sub> drop and temporal patterns agree well with those found in the nC<sub>T</sub> time series derived from pCO<sub>2</sub> measurements (below).</p>
 </div>
 </div>
-<div id="nct-profiles" class="section level1">
-<h1><span class="header-section-number">3</span> nC<sub>T</sub> profiles</h1>
-<div id="calculation-from-pco2" class="section level2">
-<h2><span class="header-section-number">3.1</span> Calculation from pCO<sub>2</sub></h2>
+<div id="nct-profiles" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> nC<sub>T</sub> profiles</h1>
+<div id="calculation-from-pco2" class="section level2" number="3.1">
+<h2 number="3.1"><span class="header-section-number">3.1</span> Calculation from pCO<sub>2</sub></h2>
 <p>Alkalinity normalized C<sub>T</sub> (nC<sub>T</sub>) profiles were calculated from sensor pCO<sub>2</sub> and T profiles, and constant salinity and alkalinity values. Note that the impact of fixed vs. measured salinity has only a negligible impact on nC<sub>T</sub> profiles.</p>
 <pre class="r"><code>tm_profiles &lt;- tm_profiles %&gt;%
   mutate(
@@ -5215,8 +5248,8 @@ tm_profiles &lt;- tm_profiles %&gt;%
     )[, 16] * 1e6
   )</code></pre>
 </div>
-<div id="plot-all-profiles" class="section level2">
-<h2><span class="header-section-number">3.2</span> Plot all profiles</h2>
+<div id="plot-all-profiles" class="section level2" number="3.2">
+<h2 number="3.2"><span class="header-section-number">3.2</span> Plot all profiles</h2>
 <pre class="r"><code>tm_profiles &lt;-  tm_profiles %&gt;%
   arrange(date_time_ID)
 
@@ -5289,8 +5322,8 @@ rm(p_tem, p_pCO2, p_nCT)</code></pre>
   nrow()</code></pre>
 <pre><code>[1] 78</code></pre>
 </div>
-<div id="mean-profiles" class="section level2">
-<h2><span class="header-section-number">3.3</span> Mean profiles</h2>
+<div id="mean-profiles" class="section level2" number="3.3">
+<h2 number="3.3"><span class="header-section-number">3.3</span> Mean profiles</h2>
 <p>Mean vertical profiles were calculated for each cruise day (ID).</p>
 <pre class="r"><code>tm_profiles_ID_mean &lt;- tm_profiles %&gt;%
   select(-c(station, lat, lon, pCO2_corr, date_time)) %&gt;%
@@ -5345,8 +5378,8 @@ rm(
 Mean vertical profiles per cruise day across all stations.
 </p>
 </div>
-<div id="nct-sensitivity-to-at" class="section level3">
-<h3><span class="header-section-number">3.3.1</span> nCT sensitivity to AT</h3>
+<div id="nct-sensitivity-to-at" class="section level3" number="3.3.1">
+<h3 number="3.3.1"><span class="header-section-number">3.3.1</span> nCT sensitivity to AT</h3>
 <pre class="r"><code>tm_profiles_ID_mean_test %&gt;%
   ggplot(aes(nCT_delta - mean(nCT_delta), dep, col = ID)) +
   geom_point() +
@@ -5535,8 +5568,8 @@ rm(p_nCT, p_tem, cruise_labels, profiles_min_max)</code></pre>
 </ul>
 </div>
 </div>
-<div id="individual-profiles" class="section level2">
-<h2><span class="header-section-number">3.4</span> Individual profiles</h2>
+<div id="individual-profiles" class="section level2" number="3.4">
+<h2 number="3.4"><span class="header-section-number">3.4</span> Individual profiles</h2>
 <p>C<sub>T</sub>, pCO<sub>2</sub>, S, and T profiles were plotted individually <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a> and grouped by ID <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_ID_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a>. The later gives an idea of the differences between stations at one point in time.</p>
 <pre class="r"><code># tm_profiles_highres &lt;- tm_profiles_highres %&gt;% 
 #   filter(phase == &quot;down&quot;)
@@ -5658,8 +5691,8 @@ dev.off()
 
 rm(i_ID, tm_profiles_long)</code></pre>
 </div>
-<div id="profiles-of-incremental-changes" class="section level2">
-<h2><span class="header-section-number">3.5</span> Profiles of incremental changes</h2>
+<div id="profiles-of-incremental-changes" class="section level2" number="3.5">
+<h2 number="3.5"><span class="header-section-number">3.5</span> Profiles of incremental changes</h2>
 <p>Changes of seawater vars at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.</p>
 <pre class="r"><code>tm_profiles_ID_long &lt;- tm_profiles_ID_long %&gt;%
   group_by(var, dep) %&gt;%
@@ -5685,8 +5718,8 @@ rm(i_ID, tm_profiles_long)</code></pre>
   labs(x = &quot;Change of value inbetween cruises per day&quot;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="profiles-of-cumulative-changes" class="section level2">
-<h2><span class="header-section-number">3.6</span> Profiles of cumulative changes</h2>
+<div id="profiles-of-cumulative-changes" class="section level2" number="3.6">
+<h2 number="3.6"><span class="header-section-number">3.6</span> Profiles of cumulative changes</h2>
 <p>Cumulative changes of seawater vars were calculated at each depth relative to the first cruise day on July 5.</p>
 <pre class="r"><code>tm_profiles_ID_long %&gt;%
   arrange(dep) %&gt;%
@@ -5724,10 +5757,10 @@ rm(i_ID, tm_profiles_long)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/cumulative_directional_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="timeseries" class="section level1">
-<h1><span class="header-section-number">4</span> Timeseries</h1>
-<div id="timeseries-depth-intervals" class="section level2">
-<h2><span class="header-section-number">4.1</span> Timeseries depth intervals</h2>
+<div id="timeseries" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Timeseries</h1>
+<div id="timeseries-depth-intervals" class="section level2" number="4.1">
+<h2 number="4.1"><span class="header-section-number">4.1</span> Timeseries depth intervals</h2>
 <p>Mean seawater parameters were calculated for 5m depth intervals.</p>
 <pre class="r"><code>tm_profiles_ID_long_grid &lt;- tm_profiles_ID_long %&gt;%
   mutate(dep = cut(dep, seq(0, 30, 5))) %&gt;%
@@ -6582,8 +6615,8 @@ tem
 </table>
 </div>
 <pre class="r"><code>rm(tm_profiles_ID_long_grid)</code></pre>
-<div id="test-at-sensitivity" class="section level3">
-<h3><span class="header-section-number">4.1.1</span> Test AT sensitivity</h3>
+<div id="test-at-sensitivity" class="section level3" number="4.1.1">
+<h3 number="4.1.1"><span class="header-section-number">4.1.1</span> Test AT sensitivity</h3>
 <p>Mean seawater CT were calculated for 5m depth intervals based on two AT values.</p>
 <pre class="r"><code>tm_profiles_ID_long_grid &lt;- tm_profiles_ID_long_test %&gt;%
   mutate(dep = cut(dep, seq(0, 30, 5))) %&gt;%
@@ -6718,10 +6751,10 @@ ggsave(
 )</code></pre>
 </div>
 </div>
-<div id="hovmoeller-plots" class="section level2">
-<h2><span class="header-section-number">4.2</span> Hovmoeller plots</h2>
-<div id="absolute-values" class="section level3">
-<h3><span class="header-section-number">4.2.1</span> Absolute values</h3>
+<div id="hovmoeller-plots" class="section level2" number="4.2">
+<h2 number="4.2"><span class="header-section-number">4.2</span> Hovmoeller plots</h2>
+<div id="absolute-values" class="section level3" number="4.2.1">
+<h3 number="4.2.1"><span class="header-section-number">4.2.1</span> Absolute values</h3>
 <pre class="r"><code>bin_nCT &lt;- 30
 
 p_nCT_hov &lt;- tm_profiles_ID_long %&gt;%
@@ -6787,8 +6820,8 @@ Hovmoeller plotm of absolute changes in C<sub>T</sub> and temperature.
 </div>
 <pre class="r"><code>rm(p_nCT_hov, bin_nCT, p_tem_hov, bin_Tem)</code></pre>
 </div>
-<div id="incremental-changes" class="section level3">
-<h3><span class="header-section-number">4.2.2</span> Incremental changes</h3>
+<div id="incremental-changes" class="section level3" number="4.2.2">
+<h3 number="4.2.2"><span class="header-section-number">4.2.2</span> Incremental changes</h3>
 <pre class="r"><code>bin_nCT &lt;- 2.5
 
 nCT_hov &lt;- tm_profiles_ID_long %&gt;%
@@ -6850,8 +6883,8 @@ Hovmoeller plotm of daily changes in C<sub>T</sub> and temperature. Note that ca
 </div>
 <pre class="r"><code>rm(nCT_hov, bin_nCT, Tem_hov, bin_Tem)</code></pre>
 </div>
-<div id="cumulative-changes" class="section level3">
-<h3><span class="header-section-number">4.2.3</span> Cumulative changes</h3>
+<div id="cumulative-changes" class="section level3" number="4.2.3">
+<h3 number="4.2.3"><span class="header-section-number">4.2.3</span> Cumulative changes</h3>
 <pre class="r"><code>bin_nCT &lt;- 20
 
 nCT_hov &lt;- tm_profiles_ID_long %&gt;%
@@ -6915,20 +6948,20 @@ Hovmoeller plotm of cumulative changes in C<sub>T</sub> and temperature.
 </div>
 </div>
 </div>
-<div id="depth-integration-ct" class="section level1">
-<h1><span class="header-section-number">5</span> Depth-integration C<sub>T</sub></h1>
+<div id="depth-integration-ct" class="section level1" number="5">
+<h1 number="5"><span class="header-section-number">5</span> Depth-integration C<sub>T</sub></h1>
 <p>A critical first step for the determination of net community production (NCP) is the integration of observed changes in nC<sub>T</sub> over depth. Two approaches were tested:</p>
 <ul>
 <li>Integration of changes in nC<sub>T</sub> over a predefined, fixed water depth</li>
 <li>Integration of changes in nC<sub>T</sub> over a mixed layer depth (MLD)</li>
 </ul>
 <p>Both aproaches deliver depth-integrated, incremental changes of C<sub>T</sub> inbetween cruise dates. Those were summed up to derive a trajectory of cummulative integrated nC<sub>T</sub> changes.</p>
-<div id="fixed-depths-approach" class="section level2">
-<h2><span class="header-section-number">5.1</span> Fixed depths approach</h2>
+<div id="fixed-depths-approach" class="section level2" number="5.1">
+<h2 number="5.1"><span class="header-section-number">5.1</span> Fixed depths approach</h2>
 <p>Incremental and cumulative nC<sub>T</sub> changes inbetween cruise dates were integrated across the water colums down to predefined depth limits. This was done separately for observed positive/negative changes in C<sub>T</sub>, as well as for the total observed changes.</p>
 <p>Predefined integration depth levels in metres are: 9, 10, 11, 12, 13</p>
-<div id="calculate-inct" class="section level3">
-<h3><span class="header-section-number">5.1.1</span> Calculate inC<sub>T</sub></h3>
+<div id="calculate-inct" class="section level3" number="5.1.1">
+<h3 number="5.1.1"><span class="header-section-number">5.1.1</span> Calculate inC<sub>T</sub></h3>
 <pre class="r"><code>inCT_grid_sign &lt;- tm_profiles_ID_long %&gt;% 
   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
   unique() %&gt;% 
@@ -6995,8 +7028,8 @@ inCT &lt;- inCT %&gt;%
 inCT_fixed_dep &lt;- inCT
 rm(inCT, i_dep)</code></pre>
 </div>
-<div id="time-series" class="section level3">
-<h3><span class="header-section-number">5.1.2</span> Time series</h3>
+<div id="time-series" class="section level3" number="5.1.2">
+<h3 number="5.1.2"><span class="header-section-number">5.1.2</span> Time series</h3>
 <pre class="r"><code>inCT_fixed_dep %&gt;%
   ggplot() +
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
@@ -7015,11 +7048,11 @@ rm(inCT, i_dep)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/inCT_fixed_depth_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="mld-approach" class="section level2">
-<h2><span class="header-section-number">5.2</span> MLD approach</h2>
+<div id="mld-approach" class="section level2" number="5.2">
+<h2 number="5.2"><span class="header-section-number">5.2</span> MLD approach</h2>
 <p>As an alternative to fixed depth levels, vertical integration as low as the mixed layer depth was tested.</p>
-<div id="density-calculation" class="section level3">
-<h3><span class="header-section-number">5.2.1</span> Density calculation</h3>
+<div id="density-calculation" class="section level3" number="5.2.1">
+<h3 number="5.2.1"><span class="header-section-number">5.2.1</span> Density calculation</h3>
 <p>Seawater density Rho was determined from S, T, and p according to TEOS-10.</p>
 <pre class="r"><code>tm_profiles &lt;- tm_profiles %&gt;%
   mutate(rho = swSigma(
@@ -7028,8 +7061,8 @@ rm(inCT, i_dep)</code></pre>
     pressure = dep / 10
   ))</code></pre>
 </div>
-<div id="density-profiles" class="section level3">
-<h3><span class="header-section-number">5.2.2</span> Density profiles</h3>
+<div id="density-profiles" class="section level3" number="5.2.2">
+<h3 number="5.2.2"><span class="header-section-number">5.2.2</span> Density profiles</h3>
 <pre class="r"><code>tm_profiles_ID_mean_hydro &lt;- tm_profiles %&gt;%
   select(-c(station, lat, lon, pCO2_corr, pCO2, nCT, date_time)) %&gt;%
   group_by(ID, date_time_ID, date_ID, dep) %&gt;%
@@ -7073,8 +7106,8 @@ Mean vertical profiles per cruise day across all stations.
 </p>
 </div>
 </div>
-<div id="mld-calculation" class="section level3">
-<h3><span class="header-section-number">5.2.3</span> MLD calculation</h3>
+<div id="mld-calculation" class="section level3" number="5.2.3">
+<h3 number="5.2.3"><span class="header-section-number">5.2.3</span> MLD calculation</h3>
 <p>Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria</p>
 <pre class="r"><code>tm_profiles_ID_hydro &lt;- expand_grid(tm_profiles_ID_hydro, rho_lim = c(0.1,0.2,0.5))
 
@@ -7086,8 +7119,8 @@ MLD &lt;- tm_profiles_ID_hydro  %&gt;%
   summarise(MLD = min(dep)) %&gt;% 
   ungroup()</code></pre>
 </div>
-<div id="daily-density-profiles" class="section level3">
-<h3><span class="header-section-number">5.2.4</span> Daily density profiles</h3>
+<div id="daily-density-profiles" class="section level3" number="5.2.4">
+<h3 number="5.2.4"><span class="header-section-number">5.2.4</span> Daily density profiles</h3>
 <pre class="r"><code>tm_profiles_ID_hydro &lt;-
   full_join(tm_profiles_ID_hydro, MLD)
 
@@ -7107,8 +7140,8 @@ Mean density profiles and MLD per cruise dates (ID).
 </p>
 </div>
 </div>
-<div id="mld-timeseries" class="section level3">
-<h3><span class="header-section-number">5.2.5</span> MLD timeseries</h3>
+<div id="mld-timeseries" class="section level3" number="5.2.5">
+<h3 number="5.2.5"><span class="header-section-number">5.2.5</span> MLD timeseries</h3>
 <pre class="r"><code>MLD %&gt;%
   ggplot(aes(date_time_ID, MLD, col = as.factor(rho_lim))) +
   geom_hline(yintercept = 0) +
@@ -7120,8 +7153,8 @@ Mean density profiles and MLD per cruise dates (ID).
   labs(x = &quot;&quot;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/MLD_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="inct-calculation" class="section level3">
-<h3><span class="header-section-number">5.2.6</span> inCT calculation</h3>
+<div id="inct-calculation" class="section level3" number="5.2.6">
+<h3 number="5.2.6"><span class="header-section-number">5.2.6</span> inCT calculation</h3>
 <pre class="r"><code>inCT &lt;- tm_profiles_ID_long %&gt;% 
   filter(var == &quot;nCT&quot;)
 
@@ -7148,8 +7181,8 @@ inCT_MLD &lt;- inCT
 
 rm(inCT, MLD, tm_profiles_ID_hydro, tm_profiles_ID_hydro_long)</code></pre>
 </div>
-<div id="time-series-1" class="section level3">
-<h3><span class="header-section-number">5.2.7</span> Time series</h3>
+<div id="time-series-1" class="section level3" number="5.2.7">
+<h3 number="5.2.7"><span class="header-section-number">5.2.7</span> Time series</h3>
 <pre class="r"><code>inCT_MLD %&gt;%
   ggplot() +
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
@@ -7167,8 +7200,8 @@ rm(inCT, MLD, tm_profiles_ID_hydro, tm_profiles_ID_hydro_long)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/inCT_MLD_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="comparison-of-approaches" class="section level2">
-<h2><span class="header-section-number">5.3</span> Comparison of approaches</h2>
+<div id="comparison-of-approaches" class="section level2" number="5.3">
+<h2 number="5.3"><span class="header-section-number">5.3</span> Comparison of approaches</h2>
 <p>In the following, all cummulative iC<sub>T</sub> trajectories are displayed. Highlighted are those obtained for the fixed depth approach with 10 m limit, and the MLD approach with a high density threshold of 0.5 kg/m3.</p>
 <pre class="r"><code>inCT &lt;- full_join(inCT_fixed_dep, inCT_MLD)
 
@@ -7199,20 +7232,20 @@ inCT %&gt;%
 <pre class="r"><code>rm(inCT, inCT_MLD)</code></pre>
 </div>
 </div>
-<div id="ncp-determination" class="section level1">
-<h1><span class="header-section-number">6</span> NCP determination</h1>
+<div id="ncp-determination" class="section level1" number="6">
+<h1 number="6"><span class="header-section-number">6</span> NCP determination</h1>
 <p>In order to derive an estimate of the net community production NCP (which is equivalent to the formed organic matter that can be exported from the investigated surface layer), two steps are required:</p>
 <ul>
-<li>decision about the most appropiate iC<sub>T</sub> trajectory</li>
-<li>correction of quantifyable CO<sub>2</sub> fluxes in and out of the investigated water volume during the period of interest, this includes:
+<li><p>decision about the most appropiate iC<sub>T</sub> trajectory</p></li>
+<li><p>correction of quantifyable CO<sub>2</sub> fluxes in and out of the investigated water volume during the period of interest, this includes:</p>
 <ul>
 <li>Air-sea CO<sub>2</sub> fluxes</li>
 <li>CO<sub>2</sub> fluxes due to vertical mixing</li>
 <li>CO<sub>2</sub> fluxes due to lateral transport of water masses (not corrected here)</li>
 </ul></li>
 </ul>
-<div id="best-ict-estimate" class="section level2">
-<h2><span class="header-section-number">6.1</span> Best iC<sub>T</sub> estimate</h2>
+<div id="best-ict-estimate" class="section level2" number="6.1">
+<h2 number="6.1"><span class="header-section-number">6.1</span> Best iC<sub>T</sub> estimate</h2>
 <p>To determine the optimum depth for the nC<sub>T</sub> integration we investigated the vertical distribution of cumulative temperature and nC<sub>T</sub> changes on the peak of the productivity signal on June 23:</p>
 <pre class="r"><code>tm_profiles_ID_long_180723 &lt;- tm_profiles_ID_long %&gt;%
   filter(ID == 180723,
@@ -7304,20 +7337,20 @@ p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel</code></pre>
 )</code></pre>
 <p>The cummulative iC<sub>T</sub> trajectory determined by integration of C<sub>T</sub> to a fixed water depth of 12 m was used for NCP calculation for the following reasons:</p>
 <ul>
-<li>During the first productivity pulse that lasted until July 23:
+<li><p>During the first productivity pulse that lasted until July 23:</p>
 <ul>
 <li>no negative nC<sub>T</sub> changes were detected below that depth</li>
 <li>cumulative nC<sub>T</sub> switch sign at that depth</li>
 <li>95% of the cumulative warming signal appears across that depth</li>
 </ul></li>
-<li>MLD were too shallow to cover all observed negative C<sub>T</sub> changes</li>
+<li><p>MLD were too shallow to cover all observed negative C<sub>T</sub> changes</p></li>
 </ul>
 </div>
-<div id="air-sea-co2-flux" class="section level2">
-<h2><span class="header-section-number">6.2</span> Air-Sea CO<sub>2</sub> flux</h2>
-<div id="surface-water-data" class="section level3">
-<h3><span class="header-section-number">6.2.1</span> Surface water data</h3>
-<p>The cruise mean pCO<sub>2</sub> recorded in profiling-mode (stations only) and depths &lt; 6m was used for gas exchange calcualtions.</p>
+<div id="air-sea-co2-flux" class="section level2" number="6.2">
+<h2 number="6.2"><span class="header-section-number">6.2</span> Air-Sea CO<sub>2</sub> flux</h2>
+<div id="surface-water-data" class="section level3" number="6.2.1">
+<h3 number="6.2.1"><span class="header-section-number">6.2.1</span> Surface water data</h3>
+<p>The cruise mean pCO<sub>2</sub> recorded in profiling-mode (stations only) and depths &lt; 6m was used for gas exchange calculations.</p>
 <pre class="r"><code>tm_profiles_surface_long &lt;- tm_profiles %&gt;%
   filter(dep &lt; parameters$surface_dep) %&gt;%
   select(date_time = date_time_ID, ID, tem, pCO2 = pCO2, nCT) %&gt;%
@@ -7333,39 +7366,60 @@ rm(tm_profiles_surface_long)
 p_pCO2_surf &lt;- tm_profiles_surface_long_ID %&gt;%
   filter(var == &quot;pCO2&quot;) %&gt;%
   ggplot(aes(x = date_time)) +
-  geom_ribbon(aes(ymin = mean - sd, ymax = mean + sd), alpha = 0.2) +
+  geom_ribbon(aes(ymin = mean - sd, ymax = mean + sd,
+                  fill = &quot;+/- SD&quot;), alpha = 0.2) +
   geom_path(aes(y = mean)) +
   geom_point(aes(y = mean)) +
-  scale_fill_discrete(guide = FALSE) +
+  scale_color_manual(name = &quot;&quot;, values = &quot;black&quot;, guide = FALSE) +
+  scale_fill_manual(name = &quot;&quot;, values = &quot;black&quot;, guide = FALSE) +
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis()) +
   labs(y = expression(atop(pCO[2], (mu * atm))),
        title = &quot;Surface water observations&quot;) +
   theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+        axis.text.x = element_blank(),
+    legend.title = element_blank())
 
 p_tem_surf &lt;- tm_profiles_surface_long_ID %&gt;%
   filter(var == &quot;tem&quot;) %&gt;%
   ggplot(aes(x = date_time)) +
-  geom_ribbon(aes(ymin = mean - sd, ymax = mean + sd), alpha = 0.2) +
-  geom_path(aes(y = mean)) +
-  geom_point(aes(y = mean)) +
-  scale_fill_discrete(guide = FALSE) +
+  geom_ribbon(aes(
+    ymin = mean - sd,
+    ymax = mean + sd,
+    fill = &quot;Mean +/- SD&quot;
+  ),
+  alpha = 0.2) +
+  geom_path(aes(y = mean, col = &quot;Mean +/- SD&quot;)) +
+  geom_point(aes(y = mean, col = &quot;Mean +/- SD&quot;)) +
+  scale_color_manual(name = &quot;Sensor data&quot;, values = &quot;black&quot;) +
+  scale_fill_manual(name = &quot;Sensor data&quot;, values = &quot;black&quot;) +
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(&quot;SST&quot;,&quot;(\u00B0C)&quot;))) +
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+  labs(y = expression(atop(&quot;SST&quot;, &quot;(\u00B0C)&quot;))) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    legend.key.height = unit(5, &quot;mm&quot;),
+    legend.key.width = unit(5,&quot;mm&quot;)
+  )
+
 
 p_nCT_surf &lt;-
   tm_profiles_surface_long_ID %&gt;%
   filter(var == &quot;nCT&quot;) %&gt;%
   ggplot() +
-  geom_point(data = tb_surface_station_mean %&gt;%
-               filter(var == &quot;nCT&quot;),
-             aes(x = date_time_ID,
-                 y = value_mean,
-                 color = &quot;discrete&quot;)) +
+  geom_ribbon(aes(
+    x = date_time,
+    ymin = mean - sd,
+    ymax = mean + sd,
+    fill = &quot;+/- SD&quot;
+  ),
+  alpha = 0.2) +
+  geom_path(aes(x = date_time, y = mean)) +
+  geom_point(aes(x = date_time, y = mean)) +
+  scale_color_manual(name = &quot;&quot;, values = &quot;black&quot;, guide = FALSE) +
+  scale_fill_manual(name = &quot;&quot;, values = &quot;black&quot;, guide = FALSE) +
+  new_scale_color() +
   geom_linerange(
     data = tb_surface_station_mean %&gt;%
       filter(var == &quot;nCT&quot;),
@@ -7373,33 +7427,28 @@ p_nCT_surf &lt;-
       x = date_time_ID,
       ymin = value_mean - value_sd,
       ymax = value_mean + value_sd,
-      color = &quot;discrete&quot;
+      color = &quot;Mean +/- SD&quot;
     )
   ) +
-  geom_ribbon(aes(
-    x = date_time,
-    ymin = mean - sd,
-    ymax = mean + sd
-  ), alpha = 0.2) +
-  geom_path(aes(x = date_time, y = mean)) +
-  geom_point(aes(x = date_time, y = mean)) +
-  scale_color_manual(values = &quot;red&quot;) +
+  geom_point(
+    data = tb_surface_station_mean %&gt;%
+      filter(var == &quot;nCT&quot;),
+    aes(x = date_time_ID,
+        y = value_mean,
+        color = &quot;Mean +/- SD&quot;)
+  ) +
+  scale_color_manual(name = &quot;Bottle data&quot;, values = &quot;red&quot;) +
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(paste(C[T],&quot;*&quot;),
+  labs(y = expression(atop(paste(C[T], &quot;*&quot;),
                            (mu * mol ~ kg ^ {
                              -1
                            })))) +
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
-    legend.position = c(0.35, 0.75),
-    legend.title = element_blank(),
-    legend.direction = &quot;horizontal&quot;,
-    legend.background = element_rect(fill = &quot;transparent&quot;),
-    legend.key = element_rect(colour = &quot;black&quot;, fill = &quot;white&quot;),
-    legend.key.height = unit(4, &quot;mm&quot;),
-    legend.key.width = unit(4,&quot;mm&quot;) 
+    legend.key.height = unit(5, &quot;mm&quot;),
+    legend.key.width = unit(5,&quot;mm&quot;)
   )
 
 
@@ -7409,8 +7458,8 @@ p_pCO2_surf + p_tem_surf + p_nCT_surf +
 <pre class="r"><code>start &lt;- min(tm_profiles_surface_long_ID$date_time)
 end   &lt;- max(tm_profiles_surface_long_ID$date_time)</code></pre>
 </div>
-<div id="wind-and-atm.-pco2" class="section level3">
-<h3><span class="header-section-number">6.2.2</span> Wind and atm. pCO<sub>2</sub></h3>
+<div id="wind-and-atm.-pco2" class="section level3" number="6.2.2">
+<h3 number="6.2.2"><span class="header-section-number">6.2.2</span> Wind and atm. pCO<sub>2</sub></h3>
 <p>Metrological data were recorded on the flux tower located on Ostergarnsholm island.</p>
 <pre class="r"><code>og &lt;-
   read_csv(here::here(&quot;data/intermediate/_summarized_data_files&quot;,
@@ -7422,8 +7471,8 @@ og &lt;- og %&gt;%
 
 rm(end, start)</code></pre>
 </div>
-<div id="conversion-to-u10" class="section level3">
-<h3><span class="header-section-number">6.2.3</span> Conversion to U10</h3>
+<div id="conversion-to-u10" class="section level3" number="6.2.3">
+<h3 number="6.2.3"><span class="header-section-number">6.2.3</span> Conversion to U10</h3>
 <p>Wind speed was determined at 12 and converted to 10 m above sea level, to be used for gas exchange calculation.</p>
 <pre class="r"><code>og &lt;- og %&gt;%
   mutate(wind = wind.scale.base(wnd = wind, wnd.z = 12))</code></pre>
@@ -7447,11 +7496,6 @@ tm_og &lt;- tm_og %&gt;%
   filter(!is.na(pCO2_atm))
 
 rm(tm_profiles_surface_ID, og)</code></pre>
-<pre class="r"><code>rolling_mean   &lt;- rollify( ~ mean(.x, na.rm = TRUE), window = 48)
-
-tm_og &lt;- tm_og %&gt;%
-  mutate(wind_daily = rolling_mean(wind),
-         pCO2_atm_daily = rolling_mean(pCO2_atm))</code></pre>
 <pre class="r"><code>p_pCO2_atm &lt;- tm_og %&gt;%
   ggplot(aes(x = date_time)) +
   geom_path(aes(y = pCO2_atm)) +
@@ -7467,7 +7511,7 @@ p_wind &lt;- tm_og %&gt;%
   geom_path(aes(y = wind)) +
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(Wind~speed, (m ~ s ^ {
+  labs(y = expression(atop(U[&quot;10&quot;], (m ~ s ^ {
     -1
   })))) +
   theme(
@@ -7481,8 +7525,8 @@ p_pCO2_atm + p_wind +
   plot_layout(guides = &#39;collect&#39;)</code></pre>
 <p><img src="figure/CT_dynamics.Rmd/Ostergarn_tower_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="air-sea-fluxes" class="section level3">
-<h3><span class="header-section-number">6.2.4</span> Air-sea fluxes</h3>
+<div id="air-sea-fluxes" class="section level3" number="6.2.4">
+<h3 number="6.2.4"><span class="header-section-number">6.2.4</span> Air-sea fluxes</h3>
 <p>F = k * dCO2</p>
 <p>with</p>
 <p>dCO2 = K0 * dpCO2 and</p>
@@ -7568,8 +7612,8 @@ p_flux_daily + p_flux_cum +
 <p><img src="figure/CT_dynamics.Rmd/flux_air_sea_cumulative_CO2-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="ict-correction" class="section level2">
-<h2><span class="header-section-number">6.3</span> iC<sub>T</sub> correction</h2>
+<div id="ict-correction" class="section level2" number="6.3">
+<h2 number="6.3"><span class="header-section-number">6.3</span> iC<sub>T</sub> correction</h2>
 <p>The cumulative integrated nCT (inCT) time series obtained through integration across the upper 12m of the water column was used for further calculations of NCP.</p>
 <p>Correction of inCT for air-sea CO2 fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014).</p>
 <p>To derive an integrated NCP estimated, the observed change in inCT must be corrected for the air-sea flux of CO2. inCT was determined for the upper 12m of the water column. The MLD was always shallower 12m, except for the last cruise day. Therefore:</p>
@@ -7590,8 +7634,8 @@ NCP &lt;- NCP %&gt;%
 
 # date of the second last cruise
 date_180806 &lt;- unique(NCP$date_time)[7]</code></pre>
-<div id="air-sea-fluxes-1" class="section level3">
-<h3><span class="header-section-number">6.3.1</span> Air-sea fluxes</h3>
+<div id="air-sea-fluxes-1" class="section level3" number="6.3.1">
+<h3 number="6.3.1"><span class="header-section-number">6.3.1</span> Air-sea fluxes</h3>
 <pre class="r"><code># calculate cumulative air-sea fluxes affecting surface water column
 tm_og_flux &lt;- tm_og %&gt;%
   mutate(
@@ -7641,8 +7685,8 @@ NCP_flux_diff &lt;- NCP_flux %&gt;%
                names_to = &quot;var&quot;,
                values_to = &quot;value_diff&quot;)</code></pre>
 </div>
-<div id="vertical-mixing" class="section level3">
-<h3><span class="header-section-number">6.3.2</span> Vertical mixing</h3>
+<div id="vertical-mixing" class="section level3" number="6.3.2">
+<h3 number="6.3.2"><span class="header-section-number">6.3.2</span> Vertical mixing</h3>
 <p>The aim is to approximate the CT entrainment flux between Aug 06 and 15. The relevant profiles are:</p>
 <pre class="r"><code>CT_mix &lt;- tm_profiles_ID_long %&gt;%
       filter(ID %in% c(&quot;180806&quot;),
@@ -7663,19 +7707,23 @@ p_nCT &lt;- CT_profile %&gt;%
       xmin = CT_mix,
       ymax = dep + 0.5,
       ymin = dep - 0.5
-    )
+    ),
+    alpha = 0.2
   ) +
   geom_hline(yintercept = c(12, 17)) +
   geom_segment(aes(x = CT_mix, xend = CT_mix,
               y = -Inf, yend = 17),
               linetype = 2) +
-  annotate(&quot;text&quot;, label = as.character(expression(paste(C[T],&quot;*&quot;,mix))),
-           parse = TRUE, x = 1560, y = 3) +
+  annotate(&quot;text&quot;, label = as.character(expression(paste(C[T],&quot;*&quot;)~mix)),
+           parse = TRUE, x = 1560, y = 3,
+           size = geom_text_size) +
   annotate(&quot;text&quot;, label = as.character(expression(paste(C[T],&quot;*&quot;)~flux)),
-           parse = TRUE, x = 1580, y = 14.5, col = &quot;white&quot;) +
-  geom_point(aes(nCT, dep, col = ID)) +
+           parse = TRUE, x = 1580, y = 14.5,
+           size = geom_text_size) +
+  geom_point(aes(nCT, dep, fill = ID), shape = 21) +
   geom_path(aes(nCT, dep, col = ID)) +
   scale_y_reverse() +
+  scale_fill_viridis_d() +
   scale_color_viridis_d() +
     labs(y = &quot;Depth (m)&quot;, x = expression(paste(C[T],&quot;*&quot;, ~ (µmol ~ kg ^ {
     -1
@@ -7688,19 +7736,23 @@ p_nCT &lt;- CT_profile %&gt;%
     legend.position = &quot;none&quot;
   )
 
-p_tem &lt;- tm_profiles_ID_long %&gt;%
-  filter(ID %in% c(&quot;180806&quot;, &quot;180815&quot;),
-         var %in% c(&quot;tem&quot;)) %&gt;%
-  ggplot(aes(value, dep, col = ID)) +
+tm_profiles_ID_long_temp &lt;-
+  left_join(tm_profiles_ID_long %&gt;%
+              filter(ID %in% c(&quot;180806&quot;, &quot;180815&quot;),
+                     var %in% c(&quot;tem&quot;)) %&gt;% 
+              select(-date_ID),
+            cruise_dates)
+
+
+p_tem &lt;- tm_profiles_ID_long_temp  %&gt;%
+  ggplot() +
   geom_hline(yintercept = c(12, 17)) +
-  geom_point() +
-  geom_path() +
+  geom_path(aes(value, dep, col = date_ID)) +
+  geom_point(aes(value, dep, fill = date_ID), shape = 21) +
   scale_y_reverse() +
-  scale_color_viridis_d() +
-    labs(y = &quot;Depth (m)&quot;, x = expression(paste(Temperature ~ (degree*C)))) +
-  theme(
-    legend.title = element_blank()
-  )
+  scale_color_viridis_d(name = &quot;Mean\ncruise date&quot;) +
+  scale_fill_viridis_d(name = &quot;Mean\ncruise date&quot;) +
+    labs(y = &quot;Depth (m)&quot;, x = expression(paste(Temperature ~ &quot;(\u00B0C)&quot;)))
 
 p_tem + p_nCT +
   plot_layout(guides = &#39;collect&#39;) +
@@ -7729,130 +7781,8 @@ ggsave(
 )
 
 
-rm(p_tem, p_nCT, CT_mix, CT_profile)</code></pre>
+rm(p_tem, p_nCT, CT_mix, CT_profile, tm_profiles_ID_long_temp)</code></pre>
 <p>The effect of mixing was derived from the mean concentration difference on Aug 06.</p>
-<pre class="r"><code># calculate mixing with deep waters, corrected for air sea fluxes
-nCT_surface &lt;- tm_profiles_ID_long %&gt;%
-  filter(ID == &quot;180806&quot;,
-         var == &quot;nCT&quot;,
-         dep &lt; parameters$i_dep_lim) %&gt;%
-  group_by(ID) %&gt;%
-  summarise(nCT_surface = mean(value)) %&gt;%
-  ungroup()
-
-nCT_ML &lt;- tm_profiles_ID_long %&gt;%
-  filter(ID == &quot;180806&quot;,
-         var == &quot;nCT&quot;,
-         dep &lt; parameters$i_dep_mix_lim,
-         dep &gt; parameters$i_dep_lim) %&gt;%
-  group_by(ID) %&gt;%
-  summarise(nCT_ML = mean(value)) %&gt;%
-  ungroup()
-
-NCP_mix &lt;- full_join(nCT_surface, nCT_ML)
-
-NCP_mix &lt;- NCP_mix %&gt;%
-  mutate(
-    value_diff = (nCT_surface - nCT_ML) * 1e-3 * parameters$i_dep_lim * (parameters$i_dep_mix_lim - parameters$i_dep_lim) / parameters$i_dep_mix_lim,
-    ID = &quot;180815&quot;
-  ) %&gt;%
-  select(-c(nCT_surface, nCT_ML))
-
-rm(tm_og_flux_dep)
-rm(nCT_ML, nCT_surface)
-
-NCP_mix_diff &lt;- NCP_mix %&gt;%
-  mutate(var = &quot;mixing&quot;)
-
-NCP_flux_mix_diff &lt;-
-  full_join(NCP_flux_diff, NCP_mix_diff) %&gt;% #
-  arrange(ID) %&gt;%
-  fill(date_time_ID_ref)
-
-NCP_mix &lt;- NCP_mix %&gt;%
-  rename(mix_cum = value_diff) %&gt;%
-  select(ID, mix_cum)
-
-NCP_flux_mix &lt;-
-  full_join(NCP_flux,
-            NCP_mix)
-
-rm(NCP_mix, NCP_mix_diff, NCP_flux, NCP_flux_diff, date_180806)
-
-NCP_flux_mix &lt;- NCP_flux_mix %&gt;%
-  arrange(date_time) %&gt;%
-  fill(ID) %&gt;%
-  mutate(
-    mix_cum = if_else(ID %in% c(&quot;180806&quot;, 180815), mix_cum, 0),
-    mix_cum = na.approx(mix_cum),
-    nCT_i_flux_mix_cum = nCT_i_flux_cum + mix_cum
-  )
-
-# reorder factors for plotting
-NCP_flux_mix_diff &lt;- NCP_flux_mix_diff %&gt;%
-  mutate(var = factor(var, c(&quot;observed&quot;, &quot;flux correction&quot;, &quot;mixing correction&quot;)))
-
-NCP_flux_mix_long &lt;- NCP_flux_mix %&gt;%
-  select(date_time, nCT_i_cum, nCT_i_flux_cum, nCT_i_flux_mix_cum) %&gt;%
-  pivot_longer(nCT_i_cum:nCT_i_flux_mix_cum,
-               values_to = &quot;value&quot;,
-               names_to = &quot;var&quot;) %&gt;%
-  mutate(
-    var = fct_recode(
-      var,
-      observed = &quot;nCT_i_cum&quot;,
-      `flux corrected` = &quot;nCT_i_flux_cum&quot;,
-      `flux + mixing corrected (NCP)` = &quot;nCT_i_flux_mix_cum&quot;
-    )
-  )
-
-
-p_inCT &lt;- NCP_flux_mix_long %&gt;%
-  arrange(date_time) %&gt;%
-  ggplot() +
-  geom_col(
-    data = NCP_flux_mix_diff,
-    aes(date_time_ID_ref, value_diff, fill = var),
-    position = position_dodge2(preserve = &quot;single&quot;),
-    alpha = 0.5
-  ) +
-  geom_hline(yintercept = 0) +
-  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
-  geom_line(aes(date_time, value, col = var)) +
-  scale_x_datetime(date_breaks = &quot;week&quot;,
-                   date_labels = &quot;%b %d&quot;,
-                   sec.axis = dup_axis()) +
-  scale_fill_brewer(palette = &quot;Dark2&quot;, name = &quot;Incremental changes&quot;) +
-  scale_color_brewer(palette = &quot;Dark2&quot;, name = &quot;Cumulative changes&quot;) +
-  labs(y = expression(atop(Integrated ~ paste(C[T],&quot;*&quot;), (mol ~ m ^ {
-    -2
-  }))),
-  title = &quot;Water column inventory changes&quot;) +
-  guides(guide_colourbar(order = 1)) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.text.x.top = element_blank(),
-    legend.position = &quot;bottom&quot;,
-    legend.direction = &quot;vertical&quot;
-  )
-
-p_inCT
-
-NCP_flux_mix %&gt;%
-  write_csv(
-    here::here(
-      &quot;data/intermediate/_merged_data_files/CT_dynamics&quot;,
-      &quot;tm_NCP_cum.csv&quot;
-    )
-  )
-
-NCP_flux_mix_diff %&gt;%
-  write_csv(
-    here::here(
-      &quot;data/intermediate/_merged_data_files/CT_dynamics&quot;,
-      &quot;tm_NCP_inc.csv&quot;
-    )
-  )</code></pre>
 <pre class="r"><code># calculate mixing with deep waters, corrected for air sea fluxes
 nCT_inventory_mean &lt;- tm_profiles_ID_long %&gt;%
   filter(ID == &quot;180806&quot;,
@@ -7925,107 +7855,7 @@ NCP_flux_mix_long &lt;- NCP_flux_mix %&gt;%
       var,
       observed = &quot;nCT_i_cum&quot;,
       `flux corrected` = &quot;nCT_i_flux_cum&quot;,
-      `flux + mixing corrected (NCP)` = &quot;nCT_i_flux_mix_cum&quot;
-    )
-  )
-
-
-p_inCT &lt;- NCP_flux_mix_long %&gt;%
-  arrange(date_time) %&gt;%
-  ggplot() +
-  geom_col(
-    data = NCP_flux_mix_diff,
-    aes(date_time_ID_ref, value_diff, fill = var),
-    position = position_dodge2(preserve = &quot;single&quot;),
-    alpha = 0.5
-  ) +
-  geom_hline(yintercept = 0) +
-  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
-  geom_line(aes(date_time, value, col = var)) +
-  scale_x_datetime(date_breaks = &quot;week&quot;,
-                   date_labels = &quot;%b %d&quot;,
-                   sec.axis = dup_axis()) +
-  scale_fill_brewer(palette = &quot;Dark2&quot;, name = &quot;incremental changes&quot;) +
-  scale_color_brewer(palette = &quot;Dark2&quot;, name = &quot;cumulative changes&quot;) +
-  labs(y = expression(atop(integrated ~ nC[T], (mol ~ m ^ {
-    -2
-  }))),
-  title = &quot;Water column inventory changes&quot;) +
-  guides(guide_colourbar(order = 1)) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.text.x.top = element_blank(),
-    legend.position = &quot;bottom&quot;,
-    legend.direction = &quot;vertical&quot;
-  )
-
-p_inCT</code></pre>
-<p><img src="figure/CT_dynamics.Rmd/calculate_mixing_mass_conservation-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>NCP_flux_mix %&gt;%
-  write_csv(
-    here::here(
-      &quot;data/intermediate/_merged_data_files/CT_dynamics&quot;,
-      &quot;tm_NCP_cum.csv&quot;
-    )
-  )
-
-NCP_flux_mix_diff %&gt;%
-  write_csv(
-    here::here(
-      &quot;data/intermediate/_merged_data_files/CT_dynamics&quot;,
-      &quot;tm_NCP_inc.csv&quot;
-    )
-  )</code></pre>
-<pre class="r"><code># calculate mixing with deep waters, corrected for air sea fluxes
-NCP_mix &lt;- tm_profiles_ID_long %&gt;%
-  filter(ID == &quot;180815&quot;,
-         var == &quot;nCT&quot;,
-         dep &lt; parameters$i_dep_mix_lim,
-         dep &gt; parameters$i_dep_lim) %&gt;%
-  group_by(ID, date_time_ID, date_time_ID_ref) %&gt;%
-  summarise(value_diff =
-              sum(value_diff) / 1000 + min(tm_og_flux_dep$flux_cum)) %&gt;%
-  ungroup()
-
-rm(tm_og_flux_dep)
-
-NCP_mix_diff &lt;- NCP_mix %&gt;%
-  select(date_time_ID_ref, value_diff) %&gt;%
-  mutate(var = &quot;mixing&quot;)
-
-NCP_flux_mix_diff &lt;-
-  full_join(NCP_flux_diff, NCP_mix_diff)
-
-NCP_flux_mix &lt;-
-  full_join(NCP_flux,
-            NCP_mix %&gt;% rename(mix_cum = value_diff))
-
-rm(NCP_mix, NCP_mix_diff, NCP_flux, NCP_flux_diff, date_180806)
-
-NCP_flux_mix &lt;- NCP_flux_mix %&gt;%
-  arrange(date_time) %&gt;%
-  fill(ID) %&gt;%
-  mutate(
-    mix_cum = if_else(ID %in% c(&quot;180806&quot;, 180815), mix_cum, 0),
-    mix_cum = na.approx(mix_cum),
-    nCT_i_flux_mix_cum = nCT_i_flux_cum + mix_cum
-  )
-
-# reorder factors for plotting
-NCP_flux_mix_diff &lt;- NCP_flux_mix_diff %&gt;%
-  mutate(var = factor(var, c(&quot;observed&quot;, &quot;flux&quot;, &quot;mixing&quot;)))
-
-NCP_flux_mix_long &lt;- NCP_flux_mix %&gt;%
-  select(date_time, nCT_i_cum, nCT_i_flux_cum, nCT_i_flux_mix_cum) %&gt;%
-  pivot_longer(nCT_i_cum:nCT_i_flux_mix_cum,
-               values_to = &quot;value&quot;,
-               names_to = &quot;var&quot;) %&gt;%
-  mutate(
-    var = fct_recode(
-      var,
-      observed = &quot;nCT_i_cum&quot;,
-      `flux corrected` = &quot;nCT_i_flux_cum&quot;,
-      `flux + mixing corrected (NCP)` = &quot;nCT_i_flux_mix_cum&quot;
+      `flux + mixing\ncorrected (NCP)` = &quot;nCT_i_flux_mix_cum&quot;
     )
   )
 
@@ -8051,17 +7881,17 @@ p_inCT &lt;- NCP_flux_mix_long %&gt;%
     -2
   }))),
   title = &quot;Water column inventory changes&quot;) +
-  guides(guide_colourbar(order = 1)) +
+  guides(fill = guide_legend(order = 2)) +
   theme(
     axis.title.x = element_blank(),
     axis.text.x.top = element_blank(),
-    legend.position = &quot;bottom&quot;,
-    legend.direction = &quot;vertical&quot;
+    legend.key.height = unit(5, &quot;mm&quot;),
+    legend.key.width = unit(5,&quot;mm&quot;)
   )
 
-p_inCT
-
-NCP_flux_mix %&gt;%
+p_inCT</code></pre>
+<p><img src="figure/CT_dynamics.Rmd/calculate_mixing_mass_conservation-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>NCP_flux_mix %&gt;%
   write_csv(
     here::here(
       &quot;data/intermediate/_merged_data_files/CT_dynamics&quot;,
@@ -8079,17 +7909,17 @@ NCP_flux_mix_diff %&gt;%
 </div>
 </div>
 </div>
-<div id="open-tasks-questions" class="section level1">
-<h1><span class="header-section-number">7</span> Open tasks / questions</h1>
+<div id="open-tasks-questions" class="section level1" number="7">
+<h1 number="7"><span class="header-section-number">7</span> Open tasks / questions</h1>
 <ul>
-<li>clean and harmonize chunk labeling (label: plot, 1 plot per chunk, etc)</li>
-<li>included removed stations in coverage plot</li>
-<li>Significance of changes in AT for calculated nCT changes
+<li><p>clean and harmonize chunk labeling (label: plot, 1 plot per chunk, etc)</p></li>
+<li><p>included removed stations in coverage plot</p></li>
+<li><p>Significance of changes in AT for calculated nCT changes</p>
 <ul>
 <li>Calculate AT-S ratios, reconstruct AT profiles, calculate true nCT profiles, normalize nCT profiles to mean AT</li>
 </ul></li>
-<li>demonstrate strong permanent thermocline at around 25 m</li>
-<li>calculate oxygen demand for mineralization (4.68*10<sup>9<em>1.2 / (300e-6</em>10</sup>3) / 10^9)</li>
+<li><p>demonstrate strong permanent thermocline at around 25 m</p></li>
+<li><p>calculate oxygen demand for mineralization (4.68*10<sup>9<em>1.2 / (300e-6</em>10</sup>3) / 10^9)</p></li>
 </ul>
 <br>
 <p>
@@ -8159,6 +7989,8 @@ footer is added to webpages before the MathJax javascript. -->
     "HTML-CSS": { availableFonts: ["TeX"] }
   });
 </script>
+
+
 
 
 </div>
