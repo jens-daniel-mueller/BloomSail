@@ -2994,8 +2994,8 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_5.pdf"
   ),
-  width = 140,
-  height = 260,
+  width = 175,
+  height = 240,
   dpi = 300,
   units = "mm"
 )
