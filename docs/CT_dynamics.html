@@ -451,7 +451,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">CT dynamics</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">29 January, 2021</h4>
+<h4 class="date">30 January, 2021</h4>
 
 </div>
 
@@ -476,7 +476,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-01-29
+<strong>Last updated:</strong> 2021-01-30
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -567,16 +567,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree54ec4b0ddee8c4213cf3e650ed0d9fec02351752targetblank54ec4b0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/54ec4b0ddee8c4213cf3e650ed0d9fec02351752" target="_blank">54ec4b0</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb470c95d21940c43c2b6e775e8c2722d7f6ca7a8targetblankb470c95a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b470c95d21940c43c2b6e775e8c2722d7f6ca7a8" target="_blank">b470c95</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree54ec4b0ddee8c4213cf3e650ed0d9fec02351752targetblank54ec4b0a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeb470c95d21940c43c2b6e775e8c2722d7f6ca7a8targetblankb470c95a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/54ec4b0ddee8c4213cf3e650ed0d9fec02351752" target="_blank">54ec4b0</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/b470c95d21940c43c2b6e775e8c2722d7f6ca7a8" target="_blank">b470c95</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -585,11 +585,14 @@ Note that you need to be careful to ensure that all relevant files for the analy
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
     Ignored:    data/input/
     Ignored:    data/intermediate/
     Ignored:    data/output_submission/
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
-    Ignored:    output/Plots/Figures_publication/Appendix/
+
+Untracked files:
+    Untracked:  output/Plots/Figures_publication/Appendix/
 
 </code></pre>
 <p>
@@ -628,6 +631,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/b470c95d21940c43c2b6e775e8c2722d7f6ca7a8/analysis/CT_dynamics.Rmd" target="_blank">b470c95</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-01-30
+</td>
+<td>
+resized figures
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/6adb9abdb72ea021ed9e2686e901f4c85f7d9e6f/docs/CT_dynamics.html" target="_blank">6adb9ab</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-01-29
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -5648,7 +5685,7 @@ Mean vertical profiles per cruise day across all stations plotted indivdually. R
     &quot;Fig_D1.pdf&quot;
   ),
   width = 120,
-  height = 200,
+  height = 180,
   dpi = 300,
   units = &quot;mm&quot;
 )
@@ -5659,7 +5696,7 @@ ggsave(
     &quot;Fig_D1.png&quot;
   ),
   width = 120,
-  height = 200,
+  height = 180,
   dpi = 300,
   units = &quot;mm&quot;
 )
@@ -7477,11 +7514,11 @@ p_pCO2_surf &lt;- tm_profiles_surface_long_ID %&gt;%
   scale_fill_manual(name = &quot;&quot;, values = &quot;black&quot;, guide = FALSE) +
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(pCO[2], (mu * atm))),
-       title = &quot;Surface water observations&quot;) +
+  labs(y = expression(atop(pCO[2], (mu * atm)))) +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
-    legend.title = element_blank())
+    legend.title = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, &quot;cm&quot;))
 
 p_tem_surf &lt;- tm_profiles_surface_long_ID %&gt;%
   filter(var == &quot;tem&quot;) %&gt;%
@@ -7503,7 +7540,8 @@ p_tem_surf &lt;- tm_profiles_surface_long_ID %&gt;%
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     legend.key.height = unit(5, &quot;mm&quot;),
-    legend.key.width = unit(5,&quot;mm&quot;)
+    legend.key.width = unit(5,&quot;mm&quot;),
+    plot.margin = margin(0, 0, 0, 0, &quot;cm&quot;)
   )
 
 
@@ -7551,7 +7589,8 @@ p_nCT_surf &lt;-
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     legend.key.height = unit(5, &quot;mm&quot;),
-    legend.key.width = unit(5,&quot;mm&quot;)
+    legend.key.width = unit(5,&quot;mm&quot;),
+    plot.margin = margin(0, 0, 0, 0, &quot;cm&quot;)
   )
 
 
@@ -8244,10 +8283,10 @@ rm(tm_profiles_surface_ID, og)</code></pre>
   geom_path(aes(y = pCO2_atm)) +
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(pCO[&quot;2,atm&quot;], (mu * atm))),
-       title = &quot;Atmospheric observations&quot;) +
+  labs(y = expression(atop(pCO[&quot;2,atm&quot;], (mu * atm)))) +
   theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+        axis.text.x = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, &quot;cm&quot;))
 
 p_wind &lt;- tm_og %&gt;%
   ggplot(aes(x = date_time)) +
@@ -8260,7 +8299,8 @@ p_wind &lt;- tm_og %&gt;%
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
-    legend.title = element_blank()
+    legend.title = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, &quot;cm&quot;)
   )
 
 p_pCO2_atm + p_wind +
@@ -8313,20 +8353,18 @@ rm(Sc_W14)</code></pre>
 <pre class="r"><code>p_flux_daily &lt;- tm_og %&gt;%
   ggplot(aes(x = date_time)) +
   geom_path(aes(y = flux)) +
-  # geom_path(aes(y=flux_daily, col=&quot;24h&quot;))+
-  # scale_color_brewer(palette = &quot;Set1&quot;)+
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis()) +
   labs(y = expression(atop(F[&quot;daily&quot;], (mol ~ m ^ {
     -2
   } ~ d ^ {
     -1
-  }))),
-  title = &quot;Air-sea fluxes&quot;) +
+  })))) +
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
-    legend.title = element_blank()
+    legend.title = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, &quot;cm&quot;)
   )</code></pre>
 <pre class="r"><code># scale flux to time interval
 
@@ -8336,6 +8374,7 @@ tm_og &lt;- tm_og %&gt;%
   arrange(date_time) %&gt;%
   mutate(flux_cum = cumsum(flux_scale)) %&gt;%
   ungroup()
+
 
 p_flux_cum &lt;- tm_og %&gt;%
   ggplot(aes(x = date_time)) +
@@ -8347,8 +8386,11 @@ p_flux_cum &lt;- tm_og %&gt;%
                            (mol ~ m ^ {
                              -2
                            })))) +
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, &quot;cm&quot;)
+  )
 
 p_flux_daily + p_flux_cum +
   plot_layout(ncol = 1)</code></pre>
@@ -8458,7 +8500,7 @@ p_nCT &lt;- CT_profile %&gt;%
               y = -Inf, yend = 17),
               linetype = 2) +
   annotate(&quot;text&quot;, label = as.character(expression(paste(C[T],&quot;*&quot;)~mix)),
-           parse = TRUE, x = 1560, y = 3,
+           parse = TRUE, x = 1580, y = 3,
            size = geom_text_size) +
   annotate(&quot;text&quot;, label = as.character(expression(paste(C[T],&quot;*&quot;)~flux)),
            parse = TRUE, x = 1580, y = 14.5,
@@ -8506,8 +8548,8 @@ p_tem + p_nCT +
     &quot;output/Plots/Figures_publication/appendix&quot;,
     &quot;Fig_C2.pdf&quot;
   ),
-  width = 150,
-  height = 140,
+  width = 120,
+  height = 110,
   dpi = 300,
   units = &quot;mm&quot;
 )
@@ -8517,8 +8559,8 @@ ggsave(
     &quot;output/Plots/Figures_publication/appendix&quot;,
     &quot;Fig_C2.png&quot;
   ),
-  width = 150,
-  height = 140,
+  width = 120,
+  height = 110,
   dpi = 300,
   units = &quot;mm&quot;
 )
@@ -8622,14 +8664,14 @@ p_inCT &lt;- NCP_flux_mix_long %&gt;%
   scale_color_brewer(palette = &quot;Dark2&quot;, name = &quot;Cumulative changes&quot;) +
   labs(y = expression(atop(Integrated ~ paste(C[T],&quot;*&quot;), (mol ~ m ^ {
     -2
-  }))),
-  title = &quot;Water column inventory changes&quot;) +
+  })))) +
   guides(fill = guide_legend(order = 2)) +
   theme(
     axis.title.x = element_blank(),
     axis.text.x.top = element_blank(),
     legend.key.height = unit(5, &quot;mm&quot;),
-    legend.key.width = unit(5,&quot;mm&quot;)
+    legend.key.width = unit(5,&quot;mm&quot;),
+    plot.margin = margin(0, 0, 0, 0, &quot;cm&quot;)
   )
 
 p_inCT</code></pre>
