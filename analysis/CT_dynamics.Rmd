@@ -1117,7 +1117,7 @@ ggsave(
     "Fig_D1.pdf"
   ),
   width = 120,
-  height = 200,
+  height = 180,
   dpi = 300,
   units = "mm"
 )
@@ -1128,7 +1128,7 @@ ggsave(
     "Fig_D1.png"
   ),
   width = 120,
-  height = 200,
+  height = 180,
   dpi = 300,
   units = "mm"
 )
@@ -2375,11 +2375,11 @@ p_pCO2_surf <- tm_profiles_surface_long_ID %>%
   scale_fill_manual(name = "", values = "black", guide = FALSE) +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(pCO[2], (mu * atm))),
-       title = "Surface water observations") +
+  labs(y = expression(atop(pCO[2], (mu * atm)))) +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
-    legend.title = element_blank())
+    legend.title = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "cm"))
 
 p_tem_surf <- tm_profiles_surface_long_ID %>%
   filter(var == "tem") %>%
@@ -2401,7 +2401,8 @@ p_tem_surf <- tm_profiles_surface_long_ID %>%
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     legend.key.height = unit(5, "mm"),
-    legend.key.width = unit(5,"mm")
+    legend.key.width = unit(5,"mm"),
+    plot.margin = margin(0, 0, 0, 0, "cm")
   )
 
 
@@ -2449,7 +2450,8 @@ p_nCT_surf <-
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     legend.key.height = unit(5, "mm"),
-    legend.key.width = unit(5,"mm")
+    legend.key.width = unit(5,"mm"),
+    plot.margin = margin(0, 0, 0, 0, "cm")
   )
 
 
@@ -2556,10 +2558,10 @@ p_pCO2_atm <- tm_og %>%
   geom_path(aes(y = pCO2_atm)) +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(pCO["2,atm"], (mu * atm))),
-       title = "Atmospheric observations") +
+  labs(y = expression(atop(pCO["2,atm"], (mu * atm)))) +
   theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+        axis.text.x = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "cm"))
 
 p_wind <- tm_og %>%
   ggplot(aes(x = date_time)) +
@@ -2572,7 +2574,8 @@ p_wind <- tm_og %>%
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
-    legend.title = element_blank()
+    legend.title = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "cm")
   )
 
 p_pCO2_atm + p_wind +
@@ -2645,20 +2648,18 @@ rm(Sc_W14)
 p_flux_daily <- tm_og %>%
   ggplot(aes(x = date_time)) +
   geom_path(aes(y = flux)) +
-  # geom_path(aes(y=flux_daily, col="24h"))+
-  # scale_color_brewer(palette = "Set1")+
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
   labs(y = expression(atop(F["daily"], (mol ~ m ^ {
     -2
   } ~ d ^ {
     -1
-  }))),
-  title = "Air-sea fluxes") +
+  })))) +
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
-    legend.title = element_blank()
+    legend.title = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "cm")
   )
 
 ```
@@ -2673,6 +2674,7 @@ tm_og <- tm_og %>%
   mutate(flux_cum = cumsum(flux_scale)) %>%
   ungroup()
 
+
 p_flux_cum <- tm_og %>%
   ggplot(aes(x = date_time)) +
   geom_path(aes(y = flux_cum)) +
@@ -2683,8 +2685,11 @@ p_flux_cum <- tm_og %>%
                            (mol ~ m ^ {
                              -2
                            })))) +
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "cm")
+  )
 
 p_flux_daily + p_flux_cum +
   plot_layout(ncol = 1)
@@ -2810,7 +2815,7 @@ p_nCT <- CT_profile %>%
               y = -Inf, yend = 17),
               linetype = 2) +
   annotate("text", label = as.character(expression(paste(C[T],"*")~mix)),
-           parse = TRUE, x = 1560, y = 3,
+           parse = TRUE, x = 1580, y = 3,
            size = geom_text_size) +
   annotate("text", label = as.character(expression(paste(C[T],"*")~flux)),
            parse = TRUE, x = 1580, y = 14.5,
@@ -2858,8 +2863,8 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_C2.pdf"
   ),
-  width = 150,
-  height = 140,
+  width = 120,
+  height = 110,
   dpi = 300,
   units = "mm"
 )
@@ -2869,8 +2874,8 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_C2.png"
   ),
-  width = 150,
-  height = 140,
+  width = 120,
+  height = 110,
   dpi = 300,
   units = "mm"
 )
@@ -2981,14 +2986,14 @@ p_inCT <- NCP_flux_mix_long %>%
   scale_color_brewer(palette = "Dark2", name = "Cumulative changes") +
   labs(y = expression(atop(Integrated ~ paste(C[T],"*"), (mol ~ m ^ {
     -2
-  }))),
-  title = "Water column inventory changes") +
+  })))) +
   guides(fill = guide_legend(order = 2)) +
   theme(
     axis.title.x = element_blank(),
     axis.text.x.top = element_blank(),
     legend.key.height = unit(5, "mm"),
-    legend.key.width = unit(5,"mm")
+    legend.key.width = unit(5,"mm"),
+    plot.margin = margin(0, 0, 0, 0, "cm")
   )
 
 p_inCT
@@ -3013,21 +3018,22 @@ NCP_flux_mix_diff %>%
 
 ```{r plot_inCT_time_series, include=FALSE}
 
-
 p_pCO2_surf + p_tem_surf + p_nCT_surf +
-  p_pCO2_atm + p_wind + p_flux_daily + p_flux_cum +
+  p_pCO2_atm + p_wind + p_flux_daily + p_flux_cum + 
   p_inCT +
   plot_layout(ncol = 1,
-              heights = c(rep(1.35, 7), 4.5)) +
-  plot_annotation(tag_levels = 'a')
+              heights = c(rep(1.35, 7), 3.5),
+              tag_level = 'new') +
+  plot_annotation(tag_levels = c('a'))
+
 
 ggsave(
   here::here(
     "output/Plots/Figures_publication/article",
     "Fig_5.pdf"
   ),
-  width = 175,
-  height = 240,
+  width = 165,
+  height = 215,
   dpi = 300,
   units = "mm"
 )
@@ -3037,8 +3043,8 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_5.png"
   ),
-  width = 175,
-  height = 240,
+  width = 165,
+  height = 215,
   dpi = 300,
   units = "mm"
 )

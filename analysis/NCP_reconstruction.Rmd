@@ -213,7 +213,7 @@ p_nCT <-
     "text",
     x = -3.5,
     y = 2.5,
-    label = "Integrated change"
+    label = "Integrated\nchange"
   ) +
   geom_point(aes(value_diff_daily, dep)) +
   geom_path(aes(value_diff_daily, dep)) +
@@ -256,7 +256,7 @@ p_tem <-
     "text",
     x = 0.2,
     y = 2.5,
-    label = "Integrated change"
+    label = "Integrated\nchange"
   ) +
   geom_point(aes(value_diff_daily, dep)) +
   geom_path(aes(value_diff_daily, dep)) +
@@ -273,8 +273,8 @@ p_tem + p_nCT +
 ggsave(
   here::here("output/Plots/Figures_publication/appendix",
              "Fig_F1.pdf"),
-  width = 150,
-  height = 150,
+  width = 120,
+  height = 110,
   dpi = 300,
   units = "mm"
 )
@@ -282,8 +282,8 @@ ggsave(
 ggsave(
   here::here("output/Plots/Figures_publication/appendix",
              "Fig_F1.png"),
-  width = 150,
-  height = 150,
+  width = 120,
+  height = 110,
   dpi = 300,
   units = "mm"
 )
@@ -1415,7 +1415,8 @@ p_hov_dep <-
     axis.text.x = element_blank(),
     strip.background = element_blank(),
     strip.text.x = element_blank(),
-    axis.text.x.top = element_blank()
+    axis.text.x.top = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "cm")
   ) +
   facet_wrap( ~ source)
 
@@ -1525,19 +1526,20 @@ p_nCT <- iCT %>%
   ggplot() +
   geom_path(aes(date_time_ID, nCT)) +
   geom_point(aes(date_time_ID, nCT, fill = sensor), shape = 21) +
-  # scale_color_discrete(name = "Reconstruction") +
   scale_fill_manual(values = c("white", "black"),
                     guide = FALSE) +
   scale_x_datetime(breaks = "week",
                    date_labels = "%d %b",
                    expand = c(0, 0)) +
-  # scale_linetype(name = "Resolution") +
-  facet_wrap( ~ source) +
-  labs(y = expression(atop(paste(C[T],"*"), (mu * mol ~ kg ^ {
+  facet_wrap(~ source) +
+  labs(y = expression(atop(paste(C[T], "*"), (mu * mol ~ kg ^ {
     -1
   })))) +
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "cm")
+  )
 
 # iCT <- iCT %>%
 #   mutate(i_res = fct_recode(i_res, `cumulative` = "cum")) %>%
@@ -1631,7 +1633,8 @@ p_NCP <- NCP_flux_int %>%
     axis.title.x = element_blank(),
     strip.background = element_blank(),
     strip.text.x = element_blank(),
-    axis.text.x.top = element_blank()
+    axis.text.x.top = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "cm")
   )
 
 p_nCT / p_hov_dep / p_NCP +
@@ -1642,8 +1645,8 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_6.pdf"
   ),
-  width = 175,
-  height = 175,
+  width = 165,
+  height = 165,
   dpi = 300,
   units = "mm"
 )
@@ -1653,8 +1656,8 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_6.png"
   ),
-  width = 175,
-  height = 175,
+  width = 165,
+  height = 165,
   dpi = 300,
   units = "mm"
 )

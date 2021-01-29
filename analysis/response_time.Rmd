@@ -167,10 +167,10 @@ resid_abs_mean <- mean(abs(resid(fit)))
 
 augment(fit) %>%
   ggplot(aes(duration, pCO2_corr)) +
-  geom_point(shape = 21) +
-  geom_line(aes(y = .fitted), col = "red") +
   geom_vline(xintercept = tau) +
   geom_hline(yintercept = pCO2_corr_start + 0.63 * (pCO2_corr_delta)) +
+  geom_point(shape = 21) +
+  geom_line(aes(y = .fitted), col = "red") +
   labs(y = expression(pCO[2] ~ (µatm)), x = "time (sec)")
 
 ggsave(
@@ -1581,8 +1581,8 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_A2.pdf"
   ),
-  width = 175,
-  height = 120,
+  width = 140,
+  height = 90,
   dpi = 300,
   units = "mm"
 )
@@ -1592,8 +1592,8 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_A2.png"
   ),
-  width = 175,
-  height = 120,
+  width = 140,
+  height = 90,
   dpi = 300,
   units = "mm"
 )
