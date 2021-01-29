@@ -2863,7 +2863,7 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_C2.pdf"
   ),
-  width = 120,
+  width = 130,
   height = 110,
   dpi = 300,
   units = "mm"
@@ -2874,7 +2874,7 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_C2.png"
   ),
-  width = 120,
+  width = 130,
   height = 110,
   dpi = 300,
   units = "mm"
