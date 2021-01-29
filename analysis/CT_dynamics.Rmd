@@ -695,7 +695,7 @@ p_AT + p_CT + p_nCT +
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A3.pdf"
+    "Fig_B1.pdf"
   ),
   width = 150,
   height = 80,
@@ -706,7 +706,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A3.png"
+    "Fig_B1.png"
   ),
   width = 150,
   height = 80,
@@ -1114,7 +1114,7 @@ p_CT | p_tem
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A4.pdf"
+    "Fig_D1.pdf"
   ),
   width = 120,
   height = 200,
@@ -1125,7 +1125,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A4.png"
+    "Fig_D1.png"
   ),
   width = 120,
   height = 200,
@@ -1528,7 +1528,7 @@ nCT_sens %>%
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A6.pdf"
+    "Fig_C1.pdf"
   ),
   width = 83,
   height = 60,
@@ -1539,7 +1539,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A6.png"
+    "Fig_C1.png"
   ),
   width = 83,
   height = 60,
@@ -2856,7 +2856,7 @@ p_tem + p_nCT +
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A7.pdf"
+    "Fig_C2.pdf"
   ),
   width = 150,
   height = 140,
@@ -2867,7 +2867,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_A7.png"
+    "Fig_C2.png"
   ),
   width = 150,
   height = 140,

@@ -272,7 +272,7 @@ p_tem + p_nCT +
 
 ggsave(
   here::here("output/Plots/Figures_publication/appendix",
-             "Fig_A8.pdf"),
+             "Fig_F1.pdf"),
   width = 150,
   height = 150,
   dpi = 300,
@@ -281,7 +281,7 @@ ggsave(
 
 ggsave(
   here::here("output/Plots/Figures_publication/appendix",
-             "Fig_A8.png"),
+             "Fig_F1.png"),
   width = 150,
   height = 150,
   dpi = 300,
