@@ -207,13 +207,15 @@ p_nCT <-
     x = -6,
     y = 11,
     label = "CPD",
-    col = col_value
+    col = col_value,
+    size = geom_text_size
   ) +
   annotate(
     "text",
     x = -3.5,
     y = 2.5,
-    label = "Integrated\nchange"
+    label = "Integrated\nchange",
+    size = geom_text_size
   ) +
   geom_point(aes(value_diff_daily, dep)) +
   geom_path(aes(value_diff_daily, dep)) +
@@ -250,13 +252,15 @@ p_tem <-
     x = 0.4,
     y = 11,
     label = "TPD",
-    col = col_value
+    col = col_value,
+    size = geom_text_size
   ) +
   annotate(
     "text",
     x = 0.2,
     y = 2.5,
-    label = "Integrated\nchange"
+    label = "Integrated\nchange",
+    size = geom_text_size
   ) +
   geom_point(aes(value_diff_daily, dep)) +
   geom_path(aes(value_diff_daily, dep)) +
@@ -272,7 +276,7 @@ p_tem + p_nCT +
 
 ggsave(
   here::here("output/Plots/Figures_publication/appendix",
-             "Fig_F1.pdf"),
+             "Fig_C4.pdf"),
   width = 120,
   height = 110,
   dpi = 300,
@@ -281,7 +285,7 @@ ggsave(
 
 ggsave(
   here::here("output/Plots/Figures_publication/appendix",
-             "Fig_F1.png"),
+             "Fig_C4.png"),
   width = 120,
   height = 110,
   dpi = 300,

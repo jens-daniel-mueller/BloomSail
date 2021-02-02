@@ -1114,7 +1114,7 @@ p_CT | p_tem
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_D1.pdf"
+    "Fig_C3.pdf"
   ),
   width = 120,
   height = 180,
@@ -1125,7 +1125,7 @@ ggsave(
 ggsave(
   here::here(
     "output/Plots/Figures_publication/appendix",
-    "Fig_D1.png"
+    "Fig_C3.png"
   ),
   width = 120,
   height = 180,
