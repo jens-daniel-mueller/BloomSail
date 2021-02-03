@@ -1104,7 +1104,7 @@ p_tem <-
   scale_y_reverse() +
   scale_fill_manual(values = "black", name = "") +
   scale_color_discrete(name = "Station") +
-  guides(fill = guide_legend(order = 2)) +
+  guides(color = guide_legend(order = 1)) +
   facet_grid(ID ~ .,
              labeller = labeller(ID = cruise_labels)) +
   labs(x = "Temperature (\u00B0C)",
