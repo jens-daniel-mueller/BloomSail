@@ -996,9 +996,9 @@ p_CT <-
   geom_path(aes(value, dep, col = ID)) +
   scale_y_reverse() +
   scale_color_viridis_d(labels = cruise_dates$date_ID,
-                        name = "Cruise mean +/- SD") +
+                        name = "Cruise mean \u00B1 SD") +
   scale_fill_viridis_d(labels = cruise_dates$date_ID,
-                       name = "Cruise mean +/- SD") +
+                       name = "Cruise mean \u00B1 SD") +
   facet_grid(ID ~ .) +
   labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {-1}))),
   y = "Depth (m)") +
@@ -1024,9 +1024,9 @@ p_tem <-
   geom_path(aes(value, dep, col = ID)) +
   scale_y_reverse() +
   scale_color_viridis_d(labels = cruise_dates$date_ID,
-                        name = "Cruise mean +/- SD") +
+                        name = "Cruise mean \u00B1 SD") +
   scale_fill_viridis_d(labels = cruise_dates$date_ID,
-                       name = "Cruise mean +/- SD") +
+                       name = "Cruise mean \u00B1 SD") +
   facet_grid(ID ~ .) +
   labs(x = "Temperature (\u00B0C)",
        y = "Depth (m)") +
@@ -2368,7 +2368,7 @@ p_pCO2_surf <- tm_profiles_surface_long_ID %>%
   filter(var == "pCO2") %>%
   ggplot(aes(x = date_time)) +
   geom_ribbon(aes(ymin = mean - sd, ymax = mean + sd,
-                  fill = "+/- SD"), alpha = 0.2) +
+                  fill = "\u00B1 SD"), alpha = 0.2) +
   geom_path(aes(y = mean)) +
   geom_point(aes(y = mean)) +
   scale_color_manual(name = "", values = "black", guide = FALSE) +
@@ -2387,11 +2387,11 @@ p_tem_surf <- tm_profiles_surface_long_ID %>%
   geom_ribbon(aes(
     ymin = mean - sd,
     ymax = mean + sd,
-    fill = "Mean +/- SD"
+    fill = "Mean \u00B1 SD"
   ),
   alpha = 0.2) +
-  geom_path(aes(y = mean, col = "Mean +/- SD")) +
-  geom_point(aes(y = mean, col = "Mean +/- SD")) +
+  geom_path(aes(y = mean, col = "Mean \u00B1 SD")) +
+  geom_point(aes(y = mean, col = "Mean \u00B1 SD")) +
   scale_color_manual(name = "Sensor data", values = "black") +
   scale_fill_manual(name = "Sensor data", values = "black") +
   scale_x_datetime(date_breaks = "week",
@@ -2414,7 +2414,7 @@ p_nCT_surf <-
     x = date_time,
     ymin = mean - sd,
     ymax = mean + sd,
-    fill = "+/- SD"
+    fill = "\u00B1 SD"
   ),
   alpha = 0.2) +
   geom_path(aes(x = date_time, y = mean)) +
@@ -2429,7 +2429,7 @@ p_nCT_surf <-
       x = date_time_ID,
       ymin = value_mean - value_sd,
       ymax = value_mean + value_sd,
-      color = "Mean +/- SD"
+      color = "Mean \u00B1 SD"
     )
   ) +
   geom_point(
@@ -2437,7 +2437,7 @@ p_nCT_surf <-
       filter(var == "nCT"),
     aes(x = date_time_ID,
         y = value_mean,
-        color = "Mean +/- SD")
+        color = "Mean \u00B1 SD")
   ) +
   scale_color_manual(name = "Bottle data", values = "red") +
   scale_x_datetime(date_breaks = "week",
