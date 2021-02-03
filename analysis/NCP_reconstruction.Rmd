@@ -1401,10 +1401,9 @@ p_hov_dep <-
     high = "grey90",
     low = "grey20"
   ) +
-  guides(fill = guide_colorsteps(barheight = unit(40, "mm"),
+  guides(fill = guide_colorsteps(barheight = unit(35, "mm"),
                                  barwidth = unit(4, "mm"),
                                  frame.colour = "black",
-                                 show.limits = TRUE,
                                  ticks = TRUE,
                                  ticks.colour = "black")) +
   scale_color_discrete(name = "Reconstruction", guide = FALSE) +
@@ -1649,8 +1648,8 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_6.pdf"
   ),
-  width = 165,
-  height = 165,
+  width = 160,
+  height = 155,
   dpi = 300,
   units = "mm"
 )
@@ -1660,8 +1659,8 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_6.png"
   ),
-  width = 165,
-  height = 165,
+  width = 160,
+  height = 155,
   dpi = 300,
   units = "mm"
 )

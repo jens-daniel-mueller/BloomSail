@@ -1097,10 +1097,12 @@ p_tem <-
   geom_ribbon(data = profiles_min_max,
               aes(xmin = min_tem,
                   xmax = max_tem,
-                  y = dep),
+                  y = dep,
+                  fill = "Min/Max"),
               alpha = 0.2) +
   geom_path(aes(tem, dep, col = station)) +
   scale_y_reverse() +
+  scale_fill_manual(values = "black", name = "") +
   scale_color_discrete(name = "Station") +
   facet_grid(ID ~ .,
              labeller = labeller(ID = cruise_labels)) +
@@ -1642,7 +1644,6 @@ p_nCT_hov <- tm_profiles_ID_long %>%
   guides(fill = guide_colorsteps(barheight = unit(3, "mm"),
                                  barwidth = unit(65, "mm"),
                                  frame.colour = "black",
-                                 show.limits = TRUE,
                                  ticks = TRUE,
                                  ticks.colour = "black")) +
   scale_y_reverse(sec.axis = dup_axis()) +
@@ -1680,7 +1681,6 @@ p_tem_hov <- tm_profiles_ID_long %>%
   guides(fill = guide_colorsteps(barheight = unit(3, "mm"),
                                  barwidth = unit(55, "mm"),
                                  frame.colour = "black",
-                                 show.limits = TRUE,
                                  ticks = TRUE,
                                  ticks.colour = "black")) +
   scale_y_reverse(sec.axis = dup_axis()) +
