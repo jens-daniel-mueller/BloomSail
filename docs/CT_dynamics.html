@@ -567,16 +567,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree427dabad2daeddc6dba079d655096d3932a99fc5targetblank427dabaa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/427dabad2daeddc6dba079d655096d3932a99fc5" target="_blank">427daba</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreefbcfd6cb74857d70db5e8980c858f429a212d885targetblankfbcfd6ca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/fbcfd6cb74857d70db5e8980c858f429a212d885" target="_blank">fbcfd6c</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree427dabad2daeddc6dba079d655096d3932a99fc5targetblank427dabaa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreefbcfd6cb74857d70db5e8980c858f429a212d885targetblankfbcfd6ca" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/427dabad2daeddc6dba079d655096d3932a99fc5" target="_blank">427daba</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/fbcfd6cb74857d70db5e8980c858f429a212d885" target="_blank">fbcfd6c</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -630,6 +630,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/fbcfd6cb74857d70db5e8980c858f429a212d885/analysis/CT_dynamics.Rmd" target="_blank">fbcfd6c</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-03
+</td>
+<td>
+resized figures
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/c31f5c76e1c3d6d5ee76554ecc0672e18d268124/docs/CT_dynamics.html" target="_blank">c31f5c7</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -5836,7 +5870,7 @@ p_tem &lt;-
   scale_y_reverse() +
   scale_fill_manual(values = &quot;black&quot;, name = &quot;&quot;) +
   scale_color_discrete(name = &quot;Station&quot;) +
-  guides(fill = guide_legend(order = 2)) +
+  guides(color = guide_legend(order = 1)) +
   facet_grid(ID ~ .,
              labeller = labeller(ID = cruise_labels)) +
   labs(x = &quot;Temperature (\u00B0C)&quot;,
