@@ -449,7 +449,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">NCP reconstruction</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">03 February, 2021</h4>
+<h4 class="date">04 February, 2021</h4>
 
 </div>
 
@@ -474,7 +474,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-02-03
+<strong>Last updated:</strong> 2021-02-04
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -565,16 +565,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree6747fd93cc2830bed00d7bff091640f19953ccbctargetblank6747fd9a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/6747fd93cc2830bed00d7bff091640f19953ccbc" target="_blank">6747fd9</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef8ff3d778d9a28b210b20c905e9950037e424213targetblankf8ff3d7a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f8ff3d778d9a28b210b20c905e9950037e424213" target="_blank">f8ff3d7</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree6747fd93cc2830bed00d7bff091640f19953ccbctargetblank6747fd9a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreef8ff3d778d9a28b210b20c905e9950037e424213targetblankf8ff3d7a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/6747fd93cc2830bed00d7bff091640f19953ccbc" target="_blank">6747fd9</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/f8ff3d778d9a28b210b20c905e9950037e424213" target="_blank">f8ff3d7</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -590,17 +590,6 @@ Ignored files:
 
 Untracked files:
     Untracked:  output/Plots/Figures_publication/Appendix/
-
-Unstaged changes:
-    Modified:   output/Plots/Figures_publication/Article/Fig_1.pdf
-    Modified:   output/Plots/Figures_publication/Article/Fig_1.png
-    Modified:   output/Plots/Figures_publication/Article/Fig_2.pdf
-    Modified:   output/Plots/Figures_publication/Article/Fig_2.png
-    Modified:   output/Plots/Figures_publication/Article/Fig_3.pdf
-    Modified:   output/Plots/Figures_publication/Article/Fig_3.png
-    Modified:   output/Plots/Figures_publication/Article/Fig_4.pdf
-    Modified:   output/Plots/Figures_publication/Article/Fig_4.png
-    Modified:   output/Plots/Figures_publication/Article/Fig_5.pdf
 
 </code></pre>
 <p>
@@ -639,6 +628,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/f8ff3d778d9a28b210b20c905e9950037e424213/analysis/NCP_reconstruction.Rmd" target="_blank">f8ff3d7</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-04
+</td>
+<td>
+resized figures
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/2394871299bb7dbb7754153c0eae34cf20161db9/docs/NCP_reconstruction.html" target="_blank">2394871</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -3290,7 +3313,7 @@ p_NCP &lt;- NCP_flux_int %&gt;%
   ggplot() +
   geom_hline(yintercept = 0) +
   geom_path(data = tm_NCP_cum,
-            aes(date_time, nCT_i_flux_mix_cum, linetype = &quot;best-guess&quot;),
+            aes(date_time, nCT_i_flux_mix_cum, linetype = &quot;best \U2013 guess&quot;),
             col = &quot;black&quot;) +
   geom_path(aes(
     date_time,
