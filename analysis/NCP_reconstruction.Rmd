@@ -1610,7 +1610,7 @@ p_NCP <- NCP_flux_int %>%
   ggplot() +
   geom_hline(yintercept = 0) +
   geom_path(data = tm_NCP_cum,
-            aes(date_time, nCT_i_flux_mix_cum, linetype = "best-guess"),
+            aes(date_time, nCT_i_flux_mix_cum, linetype = "best \U2013 guess"),
             col = "black") +
   geom_path(aes(
     date_time,
