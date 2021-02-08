@@ -398,13 +398,15 @@ p_map <-
   geom_text(
     aes(parameters$herrvik_lon, parameters$herrvik_lat, label = "Herrvik"),
     nudge_x = -0.05,
+    nudge_y = -0.01,
     size = geom_text_size
   ) +
   geom_point(aes(parameters$ostergarn_lon, parameters$ostergarn_lat)) +
   geom_text(
-    aes(parameters$ostergarn_lon, parameters$ostergarn_lat, label = "Flux tower"),
+    aes(parameters$ostergarn_lon, parameters$ostergarn_lat,
+        label = "Östergarnsholm\nFlux tower"),
     nudge_x = -0.07,
-    nudge_y = 0.01,
+    nudge_y = 0.03,
     size = geom_text_size
   ) +
   geom_text(aes(19.26, 57.57, label = "VOS Finnmaid"),
