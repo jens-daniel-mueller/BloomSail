@@ -402,28 +402,28 @@ The output of an automated Exploratory Data Analysis (EDA) performed on the clea
 ```{r temperature_profiles, fig.cap="temperature profiles by stations. Color refers to the starting date of each cruise.", fig.asp = 1.3}
 
 ts %>%
-  arrange(date_time) %>% 
-  filter(type == "P", !(station %in% c("PX1", "PX2"))) %>%
-  ggplot(aes(tem, dep, col=ymd(ID), group=ID))+
-  geom_path()+
-  scale_y_reverse()+
-  scale_color_viridis_c(trans = "date", name="")+
-  labs(x="temperature (°C)", y="Depth (m)")+
-  facet_wrap(~station)
+  arrange(date_time) %>%
+  filter(type == "P",!(station %in% c("PX1", "PX2"))) %>%
+  ggplot(aes(tem, dep, col = ymd(ID), group = ID)) +
+  geom_path() +
+  scale_y_reverse() +
+  scale_color_viridis_c(trans = "date", name = "") +
+  labs(x = "temperature (°C)", y = "Depth (m)") +
+  facet_wrap( ~ station)
 
 ```
 
 ```{r pCO2_analog_profiles, fig.cap="pCO~2~ (analog signal) profiles by stations. Color refers to the starting date of each cruise.", fig.asp = 1.3}
 
 ts %>%
-  arrange(date_time) %>% 
-  filter(type == "P", !(station %in% c("PX1", "PX2"))) %>%
-  ggplot(aes(pCO2_analog, dep, col=ymd(ID), group=ID))+
-  geom_path()+
-  scale_y_reverse()+
-  scale_color_viridis_c(trans = "date", name="")+
-  labs(x="temperature (°C)", y="Depth (m)")+
-  facet_wrap(~station)
+  arrange(date_time) %>%
+  filter(type == "P",!(station %in% c("PX1", "PX2"))) %>%
+  ggplot(aes(pCO2_analog, dep, col = ymd(ID), group = ID)) +
+  geom_path() +
+  scale_y_reverse() +
+  scale_color_viridis_c(trans = "date", name = "") +
+  labs(x = "temperature (°C)", y = "Depth (m)") +
+  facet_wrap( ~ station)
 
 ```
 
@@ -469,13 +469,6 @@ th %>%
   ))
 
 
-# th_deployment <- th %>% 
-#   group_by(deployment) %>% 
-#   summarise(deployment_duration = max(date_time) - min(date_time)) %>% 
-#   ungroup() %>% 
-#   arrange(deployment_duration)
-
-
 th <- th %>%
   filter(deployment %in% c(2, 6, 9, 14, 17, 21, 23, 27, 31, 33, 34, 35, 37))
 
@@ -485,9 +478,7 @@ th <- th %>%
 
 ```{r remove_duplicated_timestamp_th}
 
-
 # add counter for date_time observations
-
 th <- th %>%
   add_count(date_time)
 
@@ -622,7 +613,6 @@ th <- th %>%
 ## Flush and Zeroing identification
 
 ```{r Identify_Zeroing_Flush_th}
-
 
 # Zeroing ID labeling
 
