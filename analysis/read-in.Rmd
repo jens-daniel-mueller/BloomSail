@@ -12,11 +12,9 @@ editor_options:
   chunk_output_type: console
 ---
 
-
 ```{r global_options, include = FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
-
 
 ```{r packages}
 library(tidyverse)
@@ -39,18 +37,19 @@ parameters <-
 theme_set(theme_bw())
 ```
 
-# Scope
+# Scope of this script
 
-For each data source:  
+For each data source:
 
-- read raw data files
-- harmonized column names
-- merged into one file
-- write summary file
+-   read raw data files
+-   harmonize column names
+-   clean obvious erroneous data
+-   merged into one file
+-   write merged file
 
 # Sea-Bird SBE 16 sensor data (ts)
 
-CTD sensor data including recordings from auxiliary pH, O~2~, Chla and pCO~2~ sensors were recorded with a measurement frequency of 15 sec. (In addition, pCO~2~ data were also internally recorded on the Contros HydroC instrument with higher temporal resolution and will later be used for further analysis after merging with CTD data.)
+CTD sensor data including recordings from the analog output of auxiliary pH, O~2~, Chla and pCO~2~ sensors were recorded with a measurement frequency of 15 sec. (In addition, pCO~2~ data were also internally recorded on the Contros HydroC instrument with higher temporal resolution and will later be used for further analysis after merging with CTD data.)
 
 ## Read regular profiles and transects
 
@@ -118,7 +117,7 @@ rm(dataset, file, files)
 
 ```
 
-## Read profiles and transects around Ostergarnsholm
+## Read profiles and transects around Östergarnsholm
 
 ```{r read_ts_profile_transect_Ostergarnsholm}
 
@@ -208,13 +207,13 @@ rm(eda)
 
 ```
 
-The output of an automated Exploratory Data Analysis (EDA) performed with the package `DataExplorer` can be accessed here:
+The output of an automated Exploratory Data Analysis (EDA) performed on the raw data with the package `DataExplorer` can be accessed here:
 
-[Link to EDA report of CTD raw data](https://jens-daniel-mueller.github.io/BloomSail/EDA_report_ts-raw.html){target="_blank}
+[Link to EDA report of CTD raw data](https://jens-daniel-mueller.github.io/BloomSail/EDA_report_ts-raw.html){target="\"_blank"}
 
 ## Clean data set
 
-Sensor recordings were cleaned from obviously erroneous readings, by setting suspecious values to NA. 
+Sensor recordings were cleaned from obviously erroneous readings, by setting suspicious values to NA.
 
 ```{r clean_ts_data}
 
@@ -394,10 +393,9 @@ eda(ts, "ts_clean")
 rm(eda)
 ```
 
+The output of an automated Exploratory Data Analysis (EDA) performed on the cleaned data with the package `DataExplorer` can be accessed here:
 
-The output of an automated Exploratory Data Analysis (EDA) performed with the package `DataExplorer` can be accessed here:
-
-[Link to EDA report of CTD clean data](https://jens-daniel-mueller.github.io/BloomSail/EDA_report_ts_clean.html){target="_blank}
+[Link to EDA report of CTD clean data](https://jens-daniel-mueller.github.io/BloomSail/EDA_report_ts_clean.html){target="\"_blank"}
 
 ## Overview plots
 
@@ -415,7 +413,6 @@ ts %>%
 
 ```
 
-
 ```{r pCO2_analog_profiles, fig.cap="pCO~2~ (analog signal) profiles by stations. Color refers to the starting date of each cruise.", fig.asp = 1.3}
 
 ts %>%
@@ -430,12 +427,11 @@ ts %>%
 
 ```
 
-
 # HydroC CO~2~ data (th)
 
 ## Read data
 
-Originally, HydroC pCO~2~ data  were provided by KM Contros after applying a drift correction to the raw data, which was based on pre- and post-deployment calibration results. Those data are read-in here. However, later, the post-processing was repeated based on a cleaned data set.
+Originally, HydroC pCO~2~ data were provided by KM Contros after applying a drift correction to the raw data, which was based on pre- and post-deployment calibration results. Those data are read-in here. However, later, the post-processing was repeated based on a cleaned data set.
 
 ```{r read_th_post_processed_by_manufacturer}
 
@@ -456,7 +452,7 @@ th <-
 
 ## Deployment identification and subsetting
 
-Individual deployments (periods of observations with less than 30 sec between recordings) were identified and relevant deployment periods were subsetted. This procedure removes only recordings attributable to sensor testing and set-up.
+Individual deployments (periods of observations with less than 30 sec between recordings) were identified and relevant deployment periods were selected. This procedure removes some data recorded during sensor testing and set-up.
 
 ```{r identify_select_th_deployment}
 
@@ -700,7 +696,6 @@ A pdf with pCO~2~ timeseries plots of all deployments can be found here:
 
 [Link to pCO~2~ timeseries plots](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/read_in/th_deployments.pdf){target="_blank"}
 
-
 ```{r th_EDA, eval=FALSE}
 
 source("code/eda.R")
@@ -711,7 +706,7 @@ rm(eda)
 
 The output of an automated Exploratory Data Analysis (EDA) performed with the package `DataExplorer` can be accessed here:
 
-[Link to EDA report of HydroC pCO~2~ data data](https://jens-daniel-mueller.github.io/BloomSail/EDA_report_th.html){target="_blank}
+[Link to EDA report of HydroC pCO~2~ data data](https://jens-daniel-mueller.github.io/BloomSail/EDA_report_th.html){target="\"_blank"}
 
 ## Write summary file
 
@@ -728,10 +723,9 @@ rm(th)
 
 ```
 
+# Bottle data CO~2~ (tb)
 
-# Bottle data CO2 (tb)
-
-Discrete samples were collected with a Niskin bottle and analyzed for C[T] and A[T] at IOW CO~2~ lab.
+Discrete samples were collected with a Niskin bottle and analyzed for CT and AT at IOW's CO~2~ lab.
 
 ## Read data
 
@@ -762,10 +756,9 @@ rm(tb)
 
 ```
 
-
 # Bottle data plankton (tp)
 
-Discrete samples were collected with a Niskin bottle and analysed for phytoplankton composition and biomass at IOW CO~2~ lab.
+Discrete samples were collected with a Niskin bottle and analysed for phytoplankton composition and biomass at IOW's phytoplankton lab (Norbert Wasmund).
 
 ## Read data
 
@@ -816,8 +809,6 @@ tp %>% write_csv(here::here("data/intermediate/_summarized_data_files",
 rm(tp)
 
 ```
-
-
 
 # GPS track (tt)
 
@@ -876,9 +867,9 @@ rm(tt)
 
 ```
 
-# Ostergarnsholm
+# Östergarnsholm
 
-Atmospheric data were recorded at the ICOS station on Osterganrsholm.
+Atmospheric data were recorded at the ICOS station on Östergarnsholm.
 
 ## Read data
 
@@ -929,10 +920,9 @@ rm(og)
 
 ```
 
+# SOOP Finnmaid
 
-# Finnmaid
-
-pCO~2~ data were recorded on VOS Finnmaid in summer 2018.
+pCO~2~ and SST data were recorded on SOOP Finnmaid in summer 2018.
 
 ## Read data
 
@@ -1033,7 +1023,7 @@ rm(temp, files, file)
 
 ```
 
-## Convert O2 concentration units
+## Convert O~2~ concentration units
 
 ```{r convert_O2_Los_Gatos_fm}
 
@@ -1074,9 +1064,6 @@ fm %>%
 rm(fm)
 
 ```
-
-
-
 
 # Interactive map
 
