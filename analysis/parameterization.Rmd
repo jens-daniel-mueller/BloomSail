@@ -35,15 +35,30 @@ parameters <-
   lst(
     # flush duration after zeroing of the HydroC pCO2 sensor
     HC_flush_duration = 600,
+    
+    # mixing duration after zeroing of the HydroC pCO2 sensor
     HC_mixing_duration = 20,
+    
+    # date of switching between 1W- and 8W- pump
     pump_switch = ymd_hms("2018-07-17;13:08:34"),
+    
+    # duration of intervals to be used for tau determination
     duration_intervals = seq(150,500,50),
+    
+    # pCO2 residual limit for tau determination
     pCO2_resid_lim = 1,
-    example_ID = "180802",
-    example_station = "P03",
+    
+    # window width in seconds used to smooth RT corrected pCO2
     smoothing_duration = 30,
     tau_factors = seq(0.8, 1.6, 0.2),
     tau_factor_used = 1,
+    
+        # ID used to produce example plots
+    example_ID = "180802",
+    
+    # station used to produce example plots
+    example_station = "P03",
+    
     dep_grid = 1,
     max_dep = 25,
     max_dep_gap = 20,
