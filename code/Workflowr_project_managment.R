@@ -107,7 +107,7 @@ wflow_build()
 wflow_publish("analysis/*", message = "XXX")
 
 # commit regular changes (locally) and rebuild site
-wflow_publish(all = TRUE, message = "resized figures")
+wflow_publish(all = TRUE, message = "code and output cleaning")
 
 # commit changes including _site.yml (locally) and rebuild site
 wflow_publish(c(

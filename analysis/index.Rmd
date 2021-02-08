@@ -8,7 +8,9 @@ editor_options:
   chunk_output_type: console
 ---
 
-On this website we present our ongoing ambition to quantify the net community production (NCP) during a cyanobacteria bloom in the Baltic Sea through vertically resolved pCO~2~ measurements.
+On this website, you find code and explanations to quantify the net community production (NCP) during a cyanobacteria bloom in the Baltic Sea through vertically resolved pCO~2~ measurements.
+
+The outcome of this study was submitted to Copernicus Journal Biogeosciences and is available under: XXX
 
 Please navigate trough the navbar on top to take a look at the various chapters of this project.
 

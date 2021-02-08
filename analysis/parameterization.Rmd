@@ -30,9 +30,10 @@ theme_set(theme_bw())
 
 Following parameterizations were chosen to run analysis and display results:
 
-```{r define_parameters}
+```{r define_parameters, class.source = 'fold-show'}
 parameters <-
   lst(
+    # flush duration after zeroing of the HydroC pCO2 sensor
     HC_flush_duration = 600,
     HC_mixing_duration = 20,
     pump_switch = ymd_hms("2018-07-17;13:08:34"),
@@ -77,7 +78,6 @@ parameters <-
     getm_i_dep = 19
   )
 
-parameters
 
 ```
 
