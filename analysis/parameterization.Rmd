@@ -21,14 +21,9 @@ library(tidyverse)
 library(lubridate)
 ```
 
-```{r ggplot_theme, include = FALSE}
-theme_set(theme_bw())
-```
-
-
 # Definition
 
-Following parameterizations were chosen to run analysis and display results:
+Following parameterizations were are saved to an `.rds` file and will be used to run analysis and display results:
 
 ```{r define_parameters, class.source = 'fold-show'}
 parameters <-
@@ -50,46 +45,97 @@ parameters <-
     
     # window width in seconds used to smooth RT corrected pCO2
     smoothing_duration = 30,
+    
+    # scaling factors used to test optimization of tau determination
     tau_factors = seq(0.8, 1.6, 0.2),
+    
+    # scaling factor used to optimize tau
     tau_factor_used = 1,
     
-        # ID used to produce example plots
+    # ID used to produce example plots
     example_ID = "180802",
     
     # station used to produce example plots
     example_station = "P03",
     
+    # width for vertical gridding of profiles 
     dep_grid = 1,
+    
+    # max depth for data analysis
     max_dep = 25,
+    
+    # max depth for checking of data gaps
     max_dep_gap = 20,
+    
+    # max number of accepted data gaps
     max_gap = 3,
+    
+    # max depth for RT quality assessment
     RT_stats_dep_max = 30,
+    
+    # max pCO2 for RT quality assessment
     RT_stats_pCO2_max = 300,
+    
+    # max depth for RT quality assessment
     RT_stats_dep = 20,
+    
+    # max depth considered for surface data
     surface_dep = 6,
-    i_dep_lim = 12,
-    i_dep_mix_lim = 17,
+    
+    # integration depths tested for NCP quantification
     fixed_integration_depths = seq(9,13,1),
+    
+    # integration depth for NCP quantification
+    i_dep_lim = 12,
+    
+    # maximum depth of vertical mixing event
+    i_dep_mix_lim = 17,
+    
+    # stations not used in this study
     stations_out = c("PX1", "PX2", "P14", "P13", "P01"),
+    
+    # cruise dates not used in this study
     dates_out = c("180616","180820"),
+    
+    # profiling phases used for quality assessment and analysis
     phases_in = c("down", "up"),
+    
+    # box limits for inclusion of SOOP Finnmaid data
     fm_box_lon = c(18.9, 19.5, 19.5, 18.9),
     fm_box_lat = c(57.4, 57.2, 57.45, 57.61),
+    
+    # box limits for map
     map_lat_lo = 57.25,
     map_lat_hi = 57.6,
     map_lon_lo = 18.6,
     map_lon_hi = 19.7,
+    
+    # coordinates of Herrvik harbor
     herrvik_lat = 57.421658,
     herrvik_lon = 18.914558,
+    
+    # coordinates of ICOS flux tower on Ostergarnsholm
     ostergarn_lat = 57.430544,
     ostergarn_lon = 18.984387,
+    
+    # stations used for analysis of phytoplankton data
     stations_in_phytoplankton = c("P07", "P10"),
+    
+    # class of phytoplanktion data used
     class_in_phytoplankton = "t",
+    
+    # Finnmaid standard route ("E" or "W") used to select GETM model output
     getm_select_route = "E",
+    
+    # latitude limits for subsetting of GETM model data
     getm_low_lat = 57.3,
     getm_high_lat = 57.5,
+    
+    # date limits for subsetting of GETM model data
     getm_start_date = "2018-06-20",
     getm_end_date = "2018-08-25",
+    
+    # maximum depth used for integrations of GETM model data
     getm_i_dep = 19
   )
 
