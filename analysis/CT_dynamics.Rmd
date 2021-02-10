@@ -833,7 +833,7 @@ p_pCO2 <-
   ggplot(aes(pCO2, dep, col = ID, group = interaction(station, ID))) +
   geom_path() +
   scale_y_reverse(expand = c(0, 0)) +
-  labs(x = expression(pCO[2] ~ (µatm))) +
+  labs(x = expression(italic(p)*CO[2] ~ (µatm))) +
   scale_color_viridis_d(guide = FALSE) +
   theme(
     axis.text.y = element_blank(),
@@ -2378,7 +2378,7 @@ p_pCO2_surf <- tm_profiles_surface_long_ID %>%
   scale_fill_manual(name = "", values = "black", guide = FALSE) +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(pCO[2], (mu * atm)))) +
+  labs(y = expression(atop(italic(p)*CO[2], (mu * atm)))) +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
     legend.title = element_blank(),
@@ -2561,7 +2561,7 @@ p_pCO2_atm <- tm_og %>%
   geom_path(aes(y = pCO2_atm)) +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(pCO["2,atm"], (mu * atm)))) +
+  labs(y = expression(atop(italic(p)*CO["2,atm"], (mu * atm)))) +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
     plot.margin = margin(0, 0, 0, 0, "cm"))

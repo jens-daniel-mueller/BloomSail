@@ -171,7 +171,7 @@ augment(fit) %>%
   geom_hline(yintercept = pCO2_corr_start + 0.63 * (pCO2_corr_delta)) +
   geom_point(shape = 21) +
   geom_line(aes(y = .fitted), col = "red") +
-  labs(y = expression(pCO[2] ~ (µatm)), x = "time (sec)")
+  labs(y = expression(italic(p)*CO[2] ~ (µatm)), x = "time (sec)")
 
 ggsave(
   here::here(
@@ -286,7 +286,7 @@ for (i in unique(tm_flush$Zero_counter)) {
           geom_vline(xintercept = tau) +
           geom_hline(yintercept = pCO2_corr_start + 0.63 * (pCO2_corr_delta)) +
           labs(
-            y = expression(pCO[2] ~ (µatm)),
+            y = expression(italic(p)*CO[2] ~ (µatm)),
             x = "Duration of Flush period (s)",
             title = paste(
               "Zero_counter: ",
@@ -329,7 +329,7 @@ for (i in unique(tm_flush$Zero_counter)) {
           ggplot(aes(duration, pCO2_corr)) +
           geom_point(col = "red") +
           labs(
-            y = expression(pCO[2] ~ (µatm)),
+            y = expression(italic(p)*CO[2] ~ (µatm)),
             x = "Duration of Flush period (s)",
             title = paste("Zero_counter: ", i,
                           "nls model failed")
@@ -464,7 +464,7 @@ tau_values %>%
   facet_wrap( ~ duration, labeller = label_both) +
   geom_vline(xintercept = parameters$pCO2_resid_lim) +
   labs(x = expression(Mean ~ absolute ~ residuals ~ ("%" ~ of ~ equilibrium ~
-                                                       pCO[2])))
+                                                       italic(p)*CO[2])))
 
 ```
 
@@ -1146,7 +1146,7 @@ tm_grid %>%
   scale_color_brewer(palette = "Set1", direction = -1) +
   labs(
     y = "Depth [m]",
-    x = expression(pCO[2] ~ (µatm)),
+    x = expression(italic(p)*CO[2] ~ (µatm)),
     title = str_c(
       "Date: ",
       parameters$example_ID,
@@ -1180,7 +1180,7 @@ p_profile_corr <- tm_grid %>%
     direction = -1,
     labels = c("corrected", "raw")
   ) +
-  labs(y = "Depth (m)", x = expression(pCO[2] ~ (µatm))) +
+  labs(y = "Depth (m)", x = expression(italic(p)*CO[2] ~ (µatm))) +
   theme(
     legend.title = element_blank(),
     legend.position = c(0.8, 0.75),
@@ -1255,7 +1255,7 @@ tm_grid %>%
   scale_y_reverse(breaks = seq(0, 40, 2)) +
   scale_color_discrete(name = "tau factor") +
   labs(
-    x = expression(Delta ~ pCO[2] ~ (µatm)),
+    x = expression(Delta ~ italic(p)*CO[2] ~ (µatm)),
     y = "Depth [m]",
     title = str_c(
       "Date: ",
@@ -1329,7 +1329,7 @@ tm_grid %>%
   scale_y_reverse(breaks = seq(0, 40, 2)) +
   scale_color_discrete(name = "tau factor") +
   labs(
-    x = expression(Delta ~ pCO[2] ~ ("%" ~ of ~ absolute ~ value)),
+    x = expression(Delta ~ italic(p)*CO[2] ~ ("%" ~ of ~ absolute ~ value)),
     y = "Depth [m]",
     title = str_c(
       "Date: ",
@@ -1404,8 +1404,8 @@ tm_equi_delta %>%
   ggplot(aes(pCO2_equi, pCO2_delta_equi)) +
   geom_hline(yintercept = 0) +
   geom_point() +
-  labs(x = expression(Reference ~ pCO[2] ~ (µatm)),
-       y = expression(Delta ~ pCO[2] ~ from ~ reference ~ (µatm)))
+  labs(x = expression(Reference ~ italic(p)*CO[2] ~ (µatm)),
+       y = expression(Delta ~ italic(p)*CO[2] ~ from ~ reference ~ (µatm)))
 
 ```
 
@@ -1524,7 +1524,7 @@ tm_grid_shallow_sum %>%
   geom_path(aes(pCO2_delta, dep_grid, col = as.factor(tau_factor))) +
   scale_y_reverse() +
   scale_color_discrete(name = "Tau factor") +
-  labs(x = expression(Delta ~ pCO[2] ~ (µatm)), y = "Depth intervals (1m)") +
+  labs(x = expression(Delta ~ italic(p)*CO[2] ~ (µatm)), y = "Depth intervals (1m)") +
   facet_grid(estimate ~ .)
 
 ```
@@ -1542,7 +1542,7 @@ p_delta_pCO2 <- tm_grid_shallow_sum %>%
     direction = -1,
     labels = c("corrected", "raw")
   ) +
-  labs(x = expression(Mean ~ "|" ~ Delta ~ pCO[2] ~ "|" ~ (µatm)), y = "Depth (m)") +
+  labs(x = expression(Mean ~ "|" ~ Delta ~ italic(p)*CO[2] ~ "|" ~ (µatm)), y = "Depth (m)") +
   xlim(0, NA) +
   theme(
     legend.title = element_blank(),
@@ -1629,7 +1629,7 @@ tm_equi_delta_sum %>%
   ggplot(aes(tau_factor, dpCO2, linetype = correction, shape = correction)) +
   geom_point() +
   geom_hline(yintercept = 0) +
-  labs(x = "Tau factor", y = expression(Mean ~ Delta ~ pCO[2])) +
+  labs(x = "Tau factor", y = expression(Mean ~ Delta ~ italic(p)*CO[2])) +
   facet_wrap( ~ estimate)
 
 
@@ -2009,8 +2009,8 @@ df %>%
   ggplot(aes(pCO2, ratio, col = as.factor(Tem))) +
   geom_line() +
   scale_color_viridis_d(option = "C", name = "Tem [°C]") +
-  labs(x = expression(pCO[2] ~ (µatm)),
-       y = expression(Delta ~ pCO[2] ~ "/" ~ Delta ~ DIC ~ (µatm ~ µmol ^ {
+  labs(x = expression(italic(p)*CO[2] ~ (µatm)),
+       y = expression(Delta ~ italic(p)*CO[2] ~ "/" ~ Delta ~ DIC ~ (µatm ~ µmol ^ {
          -1
        } ~ kg))) +
   scale_y_continuous(limits = c(0, 8), breaks = seq(0, 10, 1))
