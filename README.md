@@ -1,8 +1,11 @@
-# BloomSail - work in progress
+# BloomSail
 
-In this repo we present our ongoing ambition to quantify net primary production during cyanobacteria blooms in the Baltic Sea through vertically resolved pCO~2~ measurements.
+On this website, you find code and explanations to quantify the net community production (NCP) during a cyanobacteria bloom in the Baltic Sea through vertically resolved pCO~2~ measurements.
 
-Results can be accessed under:
-https://jens-daniel-mueller.github.io/BloomSail
+The outcome of this study was submitted to Copernicus Journal Biogeosciences and is available under: XXX
 
-Dr. Jens Daniel Müller, 2019
+Please navigate trough the navbar on top to take a look at the various chapters of this project.
+
+The links in the upper right corner bring you to the source code of this project and back to Jens' main homepage.
+
+Dr. Jens Daniel Müller
