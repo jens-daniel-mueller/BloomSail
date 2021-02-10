@@ -422,7 +422,6 @@ fixed_values <-
 ```{r read_gt_3d_sal_tem_age, eval=FALSE}
 
 nc <- nc_open(here::here("data/input/GETM", "Finnmaid.E.3d.2018.nc"))
-#print(nc$var)
 
 lat <- ncvar_get(nc, "latc")
 
@@ -484,8 +483,9 @@ gt_3d_long <- gt_3d %>%
   summarise_all(list(value=~mean(.,na.rm=TRUE))) %>% # regional averaging
   ungroup()
 
-gt_3d_long %>% 
-  write_csv(here::here("data/intermediate/_summarized_data_files", file = "gt_3d_long.csv"))
+gt_3d_long %>%
+  write_csv(here::here("data/intermediate/_summarized_data_files", 
+                       file = "gt_3d_long.csv"))
 
 
 rm(gt_3d, gt_3d_long, i, lat, d, t, var_3d)

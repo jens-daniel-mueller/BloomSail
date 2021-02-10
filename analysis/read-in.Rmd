@@ -58,7 +58,6 @@ CTD sensor data including recordings from the analog output of auxiliary pH, O~2
 
 files <-
   list.files(path = "data/input/TinaV/Sensor/Profiles_Transects/", pattern = "[.]cnv$")
-#file <- files[1]
 
 for (file in files) {
   start_date <-
@@ -217,7 +216,10 @@ Sensor recordings were cleaned from obviously erroneous readings, by setting sus
 
 ```{r clean_ts_data}
 
-# class(ts)
+# running the commented code for plotting
+# before and after the cleaning steps
+# allows to visualize the removal of errorneous readings
+
 ts <- data.table(ts)
 
 # Profiling data
@@ -375,9 +377,6 @@ ts <- ts %>%
          tem,
          pCO2_analog)
 
-# ts <- ts %>% 
-#   filter( !(station %in% c("PX1", "PX2", "TX1", "TX2") ))
-
 ts %>% 
   write_csv(here::here("data/intermediate/_summarized_data_files", "ts.csv"))
 
@@ -399,7 +398,7 @@ The output of an automated Exploratory Data Analysis (EDA) performed on the clea
 
 ## Overview plots
 
-```{r temperature_profiles, fig.cap="temperature profiles by stations. Color refers to the starting date of each cruise.", fig.asp = 1.3}
+```{r temperature_profiles, fig.cap="Temperature profiles by stations. Color refers to the starting date of each cruise.", fig.asp = 1.3}
 
 ts %>%
   arrange(date_time) %>%
@@ -408,7 +407,6 @@ ts %>%
   geom_path() +
   scale_y_reverse() +
   scale_color_viridis_c(trans = "date", name = "") +
-  labs(x = "temperature (°C)", y = "Depth (m)") +
   facet_wrap( ~ station)
 
 ```
@@ -422,7 +420,6 @@ ts %>%
   geom_path() +
   scale_y_reverse() +
   scale_color_viridis_c(trans = "date", name = "") +
-  labs(x = "temperature (°C)", y = "Depth (m)") +
   facet_wrap( ~ station)
 
 ```
@@ -431,12 +428,11 @@ ts %>%
 
 ## Read data
 
-Originally, HydroC pCO~2~ data were provided by KM Contros after applying a drift correction to the raw data, which was based on pre- and post-deployment calibration results. Those data are read-in here. However, later, the post-processing was repeated based on a cleaned data set.
+Originally, HydroC pCO~2~ data were provided by KM Contros after applying a drift correction to the raw data, which was based on pre- and post-deployment calibration results. Those preliminary data are read-in here. However, some data recorded during testing and configuration of the sensor were later on removed, and the post-processing was repeated based on a cleaned data set. This revised post-processed file is use in the merging script.
 
 ```{r read_th_post_processed_by_manufacturer}
 
 # Read Contros corrected data file, based on all recordings
-
 th <-
   read_csv2(here::here("data/input/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
                        "parameter&pCO2s(method 43).txt"),
@@ -456,11 +452,12 @@ Individual deployments (periods of observations with less than 30 sec between re
 
 ```{r identify_select_th_deployment}
 
+# identify individual deployments
 th <- th %>%
   arrange(date_time) %>%
   mutate(deployment = cumsum(c(TRUE, diff(date_time) >= 30)))
 
-
+# write pre-cleaning file for later comparison
 th %>%
   select(date_time, pCO2_corr, deployment) %>%
   write_csv(here::here(
@@ -468,13 +465,15 @@ th %>%
     "th_pre_cleaning.csv"
   ))
 
-
+# filter relevant deployments
 th <- th %>%
   filter(deployment %in% c(2, 6, 9, 14, 17, 21, 23, 27, 31, 33, 34, 35, 37))
 
 ```
 
 ## Removal of duplicated time stamps
+
+A low number of the recorded HydroC data revealed the exact same time stamp. This was corrected either by filling a corresponding gap before or after the duplicate, or by removing one of the duplicated rows if no such gap existed.
 
 ```{r remove_duplicated_timestamp_th}
 
@@ -612,6 +611,8 @@ th <- th %>%
 
 ## Flush and Zeroing identification
 
+Flush and zeroing periods of the sensor are identified and assigned with unique IDs.
+
 ```{r Identify_Zeroing_Flush_th}
 
 # Zeroing ID labeling
@@ -623,8 +624,6 @@ th <- th %>%
     TRUE, diff(date_time) >= 30
   )))) %>%
   ungroup()
-
-# unique(th$Zero_counter)
 
 # Flush: Identification
 
@@ -700,7 +699,7 @@ The output of an automated Exploratory Data Analysis (EDA) performed with the pa
 
 ## Write summary file
 
-Summarized pCO~2~ date were written to file.
+Summarized clean pCO~2~ data were written to file.
 
 ```{r write_th_summary_file}
 
@@ -721,10 +720,11 @@ Discrete samples were collected with a Niskin bottle and analyzed for CT and AT 
 
 ```{r read_tb_CO2_data}
 
-
+# Read CO2 system bottle data
 tb <- read_csv(here::here("data/input/TinaV/Bottle/Tracegases", "BloomSail_bottle_CO2_all.csv"),
                    col_types = list("c","c","n","n","n","n","n"))
 
+# select and rename relevant columns
 tb <- tb %>% 
   select(ID = transect.ID,
          station = label,
@@ -857,7 +857,7 @@ rm(tt)
 
 ```
 
-# Östergarnsholm
+# Atmospheric observations
 
 Atmospheric data were recorded at the ICOS station on Östergarnsholm.
 
@@ -912,18 +912,16 @@ rm(og)
 
 # SOOP Finnmaid
 
-pCO~2~ and SST data were recorded on SOOP Finnmaid in summer 2018.
+Here, we read in pCO~2~ and SST data recorded on SOOP Finnmaid in June-August 2018.
 
 ## Read data
 
 ```{r read_fm_data}
 
-### June - August 2018
+# LI-COR data
 
 files <-
   list.files(path = "data/input/Finnmaid_2018", pattern = "[.]xls$")
-
-#file <-files[1]
 
 for (file in files) {
   temp <- read_excel(here::here("data/input/Finnmaid_2018", file))
@@ -972,12 +970,12 @@ rm(temp, files, file)
 dataset <- dataset[pCO2 != 0]
 
 
-#### Los Gatos data
-
+# Los Gatos Research (LGR) data
+# Please note that the LGR data were corrected manually before
+# The correction procedure is outlined in the Appendix of the ms
 
 files <-
   list.files(path = "data/input/Finnmaid_2018/LGR", pattern = "[.]xls$")
-#file <-files[1]
 
 for (file in files) {
   temp <- read_excel(here::here("data/input/Finnmaid_2018/LGR", file))
@@ -1013,9 +1011,10 @@ rm(temp, files, file)
 
 ```
 
-## Convert O~2~ concentration units
+```{r convert_O2_Los_Gatos_fm, eval=FALSE}
 
-```{r convert_O2_Los_Gatos_fm}
+# This code can be used to convert O2 units
+# but is not applied, because O2 data are not used in this study
 
 source(here::here("code", "O2stoO2c.R"))
 
@@ -1057,7 +1056,7 @@ rm(fm)
 
 # Interactive map
 
-```{r map}
+```{r map, fig.cap="Overview map of SOOP Finnmaid and SV Tina V tracks. Please note that only a subet of the recorded track data is plotted."}
 
 
 fm <-
