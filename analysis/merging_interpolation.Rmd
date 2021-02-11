@@ -273,7 +273,7 @@ ggplot() +
 ```
 
 
-```{r compare_processed_hc_files, fig.asp=5, eval=FALSE, include=FALSE}
+```{r compare_processed_hc_files, fig.asp=5}
 
 th_comparison <- full_join(
   ts_th_sub %>% select(date_time, deployment, pCO2_corr),
