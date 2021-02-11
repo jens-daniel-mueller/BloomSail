@@ -156,7 +156,7 @@ rm(ts_th_Zero,
 
 ### Read cleaned processed data
 
-A second post-processed HydroC pCO~2~ data set was provided by KM Contros after applying a drift correction to the cleaned raw data, i.e. those without data recorded during configuration and testing of the sensor. The post-processing was still based on pre- and post-deployment calibration results. 
+A revised post-processed HydroC pCO~2~ data set was provided by KM Contros after applying a drift correction to the cleaned raw data, i.e. those without data recorded during configuration and testing of the sensor. The post-processing was still based on pre- and post-deployment calibration results. 
 
 ```{r read_th_post_processed_by_manufacturer_without_AW}
 
@@ -192,27 +192,32 @@ th_new_withoutAW_all <-
     Zero = as.factor(as.character(Zero))
   )
 
+# slive every 10th data point to reduce number for plotting
 th_new_withoutAW <- th_new_withoutAW_all %>%
   slice(seq(1, n(), 10))
 
+# load analog pCO2 data (raw)
 th_pre_cleaning <-
   read_csv(here::here(
     "data/intermediate/_summarized_data_files",
     "th_pre_cleaning.csv"
   ))
 
+# slive every 10th data point to reduce number for plotting
 th_pre_cleaning <- th_pre_cleaning %>%
   slice(seq(1, n(), 10))
 
+# slive every 10th data point to reduce number for plotting
 ts_th_sub <- ts_th %>%
   slice(seq(1, n(), 10))
 
 ```
 
-```{r read_th_post_processed_by_manufacturer_with_AW, eval=FALSE, include=FALSE}
+```{r read_th_post_processed_by_manufacturer_with_AW, include=FALSE}
 
 # Read Contros corrected data file, based on cleaned recordings and 
-# with water vapor correction
+# with water vapor (AW) correction
+# the AW correction was tested, but not used in this study
 
 th_new_withAW <-
   read_csv2(
@@ -256,12 +261,14 @@ th_new_withAW <- th_new_withAW %>%
 ```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µatm. Zeroing periods are included.", fig.asp = 2}
 
 ggplot() +
-  geom_path(data = ts_th_sub, aes(date_time, pCO2_corr, col = "HydroC, drift corrected")) +
-  geom_path(data = ts_th_sub, aes(date_time, pCO2_analog, col = "analog CTD")) +
+  geom_path(data = ts_th_sub,
+            aes(date_time, pCO2_corr, col = "HydroC, drift corrected")) +
+  geom_path(data = ts_th_sub,
+            aes(date_time, pCO2_analog, col = "analog CTD")) +
   scale_color_brewer(palette = "Set1", name = "pCO2 record") +
   coord_cartesian(ylim = c(0, 600)) +
   labs(y = expression(pCO[2] ~ (µatm)), x = "") +
-  facet_wrap( ~ deployment, scales = "free_x", ncol = 1)
+  facet_wrap(~ deployment, scales = "free_x", ncol = 1)
 
 ```
 
@@ -278,12 +285,11 @@ th_comparison <- full_join(
   th_new_withoutAW %>% select(date_time, pCO2_corr) %>% rename(pCO2_withoutAW = pCO2_corr)
 )
 
-
 th_comparison %>%
   ggplot() +
-  geom_path(data = th_pre_cleaning, aes(date_time, pCO2_corr, col = "pre cleaning")) +
+  #geom_path(data = th_pre_cleaning, aes(date_time, pCO2_corr, col = "pre cleaning")) +
   geom_path(aes(date_time, pCO2_corr, col = "HydroC, drift corrected")) +
-  geom_path(aes(date_time, pCO2_withAW, col = "withAW")) +
+  #geom_path(aes(date_time, pCO2_withAW, col = "withAW")) +
   geom_path(aes(date_time, pCO2_withoutAW, col = "withoutAW")) +
   scale_color_brewer(palette = "Set1", name = "pCO2 record") +
   coord_cartesian(ylim = c(0, 600)) +
