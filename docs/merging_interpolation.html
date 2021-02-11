@@ -565,16 +565,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree8dc33564f94c75080004ad37aa20a4d6f85f770etargetblank8dc3356a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/8dc33564f94c75080004ad37aa20a4d6f85f770e" target="_blank">8dc3356</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0d87752e76dfdfb88960152cf157fdcc6e9b2925targetblank0d87752a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/0d87752e76dfdfb88960152cf157fdcc6e9b2925" target="_blank">0d87752</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree8dc33564f94c75080004ad37aa20a4d6f85f770etargetblank8dc3356a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree0d87752e76dfdfb88960152cf157fdcc6e9b2925targetblank0d87752a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/8dc33564f94c75080004ad37aa20a4d6f85f770e" target="_blank">8dc3356</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/0d87752e76dfdfb88960152cf157fdcc6e9b2925" target="_blank">0d87752</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -623,6 +623,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/0d87752e76dfdfb88960152cf157fdcc6e9b2925/analysis/merging_interpolation.Rmd" target="_blank">0d87752</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-11
+</td>
+<td>
+cleaning
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/4dfc4f8da2ffefa4879ea1049766fcb3e10c981b/docs/merging_interpolation.html" target="_blank">4dfc4f8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2418,8 +2452,8 @@ finisehd read CTD and HydroC, created merging Rmd
 <pre class="r"><code>library(tidyverse)
 library(lubridate)
 library(zoo)</code></pre>
-<div id="ctd-ts-hydroc-co2-data-th" class="section level1" number="1">
-<h1 number="1"><span class="header-section-number">1</span> CTD (ts) + HydroC CO<sub>2</sub> data (th)</h1>
+<div id="ctd-ts-hydroc-co2-data-th-v1" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> CTD (ts) + HydroC CO<sub>2</sub> data (th, V1)</h1>
 <div id="merging-summarized-data-sets" class="section level2" number="1.1">
 <h2 number="1.1"><span class="header-section-number">1.1</span> Merging summarized data sets</h2>
 <p>Before merging the ts and th data set, the time stamp of ts is adjusted to match exactly that of th, based on zeroing pCO<sub>2</sub> values recorded in the analog output (ts) and the internal memory (th).</p>
@@ -2519,8 +2553,8 @@ rm(ts_th_Zero,
    i_deployment,
    i_Zero_counter)</code></pre>
 </div>
-<div id="read-cleaned-processed-pco2-data" class="section level2" number="1.3">
-<h2 number="1.3"><span class="header-section-number">1.3</span> Read cleaned, processed pCO<sub>2</sub> data</h2>
+<div id="read-cleaned-processed-pco2-data-v2" class="section level2" number="1.3">
+<h2 number="1.3"><span class="header-section-number">1.3</span> Read cleaned, processed pCO<sub>2</sub> data (V2)</h2>
 <p>A revised post-processed HydroC pCO<sub>2</sub> data set was provided by KM Contros after applying a drift correction to the cleaned raw data, i.e. those without data recorded during configuration and testing of the sensor. This data set is referred to as V2. The post-processing was still based on pre- and post-deployment calibration results.</p>
 <pre class="r"><code># Read Contros corrected data file, based on cleaned recordings and
 # without water vapor correction
@@ -2577,6 +2611,7 @@ ts_th_sub &lt;- ts_th %&gt;%
 <h3 number="1.3.1"><span class="header-section-number">1.3.1</span> Comparison of pCO<sub>2</sub> time series</h3>
 <div id="analog-vs-internal" class="section level4" number="1.3.1.1">
 <h4 number="1.3.1.1"><span class="header-section-number">1.3.1.1</span> Analog vs internal</h4>
+<p>Below, pCO<sub>2</sub> time series for the analog output and the post-processed (ie drift corrected) data V1 are shown.</p>
 <pre class="r"><code>ggplot() +
   geom_path(data = ts_th_sub,
             aes(date_time, pCO2_corr, col = &quot;HydroC V1&quot;)) +
@@ -2587,14 +2622,15 @@ ts_th_sub &lt;- ts_th %&gt;%
   labs(y = expression(pCO[2] ~ (µatm)), x = &quot;&quot;) +
   facet_wrap(~ deployment, scales = &quot;free_x&quot;, ncol = 1)</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/merging_interpolation.Rmd/pCO2_time_series-1.png" alt="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µatm. Zeroing periods are included." width="672" />
+<img src="figure/merging_interpolation.Rmd/pCO2_time_series-1.png" alt="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC recorded with CTD and drift corrected HydroC data V1 provided by Contos). ID refers to the starting date of each cruise. Please note that measurement range of the analog signal is technically restricted to 100-500  µatm. Zeroing periods are included." width="672" />
 <p class="caption">
-pCO<sub>2</sub> record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500 µatm. Zeroing periods are included.
+pCO<sub>2</sub> record after interpolation to HydroC timestamp (analog output from HydroC recorded with CTD and drift corrected HydroC data V1 provided by Contos). ID refers to the starting date of each cruise. Please note that measurement range of the analog signal is technically restricted to 100-500 µatm. Zeroing periods are included.
 </p>
 </div>
 </div>
 <div id="internal-v1-vs.-v2" class="section level4" number="1.3.1.2">
 <h4 number="1.3.1.2"><span class="header-section-number">1.3.1.2</span> Internal V1 vs. V2</h4>
+<p>Below, pCO<sub>2</sub> time series for the post-processed (ie drift corrected) data V1 and V2 are shown.</p>
 <pre class="r"><code>th_comparison &lt;- full_join(
   ts_th_sub %&gt;% select(date_time, deployment, pCO2_corr),
   th_new_withAW %&gt;% select(date_time, pCO2_corr) %&gt;% rename(pCO2_withAW = pCO2_corr)
@@ -2607,9 +2643,7 @@ th_comparison &lt;- full_join(
 
 th_comparison %&gt;%
   ggplot() +
-  #geom_path(data = th_pre_cleaning, aes(date_time, pCO2_corr, col = &quot;pre cleaning&quot;)) +
   geom_path(aes(date_time, pCO2_corr, col = &quot;V1&quot;)) +
-  #geom_path(aes(date_time, pCO2_withAW, col = &quot;withAW&quot;)) +
   geom_path(aes(date_time, pCO2_withoutAW, col = &quot;V2&quot;)) +
   scale_color_brewer(palette = &quot;Set1&quot;, name = &quot;HydroC pCO2 (th)&quot;) +
   coord_cartesian(ylim = c(0, 600)) +
@@ -2620,6 +2654,7 @@ th_comparison %&gt;%
 </div>
 <div id="replace-pco2-data" class="section level3" number="1.3.2">
 <h3 number="1.3.2"><span class="header-section-number">1.3.2</span> Replace pCO<sub>2</sub> data</h3>
+<p>The pCO<sub>2</sub> data V1 are replaced with V2, in the data set that will be used for further analysis.</p>
 <pre class="r"><code>th_new_withoutAW_all &lt;- th_new_withoutAW_all %&gt;% 
   select(date_time, pCO2_corr)
 
@@ -2632,23 +2667,24 @@ rm(th_new_withoutAW_all)</code></pre>
 </div>
 <div id="offset-analog-vs-post-processed-pco2-v2" class="section level3" number="1.3.3">
 <h3 number="1.3.3"><span class="header-section-number">1.3.3</span> Offset analog vs post-processed pCO<sub>2</sub> (V2)</h3>
+<p>Below, the offset pCO<sub>2</sub> time series between the analog output and the post-processed (ie drift corrected) data V2 are shown, which allows to judge the magnitude of the drift correction applied to V2.</p>
 <pre class="r"><code>ts_th %&gt;%
   ggplot() +
   geom_path(aes(date_time, pCO2_corr - pCO2_analog)) +
   ylim(-30, 0) +
   labs(y = expression(pCO[2] ~ (µats_th)), x = &quot;&quot;) +
-  facet_wrap( ~ ID, scales = &quot;free_x&quot;, ncol = 1)</code></pre>
+  facet_wrap( ~ deployment, scales = &quot;free_x&quot;, ncol = 1)</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/merging_interpolation.Rmd/pCO2_diff_time_series-1.png" alt="pCO~2~ difference betweeb HydroC and drift corrected data provided by Contos. Please note that pCO2 range is restricted to +/- 50  µatm." width="672" />
+<img src="figure/merging_interpolation.Rmd/pCO2_diff_time_series-1.png" alt="pCO~2~ difference between analog and drift corrected data provided by Contos. Please note that pCO2 range is restricted to 0 - 30 µatm." width="672" />
 <p class="caption">
-pCO<sub>2</sub> difference betweeb HydroC and drift corrected data provided by Contos. Please note that pCO2 range is restricted to +/- 50 µatm.
+pCO<sub>2</sub> difference between analog and drift corrected data provided by Contos. Please note that pCO2 range is restricted to 0 - 30 µatm.
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="merges-sensor-ts_th-track-tt-data" class="section level1" number="2">
-<h1 number="2"><span class="header-section-number">2</span> Merges sensor (ts_th) + track (tt) data</h1>
+<div id="merge-sensor-ts_th-track-tt-data" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Merge sensor (ts_th) + track (tt) data</h1>
 <pre class="r"><code>tt &lt;- read_csv(here::here(&quot;data/intermediate/_summarized_data_files&quot;,
                           &quot;tt.csv&quot;))
 
