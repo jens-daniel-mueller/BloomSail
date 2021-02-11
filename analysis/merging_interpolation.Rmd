@@ -39,6 +39,7 @@ theme_set(theme_bw())
 
 ## Merging summarized data sets
 
+Before merging the ts and th data set, the time stamp of ts is adjusted to match exactly that of th, based on zeroing pCO~2~ values recorded in the analog output (ts) and the internal memory (th).
 
 ```{r load_summarized_data_synchronize_time_stamp}
 
@@ -70,13 +71,16 @@ ts_th <- full_join(ts, th) %>%
 rm(th, ts)
 ```
 
+A pdf with plots of the zeroing signals to check the time stamp syncronicity, can be found here:
+
+[Link to zeroing plots](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/merging_interpolation/Zero_time_synchronization.pdf){target="_blank"}
+
 
 ## Interpolation to common time stamp
 
-CTD and auxillary recordings (15 sec measurment interval) are interpolated to HydroC time stamps (first 10 sec, than 1 sec measurement interval) when gaps between observations are not larger than 20. Thereafter, HydroC readings not falling in regular transects/profilings are removed, by removing rows with NA depth values. Furthermore, CTD readings without corresponding HydroC reading are removed, except during periods when HydroC was not operating.
+CTD (ts) and auxillary recordings (15 sec measurment interval) are interpolated to the HydroC (th) time stamps (first 10 sec, than 1 sec measurement interval). Interpolation of ts data is not done when gaps between observations are larger than 20, indicating that th was running without ts, eg during data download from th. Thereafter, th readings not falling in regular transects/profilings are removed, by removing rows with NA depth values. Furthermore, ts readings without corresponding th readings are removed, except during periods when th was not operating.
 
 ```{r interpolation_to_common_timestamp}
-
 
 # Interpolate Sensor data to HydroC time stamp
 
@@ -88,14 +92,17 @@ ts_th <- ts_th %>%
     tem = approxfun(date_time, tem)(date_time),
     pCO2_analog = approxfun(date_time, pCO2_analog)(date_time)
   ) %>%
-  filter(!is.na(dep_maxgap)) %>% #remove HC readings not falling in regular transects/profiling
+  #remove HC readings not falling in regular transects/profiling
+  filter(!is.na(dep_maxgap)) %>% 
   select(-dep_maxgap) %>%
   fill(ID, type, station) %>%
-  filter(!is.na(deployment),!is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading
+  # removes CTD readings without corresponding HydroC reading
+  filter(!is.na(deployment),!is.na(pCO2_analog))
 
-# filter(!is.na(deployment) | is.na(pCO2_analog)) # removes CTD readings without corresponding HydroC reading, except during periods when HydroC was not operating
 
+```
 
+```{r time_stamp_synchronicity_check, eval=FALSE}
 # Time stamp synchronicity
 
 ts_th_Zero <- ts_th %>%
@@ -145,51 +152,16 @@ rm(ts_th_Zero,
 
 ```
 
-
 ## Time series pCO~2~
 
 ### Read cleaned processed data
 
-HydroC pCO~2~ data  were provided by KM Contros after applying a drift correction to the raw data, which was based on pre- and post-deployment calibration results. 
+A second post-processed HydroC pCO~2~ data set was provided by KM Contros after applying a drift correction to the cleaned raw data, i.e. those without data recorded during configuration and testing of the sensor. The post-processing was still based on pre- and post-deployment calibration results. 
 
-```{r read_th_post_processed_by_manufacturer}
+```{r read_th_post_processed_by_manufacturer_without_AW}
 
-
-# Read Contros corrected data file, based on cleaned recordings
-
-th_new_withAW <-
-  read_csv2(
-    here::here(
-      "data/input/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
-      "parameter&pCO2s(method 43)_new_withAW.txt"
-    ),
-    col_names = c(
-      "date_time",
-      "Zero",
-      "Flush",
-      "p_NDIR",
-      "p_in",
-      "T_control",
-      "T_gas",
-      "%rH_gas",
-      "Signal_raw",
-      "Signal_ref",
-      "T_sensor",
-      "pCO2_corr",
-      "Runtime",
-      "nr.ave"
-    )
-  ) %>%
-  mutate(
-    date_time = dmy_hms(date_time),
-    Flush = as.factor(as.character(Flush)),
-    Zero = as.factor(as.character(Zero))
-  )
-
-th_new_withAW <- th_new_withAW %>%
-  slice(seq(1, n(), 10))
-
-# Read Contros corrected data file, based on cleaned recordings without water vapor correction
+# Read Contros corrected data file, based on cleaned recordings and
+# without water vapor correction
 
 th_new_withoutAW_all <-
   read_csv2(
@@ -237,14 +209,53 @@ ts_th_sub <- ts_th %>%
 
 ```
 
-### Comparison of preliminary pCO2 data
+```{r read_th_post_processed_by_manufacturer_with_AW, eval=FALSE, include=FALSE}
+
+# Read Contros corrected data file, based on cleaned recordings and 
+# with water vapor correction
+
+th_new_withAW <-
+  read_csv2(
+    here::here(
+      "data/input/TinaV/Sensor/HydroC-pCO2/corrected_Contros",
+      "parameter&pCO2s(method 43)_new_withAW.txt"
+    ),
+    col_names = c(
+      "date_time",
+      "Zero",
+      "Flush",
+      "p_NDIR",
+      "p_in",
+      "T_control",
+      "T_gas",
+      "%rH_gas",
+      "Signal_raw",
+      "Signal_ref",
+      "T_sensor",
+      "pCO2_corr",
+      "Runtime",
+      "nr.ave"
+    )
+  ) %>%
+  mutate(
+    date_time = dmy_hms(date_time),
+    Flush = as.factor(as.character(Flush)),
+    Zero = as.factor(as.character(Zero))
+  )
+
+th_new_withAW <- th_new_withAW %>%
+  slice(seq(1, n(), 10))
+
+```
+
+
+### Comparison of pCO~2~ records
 
 #### Analog vs internal
 
 ```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µatm. Zeroing periods are included.", fig.asp = 2}
 
 ggplot() +
-  #geom_path(data = th_pre_cleaning, aes(date_time, pCO2_corr, col = "pre cleaning")) +
   geom_path(data = ts_th_sub, aes(date_time, pCO2_corr, col = "HydroC, drift corrected")) +
   geom_path(data = ts_th_sub, aes(date_time, pCO2_analog, col = "analog CTD")) +
   scale_color_brewer(palette = "Set1", name = "pCO2 record") +
@@ -254,9 +265,8 @@ ggplot() +
 
 ```
 
-#### Raw vs clean
 
-```{r compare_processed_hc_files, fig.asp=5, eval=FALSE}
+```{r compare_processed_hc_files, fig.asp=5, eval=FALSE, include=FALSE}
 
 th_comparison <- full_join(
   ts_th_sub %>% select(date_time, deployment, pCO2_corr),
@@ -282,10 +292,7 @@ th_comparison %>%
 
 ```
 
-#### Water vapor correction
-
-
-```{r water_vapor_correction, fig.asp=5, eval=FALSE}
+```{r water_vapor_correction, fig.asp=5, eval=FALSE, include=FALSE}
 
 th_comparison %>%
   ggplot() +
@@ -298,9 +305,7 @@ th_comparison %>%
 
 ```
 
-
-
-```{r water_vapor_correction_offset, fig.asp=5, eval=FALSE}
+```{r water_vapor_correction_offset, fig.asp=5, eval=FALSE, include=FALSE}
 
 th_comparison %>%
   ggplot() +
@@ -319,7 +324,7 @@ rm(ts_th_sub,
 ```
 
 
-### replace pCO2 data
+### Replace pCO2 data
 
 ```{r replace_with_clean_pCO2_record}
 

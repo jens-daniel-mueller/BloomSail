@@ -311,7 +311,7 @@ ts[ID == "180616"]$pCO2_analog <- NA
 ts[Chl > 100]$Chl <- NA
 
 
-#### Surface transect data
+# Surface transect data
 
 # ts %>%
 #   filter(type == "T") %>%
@@ -681,7 +681,7 @@ rm(sub, start_date, i)
 
 ```
 
-A pdf with pCO~2~ timeseries plots of all deployments can be found here:
+A pdf with pCO~2~ timeseries plots of all individual deployments can be found here:
 
 [Link to pCO~2~ timeseries plots](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/read_in/th_deployments.pdf){target="_blank"}
 
@@ -703,8 +703,15 @@ Summarized clean pCO~2~ data were written to file.
 
 ```{r write_th_summary_file}
 
-th %>% 
-  select(date_time, Zero, Flush, pCO2_corr, deployment, Zero_counter, duration, mixing) %>% 
+th %>%
+  select(date_time,
+         Zero,
+         Flush,
+         pCO2_corr,
+         deployment,
+         Zero_counter,
+         duration,
+         mixing) %>%
   write_csv(here::here("data/intermediate/_summarized_data_files",
                        "th.csv"))
 
@@ -721,17 +728,25 @@ Discrete samples were collected with a Niskin bottle and analyzed for CT and AT 
 ```{r read_tb_CO2_data}
 
 # Read CO2 system bottle data
-tb <- read_csv(here::here("data/input/TinaV/Bottle/Tracegases", "BloomSail_bottle_CO2_all.csv"),
-                   col_types = list("c","c","n","n","n","n","n"))
+tb <-
+  read_csv(
+    here::here(
+      "data/input/TinaV/Bottle/Tracegases",
+      "BloomSail_bottle_CO2_all.csv"
+    ),
+    col_types = list("c", "c", "n", "n", "n", "n", "n")
+  )
 
 # select and rename relevant columns
-tb <- tb %>% 
-  select(ID = transect.ID,
-         station = label,
-         dep = Dep,
-         sal = Sal,
-         CT,
-         AT)
+tb <- tb %>%
+  select(
+    ID = transect.ID,
+    station = label,
+    dep = Dep,
+    sal = Sal,
+    CT,
+    AT
+  )
 
 
 ```
@@ -754,37 +769,64 @@ Discrete samples were collected with a Niskin bottle and analysed for phytoplank
 
 ```{r read_tp_phytoplankton_data}
 
-
-tp <- read_csv(here::here("data/input/TinaV/Bottle/Phytoplankton",
-                          "181205_BloomSail_Plankton_counts.csv"))
-
-#### delete colomns that contain counts, not calculated biomass
-tp <- tp[,-seq(4, 21,1)]
-
-#### assign new column names
-#### for species: nr = size class, HV = Heterocyst per Volume, Hl = Heterocyst per length, t = total
-
-names(tp) <-
-  c("date", "station", "dep",
-    "Aphanizomenon.1",	"Aphanizomenon.2", "Aphanizomenon.3",
-    "Aphanizomenon.t",	"Aphanizomenon.HV",	"Aphanizomenon.Hl",
-    "Dolichospermum.1", "Dolichospermum.2", "Dolichospermum.3", "Dolichospermum.4",
-    "Dolichospermum.t", "Dolichospermum.HV", "Dolichospermum.Hl",
-    "Nodularia.1", "Nodularia.2", "Nodularia.3",
-    "Nodularia.t", "Nodularia.HV", "Nodularia.Hl",
-    "Nodulariadead.1", "Nodulariadead.2", "Nodulariadead.3",
-    "Nodulariadead.t", 
-    "total.t"
+tp <- read_csv(
+  here::here(
+    "data/input/TinaV/Bottle/Phytoplankton",
+    "181205_BloomSail_Plankton_counts.csv"
+  )
 )
 
+# delete colomns that contain counts, not calculated biomass
+tp <- tp[, -seq(4, 21, 1)]
 
-#### change format of data table and seperate into 2 columns for species and class
+# assign new column names
+# for species: 
+# nr = size class, 
+# HV = Heterocyst per Volume, 
+# Hl = Heterocyst per length, 
+# t = total
 
-tp <- gather(tp, para, value, Aphanizomenon.1:total.t, factor_key = TRUE)
+names(tp) <-
+  c(
+    "date",
+    "station",
+    "dep",
+    "Aphanizomenon.1",
+    "Aphanizomenon.2",
+    "Aphanizomenon.3",
+    "Aphanizomenon.t",
+    "Aphanizomenon.HV",
+    "Aphanizomenon.Hl",
+    "Dolichospermum.1",
+    "Dolichospermum.2",
+    "Dolichospermum.3",
+    "Dolichospermum.4",
+    "Dolichospermum.t",
+    "Dolichospermum.HV",
+    "Dolichospermum.Hl",
+    "Nodularia.1",
+    "Nodularia.2",
+    "Nodularia.3",
+    "Nodularia.t",
+    "Nodularia.HV",
+    "Nodularia.Hl",
+    "Nodulariadead.1",
+    "Nodulariadead.2",
+    "Nodulariadead.3",
+    "Nodulariadead.t",
+    "total.t"
+  )
+
+
+# change format of data table and separate into 2 columns for species and class
+
+tp <-
+  gather(tp, para, value, Aphanizomenon.1:total.t, factor_key = TRUE)
+
 tp <- separate(tp, col = para, into = c("Species", "class"))
 
-#### change class of columns
-tp <- tp %>% 
+# change class of columns
+tp <- tp %>%
   mutate(ID = date,
          date = ymd(date))
 
@@ -807,7 +849,6 @@ GPS track data were recorded with a Samsung Galaxy tablet.
 ## Read data
 
 ```{r read_tt_data}
-
 
 files <-
   list.files(path = "data/input/TinaV/Track/GPS_Logger_Track/", pattern = "[.]txt$")
@@ -891,7 +932,7 @@ og <- og %>%
 
 # conversion from GMT+1 to UTC
 og <- og %>%
-  mutate(date_time = date_time - 60^2)
+  mutate(date_time = date_time - 60 ^ 2)
 
 og <- og %>%
   select(date_time, pCO2_atm = "CO2 12m [ppm]", wind = "WS 12m [m/s]")
