@@ -331,7 +331,7 @@ rm(ts_th_sub,
 ```
 
 
-### Replace pCO2 data
+### Replace pCO~2~ data
 
 ```{r replace_with_clean_pCO2_record}
 
@@ -344,15 +344,6 @@ ts_th <- ts_th %>%
 ts_th <- full_join(ts_th, th_new_withoutAW_all) 
 
 rm(th_new_withoutAW_all)
-```
-
-## Write merged file
-
-```{r safe_merged_data_file}
-
-ts_th %>% 
-  write_csv(here::here("data/intermediate/_merged_data_files/merging_interpolation", "ts_th.csv"))
-
 ```
 
 
@@ -369,17 +360,6 @@ ts_th %>%
 
 ```
 
-```{r measurement_frequency, eval=FALSE, include=FALSE}
-
-ts_th <- ts_th %>% 
-  mutate(dt = c(0,diff(date_time)))
-
-ts_th %>% 
-  filter(dt < 30) %>% 
-  ggplot(aes(date_time, dt))+
-  geom_point()
-
-```
 
 # Merges sensor (ts_th) + track (tt) data
 
@@ -398,9 +378,19 @@ tm <- tm %>%
          lon = approxfun(date_time, lon)(date_time)) %>% 
   filter(!is.na(dep))
 
+
+```
+
+
+# Write merged file
+
+```{r write_merged_data_file}
+
+
 tm %>% write_csv(here::here("data/intermediate/_merged_data_files/merging_interpolation",
                             "tm.csv"))
 
 rm(tm, ts_th, tt)
+
 ```
 
