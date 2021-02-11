@@ -419,7 +419,7 @@ fixed_values <-
 
 ## Read netcdf file
 
-```{r read_gt_3d_sal_tem_age, eval=FALSE}
+```{r read_gt_3d_sal_tem_age}
 
 nc <- nc_open(here::here("data/input/GETM", "Finnmaid.E.3d.2018.nc"))
 
