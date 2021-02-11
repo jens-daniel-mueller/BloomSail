@@ -428,7 +428,7 @@ ts %>%
 
 ## Read data
 
-Originally, HydroC pCO~2~ data were provided by KM Contros after applying a drift correction to the raw data, which was based on pre- and post-deployment calibration results. Those preliminary data are read-in here. However, some data recorded during testing and configuration of the sensor were later on removed, and the post-processing was repeated based on a cleaned data set. This revised post-processed file is use in the merging script.
+Originally, HydroC pCO~2~ data were provided by KM Contros after applying a drift correction to the raw data, which was based on pre- and post-deployment calibration results. Those preliminary data are read-in here and is referred to as V1. However, some data recorded during testing and configuration of the sensor were later on removed, and the post-processing was repeated based on a cleaned data set. This revised post-processed file is referred to as V2 and used in the merging script.
 
 ```{r read_th_post_processed_by_manufacturer}
 
