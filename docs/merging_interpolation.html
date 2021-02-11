@@ -565,16 +565,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree775bef9087d39752f040fbc1b57180ab84889ddatargetblank775bef9a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/775bef9087d39752f040fbc1b57180ab84889dda" target="_blank">775bef9</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreefbe6ede26948bb2d2d9f0bf1d3a118a400b6087atargetblankfbe6edea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/fbe6ede26948bb2d2d9f0bf1d3a118a400b6087a" target="_blank">fbe6ede</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree775bef9087d39752f040fbc1b57180ab84889ddatargetblank775bef9a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreefbe6ede26948bb2d2d9f0bf1d3a118a400b6087atargetblankfbe6edea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/775bef9087d39752f040fbc1b57180ab84889dda" target="_blank">775bef9</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/fbe6ede26948bb2d2d9f0bf1d3a118a400b6087a" target="_blank">fbe6ede</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -623,6 +623,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/fbe6ede26948bb2d2d9f0bf1d3a118a400b6087a/analysis/merging_interpolation.Rmd" target="_blank">fbe6ede</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-11
+</td>
+<td>
+cleaning
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/9544a3e3970dd4f007091b05137f8f4357dcdf86/docs/merging_interpolation.html" target="_blank">9544a3e</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2552,7 +2586,7 @@ th_comparison %&gt;%
 </div>
 </div>
 <div id="replace-pco2-data" class="section level3" number="1.3.3">
-<h3 number="1.3.3"><span class="header-section-number">1.3.3</span> Replace pCO2 data</h3>
+<h3 number="1.3.3"><span class="header-section-number">1.3.3</span> Replace pCO<sub>2</sub> data</h3>
 <pre class="r"><code>th_new_withoutAW_all &lt;- th_new_withoutAW_all %&gt;% 
   select(date_time, pCO2_corr)
 
@@ -2563,13 +2597,8 @@ ts_th &lt;- full_join(ts_th, th_new_withoutAW_all)
 
 rm(th_new_withoutAW_all)</code></pre>
 </div>
-</div>
-<div id="write-merged-file" class="section level2" number="1.4">
-<h2 number="1.4"><span class="header-section-number">1.4</span> Write merged file</h2>
-<pre class="r"><code>ts_th %&gt;% 
-  write_csv(here::here(&quot;data/intermediate/_merged_data_files/merging_interpolation&quot;, &quot;ts_th.csv&quot;))</code></pre>
-<div id="offset-analog-vs-post-processed-pco2" class="section level3" number="1.4.1">
-<h3 number="1.4.1"><span class="header-section-number">1.4.1</span> Offset analog vs post-processed pCO<sub>2</sub></h3>
+<div id="offset-analog-vs-post-processed-pco2" class="section level3" number="1.3.4">
+<h3 number="1.3.4"><span class="header-section-number">1.3.4</span> Offset analog vs post-processed pCO<sub>2</sub></h3>
 <pre class="r"><code>ts_th %&gt;%
   ggplot() +
   geom_path(aes(date_time, pCO2_corr - pCO2_analog)) +
@@ -2598,9 +2627,11 @@ tm &lt;- full_join(ts_th, tt) %&gt;%
 tm &lt;- tm %&gt;%
   mutate(lat = approxfun(date_time, lat)(date_time),
          lon = approxfun(date_time, lon)(date_time)) %&gt;% 
-  filter(!is.na(dep))
-
-tm %&gt;% write_csv(here::here(&quot;data/intermediate/_merged_data_files/merging_interpolation&quot;,
+  filter(!is.na(dep))</code></pre>
+</div>
+<div id="write-merged-file" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Write merged file</h1>
+<pre class="r"><code>tm %&gt;% write_csv(here::here(&quot;data/intermediate/_merged_data_files/merging_interpolation&quot;,
                             &quot;tm.csv&quot;))
 
 rm(tm, ts_th, tt)</code></pre>
