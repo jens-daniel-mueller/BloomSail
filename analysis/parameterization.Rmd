@@ -70,13 +70,13 @@ parameters <-
     # max number of accepted data gaps
     max_gap = 3,
     
-    # max depth for RT quality assessment
+    # max depth threshold for entire profile to be included in RT quality assessment
     RT_stats_dep_max = 30,
     
     # max pCO2 for RT quality assessment
     RT_stats_pCO2_max = 300,
     
-    # max depth for RT quality assessment
+    # max sampling depth included for RT quality assessment
     RT_stats_dep = 20,
     
     # max depth considered for surface data
