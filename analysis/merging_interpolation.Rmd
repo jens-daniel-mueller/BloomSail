@@ -35,6 +35,13 @@ parameters <-
 theme_set(theme_bw())
 ```
 
+# Scope of this script
+
+- merge CTD, pCO~2~ and track data
+- interpolate to common time stamp
+- compare pCO~2~ from different source files
+
+
 # CTD (ts) + HydroC CO~2~ data (th, V1)
 
 ## Merging summarized data sets
