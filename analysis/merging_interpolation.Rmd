@@ -35,7 +35,7 @@ parameters <-
 theme_set(theme_bw())
 ```
 
-# CTD (ts) + HydroC CO~2~ data (th)
+# CTD (ts) + HydroC CO~2~ data (th, V1)
 
 ## Merging summarized data sets
 
@@ -154,7 +154,7 @@ rm(ts_th_Zero,
 
 ```
 
-## Read cleaned, processed pCO~2~ data
+## Read cleaned, processed pCO~2~ data (V2)
 
 A revised post-processed HydroC pCO~2~ data set was provided by KM Contros after applying a drift correction to the cleaned raw data, i.e. those without data recorded during configuration and testing of the sensor. This data set is referred to as V2. The post-processing was still based on pre- and post-deployment calibration results. 
 
@@ -258,7 +258,9 @@ th_new_withAW <- th_new_withAW %>%
 
 #### Analog vs internal
 
-```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC and drift corrected data provided by Contos). ID refers to the starting date of each cruise. Please note that pCO2_analog measurement range is technically restricted to 100-500  µatm. Zeroing periods are included.", fig.asp = 3}
+Below, pCO~2~ time series for the analog output and the post-processed (ie drift corrected) data V1 are shown.
+
+```{r pCO2_time_series, fig.cap="pCO~2~ record after interpolation to HydroC timestamp (analog output from HydroC recorded with CTD and drift corrected HydroC data V1 provided by Contos). ID refers to the starting date of each cruise. Please note that measurement range of the analog signal is technically restricted to 100-500  µatm. Zeroing periods are included.", fig.asp = 3}
 
 ggplot() +
   geom_path(data = ts_th_sub,
@@ -274,6 +276,8 @@ ggplot() +
 
 #### Internal V1 vs. V2
 
+Below, pCO~2~ time series for the post-processed (ie drift corrected) data V1 and V2 are shown.
+
 ```{r compare_processed_hc_files, fig.asp=3}
 
 th_comparison <- full_join(
@@ -288,9 +292,7 @@ th_comparison <- full_join(
 
 th_comparison %>%
   ggplot() +
-  #geom_path(data = th_pre_cleaning, aes(date_time, pCO2_corr, col = "pre cleaning")) +
   geom_path(aes(date_time, pCO2_corr, col = "V1")) +
-  #geom_path(aes(date_time, pCO2_withAW, col = "withAW")) +
   geom_path(aes(date_time, pCO2_withoutAW, col = "V2")) +
   scale_color_brewer(palette = "Set1", name = "HydroC pCO2 (th)") +
   coord_cartesian(ylim = c(0, 600)) +
@@ -333,6 +335,8 @@ rm(ts_th_sub,
 
 ### Replace pCO~2~ data
 
+The pCO~2~ data V1 are replaced with V2, in the data set that will be used for further analysis.
+
 ```{r replace_with_clean_pCO2_record}
 
 th_new_withoutAW_all <- th_new_withoutAW_all %>% 
@@ -349,19 +353,21 @@ rm(th_new_withoutAW_all)
 
 ### Offset analog vs post-processed pCO~2~ (V2)
 
-```{r pCO2_diff_time_series, fig.cap="pCO~2~ difference betweeb HydroC and drift corrected data provided by Contos. Please note that pCO2 range is restricted to +/- 50  µatm.", fig.asp = 3}
+Below, the offset pCO~2~ time series between the analog output and the post-processed (ie drift corrected) data V2 are shown, which allows to judge the magnitude of the drift correction applied to V2.
+
+```{r pCO2_diff_time_series, fig.cap="pCO~2~ difference between analog and drift corrected data provided by Contos. Please note that pCO2 range is restricted to 0 - 30 µatm.", fig.asp = 3}
 
 ts_th %>%
   ggplot() +
   geom_path(aes(date_time, pCO2_corr - pCO2_analog)) +
   ylim(-30, 0) +
   labs(y = expression(pCO[2] ~ (µats_th)), x = "") +
-  facet_wrap( ~ ID, scales = "free_x", ncol = 1)
+  facet_wrap( ~ deployment, scales = "free_x", ncol = 1)
 
 ```
 
 
-# Merges sensor (ts_th) + track (tt) data
+# Merge sensor (ts_th) + track (tt) data
 
 ```{r merge_sensor_track}
 
