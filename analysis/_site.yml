@@ -15,8 +15,8 @@ navbar:
       href: merging_interpolation.html
   - text: Response time
     href: response_time.html
-  - text: CT dynamics
-    href: CT_dynamics.html
+  - text: NCP best guess
+    href: NCP_best_guess.html
   - text: Phytoplankton
     href: Phytoplankton.html
   - text: NCP reconstruction

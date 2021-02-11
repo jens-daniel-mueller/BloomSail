@@ -117,12 +117,12 @@ wflow_publish(c(
   "analysis/read-in.Rmd",
   "analysis/merging_interpolation.Rmd",
   "analysis/response_time.Rmd",
-  "analysis/CT_dynamics.Rmd",
+  "analysis/NCP_best_guess.Rmd",
   "analysis/Phytoplankton.Rmd",
   "analysis/NCP_reconstruction.Rmd"
 ), message = "rerun all with empty folders", republish = TRUE)
 
 
-# Push latest version to GitHub
+ # Push latest version to GitHub
 wflow_git_push()
 jens-daniel-mueller
