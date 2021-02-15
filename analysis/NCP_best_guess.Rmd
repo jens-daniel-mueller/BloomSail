@@ -448,7 +448,7 @@ p_map <-
     nudge_y = 0.03,
     size = geom_text_size
   ) +
-  geom_text(aes(19.26, 57.57, label = "VOS Finnmaid"),
+  geom_text(aes(19.26, 57.57, label = "SOOP Finnmaid"),
             col = "white",
             size = geom_text_size) +
   geom_text(aes(19.54, 57.29, label = "SV Tina V"),

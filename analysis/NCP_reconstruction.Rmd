@@ -1365,7 +1365,7 @@ CPD <- CPD %>%
   mutate(source = factor(source, c("tm", "fm"))) %>%
   mutate(source = fct_recode(
     source,
-    `VOS Finnmaid + GETM model` = "fm",
+    `SOOP Finnmaid + GETM model` = "fm",
     `SV Tina V (surface only)` = "tm"
   ))
 
@@ -1373,7 +1373,7 @@ i_dep <- i_dep %>%
   mutate(source = factor(source, c("tm", "fm"))) %>%
   mutate(source = fct_recode(
     source,
-    `VOS Finnmaid + GETM model` = "fm",
+    `SOOP Finnmaid + GETM model` = "fm",
     `SV Tina V (surface only)` = "tm"
   ))
 
@@ -1381,7 +1381,7 @@ tm_fm_gt <- tm_fm_gt %>%
   mutate(source = factor(source, c("tm", "fm"))) %>%
   mutate(source = fct_recode(
     source,
-    `VOS Finnmaid + GETM model` = "fm",
+    `SOOP Finnmaid + GETM model` = "fm",
     `SV Tina V (surface only)` = "tm"
   ))
 
