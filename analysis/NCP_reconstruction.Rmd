@@ -79,7 +79,7 @@ tm_profiles_ID <- tm_profiles_ID %>%
 
 tm_profiles_ID_long <- tm_profiles_ID %>%
   select(-c(pCO2, sal)) %>% 
-  pivot_longer(c("tem", "nCT"), values_to = "value", names_to = "var") %>% 
+  pivot_longer(c("tem", "CT_star"), values_to = "value", names_to = "var") %>% 
   group_by(var, dep) %>%
   arrange(date_time_ID) %>%
   mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
@@ -104,7 +104,7 @@ tm_profiles_ID_long_180723 <- tm_profiles_ID_long %>%
 tm_profiles_ID_long_180723_dep <- tm_profiles_ID_long_180723 %>%
   select(var, dep, value_cum) %>%
   mutate(
-    value_cum = if_else(value_cum > 0 & var == "nCT",
+    value_cum = if_else(value_cum > 0 & var == "CT_star",
                         NaN, value_cum),
     value_cum = if_else(value_cum < 0 & var == "tem",
                         NaN, value_cum)
@@ -187,14 +187,14 @@ rm(tm_profiles_ID_long_180723_dep,
 
 col_value <- "red"
 
-p_nCT <-
+p_CT_star <-
   tm_profiles_ID_long_180723 %>%
-  filter(var == "nCT") %>%
+  filter(var == "CT_star") %>%
   arrange(dep) %>%
   ggplot() +
   geom_col(
     data = tm_profiles_ID_long_180723 %>%
-      filter(var == "nCT", value_diff_daily < 0),
+      filter(var == "CT_star", value_diff_daily < 0),
     aes(x = value_diff_daily, y = dep),
     width = 1,
     alpha = 0.2,
@@ -219,7 +219,7 @@ p_nCT <-
   ) +
   geom_point(aes(value_diff_daily, dep)) +
   geom_path(aes(value_diff_daily, dep)) +
-  geom_hline(data = TPD %>% filter(var == "nCT"),
+  geom_hline(data = TPD %>% filter(var == "CT_star"),
              aes(yintercept = TPD),
              col = col_value) +
   labs(y = "Depth (m)", x = expression(paste(Delta ~ C[T], "*") ~ (µmol ~ kg ^ {
@@ -270,7 +270,7 @@ p_tem <-
   labs(y = "Depth (m)", x = expression(Delta ~ Temperature ~ (degree * C))) +
   theme(legend.title = element_blank())
 
-p_tem + p_nCT +
+p_tem + p_CT_star +
   plot_layout(guides = 'collect') +
   plot_annotation(tag_levels = 'a')
 
@@ -292,7 +292,7 @@ ggsave(
   units = "mm"
 )
 
-rm(TPD, tm_profiles_ID_long_180723, p_tem, p_nCT)
+rm(TPD, tm_profiles_ID_long_180723, p_tem, p_CT_star)
 
 ```
 
@@ -309,7 +309,7 @@ diff_surface <- tm_profiles_ID_long %>%
   summarise(value_diff_surface = mean(value_diff, na.rm = TRUE)) %>%
   ungroup() %>%
   mutate(
-    value_diff_surface = if_else(value_diff_surface > 0 & var == "nCT",
+    value_diff_surface = if_else(value_diff_surface > 0 & var == "CT_star",
                                  NaN, value_diff_surface),
     value_diff_surface = if_else(value_diff_surface < 0 &
                                    var == "tem",
@@ -323,7 +323,7 @@ rm(diff_surface)
 
 TPD <- tm_profiles_ID_long %>%
   mutate(
-    value_diff = if_else(value_diff > 0 & var == "nCT",
+    value_diff = if_else(value_diff > 0 & var == "CT_star",
                          NaN, value_diff),
     value_diff = if_else(value_diff < 0 & var == "tem",
                          NaN, value_diff)
@@ -395,7 +395,7 @@ p_surface + p_integrated + p_pen_dep +
 TPD_mean
 
 CPD <- TPD %>%
-  filter(var == "nCT") %>%
+  filter(var == "CT_star") %>%
   drop_na()
 
 rm(p_surface, p_integrated, p_pen_dep)
@@ -662,7 +662,7 @@ Calculate nC~T~ based on fixed A~T~ and salinity mean values.
 
 fm <- fm %>%
   mutate(
-    nCT = carb(
+    CT_star = carb(
       24,
       var1 = pCO2,
       var2 = fixed_values$AT * 1e-6,
@@ -684,7 +684,7 @@ Calculate regional mean and sd values for each crossing of the area.
 ```{r timeseries_of_regional_averages}
 
 fm_ID <- fm %>%
-  pivot_longer(c(pCO2, sal, tem, nCT),
+  pivot_longer(c(pCO2, sal, tem, CT_star),
                values_to = "value",
                names_to = "var") %>%
   group_by(ID) %>%
@@ -716,7 +716,7 @@ tm_profiles_ID_long_surface <- tm_profiles %>%
   filter(dep < parameters$surface_dep) %>%
   select(-c(dep, date_ID, station, date_time, lat, lon, pCO2_corr)) %>%
   mutate(ID = as.factor(ID)) %>%
-  pivot_longer(sal:nCT, values_to = "value", names_to = "var") %>%
+  pivot_longer(sal:CT_star, values_to = "value", names_to = "var") %>%
   group_by(ID, date_time_ID, var) %>%
   summarise_all(list( ~ mean(.), ~ sd(.)), na.rm = TRUE) %>%
   ungroup()
@@ -784,13 +784,13 @@ The time series was restricted to the period where BloomSail observations are av
 
 tm_start_date <- tm_profiles_ID_long_surface %>% 
   filter(ID %in% c("180705"),
-         var %in% c("tem", "nCT")) %>% 
+         var %in% c("tem", "CT_star")) %>% 
   select(date_time_ID, ID, var) %>% 
   mutate(sensor = "interpolated")
 
 fm_tm_ID <- full_join(fm_ID, tm_start_date) %>% 
   arrange(date_time_ID) %>% 
-  filter(var %in% c("tem", "nCT"))
+  filter(var %in% c("tem", "CT_star"))
 
 fm_tm_ID <- fm_tm_ID %>% 
   group_by(var) %>% 
@@ -806,14 +806,14 @@ rm(tm_start_date)
 
 tm_gap <- tm_profiles_ID_long_surface %>%
   filter(ID %in% c("180718", "180723"),
-         var %in% c("tem", "nCT")) %>%
+         var %in% c("tem", "CT_star")) %>%
   select(date_time_ID, ID, var, value = mean) %>%
   mutate(sensor = "BloomSail")
 
 fm_tm_ID <- full_join(fm_tm_ID, tm_gap) %>%
   arrange(date_time_ID) %>%
   select(-sd) %>%
-  filter(var %in% c("tem", "nCT")) %>%
+  filter(var %in% c("tem", "CT_star")) %>%
   mutate(
     period = "BloomSail",
     period = if_else(date_time_ID < fixed_values$start, "pre-BloomSail", period),
@@ -852,7 +852,7 @@ fm_tm_ID %>%
 ```{r fm_gt_merge}
 
 fm_tm_ID_wide <- fm_tm_ID %>%
-  filter(var %in% c("nCT")) %>%
+  filter(var %in% c("CT_star")) %>%
   select(date_time_ID, var, sensor, value) %>%
   pivot_wider(values_from = value, names_from = var)
 
@@ -880,7 +880,7 @@ fm_gt <- fm_gt %>%
   ) %>%
   ungroup() %>%
   arrange(dep) %>%
-  filter(!is.na(nCT))
+  filter(!is.na(CT_star))
 
 
 ```
@@ -909,7 +909,7 @@ rm(fm_gt, tm_profiles_ID)
 ```{r tm_fm_gt_time_series}
 
 tm_fm_gt_long <- tm_fm_gt %>%
-  pivot_longer(sal:nCT, values_to = "value", names_to = "var")
+  pivot_longer(sal:CT_star, values_to = "value", names_to = "var")
 
 tm_fm_gt_long %>%
   filter(dep == 3.5) %>%
@@ -1095,7 +1095,7 @@ rm(MLD_mean)
 
 tm_fm_gt_long <- tm_fm_gt %>%
   select(-c(sal)) %>%
-  pivot_longer(c("tem", "nCT"), values_to = "value", names_to = "var") %>%
+  pivot_longer(c("tem", "CT_star"), values_to = "value", names_to = "var") %>%
   group_by(source, var, dep) %>%
   arrange(date_time_ID) %>%
   mutate(
@@ -1437,9 +1437,9 @@ rm(bin)
 
 tm_fm_gt_surface <- tm_fm_gt %>%
   filter(dep < parameters$surface_dep) %>%
-  select(source, date_time_ID, sensor, nCT) %>%
+  select(source, date_time_ID, sensor, CT_star) %>%
   group_by(source, date_time_ID, sensor) %>%
-  summarise(nCT = mean(nCT, na.rm = TRUE)) %>%
+  summarise(CT_star = mean(CT_star, na.rm = TRUE)) %>%
   ungroup()
 
 tm_fm_gt_surface <- tm_fm_gt_surface %>%
@@ -1449,8 +1449,8 @@ tm_fm_gt_surface <- tm_fm_gt_surface %>%
     date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
     date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID)) /
       2,
-    nCT_diff = nCT - lag(nCT, default = first(nCT)),
-    nCT_cum = cumsum(nCT_diff)
+    CT_star_diff = CT_star - lag(CT_star, default = first(CT_star)),
+    CT_star_cum = cumsum(CT_star_diff)
   ) %>%
   ungroup()
 
@@ -1470,12 +1470,12 @@ rm(tm_fm_gt_surface)
 ```{r calculate_iCT}
 
 iCT <- iCT %>% 
-  mutate(CT_i_diff = nCT_diff * i_dep)
+  mutate(CT_i_diff = CT_star_diff * i_dep)
 
 iCT <- iCT %>% 
   group_by(source, i_method, i_res) %>%
   arrange(date_time_ID) %>%
-  mutate(nCT_i_cum = cumsum(CT_i_diff/1000)) %>% 
+  mutate(CT_star_i_cum = cumsum(CT_i_diff/1000)) %>% 
   ungroup()
 
 ```
@@ -1509,11 +1509,11 @@ NCP_flux_int <- NCP_flux %>%
   filter(!(i_method == "MLD" & i_res == "cumulative")) %>%
   group_by(source, i_method, i_res) %>%
   mutate(
-    nCT_i_cum = approxfun(date_time, nCT_i_cum)(date_time),
+    CT_star_i_cum = approxfun(date_time, CT_star_i_cum)(date_time),
     flux_cum = approxfun(date_time, flux_cum)(date_time)
   ) %>%
   fill(flux_cum) %>%
-  mutate(nCT_i_flux_cum = nCT_i_cum + flux_cum) %>%
+  mutate(CT_star_i_flux_cum = CT_star_i_cum + flux_cum) %>%
   ungroup()
 
 ```
@@ -1525,10 +1525,10 @@ NCP_flux_int <- NCP_flux %>%
 iCT <- iCT %>% 
   mutate(sensor = if_else(sensor == "BloomSail", sensor, "VOS"))
 
-p_nCT <- iCT %>%
+p_CT_star <- iCT %>%
   ggplot() +
-  geom_path(aes(date_time_ID, nCT)) +
-  geom_point(aes(date_time_ID, nCT, fill = sensor), shape = 21) +
+  geom_path(aes(date_time_ID, CT_star)) +
+  geom_point(aes(date_time_ID, CT_star, fill = sensor), shape = 21) +
   scale_fill_manual(values = c("white", "black"),
                     guide = FALSE) +
   scale_x_datetime(breaks = "week",
@@ -1551,8 +1551,8 @@ p_nCT <- iCT %>%
 p_iCT <- iCT %>%
   ggplot() +
   geom_hline(yintercept = 0) +
-  geom_path(data = tm_NCP_cum, aes(date_time, nCT_i_cum), col = "black") +
-  geom_path(aes(date_time_ID, nCT_i_cum, col = i_method, linetype = i_res)) +
+  geom_path(data = tm_NCP_cum, aes(date_time, CT_star_i_cum), col = "black") +
+  geom_path(aes(date_time_ID, CT_star_i_cum, col = i_method, linetype = i_res)) +
   scale_color_discrete(name = "Reconstruction") +
   scale_x_datetime(
     breaks = "week",
@@ -1573,7 +1573,7 @@ p_iCT <- iCT %>%
     axis.text.x.top = element_blank()
   )
 
-p_nCT / p_hov_dep / p_iCT
+p_CT_star / p_hov_dep / p_iCT
 
 # ggsave(
 #   here::here(
@@ -1610,11 +1610,11 @@ p_NCP <- NCP_flux_int %>%
   ggplot() +
   geom_hline(yintercept = 0) +
   geom_path(data = tm_NCP_cum,
-            aes(date_time, nCT_i_flux_mix_cum, linetype = "best \U2013 guess"),
+            aes(date_time, CT_star_i_flux_mix_cum, linetype = "best \U2013 guess"),
             col = "black") +
   geom_path(aes(
     date_time,
-    nCT_i_flux_cum,
+    CT_star_i_flux_cum,
     col = i_method,
     linetype = "reconstruction"
   )) +
@@ -1640,7 +1640,7 @@ p_NCP <- NCP_flux_int %>%
     plot.margin = margin(0, 0, 0, 0, "cm")
   )
 
-p_nCT / p_hov_dep / p_NCP +
+p_CT_star / p_hov_dep / p_NCP +
   plot_annotation(tag_levels = 'a')
 
 ggsave(

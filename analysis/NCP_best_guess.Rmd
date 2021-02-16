@@ -734,7 +734,7 @@ tb_long %>%
 
 ### Mean
 
-```{r bottle_CO2_profiles_mean, fig.cap="Discrete sample profiles as the mean of individual stations"}
+```{r bottle_CO2_profiles_mean, fig.asp=0.5, fig.cap="Discrete sample profiles as the mean of individual stations"}
 
 # grid data into 5 m intervals
 # because some samples were not taken at exact 5m depth intervals
@@ -931,13 +931,17 @@ tm_profiles <- tm_profiles %>%
 
 ```
 
-## Plot all profiles
+## Profile plots
 
-```{r profiles_all_by_date}
+### All individual profiles
 
+```{r profiles_all_by_date, fig.asp=0.5, fig.cap="Individual vertical profiles per cruise day and station."}
+
+# arrange by date (oldest first)
 tm_profiles <-  tm_profiles %>%
   arrange(date_time_ID)
 
+# create temperature profiles plots
 p_tem <-
   tm_profiles %>%
   ggplot(aes(tem, dep, col = ID, group = interaction(station, ID))) +
@@ -947,6 +951,8 @@ p_tem <-
        y = "Depth (m)") +
   scale_color_viridis_d(guide = FALSE)
 
+
+# create pCO2 profiles plots
 p_pCO2 <-
   tm_profiles %>%
   ggplot(aes(pCO2, dep, col = ID, group = interaction(station, ID))) +
@@ -960,7 +966,7 @@ p_pCO2 <-
     axis.ticks.y = element_blank()
   )
 
-
+# create CT* profiles plots
 p_CT_star <-
   tm_profiles %>%
   ggplot(aes(CT_star, dep, col = ID, group = interaction(station, ID))) +
@@ -975,6 +981,8 @@ p_CT_star <-
     axis.title.y = element_blank()
   )
 
+
+# Combine and safe plots to file
 p_tem + p_pCO2 + p_CT_star +
   plot_annotation(tag_levels = 'a')
 
@@ -1004,21 +1012,11 @@ rm(p_tem, p_pCO2, p_CT_star)
 
 ```
 
-Number of profiles:
-
-```{r total_number_profiles}
-
-tm_profiles %>% 
-  count(date_ID, station) %>% 
-  nrow()
-
-```
-
-## Mean profiles
+### Mean profiles
 
 Mean vertical profiles were calculated for each cruise day (ID).
 
-```{r calculate_profile_mean_sd}
+```{r calculate_profile_mean_and_sd}
 
 tm_profiles_ID_mean <- tm_profiles %>%
   select(-c(station, lat, lon, pCO2_corr, date_time)) %>%
@@ -1075,9 +1073,9 @@ tm_profiles_ID_long %>%
   
 ```
 
-### CT_star sensitivity to AT
+### C~T~* sensitivity to mean A~T~
 
-```{r CT_star_profiles_delta, fig.cap="Mean vertical profiles per cruise day across all stations."}
+```{r CT_star_profiles_delta, fig.cap="Offset between C~T~* calculate from mean A~T~ and  mean A~T~ + 2 SD of A~T~, displayed as mean vertical profiles per cruise day across all stations."}
 
 tm_profiles_ID_mean_test %>%
   ggplot(aes(CT_star_delta - mean(CT_star_delta), dep, col = ID)) +
@@ -1088,7 +1086,9 @@ tm_profiles_ID_mean_test %>%
   
 ```
 
-```{r CT_star_profiles_individual_pub_V1, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
+### All individual profiles per cruise day
+
+```{r CT_star_profiles_individual_pub_V2, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
 
 profiles_min_max <- tm_profiles %>%
   group_by(dep) %>%
@@ -1097,92 +1097,6 @@ profiles_min_max <- tm_profiles %>%
             max_tem = max(tem),
             min_tem = min(tem)) %>%
   ungroup()
-
-
-p_CT <-
-  tm_profiles_ID_long %>%
-  filter(var %in% c("CT_star")) %>%
-  ggplot() +
-  geom_ribbon(data = profiles_min_max,
-              aes(xmin = min_CT,
-                  xmax = max_CT,
-                  y = dep),
-              alpha = 0.2) +
-  geom_ribbon(aes(
-    xmin = value - sd,
-    xmax = value + sd,
-    y = dep,
-    fill = ID
-  ), alpha = 0.5) +
-  geom_path(aes(value, dep, col = ID)) +
-  scale_y_reverse() +
-  scale_color_viridis_d(labels = cruise_dates$date_ID,
-                        name = "Cruise mean \u00B1 SD") +
-  scale_fill_viridis_d(labels = cruise_dates$date_ID,
-                       name = "Cruise mean \u00B1 SD") +
-  facet_grid(ID ~ .) +
-  labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {-1}))),
-  y = "Depth (m)") +
-  theme(strip.background = element_blank(),
-        strip.text = element_blank(),
-        legend.position = "none")
-
-p_tem <-
-  tm_profiles_ID_long %>%
-  filter(var %in% c("tem")) %>%
-  ggplot() +
-  geom_ribbon(data = profiles_min_max,
-              aes(xmin = min_tem,
-                  xmax = max_tem,
-                  y = dep),
-              alpha = 0.2) +
-  geom_ribbon(aes(
-    xmin = value - sd,
-    xmax = value + sd,
-    y = dep,
-    fill = ID
-  ), alpha = 0.5) +
-  geom_path(aes(value, dep, col = ID)) +
-  scale_y_reverse() +
-  scale_color_viridis_d(labels = cruise_dates$date_ID,
-                        name = "Cruise mean \u00B1 SD") +
-  scale_fill_viridis_d(labels = cruise_dates$date_ID,
-                       name = "Cruise mean \u00B1 SD") +
-  facet_grid(ID ~ .) +
-  labs(x = "Temperature (\u00B0C)",
-       y = "Depth (m)") +
-  theme(strip.background = element_blank(),
-        strip.text = element_blank(),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank())
-
-p_CT | p_tem
-
-# ggsave(
-#   here::here(
-#     "output/Plots/Figures_publication/appendix",
-#     "Fig_A5_V1.pdf"
-#   ),
-#   width = 140,
-#   height = 250,
-#   dpi = 300,
-#   units = "mm"
-# )
-# 
-# ggsave(
-#   here::here(
-#     "output/Plots/Figures_publication/appendix",
-#     "Fig_A5_V1.png"
-#   ),
-#   width = 140,
-#   height = 250,
-#   dpi = 300,
-#   units = "mm"
-# )
-
-```
-
-```{r CT_star_profiles_individual_pub_V2, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
 
 p_CT <-
   tm_profiles %>%
@@ -1264,8 +1178,6 @@ rm(p_CT_star, p_tem, cruise_labels, profiles_min_max)
 Important notes:
 
 -   the standard deviation of C~T~ in the upper 10m increases on June 30.
-
-## Individual profiles
 
 C~T~, pCO~2~, S, and T profiles were plotted individually [pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_pCO2_tem_sal_CT.pdf){target="_blank"} and grouped by ID [pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_ID_pCO2_tem_sal_CT.pdf){target="_blank"}. The later gives an idea of the differences between stations at one point in time.
 
@@ -1398,7 +1310,7 @@ rm(i_ID, tm_profiles_long)
 
 ```
 
-## Profiles of incremental changes
+### Incremental changes
 
 Changes of seawater vars at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.
 
@@ -1435,7 +1347,7 @@ tm_profiles_ID_long %>%
   
 ```
 
-## Profiles of cumulative changes
+### Cumulative changes
 
 Cumulative changes of seawater vars were calculated at each depth relative to the first cruise day on July 5.
 

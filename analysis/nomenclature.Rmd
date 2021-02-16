@@ -98,9 +98,10 @@ R environment
 
     -   tem
 
-    -   nCT: CT normalized to AT, or calculated from pCO2, temperature,
-        and fixed AT, S (please note that this variable is referred to
-        as C~T~\* in the accompanying manuscript)
+    -   CT_star: CT normalized to AT, or calculated from pCO2,
+        temperature, and fixed AT, S (please note that this variable is
+        referred to as C~T~\* in some plots and the accompanying
+        manuscript)
 
     -   CT: Measured dissolved inorganic carbon
 
