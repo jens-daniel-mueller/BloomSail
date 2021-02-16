@@ -77,29 +77,45 @@ Please note that:
 ```{r read_prepare_sensor_data}
 
 tm <-
- read_csv(here::here("data/intermediate/_merged_data_files/response_time",
-                      "tm_RT_all.csv"),
-               col_types = cols(ID = col_character(),
-                                pCO2_analog = col_double(),
-                                pCO2_corr = col_double(),
-                                Zero = col_character(),
-                                Flush = col_character(),
-                                mixing = col_character(),
-                                Zero_counter = col_integer(),
-                                deployment = col_integer(),
-                                lon = col_double(),
-                                lat = col_double(),
-                                pCO2 = col_double()))
+  read_csv(
+    here::here(
+      "data/intermediate/_merged_data_files/response_time",
+      "tm_RT_all.csv"
+    ),
+    col_types = cols(
+      ID = col_character(),
+      pCO2_analog = col_double(),
+      pCO2_corr = col_double(),
+      Zero = col_character(),
+      Flush = col_character(),
+      mixing = col_character(),
+      Zero_counter = col_integer(),
+      deployment = col_integer(),
+      lon = col_double(),
+      lat = col_double(),
+      pCO2 = col_double()
+    )
+  )
 
 
 # Filter relevant rows and columns
-tm_profiles <- tm %>% 
+tm_profiles <- tm %>%
   filter(type == "P",
          Flush == "0",
          Zero == "0",
          !ID %in% parameters$dates_out,
-         !(station %in% c("PX1", "PX2"))) %>% 
-  select(date_time, ID, station, lat, lon, dep, sal, tem, pCO2_corr, pCO2, duration)
+         !(station %in% c("PX1", "PX2"))) %>%
+  select(date_time,
+         ID,
+         station,
+         lat,
+         lon,
+         dep,
+         sal,
+         tem,
+         pCO2_corr,
+         pCO2,
+         duration)
 
 #calculate mean location of stations
 stations <- tm_profiles %>% 
@@ -122,9 +138,7 @@ meta <- read_csv(here::here("data/input/TinaV/Sensor",
                  col_types = cols(ID = col_character()))
 
 meta <- meta %>% 
-    filter(!ID %in% parameters$dates_out
-           # !(station %in% parameters$stations_out)
-           )
+    filter(!ID %in% parameters$dates_out)
 
 tm_profiles <- full_join(tm_profiles, meta)
 rm(meta)
@@ -146,7 +160,7 @@ tm_profiles <- tm_profiles %>%
   select(-c(start, down, lift, up, end, comment, p_type, duration))
 
 
-# select downcasts only
+# select downcast profiles only
 tm_profiles <- tm_profiles %>% 
   filter(phase %in% parameters$phases_in)
 
@@ -164,7 +178,8 @@ tm_profiles <- tm_profiles %>%
 tm_profiles <- tm_profiles %>%
   filter(pCO2 >= 0)
 
-# subset complete profiles
+
+# subset complete profiles of stations not included in analysis
 profiles_stations_out <- tm_profiles %>% 
   filter(station %in% c("P14", "P13", "P01"))
 
@@ -182,10 +197,10 @@ tm_profiles_stations_out <- full_join(profiles_stations_out_in, profiles_station
 rm(profiles_stations_out, profiles_stations_out_in)
 
 
+# subset complete profiles of stations included in analysis
 tm_profiles <- tm_profiles %>% 
   filter(!(station %in% c("P14", "P13", "P01")))
 
-# subset complete profiles
 profiles_in <- tm_profiles %>% 
   filter(dep < parameters$max_dep_gap,
          phase == "down") %>% 
@@ -202,9 +217,7 @@ tm_profiles <- tm_profiles %>%
   mutate(select = if_else(is.na(select) | select == "out",
                                 "out",
                                 "in"))
-
 rm(profiles_in)
-
 
 ```
 
@@ -245,15 +258,15 @@ tm_profiles <- tm_profiles %>%
 ## Cruise dates
 
 ```{r mean_cruise_dates}
-# assign mean date_time stamp
 
+# assign mean date_time stamp
 cruise_dates <- tm_profiles %>% 
   group_by(ID) %>% 
   summarise(date_time_ID = mean(date_time),
             date_ID = format(as.Date(date_time_ID), "%b %d")) %>% 
   ungroup()
 
-# inner_join remove P14 observations lacking date_time_ID 
+# join profiles and mean date
 tm_profiles <- inner_join(cruise_dates, tm_profiles)
 
 cruise_dates %>% 
@@ -264,48 +277,73 @@ cruise_dates %>%
 
 ## Station map
 
+### Load SOOP Finnmaid data
+
 ```{r read_subset_fm_data}
 
+# read file
 fm <-
   read_csv(here::here("data/intermediate/_summarized_data_files",
-                       "fm.csv"))
+                      "fm.csv"))
 
-fm <- fm %>% 
-  filter(lat <= parameters$map_lat_hi, lat >= parameters$map_lat_lo, lon >= parameters$map_lon_lo)
+# filter data inside map
+fm <- fm %>%
+  filter(
+    lat <= parameters$map_lat_hi,
+    lat >= parameters$map_lat_lo,
+    lon >= parameters$map_lon_lo
+  )
 
-fm <- fm %>% 
-  mutate(Area = point.in.polygon(point.x = lon,
-                                 point.y = lat,
-                                 pol.x = parameters$fm_box_lon,
-                                 pol.y = parameters$fm_box_lat),
-         Area = as.character(Area),
-         Area = if_else(Area == "1", "utilized", "sampled"))
+# tag data inside study area to be analyzed
+fm <- fm %>%
+  mutate(
+    Area = point.in.polygon(
+      point.x = lon,
+      point.y = lat,
+      pol.x = parameters$fm_box_lon,
+      pol.y = parameters$fm_box_lat
+    ),
+    Area = as.character(Area),
+    Area = if_else(Area == "1", "utilized", "sampled")
+  )
 
-fm %>% 
-  filter(Area == "utilized") %>% 
-  select(-Area) %>% 
-  write_csv(here::here("data/intermediate/_summarized_data_files",
-                       "fm_bloomsail.csv"))
+# write tagged data to be analyzed in NCP reconstruction
+fm %>%
+  filter(Area == "utilized") %>%
+  select(-Area) %>%
+  write_csv(here::here(
+    "data/intermediate/_summarized_data_files",
+    "fm_bloomsail.csv"
+  ))
 
 ```
 
+### Load MODIS satellite image
+
 ```{r read_plot_MODIS_image}
 
+# handling of the satellite image was inspired by this website:
 # https://shekeine.github.io/visualization/2014/09/27/sfcc_rgb_in_R
+# https://www.neonscience.org/resources/learning-hub/tutorials/dc-multiband-rasters-r
+
+# read raster file manually downloaded from:
+# https://worldview.earthdata.nasa.gov/
 
 EGS  <-
   raster::stack(here::here("data/input/Maps",
                    "MODIS_2018_07_26_EGS.tiff"))
 
+# convert to tibble
 EGS <- raster::as.data.frame(EGS, xy = T)
-
 EGS <- as_tibble(EGS)
 
+# rename coordinates and subset region
 EGS <- EGS %>%
   rename(lat = y,
          lon = x) %>% 
   filter(lat >= 56.4, lat <= 58.3)
 
+# stretch histograms of each band and convert to RGB color
 EGS <- EGS %>%
   mutate(
     MODIS_2018_07_26_EGS.1_s = MODIS_2018_07_26_EGS.1 * 2.5,
@@ -334,21 +372,26 @@ EGS <- EGS %>%
         )
       )
 
+# select relevant columns
 EGS <- EGS %>%
-  dplyr::select(-c(
+  select(-c(
     MODIS_2018_07_26_EGS.1,
     MODIS_2018_07_26_EGS.2,
     MODIS_2018_07_26_EGS.3
   )) %>% 
-  dplyr::select(-c(
+  select(-c(
     MODIS_2018_07_26_EGS.1_s,
     MODIS_2018_07_26_EGS.2_s,
     MODIS_2018_07_26_EGS.3_s
   ))
 
+# plot map
+EGS <- EGS %>% 
+  rename(long = lon)
+
 p_MODIS <-
   ggplot(data = EGS,
-         aes(lon, lat, fill = RGB)) +
+         aes(long, lat, fill = RGB)) +
   coord_quickmap(expand = 0) +
   geom_raster() +
   scale_fill_identity() +
@@ -362,18 +405,32 @@ p_MODIS <-
     color = "orangered",
     size = 1.5
   ) +
-  scale_x_continuous(breaks = seq(10,30,1)) +
-  labs(x = "Longitude (°E)", y = "Latitude (°N)")
+  scale_x_continuous(breaks = seq(10, 30, 1)) +
+  labs(x = "Longitude (°E)", y = "Latitude (°N)") +
+  ggsn::scalebar(
+    EGS,
+    transform = TRUE,
+    model = "WGS84",
+    dist_unit = "nm",
+    dist = 25,
+    location = "bottomleft",
+    anchor = c(x = 15.75, y = 56.6),
+    st.dist = 0.05,
+    st.size = geom_text_size
+  )
 
 
 ```
 
+### Load bathymetric map
+
 ```{r map, fig.cap="Location of stations sampled between the east coast of Gotland and Gotland deep.", fig.asp=1}
 
-
+# read file
 map <-
   read_csv(here::here("data/input/Maps", "Bathymetry_Gotland_east_small.csv"))
 
+# filter region for plot
 map <- map %>%
   filter(
     lat < parameters$map_lat_hi,
@@ -382,6 +439,7 @@ map <- map %>%
     lon > parameters$map_lon_lo
   )
 
+# adjust resolution
 map_low_res <- map %>%
   mutate(
     lat = cut(
@@ -401,11 +459,13 @@ map_low_res <- map %>%
   mutate(lat = as.numeric(as.character(lat)),
          lon = as.numeric(as.character(lon)))
 
+# downsize track data for plot
 tm_track <- tm %>%
   arrange(date_time) %>%
-  slice(which(row_number() %% 50 == 1))
+  slice(which(row_number() %% 10 == 1))
 
 
+# plot map
 p_map <-
   ggplot() +
   geom_contour_fill(
@@ -513,6 +573,7 @@ rm(tm)
 
 ```{r data_coverage, fig.cap="Spatio-temporal data coverage, indicated as station visits over time."}
 
+# calculate mean samppling dates per station
 cover <- tm_profiles %>%
   group_by(ID, station) %>%
   summarise(date = mean(date_time),
@@ -520,6 +581,7 @@ cover <- tm_profiles %>%
   ungroup() %>%
   mutate(station = str_sub(station, 2, 3))
 
+# create coverage plot
 cover %>%
   ggplot(aes(date, station, fill = ID)) +
   geom_vline(aes(xintercept = date_time_ID, col = ID)) +
@@ -565,25 +627,31 @@ At stations P07 and P10 discrete samples for lab measurmentm of C~T~ and A~T~ we
 
 ```{r read_bottle_CO2}
 
+# read files
 tb <-
-  read_csv(here::here("data/intermediate/_summarized_data_files", "tb.csv"),
-           col_types = cols(ID = col_character()))
+  read_csv(
+    here::here("data/intermediate/_summarized_data_files", "tb.csv"),
+    col_types = cols(ID = col_character())
+  )
 
-tb <- tb %>% 
+# select stations, harmonize depth range and date ID
+tb <- tb %>%
   filter(station %in% c("P07", "P10"),
-         dep <= parameters$max_dep) %>% 
+         dep <= parameters$max_dep) %>%
   mutate(ID = if_else(ID == "180722", "180723", ID))
 
+# join with mean cruise dates
 tb <- inner_join(tb, cruise_dates)
 
 ```
 
-## Mean alkalinity
+## Mean A~T~
 
 In order to derive C~T~ from measured pCO~2~ profiles, the alkalinity mean + sd in the upper `r parameters$max_dep`m and both stations was calculated as:
 
-```{r bottle_AT}
+```{r calc_bottle_AT_mean}
 
+# AT mean calculation
 AT_mean <- tb %>% 
   filter(dep <= parameters$max_dep) %>% 
   summarise(AT = mean(AT, na.rm = TRUE)) %>%
@@ -591,6 +659,7 @@ AT_mean <- tb %>%
 
 AT_mean
 
+# AT SD calculation
 AT_sd <- tb %>% 
   filter(dep <= parameters$max_dep) %>% 
   summarise(AT = sd(AT, na.rm = TRUE)) %>%
@@ -600,10 +669,13 @@ AT_sd
 
 ```
 
+## Mean Salinity
+
 Likewise, the mean salinity amounts to:
 
-```{r bottle_sal}
+```{r calc_bottle_sal_mean}
 
+# Sal mean calculation
 sal_mean <- tb %>% 
   filter(dep <= parameters$max_dep) %>% 
   summarise(sal = mean(sal, na.rm = TRUE)) %>%
@@ -626,11 +698,13 @@ tb_fix %>%
 
 ```
 
-## nC~T~ calculation
+## C~T~* calculation
 
-The alkalinity-normalized C~T~, nC~T~, was calculated.
+The alkalinity-normalized C~T~, C~T~*, was calculated.
 
 ```{r nCT_bottle_calculation}
+
+# calculate CT*, referred to as nCT in the code
 tb <- tb %>% 
   mutate(nCT = CT/AT * AT_mean)
 
@@ -640,8 +714,7 @@ tb <- tb %>%
 
 ### Stations
 
-```{r bottle_CO2_profiles_station}
-
+```{r bottle_CO2_profiles_station, fig.cap="Discrete sample profiles for individual stations"}
 
 tb_long <- tb %>%
   pivot_longer(c(sal:AT, nCT), names_to = "var", values_to = "value")
@@ -661,9 +734,11 @@ tb_long %>%
 
 ### Mean
 
-```{r bottle_CO2_profiles_mean}
+```{r bottle_CO2_profiles_mean, fig.cap="Discrete sample profiles as the mean of individual stations"}
 
-
+# grid data into 5 m intervals
+# because some samples were not taken at exact 5m depth intervals
+# and calculate cruise mean value within each depth interval
 tb_long_mean <- tb_long %>%
   mutate(dep_grid = as.numeric(as.character(cut(
     dep,
@@ -761,14 +836,16 @@ rm(tb_long_mean, p_AT, p_CT, p_nCT, tb_fix)
 
 ## Surface time series
 
-```{r plot_bottle_CO2_surface_timeseries, fig.cap="Time series of bottle data. Shown are mean values of samples collected at water depths < 10m (usually collected at 0 and 5 m).", fig.asp=1.1}
+```{r plot_bottle_CO2_surface_timeseries, fig.cap="Time series of bottle data. Shown are raw data at water depth <= 10m, as well as mean values of samples collected at water depths < 6m (usually collected at 0 and 5 m).", fig.asp=1.1}
 
+# surface time series per station
 tb_surface <- tb_long %>%
   filter(dep < parameters$surface_dep) %>%
   group_by(ID, date_time_ID, var, station) %>%
   summarise(value = mean(value, na.rm = TRUE)) %>%
   ungroup()
 
+# mean surface time series across stations
 tb_surface_station_mean <- tb_long %>%
   filter(dep < parameters$surface_dep) %>%
   group_by(ID, date_time_ID, var) %>%
@@ -776,8 +853,9 @@ tb_surface_station_mean <- tb_long %>%
             value_sd = sd(value, na.rm = TRUE)) %>%
   ungroup()
 
+# create time series plot
 tb_long %>%
-  filter(dep < 11) %>%
+  filter(dep <= 10) %>%
   ggplot() +
   geom_line(data = tb_surface, aes(date_time_ID, value, col = "Individual")) +
   geom_line(data = tb_surface_station_mean, aes(date_time_ID, value_mean, col =
@@ -795,7 +873,9 @@ tb_long %>%
 rm(tb_long, tb_surface, tb)
 ```
 
-Important notes: - nC~T~ drop and temporal patterns agree well with those found in the nC~T~ time series derived from pCO~2~ measurements (below).
+Note:
+
+- nC~T~ drop and temporal patterns agree well with those found in the nC~T~ time series derived from pCO~2~ measurements (below).
 
 # nC~T~ profiles
 
