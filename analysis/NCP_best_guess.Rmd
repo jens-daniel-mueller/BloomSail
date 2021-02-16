@@ -1066,6 +1066,9 @@ tm_profiles_ID_mean_test <- tm_profiles_ID_mean_test %>%
 tm_profiles_ID_mean <- tm_profiles_ID_mean %>%
   select(-CT_star_test)
 
+tm_profiles <- tm_profiles %>%
+  select(-CT_star_test)
+
 tm_profiles_ID_mean %>%
   write_csv(here::here("data/intermediate/_merged_data_files/CT_dynamics", "tm_profiles_ID.csv"))
 
@@ -1565,7 +1568,7 @@ rm(tm_profiles_ID_long_grid)
 
 # C~T~* sensitivity to mean A~T~
 
-Mean seawater C~T~* were calculated for 5m depth intervals, based on two A~T~ values (regular mean + 2 SD).
+Mean seawater C~T~* were calculated for 5m depth intervals, based on two A~T~ values (regular mean + 2 SD). Relative changes of C~T~* do not differ much, despite a large bias in mean A~T~.
 
 ```{r observed_timeseries_CT_star_delta}
 
@@ -1584,13 +1587,13 @@ tm_profiles_ID_long_grid %>%
   facet_wrap( ~ var, scales = "free_y", ncol = 1) +
   theme(axis.title.x = element_blank())
 
-rm(tm_profiles_ID_long_grid)
+rm(tm_profiles_ID_long_grid, tm_profiles_ID_long_test)
+
 ```
 
-Calculate C~T~* changes for range of A~T~ errors
+To further illustrate the robustness of C~T~* to errors in mean A~T~, we calculate C~T~* changes for range of A~T~ errors and the conditions encountered during the field campaign in 2018.
 
 ```{r CT_calculation_sensitivity}
-
 
 CT_star_sens <- tm_profiles %>%
   filter(dep < parameters$surface_dep,
@@ -1712,7 +1715,7 @@ ggsave(
 
 ## Absolute values
 
-```{r plot_hovmoeller_absolut_plus_cum_profiles, fig.cap="Hovmoeller plotm of absolute changes in C~T~ and temperature, combined with profile plots of cumulative changes."}
+```{r plot_hovmoeller_absolut_plus_cum_profiles, fig.cap="Hovmoeller plots of absolute changes in C~T~ and temperature, combined with profile plots of cumulative changes."}
 
 bin_CT_star <- 30
 
@@ -1867,7 +1870,7 @@ rm(p_CT_star_hov, bin_CT_star, p_tem_hov, bin_Tem, p_CT_star_ID_cum, p_tem_ID_cu
 
 ## Incremental changes
 
-```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plotm of daily changes in C~T~ and temperature. Note that calculated  value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period."}
+```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plots of daily changes in C~T~ and temperature. Note that calculated  value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period."}
 
 
 bin_CT_star <- 2.5
@@ -1885,7 +1888,8 @@ CT_star_hov <- tm_profiles_ID_long %>%
     size = 3, shape = 24, fill = "white"
   ) +
   scale_fill_divergent(breaks = MakeBreaks(bin_CT_star),
-                       guide = "colorstrip") +
+                       guide = "colorstrip",
+                       name = "CT_star") +
   scale_y_reverse() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
   coord_cartesian(expand = 0) +
@@ -1907,7 +1911,8 @@ Tem_hov <- tm_profiles_ID_long %>%
     size = 3, shape = 24, fill = "white"
   ) +
   scale_fill_divergent(breaks = MakeBreaks(bin_Tem),
-                       guide = "colorstrip") +
+                       guide = "colorstrip",
+                       name = "tem") +
   scale_y_reverse() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
   coord_cartesian(expand = 0) +
@@ -1941,7 +1946,8 @@ CT_star_hov <- tm_profiles_ID_long %>%
     fill = "white"
   ) +
   scale_fill_divergent(breaks = MakeBreaks(bin_CT_star),
-                       guide = "colorstrip") +
+                       guide = "colorstrip",
+                       name = "CT_star") +
   scale_y_reverse() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
   coord_cartesian(expand = 0) +
@@ -1965,7 +1971,8 @@ Tem_hov <- tm_profiles_ID_long %>%
     fill = "white"
   ) +
   scale_fill_divergent(breaks = MakeBreaks(bin_Tem),
-                       guide = "colorstrip") +
+                       guide = "colorstrip",
+                       name = "tem") +
   scale_y_reverse() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
   coord_cartesian(expand = 0) +
@@ -1977,18 +1984,18 @@ rm(CT_star_hov, bin_CT_star, Tem_hov, bin_Tem)
 
 ```
 
-# Depth-integration C~T~*
+# Depth-integration of C~T~*
 
 A critical first step for the determination of net community production (NCP) is the integration of observed changes in C~T~* over depth. Two approaches were tested:
 
 -   Integration of changes in C~T~* over a predefined, fixed water depth
 -   Integration of changes in C~T~* over a mixed layer depth (MLD)
 
-Both approaches deliver depth-integrated, incremental changes of C~T~* between cruise dates. Those were summed up to derive a trajectory of cumulative integrated C~T~* changes.
+Both approaches deliver depth-integrated, incremental changes of C~T~* ( iC~T~* ) between cruise dates. Those were summed up to derive a trajectory of cumulative integrated C~T~* changes.
 
 ## Fixed depths approach
 
-Incremental and cumulative C~T~* changes between cruise dates were integrated across the water columns down to predefined depth limits. This was done separately for observed positive/negative changes in C~T~, as well as for the total observed changes.
+Incremental and cumulative C~T~* changes between cruise dates were integrated across the water columns down to predefined depth limits. This was done separately for observed positive/negative changes in C~T~*, as well as for the total observed changes.
 
 Predefined integration depth levels in meters are: `r parameters$fixed_integration_depths`
 
@@ -1996,67 +2003,72 @@ Predefined integration depth levels in meters are: `r parameters$fixed_integrati
 
 ```{r calculate_iCT_star_fixed_depth}
 
-iCT_star_grid_sign <- tm_profiles_ID_long %>% 
-  select(ID, date_time_ID, date_time_ID_ref) %>% 
-  unique() %>% 
+iCT_star_grid_sign <- tm_profiles_ID_long %>%
+  select(ID, date_time_ID, date_time_ID_ref) %>%
+  unique() %>%
   expand_grid(sign = c("pos", "neg"))
 
-iCT_star_grid_total <- tm_profiles_ID_long %>% 
-  select(ID, date_time_ID, date_time_ID_ref) %>% 
-  unique() %>% 
+iCT_star_grid_total <- tm_profiles_ID_long %>%
+  select(ID, date_time_ID, date_time_ID_ref) %>%
+  unique() %>%
   expand_grid(sign = c("total"))
 
 for (i_dep in parameters$fixed_integration_depths) {
-
-iCT_star_sign_temp <- tm_profiles_ID_long %>% 
-  filter(var == "CT_star", dep < i_dep) %>% 
-  mutate(sign = if_else(ID == "180705" & dep == 0.5, "neg", sign)) %>% 
-  group_by(ID, date_time_ID, date_time_ID_ref, sign) %>% 
-  summarise(CT_star_i_diff = sum(value_diff)/1000) %>% 
-  ungroup()
-
-iCT_star_sign_temp <- iCT_star_sign_temp %>% 
-  group_by(sign) %>%
-  arrange(date_time_ID) %>% 
-  mutate(CT_star_i_cum = cumsum(CT_star_i_diff)) %>% 
-  ungroup()
-
-iCT_star_sign_temp <- full_join(iCT_star_sign_temp, iCT_star_grid_sign) %>% 
-  arrange(sign, date_time_ID) %>% 
-  fill(CT_star_i_cum)
-
-
-iCT_star_total_temp <- tm_profiles_ID_long %>% 
-  filter(var == "CT_star", dep < i_dep) %>% 
-  group_by(ID, date_time_ID, date_time_ID_ref) %>% 
-  summarise(CT_star_i_diff = sum(value_diff)/1000) %>% 
-  ungroup()
-
-iCT_star_total_temp <- iCT_star_total_temp %>% 
-  arrange(date_time_ID) %>% 
-  mutate(CT_star_i_cum = cumsum(CT_star_i_diff)) %>% 
-  ungroup() %>% 
-  mutate(sign = "total")
-
-iCT_star_total_temp <- full_join(iCT_star_total_temp, iCT_star_grid_total) %>% 
-  arrange(sign, date_time_ID) %>% 
-  fill(CT_star_i_cum)
-
-iCT_star_temp <- bind_rows(iCT_star_sign_temp, iCT_star_total_temp) %>% 
+  iCT_star_sign_temp <- tm_profiles_ID_long %>%
+    filter(var == "CT_star", dep < i_dep) %>%
+    mutate(sign = if_else(ID == "180705" &
+                            dep == 0.5, "neg", sign)) %>%
+    group_by(ID, date_time_ID, date_time_ID_ref, sign) %>%
+    summarise(CT_star_i_diff = sum(value_diff) / 1000) %>%
+    ungroup()
+  
+  iCT_star_sign_temp <- iCT_star_sign_temp %>%
+    group_by(sign) %>%
+    arrange(date_time_ID) %>%
+    mutate(CT_star_i_cum = cumsum(CT_star_i_diff)) %>%
+    ungroup()
+  
+  iCT_star_sign_temp <-
+    full_join(iCT_star_sign_temp, iCT_star_grid_sign) %>%
+    arrange(sign, date_time_ID) %>%
+    fill(CT_star_i_cum)
+  
+  
+  iCT_star_total_temp <- tm_profiles_ID_long %>%
+    filter(var == "CT_star", dep < i_dep) %>%
+    group_by(ID, date_time_ID, date_time_ID_ref) %>%
+    summarise(CT_star_i_diff = sum(value_diff) / 1000) %>%
+    ungroup()
+  
+  iCT_star_total_temp <- iCT_star_total_temp %>%
+    arrange(date_time_ID) %>%
+    mutate(CT_star_i_cum = cumsum(CT_star_i_diff)) %>%
+    ungroup() %>%
+    mutate(sign = "total")
+  
+  iCT_star_total_temp <-
+    full_join(iCT_star_total_temp, iCT_star_grid_total) %>%
+    arrange(sign, date_time_ID) %>%
+    fill(CT_star_i_cum)
+  
+  iCT_star_temp <-
+    bind_rows(iCT_star_sign_temp, iCT_star_total_temp) %>%
     mutate(i_dep = i_dep)
-
-
-if (exists("iCT_star")) {
-  iCT_star <- bind_rows(iCT_star, iCT_star_temp)
-  } else {iCT_star <- iCT_star_temp}
-
-rm(iCT_star_temp, iCT_star_sign_temp, iCT_star_total_temp)
-
+  
+  
+  if (exists("iCT_star")) {
+    iCT_star <- bind_rows(iCT_star, iCT_star_temp)
+  } else {
+    iCT_star <- iCT_star_temp
+  }
+  
+  rm(iCT_star_temp, iCT_star_sign_temp, iCT_star_total_temp)
+  
 }
 
 rm(iCT_star_grid_sign, iCT_star_grid_total)
 
-iCT_star <- iCT_star %>% 
+iCT_star <- iCT_star %>%
   mutate(i_dep = as.factor(i_dep))
 
 iCT_star_fixed_dep <- iCT_star
@@ -2066,7 +2078,9 @@ rm(iCT_star, i_dep)
 
 ### Time series
 
-```{r iCT_star_fixed_depth_time_series, fig.asp=1.1}
+As the bulk changes of C~T~* occur in the surface water, the choice of the exact fixed integration depth has only minor impact on the derived depth integrated time series.
+
+```{r iCT_star_fixed_depth_time_series, fig.asp=1.1, fig.asp="Time series of integrated changes of C~T~*. Columns indicated incremental changes between cruise days, and lines indicate cummulative changes."}
 
 iCT_star_fixed_dep %>%
   ggplot() +
@@ -2575,7 +2589,7 @@ tm_profiles_surface_long_ID %>%
 
 ### Wind and atm. pCO~2~
 
-Metrological data were recorded on the flux tower located on Ostergarnsholm island.
+Metrological data were recorded on the flux tower located on Östergarnsholm island.
 
 ```{r read_wind_Ostergarn_tower}
 og <-
