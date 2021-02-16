@@ -451,7 +451,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">NCP best guess</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">15 February, 2021</h4>
+<h4 class="date">16 February, 2021</h4>
 
 </div>
 
@@ -476,7 +476,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-02-15
+<strong>Last updated:</strong> 2021-02-16
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -567,16 +567,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4878a06c0d66f31fe2e968d3c6fe33630fd2ef67targetblank4878a06a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/4878a06c0d66f31fe2e968d3c6fe33630fd2ef67" target="_blank">4878a06</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4ce82b8541a5c02a5c6b24fa9dfa326887c5032btargetblank4ce82b8a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/4ce82b8541a5c02a5c6b24fa9dfa326887c5032b" target="_blank">4ce82b8</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4878a06c0d66f31fe2e968d3c6fe33630fd2ef67targetblank4878a06a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree4ce82b8541a5c02a5c6b24fa9dfa326887c5032btargetblank4ce82b8a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/4878a06c0d66f31fe2e968d3c6fe33630fd2ef67" target="_blank">4878a06</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/4ce82b8541a5c02a5c6b24fa9dfa326887c5032b" target="_blank">4ce82b8</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -625,6 +625,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/4ce82b8541a5c02a5c6b24fa9dfa326887c5032b/analysis/NCP_best_guess.Rmd" target="_blank">4ce82b8</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-16
+</td>
+<td>
+added scalebar
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/0af0021dba885d69325df777722572e8d796e85b/docs/NCP_best_guess.html" target="_blank">0af0021</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -726,29 +760,45 @@ library(ggnewscale)</code></pre>
 <li>The label ID represents the start date of the cruise (“YYMMDD”), not the exact mean sampling date</li>
 </ul>
 <pre class="r"><code>tm &lt;-
- read_csv(here::here(&quot;data/intermediate/_merged_data_files/response_time&quot;,
-                      &quot;tm_RT_all.csv&quot;),
-               col_types = cols(ID = col_character(),
-                                pCO2_analog = col_double(),
-                                pCO2_corr = col_double(),
-                                Zero = col_character(),
-                                Flush = col_character(),
-                                mixing = col_character(),
-                                Zero_counter = col_integer(),
-                                deployment = col_integer(),
-                                lon = col_double(),
-                                lat = col_double(),
-                                pCO2 = col_double()))
+  read_csv(
+    here::here(
+      &quot;data/intermediate/_merged_data_files/response_time&quot;,
+      &quot;tm_RT_all.csv&quot;
+    ),
+    col_types = cols(
+      ID = col_character(),
+      pCO2_analog = col_double(),
+      pCO2_corr = col_double(),
+      Zero = col_character(),
+      Flush = col_character(),
+      mixing = col_character(),
+      Zero_counter = col_integer(),
+      deployment = col_integer(),
+      lon = col_double(),
+      lat = col_double(),
+      pCO2 = col_double()
+    )
+  )
 
 
 # Filter relevant rows and columns
-tm_profiles &lt;- tm %&gt;% 
+tm_profiles &lt;- tm %&gt;%
   filter(type == &quot;P&quot;,
          Flush == &quot;0&quot;,
          Zero == &quot;0&quot;,
          !ID %in% parameters$dates_out,
-         !(station %in% c(&quot;PX1&quot;, &quot;PX2&quot;))) %&gt;% 
-  select(date_time, ID, station, lat, lon, dep, sal, tem, pCO2_corr, pCO2, duration)
+         !(station %in% c(&quot;PX1&quot;, &quot;PX2&quot;))) %&gt;%
+  select(date_time,
+         ID,
+         station,
+         lat,
+         lon,
+         dep,
+         sal,
+         tem,
+         pCO2_corr,
+         pCO2,
+         duration)
 
 #calculate mean location of stations
 stations &lt;- tm_profiles %&gt;% 
@@ -771,9 +821,7 @@ meta &lt;- read_csv(here::here(&quot;data/input/TinaV/Sensor&quot;,
                  col_types = cols(ID = col_character()))
 
 meta &lt;- meta %&gt;% 
-    filter(!ID %in% parameters$dates_out
-           # !(station %in% parameters$stations_out)
-           )
+    filter(!ID %in% parameters$dates_out)
 
 tm_profiles &lt;- full_join(tm_profiles, meta)
 rm(meta)
@@ -795,7 +843,7 @@ tm_profiles &lt;- tm_profiles %&gt;%
   select(-c(start, down, lift, up, end, comment, p_type, duration))
 
 
-# select downcasts only
+# select downcast profiles only
 tm_profiles &lt;- tm_profiles %&gt;% 
   filter(phase %in% parameters$phases_in)
 
@@ -813,7 +861,8 @@ tm_profiles &lt;- tm_profiles %&gt;%
 tm_profiles &lt;- tm_profiles %&gt;%
   filter(pCO2 &gt;= 0)
 
-# subset complete profiles
+
+# subset complete profiles of stations not included in analysis
 profiles_stations_out &lt;- tm_profiles %&gt;% 
   filter(station %in% c(&quot;P14&quot;, &quot;P13&quot;, &quot;P01&quot;))
 
@@ -831,10 +880,10 @@ tm_profiles_stations_out &lt;- full_join(profiles_stations_out_in, profiles_stat
 rm(profiles_stations_out, profiles_stations_out_in)
 
 
+# subset complete profiles of stations included in analysis
 tm_profiles &lt;- tm_profiles %&gt;% 
   filter(!(station %in% c(&quot;P14&quot;, &quot;P13&quot;, &quot;P01&quot;)))
 
-# subset complete profiles
 profiles_in &lt;- tm_profiles %&gt;% 
   filter(dep &lt; parameters$max_dep_gap,
          phase == &quot;down&quot;) %&gt;% 
@@ -851,7 +900,6 @@ tm_profiles &lt;- tm_profiles %&gt;%
   mutate(select = if_else(is.na(select) | select == &quot;out&quot;,
                                 &quot;out&quot;,
                                 &quot;in&quot;))
-
 rm(profiles_in)</code></pre>
 </div>
 <div id="pco2-profile-overview" class="section level2" number="2.2">
@@ -893,14 +941,13 @@ Overview pCO<sub>2</sub> profiles at stations (P02-P12) and cruise dates (ID). y
 <div id="cruise-dates" class="section level2" number="2.4">
 <h2 number="2.4"><span class="header-section-number">2.4</span> Cruise dates</h2>
 <pre class="r"><code># assign mean date_time stamp
-
 cruise_dates &lt;- tm_profiles %&gt;% 
   group_by(ID) %&gt;% 
   summarise(date_time_ID = mean(date_time),
             date_ID = format(as.Date(date_time_ID), &quot;%b %d&quot;)) %&gt;% 
   ungroup()
 
-# inner_join remove P14 observations lacking date_time_ID 
+# join profiles and mean date
 tm_profiles &lt;- inner_join(cruise_dates, tm_profiles)
 
 cruise_dates %&gt;% 
@@ -909,41 +956,67 @@ cruise_dates %&gt;%
 </div>
 <div id="station-map" class="section level2" number="2.5">
 <h2 number="2.5"><span class="header-section-number">2.5</span> Station map</h2>
-<pre class="r"><code>fm &lt;-
+<div id="load-soop-finnmaid-data" class="section level3" number="2.5.1">
+<h3 number="2.5.1"><span class="header-section-number">2.5.1</span> Load SOOP Finnmaid data</h3>
+<pre class="r"><code># read file
+fm &lt;-
   read_csv(here::here(&quot;data/intermediate/_summarized_data_files&quot;,
-                       &quot;fm.csv&quot;))
+                      &quot;fm.csv&quot;))
 
-fm &lt;- fm %&gt;% 
-  filter(lat &lt;= parameters$map_lat_hi, lat &gt;= parameters$map_lat_lo, lon &gt;= parameters$map_lon_lo)
+# filter data inside map
+fm &lt;- fm %&gt;%
+  filter(
+    lat &lt;= parameters$map_lat_hi,
+    lat &gt;= parameters$map_lat_lo,
+    lon &gt;= parameters$map_lon_lo
+  )
 
-fm &lt;- fm %&gt;% 
-  mutate(Area = point.in.polygon(point.x = lon,
-                                 point.y = lat,
-                                 pol.x = parameters$fm_box_lon,
-                                 pol.y = parameters$fm_box_lat),
-         Area = as.character(Area),
-         Area = if_else(Area == &quot;1&quot;, &quot;utilized&quot;, &quot;sampled&quot;))
+# tag data inside study area to be analyzed
+fm &lt;- fm %&gt;%
+  mutate(
+    Area = point.in.polygon(
+      point.x = lon,
+      point.y = lat,
+      pol.x = parameters$fm_box_lon,
+      pol.y = parameters$fm_box_lat
+    ),
+    Area = as.character(Area),
+    Area = if_else(Area == &quot;1&quot;, &quot;utilized&quot;, &quot;sampled&quot;)
+  )
 
-fm %&gt;% 
-  filter(Area == &quot;utilized&quot;) %&gt;% 
-  select(-Area) %&gt;% 
-  write_csv(here::here(&quot;data/intermediate/_summarized_data_files&quot;,
-                       &quot;fm_bloomsail.csv&quot;))</code></pre>
-<pre class="r"><code># https://shekeine.github.io/visualization/2014/09/27/sfcc_rgb_in_R
+# write tagged data to be analyzed in NCP reconstruction
+fm %&gt;%
+  filter(Area == &quot;utilized&quot;) %&gt;%
+  select(-Area) %&gt;%
+  write_csv(here::here(
+    &quot;data/intermediate/_summarized_data_files&quot;,
+    &quot;fm_bloomsail.csv&quot;
+  ))</code></pre>
+</div>
+<div id="load-modis-satellite-image" class="section level3" number="2.5.2">
+<h3 number="2.5.2"><span class="header-section-number">2.5.2</span> Load MODIS satellite image</h3>
+<pre class="r"><code># handling of the satellite image was inspired by this website:
+# https://shekeine.github.io/visualization/2014/09/27/sfcc_rgb_in_R
+# https://www.neonscience.org/resources/learning-hub/tutorials/dc-multiband-rasters-r
+
+# read raster file manually downloaded from:
+# https://worldview.earthdata.nasa.gov/
 
 EGS  &lt;-
   raster::stack(here::here(&quot;data/input/Maps&quot;,
                    &quot;MODIS_2018_07_26_EGS.tiff&quot;))
 
+# convert to tibble
 EGS &lt;- raster::as.data.frame(EGS, xy = T)
-
 EGS &lt;- as_tibble(EGS)
 
+# rename coordinates and subset region
 EGS &lt;- EGS %&gt;%
   rename(lat = y,
          lon = x) %&gt;% 
   filter(lat &gt;= 56.4, lat &lt;= 58.3)
 
+# stretch histograms of each band and convert to RGB color
 EGS &lt;- EGS %&gt;%
   mutate(
     MODIS_2018_07_26_EGS.1_s = MODIS_2018_07_26_EGS.1 * 2.5,
@@ -972,21 +1045,26 @@ EGS &lt;- EGS %&gt;%
         )
       )
 
+# select relevant columns
 EGS &lt;- EGS %&gt;%
-  dplyr::select(-c(
+  select(-c(
     MODIS_2018_07_26_EGS.1,
     MODIS_2018_07_26_EGS.2,
     MODIS_2018_07_26_EGS.3
   )) %&gt;% 
-  dplyr::select(-c(
+  select(-c(
     MODIS_2018_07_26_EGS.1_s,
     MODIS_2018_07_26_EGS.2_s,
     MODIS_2018_07_26_EGS.3_s
   ))
 
+# plot map
+EGS &lt;- EGS %&gt;% 
+  rename(long = lon)
+
 p_MODIS &lt;-
   ggplot(data = EGS,
-         aes(lon, lat, fill = RGB)) +
+         aes(long, lat, fill = RGB)) +
   coord_quickmap(expand = 0) +
   geom_raster() +
   scale_fill_identity() +
@@ -1000,11 +1078,27 @@ p_MODIS &lt;-
     color = &quot;orangered&quot;,
     size = 1.5
   ) +
-  scale_x_continuous(breaks = seq(10,30,1)) +
-  labs(x = &quot;Longitude (°E)&quot;, y = &quot;Latitude (°N)&quot;)</code></pre>
-<pre class="r"><code>map &lt;-
+  scale_x_continuous(breaks = seq(10, 30, 1)) +
+  labs(x = &quot;Longitude (°E)&quot;, y = &quot;Latitude (°N)&quot;) +
+  ggsn::scalebar(
+    EGS,
+    transform = TRUE,
+    model = &quot;WGS84&quot;,
+    dist_unit = &quot;nm&quot;,
+    dist = 25,
+    location = &quot;bottomleft&quot;,
+    anchor = c(x = 15.75, y = 56.6),
+    st.dist = 0.05,
+    st.size = geom_text_size
+  )</code></pre>
+</div>
+<div id="load-bathymetric-map" class="section level3" number="2.5.3">
+<h3 number="2.5.3"><span class="header-section-number">2.5.3</span> Load bathymetric map</h3>
+<pre class="r"><code># read file
+map &lt;-
   read_csv(here::here(&quot;data/input/Maps&quot;, &quot;Bathymetry_Gotland_east_small.csv&quot;))
 
+# filter region for plot
 map &lt;- map %&gt;%
   filter(
     lat &lt; parameters$map_lat_hi,
@@ -1013,6 +1107,7 @@ map &lt;- map %&gt;%
     lon &gt; parameters$map_lon_lo
   )
 
+# adjust resolution
 map_low_res &lt;- map %&gt;%
   mutate(
     lat = cut(
@@ -1032,11 +1127,13 @@ map_low_res &lt;- map %&gt;%
   mutate(lat = as.numeric(as.character(lat)),
          lon = as.numeric(as.character(lon)))
 
+# downsize track data for plot
 tm_track &lt;- tm %&gt;%
   arrange(date_time) %&gt;%
-  slice(which(row_number() %% 50 == 1))
+  slice(which(row_number() %% 10 == 1))
 
 
+# plot map
 p_map &lt;-
   ggplot() +
   geom_contour_fill(
@@ -1143,15 +1240,18 @@ rm(map, map_low_res,
 
 rm(tm)</code></pre>
 </div>
+</div>
 <div id="data-coverage" class="section level2" number="2.6">
 <h2 number="2.6"><span class="header-section-number">2.6</span> Data coverage</h2>
-<pre class="r"><code>cover &lt;- tm_profiles %&gt;%
+<pre class="r"><code># calculate mean samppling dates per station
+cover &lt;- tm_profiles %&gt;%
   group_by(ID, station) %&gt;%
   summarise(date = mean(date_time),
             date_time_ID = mean(date_time_ID)) %&gt;%
   ungroup() %&gt;%
   mutate(station = str_sub(station, 2, 3))
 
+# create coverage plot
 cover %&gt;%
   ggplot(aes(date, station, fill = ID)) +
   geom_vline(aes(xintercept = date_time_ID, col = ID)) +
@@ -1198,35 +1298,46 @@ rm(cover)</code></pre>
 <div id="bottle-ct-and-at" class="section level1" number="3">
 <h1 number="3"><span class="header-section-number">3</span> Bottle C<sub>T</sub> and A<sub>T</sub></h1>
 <p>At stations P07 and P10 discrete samples for lab measurmentm of C<sub>T</sub> and A<sub>T</sub> were collected. Please note that - in contrast to the pCO<sub>2</sub> profiles - samples were taken on June 16, but removed here for harmonization of results.</p>
-<pre class="r"><code>tb &lt;-
-  read_csv(here::here(&quot;data/intermediate/_summarized_data_files&quot;, &quot;tb.csv&quot;),
-           col_types = cols(ID = col_character()))
+<pre class="r"><code># read files
+tb &lt;-
+  read_csv(
+    here::here(&quot;data/intermediate/_summarized_data_files&quot;, &quot;tb.csv&quot;),
+    col_types = cols(ID = col_character())
+  )
 
-tb &lt;- tb %&gt;% 
+# select stations, harmonize depth range and date ID
+tb &lt;- tb %&gt;%
   filter(station %in% c(&quot;P07&quot;, &quot;P10&quot;),
-         dep &lt;= parameters$max_dep) %&gt;% 
+         dep &lt;= parameters$max_dep) %&gt;%
   mutate(ID = if_else(ID == &quot;180722&quot;, &quot;180723&quot;, ID))
 
+# join with mean cruise dates
 tb &lt;- inner_join(tb, cruise_dates)</code></pre>
-<div id="mean-alkalinity" class="section level2" number="3.1">
-<h2 number="3.1"><span class="header-section-number">3.1</span> Mean alkalinity</h2>
+<div id="mean-at" class="section level2" number="3.1">
+<h2 number="3.1"><span class="header-section-number">3.1</span> Mean A<sub>T</sub></h2>
 <p>In order to derive C<sub>T</sub> from measured pCO<sub>2</sub> profiles, the alkalinity mean + sd in the upper 25m and both stations was calculated as:</p>
-<pre class="r"><code>AT_mean &lt;- tb %&gt;% 
+<pre class="r"><code># AT mean calculation
+AT_mean &lt;- tb %&gt;% 
   filter(dep &lt;= parameters$max_dep) %&gt;% 
   summarise(AT = mean(AT, na.rm = TRUE)) %&gt;%
   pull()
 
 AT_mean</code></pre>
 <pre><code>[1] 1719.706</code></pre>
-<pre class="r"><code>AT_sd &lt;- tb %&gt;% 
+<pre class="r"><code># AT SD calculation
+AT_sd &lt;- tb %&gt;% 
   filter(dep &lt;= parameters$max_dep) %&gt;% 
   summarise(AT = sd(AT, na.rm = TRUE)) %&gt;%
   pull()
 
 AT_sd</code></pre>
 <pre><code>[1] 26.95771</code></pre>
+</div>
+<div id="mean-salinity" class="section level2" number="3.2">
+<h2 number="3.2"><span class="header-section-number">3.2</span> Mean Salinity</h2>
 <p>Likewise, the mean salinity amounts to:</p>
-<pre class="r"><code>sal_mean &lt;- tb %&gt;% 
+<pre class="r"><code># Sal mean calculation
+sal_mean &lt;- tb %&gt;% 
   filter(dep &lt;= parameters$max_dep) %&gt;% 
   summarise(sal = mean(sal, na.rm = TRUE)) %&gt;%
   pull()
@@ -1242,16 +1353,17 @@ sal_mean</code></pre>
 tb_fix %&gt;% 
   write_csv(here::here(&quot;data/intermediate/_summarized_data_files&quot;, &quot;tb_fix.csv&quot;))</code></pre>
 </div>
-<div id="nct-calculation" class="section level2" number="3.2">
-<h2 number="3.2"><span class="header-section-number">3.2</span> nC<sub>T</sub> calculation</h2>
-<p>The alkalinity-normalized C<sub>T</sub>, nC<sub>T</sub>, was calculated.</p>
-<pre class="r"><code>tb &lt;- tb %&gt;% 
+<div id="ct-calculation" class="section level2" number="3.3">
+<h2 number="3.3"><span class="header-section-number">3.3</span> C<sub>T</sub>* calculation</h2>
+<p>The alkalinity-normalized C<sub>T</sub>, C<sub>T</sub>*, was calculated.</p>
+<pre class="r"><code># calculate CT*, referred to as nCT in the code
+tb &lt;- tb %&gt;% 
   mutate(nCT = CT/AT * AT_mean)</code></pre>
 </div>
-<div id="vertical-profiles" class="section level2" number="3.3">
-<h2 number="3.3"><span class="header-section-number">3.3</span> Vertical profiles</h2>
-<div id="stations" class="section level3" number="3.3.1">
-<h3 number="3.3.1"><span class="header-section-number">3.3.1</span> Stations</h3>
+<div id="vertical-profiles" class="section level2" number="3.4">
+<h2 number="3.4"><span class="header-section-number">3.4</span> Vertical profiles</h2>
+<div id="stations" class="section level3" number="3.4.1">
+<h3 number="3.4.1"><span class="header-section-number">3.4.1</span> Stations</h3>
 <pre class="r"><code>tb_long &lt;- tb %&gt;%
   pivot_longer(c(sal:AT, nCT), names_to = &quot;var&quot;, values_to = &quot;value&quot;)
 
@@ -1265,11 +1377,19 @@ tb_long %&gt;%
   facet_grid(station ~ var, scales = &quot;free_x&quot;) +
   theme(legend.position = &quot;bottom&quot;,
         legend.title = element_blank())</code></pre>
-<p><img src="figure/NCP_best_guess.Rmd/bottle_CO2_profiles_station-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="figure" style="text-align: center">
+<img src="figure/NCP_best_guess.Rmd/bottle_CO2_profiles_station-1.png" alt="Discrete sample profiles for individual stations" width="672" />
+<p class="caption">
+Discrete sample profiles for individual stations
+</p>
 </div>
-<div id="mean" class="section level3" number="3.3.2">
-<h3 number="3.3.2"><span class="header-section-number">3.3.2</span> Mean</h3>
-<pre class="r"><code>tb_long_mean &lt;- tb_long %&gt;%
+</div>
+<div id="mean" class="section level3" number="3.4.2">
+<h3 number="3.4.2"><span class="header-section-number">3.4.2</span> Mean</h3>
+<pre class="r"><code># grid data into 5 m intervals
+# because some samples were not taken at exact 5m depth intervals
+# and calculate cruise mean value within each depth interval
+tb_long_mean &lt;- tb_long %&gt;%
   mutate(dep_grid = as.numeric(as.character(cut(
     dep,
     breaks = seq(-2.5, 30, 5),
@@ -1337,7 +1457,12 @@ p_nCT &lt;- tb_long_mean %&gt;%
 
 p_AT + p_CT + p_nCT +
   plot_annotation(tag_levels = &#39;a&#39;)</code></pre>
-<p><img src="figure/NCP_best_guess.Rmd/bottle_CO2_profiles_mean-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="figure" style="text-align: center">
+<img src="figure/NCP_best_guess.Rmd/bottle_CO2_profiles_mean-1.png" alt="Discrete sample profiles as the mean of individual stations" width="672" />
+<p class="caption">
+Discrete sample profiles as the mean of individual stations
+</p>
+</div>
 <pre class="r"><code>ggsave(
   here::here(
     &quot;output/Plots/Figures_publication/appendix&quot;,
@@ -1363,14 +1488,16 @@ ggsave(
 rm(tb_long_mean, p_AT, p_CT, p_nCT, tb_fix)</code></pre>
 </div>
 </div>
-<div id="surface-time-series" class="section level2" number="3.4">
-<h2 number="3.4"><span class="header-section-number">3.4</span> Surface time series</h2>
-<pre class="r"><code>tb_surface &lt;- tb_long %&gt;%
+<div id="surface-time-series" class="section level2" number="3.5">
+<h2 number="3.5"><span class="header-section-number">3.5</span> Surface time series</h2>
+<pre class="r"><code># surface time series per station
+tb_surface &lt;- tb_long %&gt;%
   filter(dep &lt; parameters$surface_dep) %&gt;%
   group_by(ID, date_time_ID, var, station) %&gt;%
   summarise(value = mean(value, na.rm = TRUE)) %&gt;%
   ungroup()
 
+# mean surface time series across stations
 tb_surface_station_mean &lt;- tb_long %&gt;%
   filter(dep &lt; parameters$surface_dep) %&gt;%
   group_by(ID, date_time_ID, var) %&gt;%
@@ -1378,8 +1505,9 @@ tb_surface_station_mean &lt;- tb_long %&gt;%
             value_sd = sd(value, na.rm = TRUE)) %&gt;%
   ungroup()
 
+# create time series plot
 tb_long %&gt;%
-  filter(dep &lt; 11) %&gt;%
+  filter(dep &lt;= 10) %&gt;%
   ggplot() +
   geom_line(data = tb_surface, aes(date_time_ID, value, col = &quot;Individual&quot;)) +
   geom_line(data = tb_surface_station_mean, aes(date_time_ID, value_mean, col =
@@ -1393,13 +1521,16 @@ tb_long %&gt;%
   facet_grid(var ~ station, scales = &quot;free_y&quot;) +
   labs(x = &quot;Mean transect date&quot;)</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/NCP_best_guess.Rmd/plot_bottle_CO2_surface_timeseries-1.png" alt="Time series of bottle data. Shown are mean values of samples collected at water depths &lt; 10m (usually collected at 0 and 5 m)." width="672" />
+<img src="figure/NCP_best_guess.Rmd/plot_bottle_CO2_surface_timeseries-1.png" alt="Time series of bottle data. Shown are raw data at water depth &lt;= 10m, as well as mean values of samples collected at water depths &lt; 6m (usually collected at 0 and 5 m)." width="672" />
 <p class="caption">
-Time series of bottle data. Shown are mean values of samples collected at water depths &lt; 10m (usually collected at 0 and 5 m).
+Time series of bottle data. Shown are raw data at water depth &lt;= 10m, as well as mean values of samples collected at water depths &lt; 6m (usually collected at 0 and 5 m).
 </p>
 </div>
 <pre class="r"><code>rm(tb_long, tb_surface, tb)</code></pre>
-<p>Important notes: - nC<sub>T</sub> drop and temporal patterns agree well with those found in the nC<sub>T</sub> time series derived from pCO<sub>2</sub> measurements (below).</p>
+<p>Note:</p>
+<ul>
+<li>nC<sub>T</sub> drop and temporal patterns agree well with those found in the nC<sub>T</sub> time series derived from pCO<sub>2</sub> measurements (below).</li>
+</ul>
 </div>
 </div>
 <div id="nct-profiles" class="section level1" number="4">
@@ -4805,24 +4936,35 @@ other attached packages:
 [28] workflowr_1.6.2       
 
 loaded via a namespace (and not attached):
- [1] fs_1.5.0           RColorBrewer_1.1-2 webshot_0.5.2      httr_1.4.2        
- [5] rprojroot_2.0.2    tools_4.0.3        backports_1.2.1    utf8_1.1.4        
- [9] R6_2.5.0           DBI_1.1.0          colorspace_2.0-0   raster_3.4-5      
-[13] withr_2.3.0        tidyselect_1.1.0   compiler_4.0.3     git2r_0.27.1      
-[17] cli_2.2.0          rvest_0.3.6        xml2_1.3.2         isoband_0.2.3     
-[21] labeling_0.4.2     scales_1.1.1       checkmate_2.0.0    digest_0.6.27     
-[25] rmarkdown_2.6      pkgconfig_2.0.3    htmltools_0.5.0    highr_0.8         
-[29] dbplyr_2.0.0       rlang_0.4.10       readxl_1.3.1       rstudioapi_0.13   
-[33] farver_2.0.3       generics_0.1.0     jsonlite_1.7.2     magrittr_2.0.1    
-[37] Rcpp_1.0.5         munsell_0.5.0      fansi_0.4.1        lifecycle_0.2.0   
-[41] stringi_1.5.3      whisker_0.4        yaml_2.2.1         plyr_1.8.6        
-[45] grid_4.0.3         promises_1.1.1     crayon_1.3.4       lattice_0.20-41   
-[49] haven_2.3.1        hms_0.5.3          knitr_1.30         ps_1.5.0          
-[53] pillar_1.4.7       codetools_0.2-16   reprex_0.3.0       glue_1.4.2        
-[57] evaluate_0.14      data.table_1.13.6  modelr_0.1.8       vctrs_0.3.6       
-[61] httpuv_1.5.4       cellranger_1.1.0   gtable_0.3.0       assertthat_0.2.1  
-[65] xfun_0.19          broom_0.7.3        later_1.1.0.1      viridisLite_0.3.0 
-[69] ellipsis_0.3.1     here_1.0.1        </code></pre>
+ [1] colorspace_2.0-0    rjson_0.2.20        ellipsis_0.3.1     
+ [4] class_7.3-17        rprojroot_2.0.2     fs_1.5.0           
+ [7] rstudioapi_0.13     farver_2.0.3        ggsn_0.5.0         
+[10] fansi_0.4.1         xml2_1.3.2          codetools_0.2-16   
+[13] knitr_1.30          jsonlite_1.7.2      broom_0.7.3        
+[16] dbplyr_2.0.0        png_0.1-7           compiler_4.0.3     
+[19] httr_1.4.2          backports_1.2.1     assertthat_0.2.1   
+[22] cli_2.2.0           later_1.1.0.1       htmltools_0.5.0    
+[25] tools_4.0.3         ggmap_3.0.0         gtable_0.3.0       
+[28] glue_1.4.2          Rcpp_1.0.5          cellranger_1.1.0   
+[31] raster_3.4-5        vctrs_0.3.6         xfun_0.19          
+[34] ps_1.5.0            rvest_0.3.6         lifecycle_0.2.0    
+[37] scales_1.1.1        hms_0.5.3           promises_1.1.1     
+[40] RColorBrewer_1.1-2  yaml_2.2.1          stringi_1.5.3      
+[43] highr_0.8           maptools_1.0-2      e1071_1.7-4        
+[46] checkmate_2.0.0     RgoogleMaps_1.4.5.3 rlang_0.4.10       
+[49] pkgconfig_2.0.3     bitops_1.0-6        evaluate_0.14      
+[52] lattice_0.20-41     sf_0.9-6            labeling_0.4.2     
+[55] tidyselect_1.1.0    here_1.0.1          plyr_1.8.6         
+[58] magrittr_2.0.1      R6_2.5.0            generics_0.1.0     
+[61] DBI_1.1.0           pillar_1.4.7        haven_2.3.1        
+[64] whisker_0.4         foreign_0.8-80      withr_2.3.0        
+[67] units_0.6-7         modelr_0.1.8        crayon_1.3.4       
+[70] KernSmooth_2.23-17  utf8_1.1.4          rmarkdown_2.6      
+[73] jpeg_0.1-8.1        isoband_0.2.3       grid_4.0.3         
+[76] readxl_1.3.1        data.table_1.13.6   git2r_0.27.1       
+[79] reprex_0.3.0        digest_0.6.27       classInt_0.4-3     
+[82] webshot_0.5.2       httpuv_1.5.4        munsell_0.5.0      
+[85] viridisLite_0.3.0  </code></pre>
 </div>
 </div>
 
