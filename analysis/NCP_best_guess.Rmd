@@ -702,11 +702,11 @@ tb_fix %>%
 
 The alkalinity-normalized C~T~, C~T~*, was calculated.
 
-```{r nCT_bottle_calculation}
+```{r CT_star_bottle_calculation}
 
-# calculate CT*, referred to as nCT in the code
+# calculate CT*, referred to as CT_star in the code
 tb <- tb %>% 
-  mutate(nCT = CT/AT * AT_mean)
+  mutate(CT_star = CT/AT * AT_mean)
 
 ```
 
@@ -717,7 +717,7 @@ tb <- tb %>%
 ```{r bottle_CO2_profiles_station, fig.cap="Discrete sample profiles for individual stations"}
 
 tb_long <- tb %>%
-  pivot_longer(c(sal:AT, nCT), names_to = "var", values_to = "value")
+  pivot_longer(c(sal:AT, CT_star), names_to = "var", values_to = "value")
 
 tb_long %>%
   ggplot(aes(value, dep)) +
@@ -788,8 +788,8 @@ p_CT <- tb_long_mean %>%
   theme(axis.text.y = element_blank(),
         axis.title.y = element_blank())
 
-p_nCT <- tb_long_mean %>%
-  filter(dep_grid < parameters$max_dep, var == "nCT") %>%
+p_CT_star <- tb_long_mean %>%
+  filter(dep_grid < parameters$max_dep, var == "CT_star") %>%
   ggplot(aes(value, dep_grid)) +
   geom_path(aes(col = ID)) +
   geom_point(aes(fill = ID), shape = 21) +
@@ -805,7 +805,7 @@ p_nCT <- tb_long_mean %>%
     axis.title.y = element_blank()
   )
 
-p_AT + p_CT + p_nCT +
+p_AT + p_CT + p_CT_star +
   plot_annotation(tag_levels = 'a')
 
 ggsave(
@@ -830,7 +830,7 @@ ggsave(
   units = "mm"
 )
 
-rm(tb_long_mean, p_AT, p_CT, p_nCT, tb_fix)
+rm(tb_long_mean, p_AT, p_CT, p_CT_star, tb_fix)
 
 ```
 
@@ -875,19 +875,20 @@ rm(tb_long, tb_surface, tb)
 
 Note:
 
-- nC~T~ drop and temporal patterns agree well with those found in the nC~T~ time series derived from pCO~2~ measurements (below).
+- C~T~* drop and temporal patterns agree well with those found in the C~T~* time series derived from pCO~2~ measurements (below).
 
-# nC~T~ profiles
+# C~T~* profiles
 
 ## Calculation from pCO~2~
 
-Alkalinity normalized C~T~ (nC~T~) profiles were calculated from sensor pCO~2~ and T profiles, and constant salinity and alkalinity values. Note that the impact of fixed vs. measured salinity has only a negligible impact on nC~T~ profiles.
+Alkalinity normalized C~T~ (C~T~*) profiles were calculated from sensor pCO~2~ and T profiles, and constant mean salinity and mean alkalinity values. Note that the impact of fixed vs. measured salinity has only a negligible impact on C~T~ profiles.
 
-```{r CT_calculation}
+```{r CT_star_calculation}
 
+# calculate CT_star
 tm_profiles <- tm_profiles %>%
   mutate(
-    nCT = carb(
+    CT_star = carb(
       24,
       var1 = pCO2,
       var2 = AT_mean * 1e-6,
@@ -901,8 +902,7 @@ tm_profiles <- tm_profiles %>%
     )[, 16] * 1e6
   )
 
-
-
+# write CT_star profiles file
 tm_profiles %>%
   write_csv(
     here::here(
@@ -911,9 +911,10 @@ tm_profiles %>%
     )
   )
 
+# calculate CT_star test profiles for higher mean alkalinity 
 tm_profiles <- tm_profiles %>%
   mutate(
-    nCT_test = carb(
+    CT_star_test = carb(
       24,
       var1 = pCO2,
       var2 = (AT_mean + 2*AT_sd) * 1e-6,
@@ -933,7 +934,6 @@ tm_profiles <- tm_profiles %>%
 ## Plot all profiles
 
 ```{r profiles_all_by_date}
-
 
 tm_profiles <-  tm_profiles %>%
   arrange(date_time_ID)
@@ -961,9 +961,9 @@ p_pCO2 <-
   )
 
 
-p_nCT <-
+p_CT_star <-
   tm_profiles %>%
-  ggplot(aes(nCT, dep, col = ID, group = interaction(station, ID))) +
+  ggplot(aes(CT_star, dep, col = ID, group = interaction(station, ID))) +
   geom_path() +
   scale_y_reverse(expand = c(0, 0)) +
   labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {-1})))) +
@@ -975,7 +975,7 @@ p_nCT <-
     axis.title.y = element_blank()
   )
 
-p_tem + p_pCO2 + p_nCT +
+p_tem + p_pCO2 + p_CT_star +
   plot_annotation(tag_levels = 'a')
 
 ggsave(
@@ -1000,7 +1000,7 @@ ggsave(
   units = "mm"
 )
 
-rm(p_tem, p_pCO2, p_nCT)
+rm(p_tem, p_pCO2, p_CT_star)
 
 ```
 
@@ -1033,24 +1033,24 @@ tm_profiles_ID_sd <- tm_profiles %>%
   ungroup()
 
 tm_profiles_ID_sd_long <- tm_profiles_ID_sd %>%
-  pivot_longer(sal:nCT_test, names_to = "var", values_to = "sd")
+  pivot_longer(sal:CT_star_test, names_to = "var", values_to = "sd")
 
 tm_profiles_ID_mean_long <- tm_profiles_ID_mean %>%
-  pivot_longer(sal:nCT_test, names_to = "var", values_to = "value")
+  pivot_longer(sal:CT_star_test, names_to = "var", values_to = "value")
 
 tm_profiles_ID_long_test <-
   inner_join(tm_profiles_ID_mean_long, tm_profiles_ID_sd_long)
 
 tm_profiles_ID_long <- tm_profiles_ID_long_test %>% 
-  filter(var != "nCT_test")
+  filter(var != "CT_star_test")
 
 tm_profiles_ID_mean_test <- tm_profiles_ID_mean
 
 tm_profiles_ID_mean_test <- tm_profiles_ID_mean_test %>% 
-  mutate(nCT_delta = nCT - nCT_test)
+  mutate(CT_star_delta = CT_star - CT_star_test)
 
 tm_profiles_ID_mean <- tm_profiles_ID_mean %>%
-  select(-nCT_test)
+  select(-CT_star_test)
 
 tm_profiles_ID_mean %>%
   write_csv(here::here("data/intermediate/_merged_data_files/CT_dynamics", "tm_profiles_ID.csv"))
@@ -1063,7 +1063,7 @@ rm(
 
 ```
 
-```{r nCT_profiles_all, fig.cap="Mean vertical profiles per cruise day across all stations."}
+```{r CT_star_profiles_all, fig.cap="Mean vertical profiles per cruise day across all stations."}
 
 tm_profiles_ID_long %>%
   ggplot(aes(value, dep, col = ID)) +
@@ -1075,12 +1075,12 @@ tm_profiles_ID_long %>%
   
 ```
 
-### nCT sensitivity to AT
+### CT_star sensitivity to AT
 
-```{r nCT_profiles_delta, fig.cap="Mean vertical profiles per cruise day across all stations."}
+```{r CT_star_profiles_delta, fig.cap="Mean vertical profiles per cruise day across all stations."}
 
 tm_profiles_ID_mean_test %>%
-  ggplot(aes(nCT_delta - mean(nCT_delta), dep, col = ID)) +
+  ggplot(aes(CT_star_delta - mean(CT_star_delta), dep, col = ID)) +
   geom_point() +
   geom_path() +
   scale_y_reverse() +
@@ -1088,12 +1088,12 @@ tm_profiles_ID_mean_test %>%
   
 ```
 
-```{r nCT_profiles_individual_pub_V1, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
+```{r CT_star_profiles_individual_pub_V1, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
 
 profiles_min_max <- tm_profiles %>%
   group_by(dep) %>%
-  summarise(max_CT = max(nCT),
-            min_CT = min(nCT),
+  summarise(max_CT = max(CT_star),
+            min_CT = min(CT_star),
             max_tem = max(tem),
             min_tem = min(tem)) %>%
   ungroup()
@@ -1101,7 +1101,7 @@ profiles_min_max <- tm_profiles %>%
 
 p_CT <-
   tm_profiles_ID_long %>%
-  filter(var %in% c("nCT")) %>%
+  filter(var %in% c("CT_star")) %>%
   ggplot() +
   geom_ribbon(data = profiles_min_max,
               aes(xmin = min_CT,
@@ -1182,7 +1182,7 @@ p_CT | p_tem
 
 ```
 
-```{r nCT_profiles_individual_pub_V2, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
+```{r CT_star_profiles_individual_pub_V2, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
 
 p_CT <-
   tm_profiles %>%
@@ -1192,7 +1192,7 @@ p_CT <-
                   xmax = max_CT,
                   y = dep),
               alpha = 0.2) +
-   geom_path(aes(nCT, dep, col = station)) +
+   geom_path(aes(CT_star, dep, col = station)) +
   scale_y_reverse() +
   facet_grid(ID ~ .) +
   labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {-1}))),
@@ -1257,7 +1257,7 @@ ggsave(
   units = "mm"
 )
 
-rm(p_nCT, p_tem, cruise_labels, profiles_min_max)
+rm(p_CT_star, p_tem, cruise_labels, profiles_min_max)
 
 ```
 
@@ -1327,25 +1327,25 @@ for(i_ID in unique(tm_profiles$ID)){
         coord_cartesian(xlim = c(6.5,7.5), ylim = c(30,0))+
         theme_bw()
       
-      p_nCT <- 
+      p_CT_star <- 
         tm_profiles %>%
         arrange(date_time) %>% 
         filter(ID == i_ID,
                station == i_station) %>%
-        ggplot(aes(nCT, dep))+
+        ggplot(aes(CT_star, dep))+
         geom_point()+
         geom_path()+
         scale_y_reverse()+
-        labs(y="Depth [m]", x="nCT* [µmol/kg]")+
+        labs(y="Depth [m]", x="CT_star* [µmol/kg]")+
         coord_cartesian(xlim = c(1400,1700), ylim = c(30,0))+
         theme_bw()
       
 
       print(
-            p_pCO2 + p_tem + p_sal + p_nCT
+            p_pCO2 + p_tem + p_sal + p_CT_star
             )
       
-      rm(p_pCO2, p_sal, p_tem, p_nCT)
+      rm(p_pCO2, p_sal, p_tem, p_CT_star)
 
       
     }
@@ -1362,7 +1362,7 @@ rm(i_ID, i_station)
 
 tm_profiles_long <- tm_profiles %>%
   select(-c(lat, lon, pCO2_corr)) %>% 
-  pivot_longer(sal:nCT, values_to = "value", names_to = "var")
+  pivot_longer(sal:CT_star, values_to = "value", names_to = "var")
 
 
 pdf(file=here::here("output/Plots/CT_dynamics",
@@ -1532,7 +1532,7 @@ rm(tm_profiles_ID_long_grid)
 
 Mean seawater CT were calculated for 5m depth intervals based on two AT values.
 
-```{r observed_timeseries_nCT_delta}
+```{r observed_timeseries_CT_star_delta}
 
 tm_profiles_ID_long_grid <- tm_profiles_ID_long_test %>%
   mutate(dep = cut(dep, seq(0, 30, 5))) %>%
@@ -1540,7 +1540,7 @@ tm_profiles_ID_long_grid <- tm_profiles_ID_long_test %>%
   summarise_all(list(mean), na.rm = TRUE)
 
 tm_profiles_ID_long_grid %>%
-  filter(var %in% c("nCT", "nCT_test")) %>% 
+  filter(var %in% c("CT_star", "CT_star_test")) %>% 
   ggplot(aes(date_time_ID, value, col = as.factor(dep))) +
   geom_path() +
   geom_point() +
@@ -1556,7 +1556,7 @@ Calculate CT\* changes for range of AT errors
 
 ```{r CT_calculation_sensitivity}
 
-nCT_sens <- tm_profiles %>%
+CT_star_sens <- tm_profiles %>%
   filter(dep < parameters$surface_dep,
          date_ID %in% c("Jul 06", "Jul 24")) %>%
   select(date_ID, tem, pCO2) %>%
@@ -1564,14 +1564,14 @@ nCT_sens <- tm_profiles %>%
   summarise_all(mean, na.rm = TRUE) %>%
   ungroup()
 
-nCT_sens <- expand_grid(nCT_sens, factor = seq(-3, 3, 0.2))
+CT_star_sens <- expand_grid(CT_star_sens, factor = seq(-3, 3, 0.2))
 
-nCT_sens <- nCT_sens %>%
+CT_star_sens <- CT_star_sens %>%
   mutate(AT = (AT_mean + factor * AT_sd) * 1e-6)
 
-nCT_sens <- nCT_sens %>%
+CT_star_sens <- CT_star_sens %>%
   mutate(
-    nCT = carb(
+    CT_star = carb(
       24,
       var1 = pCO2,
       var2 = AT,
@@ -1584,32 +1584,32 @@ nCT_sens <- nCT_sens %>%
     )[, 16] * 1e6
   )
 
-nCT_sens <- nCT_sens %>%
+CT_star_sens <- CT_star_sens %>%
   mutate(AT = AT * 1e6) %>%
-  select(date_ID, factor, AT, nCT) %>%
+  select(date_ID, factor, AT, CT_star) %>%
   pivot_wider(names_from = "date_ID",
-              values_from = c("nCT"))
+              values_from = c("CT_star"))
 
-nCT_sens <- nCT_sens %>%
-  mutate(nCT_delta = `Jul 24` - `Jul 06`) %>%
-  select(factor, AT, nCT_delta)
+CT_star_sens <- CT_star_sens %>%
+  mutate(CT_star_delta = `Jul 24` - `Jul 06`) %>%
+  select(factor, AT, CT_star_delta)
 
-nCT_delta_mean <- nCT_sens %>%
+CT_star_delta_mean <- CT_star_sens %>%
   filter(factor == 0) %>%
-  pull(nCT_delta)
+  pull(CT_star_delta)
 
-nCT_sens <- nCT_sens %>%
-  mutate(nCT_delta_offset = nCT_delta - nCT_delta_mean,
-         nCT_delta_offset_rel = nCT_delta / nCT_delta_mean *100,
+CT_star_sens <- CT_star_sens %>%
+  mutate(CT_star_delta_offset = CT_star_delta - CT_star_delta_mean,
+         CT_star_delta_offset_rel = CT_star_delta / CT_star_delta_mean *100,
          AT_offset = AT - AT_mean)
 
-nCT_delta_sd <- nCT_sens %>%
+CT_star_delta_sd <- CT_star_sens %>%
   filter(factor == 1) %>% 
-  pull(nCT_delta_offset)
+  pull(CT_star_delta_offset)
 
 
-nCT_sens %>%
-  ggplot(aes(AT_offset, nCT_delta_offset)) +
+CT_star_sens %>%
+  ggplot(aes(AT_offset, CT_star_delta_offset)) +
   annotate(
     "rect",
     xmin = -AT_sd,
@@ -1622,8 +1622,8 @@ nCT_sens %>%
     "rect",
     xmin = -Inf,
     xmax = Inf,
-    ymin = -nCT_delta_sd,
-    ymax = +nCT_delta_sd,
+    ymin = -CT_star_delta_sd,
+    ymax = +CT_star_delta_sd,
     alpha = 0.3
   ) +
   geom_vline(xintercept = 0, linetype = 2) +
@@ -1636,7 +1636,7 @@ nCT_sens %>%
       })
     )),
     sec.axis = sec_axis(
-      ~ . / nCT_delta_mean * 100,
+      ~ . / CT_star_delta_mean * 100,
       name = expression(paste("Relative bias ", Delta ~ C[T], "* (%)")),
       breaks = seq(-10, 10, 1)
     )
@@ -1680,13 +1680,13 @@ ggsave(
 ```{r plot_hovmoeller_absolut, fig.cap="Hovmoeller plotm of absolute changes in C~T~ and temperature."}
 
 
-bin_nCT <- 30
+bin_CT_star <- 30
 
-p_nCT_hov <- tm_profiles_ID_long %>%
-  filter(var == "nCT") %>%
+p_CT_star_hov <- tm_profiles_ID_long %>%
+  filter(var == "CT_star") %>%
   ggplot() +
   geom_contour_fill(aes(x = date_time_ID, y = dep, z = value),
-                    breaks = MakeBreaks(bin_nCT),
+                    breaks = MakeBreaks(bin_CT_star),
                     col = "black") +
   geom_point(
     aes(x = date_time_ID, y = c(24.5)),
@@ -1695,9 +1695,9 @@ p_nCT_hov <- tm_profiles_ID_long %>%
     fill = "white"
   ) +
   scale_fill_scico(
-    breaks = MakeBreaks(bin_nCT),
+    breaks = MakeBreaks(bin_CT_star),
     guide = "colorstrip",
-    name = "nCT (µmol/kg)",
+    name = "CT_star (µmol/kg)",
     palette = "davos",
     direction = -1
   ) +
@@ -1736,28 +1736,28 @@ p_tem_hov <- tm_profiles_ID_long %>%
   theme(axis.title.x = element_blank(),
         legend.position = "left")
 
-p_nCT_hov / p_tem_hov
+p_CT_star_hov / p_tem_hov
 
-rm(p_nCT_hov, bin_nCT, p_tem_hov, bin_Tem)
+rm(p_CT_star_hov, bin_CT_star, p_tem_hov, bin_Tem)
 
 ```
 
-```{r pub_fig_nCT_tem_hov_abs_profiles_cum, include=FALSE}
+```{r pub_fig_CT_star_tem_hov_abs_profiles_cum, include=FALSE}
 
-bin_nCT <- 30
+bin_CT_star <- 30
 
-p_nCT_hov <- tm_profiles_ID_long %>%
-  filter(var == "nCT") %>%
+p_CT_star_hov <- tm_profiles_ID_long %>%
+  filter(var == "CT_star") %>%
   ggplot() +
   geom_contour_fill(aes(x = date_time_ID, y = dep, z = value),
-                    breaks = MakeBreaks(bin_nCT),
+                    breaks = MakeBreaks(bin_CT_star),
                     col = "black",
                     size = 0.1) +
   geom_vline(aes(xintercept = date_time_ID),
              col = "white",
              linetype = "1f") +
   scale_fill_scico(
-    breaks = MakeBreaks(bin_nCT),
+    breaks = MakeBreaks(bin_CT_star),
     guide = "colorstrip",
     name = expression(paste(C[T],"*")~(µmol ~ kg ^ {-1})~" "),
     palette = "davos",
@@ -1821,9 +1821,9 @@ p_tem_hov <- tm_profiles_ID_long %>%
 
 
 
-p_nCT_ID_cum <-
+p_CT_star_ID_cum <-
   tm_profiles_ID_long %>%
-  filter(var == "nCT") %>%
+  filter(var == "CT_star") %>%
   ggplot(aes(value_cum, dep, col = ID, fill = ID)) +
   geom_hline(yintercept = 12, col = "red") +
   geom_path() +
@@ -1866,7 +1866,7 @@ p_tem_ID_cum <-
   )
 
 ((p_tem_hov | p_tem_ID_cum ) + plot_layout(tag_level = 'new', widths = c(2.3, 1))) / 
-((p_nCT_hov | p_nCT_ID_cum ) + plot_layout(tag_level = 'new', widths = c(2.3, 1))) +
+((p_CT_star_hov | p_CT_star_ID_cum ) + plot_layout(tag_level = 'new', widths = c(2.3, 1))) +
   plot_annotation(tag_levels = c('a', '1'))
 
 ggsave(
@@ -1891,7 +1891,7 @@ ggsave(
   units = "mm"
 )
 
-rm(p_nCT_hov, bin_nCT, p_tem_hov, bin_Tem, p_nCT_ID_cum, p_tem_ID_cum)
+rm(p_CT_star_hov, bin_CT_star, p_tem_hov, bin_Tem, p_CT_star_ID_cum, p_tem_ID_cum)
 
 ```
 
@@ -1900,14 +1900,14 @@ rm(p_nCT_hov, bin_nCT, p_tem_hov, bin_Tem, p_nCT_ID_cum, p_tem_ID_cum)
 ```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plotm of daily changes in C~T~ and temperature. Note that calculated  value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period."}
 
 
-bin_nCT <- 2.5
+bin_CT_star <- 2.5
 
-nCT_hov <- tm_profiles_ID_long %>%
-  filter(var == "nCT") %>%
+CT_star_hov <- tm_profiles_ID_long %>%
+  filter(var == "CT_star") %>%
   ggplot() +
   geom_contour_fill(
     aes(x = date_time_ID_ref, y = dep, z = value_diff_daily),
-    breaks = MakeBreaks(bin_nCT),
+    breaks = MakeBreaks(bin_CT_star),
     col = "black"
   ) +
   geom_point(
@@ -1916,9 +1916,9 @@ nCT_hov <- tm_profiles_ID_long %>%
     shape = 24,
     fill = "white"
   ) +
-  scale_fill_divergent(breaks = MakeBreaks(bin_nCT),
+  scale_fill_divergent(breaks = MakeBreaks(bin_CT_star),
                        guide = "colorstrip",
-                       name = "nCT (µmol/kg)") +
+                       name = "CT_star (µmol/kg)") +
   scale_y_reverse() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
   theme_bw() +
@@ -1952,9 +1952,9 @@ Tem_hov <- tm_profiles_ID_long %>%
   labs(x = "", y = "Depth (m)") +
   coord_cartesian(expand = 0)
 
-nCT_hov / Tem_hov
+CT_star_hov / Tem_hov
 
-rm(nCT_hov, bin_nCT, Tem_hov, bin_Tem)
+rm(CT_star_hov, bin_CT_star, Tem_hov, bin_Tem)
 
 ```
 
@@ -1963,14 +1963,14 @@ rm(nCT_hov, bin_nCT, Tem_hov, bin_Tem)
 ```{r plot_hovmoeller_cumulative, fig.cap="Hovmoeller plotm of cumulative changes in C~T~ and temperature."}
 
 
-bin_nCT <- 20
+bin_CT_star <- 20
 
-nCT_hov <- tm_profiles_ID_long %>%
-  filter(var == "nCT") %>%
+CT_star_hov <- tm_profiles_ID_long %>%
+  filter(var == "CT_star") %>%
   ggplot() +
   geom_contour_fill(
     aes(x = date_time_ID, y = dep, z = value_cum),
-    breaks = MakeBreaks(bin_nCT),
+    breaks = MakeBreaks(bin_CT_star),
     col = "black"
   ) +
   geom_point(
@@ -1979,9 +1979,9 @@ nCT_hov <- tm_profiles_ID_long %>%
     shape = 24,
     fill = "white"
   ) +
-  scale_fill_divergent(breaks = MakeBreaks(bin_nCT),
+  scale_fill_divergent(breaks = MakeBreaks(bin_CT_star),
                        guide = "colorstrip",
-                       name = "nCT (µmol/kg)") +
+                       name = "CT_star (µmol/kg)") +
   scale_y_reverse() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
   theme_bw() +
@@ -2015,9 +2015,9 @@ Tem_hov <- tm_profiles_ID_long %>%
   labs(x = "", y = "Depth (m)") +
   coord_cartesian(expand = 0)
 
-nCT_hov / Tem_hov
+CT_star_hov / Tem_hov
 
-rm(nCT_hov, bin_nCT, Tem_hov, bin_Tem)
+rm(CT_star_hov, bin_CT_star, Tem_hov, bin_Tem)
 
 ```
 
@@ -2038,93 +2038,93 @@ Predefined integration depth levels in metres are: `r parameters$fixed_integrati
 
 ### Calculate inC~T~
 
-```{r calculate_inCT_fixed_depth}
+```{r calculate_iCT_star_fixed_depth}
 
-inCT_grid_sign <- tm_profiles_ID_long %>% 
+iCT_star_grid_sign <- tm_profiles_ID_long %>% 
   select(ID, date_time_ID, date_time_ID_ref) %>% 
   unique() %>% 
   expand_grid(sign = c("pos", "neg"))
 
-inCT_grid_total <- tm_profiles_ID_long %>% 
+iCT_star_grid_total <- tm_profiles_ID_long %>% 
   select(ID, date_time_ID, date_time_ID_ref) %>% 
   unique() %>% 
   expand_grid(sign = c("total"))
 
 for (i_dep in parameters$fixed_integration_depths) {
 
-inCT_sign_temp <- tm_profiles_ID_long %>% 
-  filter(var == "nCT", dep < i_dep) %>% 
+iCT_star_sign_temp <- tm_profiles_ID_long %>% 
+  filter(var == "CT_star", dep < i_dep) %>% 
   mutate(sign = if_else(ID == "180705" & dep == 0.5, "neg", sign)) %>% 
   group_by(ID, date_time_ID, date_time_ID_ref, sign) %>% 
-  summarise(nCT_i_diff = sum(value_diff)/1000) %>% 
+  summarise(CT_star_i_diff = sum(value_diff)/1000) %>% 
   ungroup()
 
-inCT_sign_temp <- inCT_sign_temp %>% 
+iCT_star_sign_temp <- iCT_star_sign_temp %>% 
   group_by(sign) %>%
   arrange(date_time_ID) %>% 
-  mutate(nCT_i_cum = cumsum(nCT_i_diff)) %>% 
+  mutate(CT_star_i_cum = cumsum(CT_star_i_diff)) %>% 
   ungroup()
 
-inCT_sign_temp <- full_join(inCT_sign_temp, inCT_grid_sign) %>% 
+iCT_star_sign_temp <- full_join(iCT_star_sign_temp, iCT_star_grid_sign) %>% 
   arrange(sign, date_time_ID) %>% 
-  fill(nCT_i_cum)
+  fill(CT_star_i_cum)
 
 
-inCT_total_temp <- tm_profiles_ID_long %>% 
-  filter(var == "nCT", dep < i_dep) %>% 
+iCT_star_total_temp <- tm_profiles_ID_long %>% 
+  filter(var == "CT_star", dep < i_dep) %>% 
   group_by(ID, date_time_ID, date_time_ID_ref) %>% 
-  summarise(nCT_i_diff = sum(value_diff)/1000) %>% 
+  summarise(CT_star_i_diff = sum(value_diff)/1000) %>% 
   ungroup()
 
-inCT_total_temp <- inCT_total_temp %>% 
+iCT_star_total_temp <- iCT_star_total_temp %>% 
   arrange(date_time_ID) %>% 
-  mutate(nCT_i_cum = cumsum(nCT_i_diff)) %>% 
+  mutate(CT_star_i_cum = cumsum(CT_star_i_diff)) %>% 
   ungroup() %>% 
   mutate(sign = "total")
 
-inCT_total_temp <- full_join(inCT_total_temp, inCT_grid_total) %>% 
+iCT_star_total_temp <- full_join(iCT_star_total_temp, iCT_star_grid_total) %>% 
   arrange(sign, date_time_ID) %>% 
-  fill(nCT_i_cum)
+  fill(CT_star_i_cum)
 
-inCT_temp <- bind_rows(inCT_sign_temp, inCT_total_temp) %>% 
+iCT_star_temp <- bind_rows(iCT_star_sign_temp, iCT_star_total_temp) %>% 
     mutate(i_dep = i_dep)
 
 
-if (exists("inCT")) {
-  inCT <- bind_rows(inCT, inCT_temp)
-  } else {inCT <- inCT_temp}
+if (exists("iCT_star")) {
+  iCT_star <- bind_rows(iCT_star, iCT_star_temp)
+  } else {iCT_star <- iCT_star_temp}
 
-rm(inCT_temp, inCT_sign_temp, inCT_total_temp)
+rm(iCT_star_temp, iCT_star_sign_temp, iCT_star_total_temp)
 
 }
 
-rm(inCT_grid_sign, inCT_grid_total)
+rm(iCT_star_grid_sign, iCT_star_grid_total)
 
-inCT <- inCT %>% 
+iCT_star <- iCT_star %>% 
   mutate(i_dep = as.factor(i_dep))
 
-inCT_fixed_dep <- inCT
-rm(inCT, i_dep)
+iCT_star_fixed_dep <- iCT_star
+rm(iCT_star, i_dep)
 
 ```
 
 ### Time series
 
-```{r inCT_fixed_depth_time_series, fig.asp=1.1}
+```{r iCT_star_fixed_depth_time_series, fig.asp=1.1}
 
-inCT_fixed_dep %>%
+iCT_star_fixed_dep %>%
   ggplot() +
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
   geom_col(
-    aes(date_time_ID_ref, nCT_i_diff, fill = i_dep),
+    aes(date_time_ID_ref, CT_star_i_diff, fill = i_dep),
     position = "dodge",
     alpha = 0.3
   ) +
-  geom_line(aes(date_time_ID, nCT_i_cum, col = i_dep)) +
+  geom_line(aes(date_time_ID, CT_star_i_cum, col = i_dep)) +
   scale_color_viridis_d(name = "Depth limit (m)") +
   scale_fill_viridis_d(name = "Depth limit (m)") +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  labs(y = "inCT (mol/m2)", x = "") +
+  labs(y = "iCT_star (mol/m2)", x = "") +
   facet_grid(sign ~ ., scales = "free_y", space = "free_y") +
   theme_bw()
 
@@ -2154,13 +2154,13 @@ tm_profiles <- tm_profiles %>%
 ```{r calculate_profiles_hydrographical_mean}
 
 tm_profiles_ID_mean_hydro <- tm_profiles %>%
-  select(-c(station, lat, lon, pCO2_corr, pCO2, nCT, date_time)) %>%
+  select(-c(station, lat, lon, pCO2_corr, pCO2, CT_star, date_time)) %>%
   group_by(ID, date_time_ID, date_ID, dep) %>%
   summarise_all(list(mean), na.rm = TRUE) %>%
   ungroup()
 
 tm_profiles_ID_sd_hydro <- tm_profiles %>%
-  select(-c(station, lat, lon, pCO2_corr, pCO2, nCT, date_time)) %>%
+  select(-c(station, lat, lon, pCO2_corr, pCO2, CT_star, date_time)) %>%
   group_by(ID, date_time_ID, date_ID, dep) %>%
   summarise_all(list(sd), na.rm = TRUE) %>%
   ungroup()
@@ -2250,55 +2250,55 @@ MLD %>%
 
 ```
 
-### inCT calculation
+### iCT_star calculation
 
-```{r calculate_inCT_MLD}
+```{r calculate_iCT_star_MLD}
 
-inCT <- tm_profiles_ID_long %>% 
-  filter(var == "nCT")
+iCT_star <- tm_profiles_ID_long %>% 
+  filter(var == "CT_star")
 
-inCT <- full_join(inCT, MLD)
+iCT_star <- full_join(iCT_star, MLD)
 
-inCT <- inCT %>% 
+iCT_star <- iCT_star %>% 
   filter(dep <= MLD)
 
-inCT <- inCT %>% 
+iCT_star <- iCT_star %>% 
   group_by(ID, date_time_ID, date_time_ID_ref, rho_lim) %>% 
-  summarise(nCT_i_diff = sum(value_diff)/1000) %>% 
+  summarise(CT_star_i_diff = sum(value_diff)/1000) %>% 
   ungroup()
 
-inCT <- inCT %>% 
+iCT_star <- iCT_star %>% 
   group_by(rho_lim) %>% 
   arrange(date_time_ID) %>% 
-  mutate(nCT_i_cum = cumsum(nCT_i_diff)) %>% 
+  mutate(CT_star_i_cum = cumsum(CT_star_i_diff)) %>% 
   ungroup()
 
-inCT <- inCT %>% 
+iCT_star <- iCT_star %>% 
   mutate(rho_lim = as.factor(rho_lim))
 
-inCT_MLD <- inCT
+iCT_star_MLD <- iCT_star
 
-rm(inCT, MLD, tm_profiles_ID_hydro, tm_profiles_ID_hydro_long)
+rm(iCT_star, MLD, tm_profiles_ID_hydro, tm_profiles_ID_hydro_long)
 
 ```
 
 ### Time series
 
-```{r inCT_MLD_time_series}
+```{r iCT_star_MLD_time_series}
 
-inCT_MLD %>%
+iCT_star_MLD %>%
   ggplot() +
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
   geom_col(
-    aes(date_time_ID_ref, nCT_i_diff, fill = rho_lim),
+    aes(date_time_ID_ref, CT_star_i_diff, fill = rho_lim),
     position = "dodge",
     alpha = 0.3
   ) +
-  geom_line(aes(date_time_ID, nCT_i_cum, col = rho_lim)) +
+  geom_line(aes(date_time_ID, CT_star_i_cum, col = rho_lim)) +
   scale_color_viridis_d(name = "Rho limit") +
   scale_fill_viridis_d(name = "Rho limit") +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  labs(y = "inCT [mol/m2]", x = "") +
+  labs(y = "iCT_star [mol/m2]", x = "") +
   theme_bw()
 
 ```
@@ -2307,35 +2307,35 @@ inCT_MLD %>%
 
 In the following, all cummulative iC~T~ trajectories are displayed. Highlighted are those obtained for the fixed depth approach with 10 m limit, and the MLD approach with a high density threshold of 0.5 kg/m3.
 
-```{r inCT_comparison}
+```{r iCT_star_comparison}
 
-inCT <- full_join(inCT_fixed_dep, inCT_MLD)
+iCT_star <- full_join(iCT_star_fixed_dep, iCT_star_MLD)
 
-inCT <- inCT %>%
+iCT_star <- iCT_star %>%
   mutate(group = paste(
     as.character(sign),
     as.character(i_dep),
     as.character(rho_lim)
   ))
 
-inCT %>%
+iCT_star %>%
   arrange(date_time_ID) %>%
   ggplot() +
   geom_hline(yintercept = 0) +
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
-  geom_line(aes(date_time_ID, nCT_i_cum,
+  geom_line(aes(date_time_ID, CT_star_i_cum,
                 group = group), col = "grey") +
   geom_line(
-    data = inCT_fixed_dep %>% filter(i_dep == 12, sign == "total"),
-    aes(date_time_ID, nCT_i_cum, col = "12m - total")
+    data = iCT_star_fixed_dep %>% filter(i_dep == 12, sign == "total"),
+    aes(date_time_ID, CT_star_i_cum, col = "12m - total")
   ) +
-  geom_line(data = inCT_MLD %>% filter(rho_lim == 0.1),
-            aes(date_time_ID, nCT_i_cum, col = "MLD - 0.1")) +
+  geom_line(data = iCT_star_MLD %>% filter(rho_lim == 0.1),
+            aes(date_time_ID, CT_star_i_cum, col = "MLD - 0.1")) +
   scale_color_brewer(palette = "Set1", name = "") +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  labs(y = "inCT [mol/m2]", x = "")
+  labs(y = "iCT_star [mol/m2]", x = "")
 
-rm(inCT, inCT_MLD)
+rm(iCT_star, iCT_star_MLD)
 
 ```
 
@@ -2355,12 +2355,12 @@ In order to derive an estimate of the net community production NCP (which is equ
 
 To determine the optimum depth for the nC~T~ integration we investigated the vertical distribution of cumulative temperature and nC~T~ changes on the peak of the productivity signal on June 23:
 
-```{r nCT_cum_profiles_180723}
+```{r CT_star_cum_profiles_180723}
 
 
 tm_profiles_ID_long_180723 <- tm_profiles_ID_long %>%
   filter(ID == 180723,
-         var == "nCT")
+         var == "CT_star")
 
 p_tm_profiles_ID_long <- tm_profiles_ID_long_180723 %>%
   arrange(dep) %>%
@@ -2370,7 +2370,7 @@ p_tm_profiles_ID_long <- tm_profiles_ID_long_180723 %>%
   geom_point() +
   geom_path() +
   scale_y_reverse() +
-  labs(x = "Cumulative change of nCT on July 23 (180723)") +
+  labs(x = "Cumulative change of CT_star on July 23 (180723)") +
   theme(legend.position = "left")
 
 tm_profiles_ID_long_180723_dep <- tm_profiles_ID_long_180723 %>%
@@ -2476,8 +2476,8 @@ The cruise mean pCO~2~ recorded in profiling-mode (stations only) and depths \< 
 
 tm_profiles_surface_long <- tm_profiles %>%
   filter(dep < parameters$surface_dep) %>%
-  select(date_time = date_time_ID, ID, tem, pCO2 = pCO2, nCT) %>%
-  pivot_longer(tem:nCT, values_to = "value", names_to = "var")
+  select(date_time = date_time_ID, ID, tem, pCO2 = pCO2, CT_star) %>%
+  pivot_longer(tem:CT_star, values_to = "value", names_to = "var")
 
 tm_profiles_surface_long_ID <- tm_profiles_surface_long %>%
   group_by(ID, date_time, var) %>%
@@ -2528,9 +2528,9 @@ p_tem_surf <- tm_profiles_surface_long_ID %>%
   )
 
 
-p_nCT_surf <-
+p_CT_star_surf <-
   tm_profiles_surface_long_ID %>%
-  filter(var == "nCT") %>%
+  filter(var == "CT_star") %>%
   ggplot() +
   geom_ribbon(aes(
     x = date_time,
@@ -2546,7 +2546,7 @@ p_nCT_surf <-
   new_scale_color() +
   geom_linerange(
     data = tb_surface_station_mean %>%
-      filter(var == "nCT"),
+      filter(var == "CT_star"),
     aes(
       x = date_time_ID,
       ymin = value_mean - value_sd,
@@ -2556,7 +2556,7 @@ p_nCT_surf <-
   ) +
   geom_point(
     data = tb_surface_station_mean %>%
-      filter(var == "nCT"),
+      filter(var == "CT_star"),
     aes(x = date_time_ID,
         y = value_mean,
         color = "Mean \u00B1 SD")
@@ -2577,7 +2577,7 @@ p_nCT_surf <-
   )
 
 
-p_pCO2_surf + p_tem_surf + p_nCT_surf +
+p_pCO2_surf + p_tem_surf + p_CT_star_surf +
   plot_layout(ncol = 1)
 
 start <- min(tm_profiles_surface_long_ID$date_time)
@@ -2820,28 +2820,28 @@ p_flux_daily + p_flux_cum +
 
 ## iC~T~ correction
 
-The cumulative integrated nCT (inCT) time series obtained through integration across the upper 12m of the water column was used for further calculations of NCP.
+The cumulative integrated CT_star (iCT_star) time series obtained through integration across the upper 12m of the water column was used for further calculations of NCP.
 
-Correction of inCT for air-sea CO2 fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014).
+Correction of iCT_star for air-sea CO2 fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014).
 
-To derive an integrated NCP estimated, the observed change in inCT must be corrected for the air-sea flux of CO2. inCT was determined for the upper 12m of the water column. The MLD was always shallower 12m, except for the last cruise day. Therefore:
+To derive an integrated NCP estimated, the observed change in iCT_star must be corrected for the air-sea flux of CO2. iCT_star was determined for the upper 12m of the water column. The MLD was always shallower 12m, except for the last cruise day. Therefore:
 
--   Cumulative air-sea fluxes can be added completely to inCT before Aug 7.
+-   Cumulative air-sea fluxes can be added completely to iCT_star before Aug 7.
 -   Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO2 flux was homogenously mixed down to the deepend thermocline at 17m. The flux correction applied to the upper 12m can therefore be scaled with a factor 12/17.
 
-During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased inCT at 0-12 m and a decrease of inCT in 12-17m. The loss of nCT in 12-17m can be assumed to be entirely cause by mixing with low-nCT surface water. However, some of the observed nCT loss is balanced through nCT input attributable to the air-sea flux. Therefore, the observed loss, corrected for 5/17 of the air-sea-flux, was added to the integrated nCT changes in 0-12m.
+During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased iCT_star at 0-12 m and a decrease of iCT_star in 12-17m. The loss of CT_star in 12-17m can be assumed to be entirely cause by mixing with low-CT_star surface water. However, some of the observed CT_star loss is balanced through CT_star input attributable to the air-sea flux. Therefore, the observed loss, corrected for 5/17 of the air-sea-flux, was added to the integrated CT_star changes in 0-12m.
 
 ```{r prepare_NCP_data_set}
 
 # extract CT data for fixed depth approach, depth limit 10m
-NCP <- inCT_fixed_dep %>%
+NCP <- iCT_star_fixed_dep %>%
   filter(i_dep == parameters$i_dep_lim, sign == "total") %>%
   select(-c(sign, i_dep))
 
-rm(inCT_fixed_dep)
+rm(iCT_star_fixed_dep)
 
 NCP <- NCP %>%
-  select(ID, date_time = date_time_ID, date_time_ID_ref, nCT_i_diff, nCT_i_cum)
+  select(ID, date_time = date_time_ID, date_time_ID_ref, CT_star_i_diff, CT_star_i_cum)
 
 # date of the second last cruise
 date_180806 <- unique(NCP$date_time)[7]
@@ -2885,18 +2885,18 @@ rm(tm_og_flux, NCP, tm_og)
 # linear interpolation of cumulative changes to frequency of the flux estimates estimates
 NCP_flux <- NCP_flux %>%
   mutate(
-    nCT_i_cum = approxfun(date_time, nCT_i_cum)(date_time),
+    CT_star_i_cum = approxfun(date_time, CT_star_i_cum)(date_time),
     flux_cum = approxfun(date_time, flux_cum)(date_time)
   ) %>%
   fill(flux_cum) %>%
-  mutate(nCT_i_flux_cum = nCT_i_cum + flux_cum)
+  mutate(CT_star_i_flux_cum = CT_star_i_cum + flux_cum)
 
 
 # calculate cumulative fluxes inbetween cruises
 NCP_flux_diff <- NCP_flux %>%
   filter(!is.na(date_time_ID_ref)) %>%
   mutate(flux_diff = flux_cum - lag(flux_cum, default = 0)) %>%
-  select(ID, date_time_ID_ref, observed = nCT_i_diff, flux = flux_diff) %>%
+  select(ID, date_time_ID_ref, observed = CT_star_i_diff, flux = flux_diff) %>%
   pivot_longer(cols = "observed":"flux",
                names_to = "var",
                values_to = "value_diff")
@@ -2912,7 +2912,7 @@ The aim is to approximate the CT entrainment flux between Aug 06 and 15. The rel
 
 CT_mix <- tm_profiles_ID_long %>%
       filter(ID %in% c("180806"),
-             var %in% c("nCT"),
+             var %in% c("CT_star"),
              dep < 17) %>% 
   summarise(mean(value)) %>% 
   pull()
@@ -2920,12 +2920,12 @@ CT_mix <- tm_profiles_ID_long %>%
 CT_profile <- tm_profiles_ID_mean %>%
   filter(ID %in% c("180806"))
 
-p_nCT <- CT_profile %>% 
+p_CT_star <- CT_profile %>% 
   ggplot() +
   geom_rect(
     data = CT_profile %>% filter(dep > 12, dep < 17),
     aes(
-      xmax = nCT,
+      xmax = CT_star,
       xmin = CT_mix,
       ymax = dep + 0.5,
       ymin = dep - 0.5
@@ -2942,8 +2942,8 @@ p_nCT <- CT_profile %>%
   annotate("text", label = as.character(expression(paste(C[T],"*")~flux)),
            parse = TRUE, x = 1580, y = 14.5,
            size = geom_text_size) +
-  geom_point(aes(nCT, dep, fill = ID), shape = 21) +
-  geom_path(aes(nCT, dep, col = ID)) +
+  geom_point(aes(CT_star, dep, fill = ID), shape = 21) +
+  geom_path(aes(CT_star, dep, col = ID)) +
   scale_y_reverse() +
   scale_fill_viridis_d() +
   scale_color_viridis_d() +
@@ -2976,7 +2976,7 @@ p_tem <- tm_profiles_ID_long_temp  %>%
   scale_fill_viridis_d(name = "Mean\ncruise date") +
     labs(y = "Depth (m)", x = expression(paste(Temperature ~ "(\u00B0C)")))
 
-p_tem + p_nCT +
+p_tem + p_CT_star +
   plot_layout(guides = 'collect') +
   plot_annotation(tag_levels = 'a')
 
@@ -3003,7 +3003,7 @@ ggsave(
 )
 
 
-rm(p_tem, p_nCT, CT_mix, CT_profile, tm_profiles_ID_long_temp)
+rm(p_tem, p_CT_star, CT_mix, CT_profile, tm_profiles_ID_long_temp)
 
 
 ```
@@ -3013,28 +3013,28 @@ The effect of mixing was derived from the mean concentration difference on Aug 0
 ```{r calculate_mixing_mass_conservation}
 
 # calculate mixing with deep waters, corrected for air sea fluxes
-nCT_inventory_mean <- tm_profiles_ID_long %>%
+CT_star_inventory_mean <- tm_profiles_ID_long %>%
   filter(ID == "180806",
-         var == "nCT",
+         var == "CT_star",
          dep < parameters$i_dep_mix_lim) %>%
-  summarise(nCT_surface = sum(value) / parameters$i_dep_mix_lim) %>%
+  summarise(CT_star_surface = sum(value) / parameters$i_dep_mix_lim) %>%
   pull()
 
-nCT_delta_mix <- tm_profiles_ID_long %>%
+CT_star_delta_mix <- tm_profiles_ID_long %>%
   filter(ID == "180806",
-         var == "nCT",
+         var == "CT_star",
          dep < parameters$i_dep_mix_lim) %>%
-  mutate(nCT_delta_mix = nCT_inventory_mean - value)
+  mutate(CT_star_delta_mix = CT_star_inventory_mean - value)
 
-NCP_mix_deep <- nCT_delta_mix %>%
+NCP_mix_deep <- CT_star_delta_mix %>%
   filter(dep < parameters$i_dep_mix_lim,
          dep > parameters$i_dep_lim) %>%
-  summarise(value_diff = sum(nCT_delta_mix) / 1000) %>%
+  summarise(value_diff = sum(CT_star_delta_mix) / 1000) %>%
   mutate(ID = "180815")
 
-NCP_mix_shallow <- nCT_delta_mix %>%
+NCP_mix_shallow <- CT_star_delta_mix %>%
   filter(dep < parameters$i_dep_lim) %>%
-  summarise(value_diff = sum(nCT_delta_mix) / 1000) %>%
+  summarise(value_diff = sum(CT_star_delta_mix) / 1000) %>%
   mutate(ID = "180815")
 
 rm(tm_og_flux_dep)
@@ -3067,7 +3067,7 @@ NCP_flux_mix <- NCP_flux_mix %>%
   mutate(
     mix_cum = if_else(ID %in% c("180806", 180815), mix_cum, 0),
     mix_cum = na.approx(mix_cum),
-    nCT_i_flux_mix_cum = nCT_i_flux_cum + mix_cum
+    CT_star_i_flux_mix_cum = CT_star_i_flux_cum + mix_cum
   )
 
 # reorder factors for plotting
@@ -3075,21 +3075,21 @@ NCP_flux_mix_diff <- NCP_flux_mix_diff %>%
   mutate(var = factor(var, c("observed", "flux", "mixing")))
 
 NCP_flux_mix_long <- NCP_flux_mix %>%
-  select(date_time, nCT_i_cum, nCT_i_flux_cum, nCT_i_flux_mix_cum) %>%
-  pivot_longer(nCT_i_cum:nCT_i_flux_mix_cum,
+  select(date_time, CT_star_i_cum, CT_star_i_flux_cum, CT_star_i_flux_mix_cum) %>%
+  pivot_longer(CT_star_i_cum:CT_star_i_flux_mix_cum,
                values_to = "value",
                names_to = "var") %>%
   mutate(
     var = fct_recode(
       var,
-      observed = "nCT_i_cum",
-      `flux corrected` = "nCT_i_flux_cum",
-      `flux + mixing\ncorrected (NCP)` = "nCT_i_flux_mix_cum"
+      observed = "CT_star_i_cum",
+      `flux corrected` = "CT_star_i_flux_cum",
+      `flux + mixing\ncorrected (NCP)` = "CT_star_i_flux_mix_cum"
     )
   )
 
 
-p_inCT <- NCP_flux_mix_long %>%
+p_iCT_star <- NCP_flux_mix_long %>%
   arrange(date_time) %>%
   ggplot() +
   geom_col(
@@ -3118,7 +3118,7 @@ p_inCT <- NCP_flux_mix_long %>%
     plot.margin = margin(0, 0, 0, 0, "cm")
   )
 
-p_inCT
+p_iCT_star
 
 NCP_flux_mix %>%
   write_csv(
@@ -3138,11 +3138,11 @@ NCP_flux_mix_diff %>%
 
 ```
 
-```{r plot_inCT_time_series, include=FALSE}
+```{r plot_iCT_star_time_series, include=FALSE}
 
-p_pCO2_surf + p_tem_surf + p_nCT_surf +
+p_pCO2_surf + p_tem_surf + p_CT_star_surf +
   p_pCO2_atm + p_wind + p_flux_daily + p_flux_cum + 
-  p_inCT +
+  p_iCT_star +
   plot_layout(ncol = 1,
               heights = c(rep(1.35, 7), 3.5),
               tag_level = 'new') +
@@ -3179,9 +3179,9 @@ ggsave(
 
 -   included removed stations in coverage plot
 
--   Significance of changes in AT for calculated nCT changes
+-   Significance of changes in AT for calculated CT_star changes
 
-    -   Calculate AT-S ratios, reconstruct AT profiles, calculate true nCT profiles, normalize nCT profiles to mean AT
+    -   Calculate AT-S ratios, reconstruct AT profiles, calculate true CT_star profiles, normalize CT_star profiles to mean AT
 
 -   demonstrate strong permanent thermocline at around 25 m
 
