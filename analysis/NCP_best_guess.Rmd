@@ -31,6 +31,7 @@ library(kableExtra)
 library(LakeMetabolizer)
 library(rgdal)
 library(ggnewscale)
+library(ggsn)
 
 ```
 
@@ -407,16 +408,19 @@ p_MODIS <-
   ) +
   scale_x_continuous(breaks = seq(10, 30, 1)) +
   labs(x = "Longitude (°E)", y = "Latitude (°N)") +
-  ggsn::scalebar(
+  scalebar(
     EGS,
     transform = TRUE,
     model = "WGS84",
     dist_unit = "nm",
     dist = 25,
     location = "bottomleft",
-    anchor = c(x = 15.75, y = 56.6),
+    anchor = c(x = 17, y = 56.6),
     st.dist = 0.05,
-    st.size = geom_text_size
+    st.size = geom_text_size,
+    st.color = "white",
+    box.color = "white",
+    border.size = 0.3
   )
 
 
@@ -457,7 +461,8 @@ map_low_res <- map %>%
   summarise_all(mean, na.rm = TRUE) %>%
   ungroup() %>%
   mutate(lat = as.numeric(as.character(lat)),
-         lon = as.numeric(as.character(lon)))
+         lon = as.numeric(as.character(lon))) %>% 
+  rename(long = lon)
 
 # downsize track data for plot
 tm_track <- tm %>%
@@ -470,7 +475,7 @@ p_map <-
   ggplot() +
   geom_contour_fill(
     data = map_low_res,
-    aes(x = lon, y = lat, z = -elev),
+    aes(x = long, y = lat, z = -elev),
     na.fill = TRUE,
     breaks = seq(0, 300, 30)
   ) +
@@ -530,7 +535,8 @@ p_map <-
   ) +
   guides(
     fill = guide_colorsteps(
-      barheight = unit(4.5, "cm"),
+      barheight = unit(35, "mm"),
+      barwidth = unit(5, "mm"),
       show.limits = TRUE,
       frame.colour = "black",
       ticks = TRUE,
@@ -538,7 +544,19 @@ p_map <-
     )
   ) +
   scale_color_manual(values = c("white", "darkgrey", "orangered"),
-                     guide = FALSE)
+                     guide = FALSE) +
+  scalebar(
+    map_low_res,
+    transform = TRUE,
+    model = "WGS84",
+    dist_unit = "nm",
+    dist = 2.5,
+    location = "bottomleft",
+    anchor = c(x = 18.65, y = 57.3),
+    st.dist = 0.05,
+    st.size = geom_text_size,
+    border.size = 0.3
+  )
 
 p_MODIS + p_map +
   plot_layout(ncol = 1) +
