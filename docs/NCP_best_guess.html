@@ -567,16 +567,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreed06470857d00226100393d8c442deda83a1f4b9btargetblankd064708a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/d06470857d00226100393d8c442deda83a1f4b9b" target="_blank">d064708</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree06d5293b859cade7809fd080ce7037b0e829cc3etargetblank06d5293a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/06d5293b859cade7809fd080ce7037b0e829cc3e" target="_blank">06d5293</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreed06470857d00226100393d8c442deda83a1f4b9btargetblankd064708a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree06d5293b859cade7809fd080ce7037b0e829cc3etargetblank06d5293a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/d06470857d00226100393d8c442deda83a1f4b9b" target="_blank">d064708</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/06d5293b859cade7809fd080ce7037b0e829cc3e" target="_blank">06d5293</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -585,7 +585,6 @@ Note that you need to be careful to ensure that all relevant files for the analy
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
     Ignored:    data/
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
 
@@ -626,6 +625,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/06d5293b859cade7809fd080ce7037b0e829cc3e/analysis/NCP_best_guess.Rmd" target="_blank">06d5293</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-16
+</td>
+<td>
+cleaning
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/cfa3fbf3202ea7a6c797ea5fed60017877a51fc6/docs/NCP_best_guess.html" target="_blank">cfa3fbf</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1616,11 +1649,15 @@ tm_profiles &lt;- tm_profiles %&gt;%
     )[, 16] * 1e6
   )</code></pre>
 </div>
-<div id="plot-all-profiles" class="section level2" number="4.2">
-<h2 number="4.2"><span class="header-section-number">4.2</span> Plot all profiles</h2>
-<pre class="r"><code>tm_profiles &lt;-  tm_profiles %&gt;%
+<div id="profile-plots" class="section level2" number="4.2">
+<h2 number="4.2"><span class="header-section-number">4.2</span> Profile plots</h2>
+<div id="all-individual-profiles" class="section level3" number="4.2.1">
+<h3 number="4.2.1"><span class="header-section-number">4.2.1</span> All individual profiles</h3>
+<pre class="r"><code># arrange by date (oldest first)
+tm_profiles &lt;-  tm_profiles %&gt;%
   arrange(date_time_ID)
 
+# create temperature profiles plots
 p_tem &lt;-
   tm_profiles %&gt;%
   ggplot(aes(tem, dep, col = ID, group = interaction(station, ID))) +
@@ -1630,6 +1667,8 @@ p_tem &lt;-
        y = &quot;Depth (m)&quot;) +
   scale_color_viridis_d(guide = FALSE)
 
+
+# create pCO2 profiles plots
 p_pCO2 &lt;-
   tm_profiles %&gt;%
   ggplot(aes(pCO2, dep, col = ID, group = interaction(station, ID))) +
@@ -1643,7 +1682,7 @@ p_pCO2 &lt;-
     axis.ticks.y = element_blank()
   )
 
-
+# create CT* profiles plots
 p_CT_star &lt;-
   tm_profiles %&gt;%
   ggplot(aes(CT_star, dep, col = ID, group = interaction(station, ID))) +
@@ -1658,9 +1697,16 @@ p_CT_star &lt;-
     axis.title.y = element_blank()
   )
 
+
+# Combine and safe plots to file
 p_tem + p_pCO2 + p_CT_star +
   plot_annotation(tag_levels = &#39;a&#39;)</code></pre>
-<p><img src="figure/NCP_best_guess.Rmd/profiles_all_by_date-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="figure" style="text-align: center">
+<img src="figure/NCP_best_guess.Rmd/profiles_all_by_date-1.png" alt="Individual vertical profiles per cruise day and station." width="672" />
+<p class="caption">
+Individual vertical profiles per cruise day and station.
+</p>
+</div>
 <pre class="r"><code>ggsave(
   here::here(
     &quot;output/Plots/Figures_publication/article&quot;,
@@ -1684,14 +1730,9 @@ ggsave(
 )
 
 rm(p_tem, p_pCO2, p_CT_star)</code></pre>
-<p>Number of profiles:</p>
-<pre class="r"><code>tm_profiles %&gt;% 
-  count(date_ID, station) %&gt;% 
-  nrow()</code></pre>
-<pre><code>[1] 78</code></pre>
 </div>
-<div id="mean-profiles" class="section level2" number="4.3">
-<h2 number="4.3"><span class="header-section-number">4.3</span> Mean profiles</h2>
+<div id="mean-profiles" class="section level3" number="4.2.2">
+<h3 number="4.2.2"><span class="header-section-number">4.2.2</span> Mean profiles</h3>
 <p>Mean vertical profiles were calculated for each cruise day (ID).</p>
 <pre class="r"><code>tm_profiles_ID_mean &lt;- tm_profiles %&gt;%
   select(-c(station, lat, lon, pCO2_corr, date_time)) %&gt;%
@@ -1746,8 +1787,9 @@ rm(
 Mean vertical profiles per cruise day across all stations.
 </p>
 </div>
-<div id="ct_star-sensitivity-to-at" class="section level3" number="4.3.1">
-<h3 number="4.3.1"><span class="header-section-number">4.3.1</span> CT_star sensitivity to AT</h3>
+</div>
+<div id="ct-sensitivity-to-mean-at" class="section level3" number="4.2.3">
+<h3 number="4.2.3"><span class="header-section-number">4.2.3</span> C<sub>T</sub>* sensitivity to mean A<sub>T</sub></h3>
 <pre class="r"><code>tm_profiles_ID_mean_test %&gt;%
   ggplot(aes(CT_star_delta - mean(CT_star_delta), dep, col = ID)) +
   geom_point() +
@@ -1755,11 +1797,14 @@ Mean vertical profiles per cruise day across all stations.
   scale_y_reverse() +
   scale_color_viridis_d()</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/NCP_best_guess.Rmd/CT_star_profiles_delta-1.png" alt="Mean vertical profiles per cruise day across all stations." width="672" />
+<img src="figure/NCP_best_guess.Rmd/CT_star_profiles_delta-1.png" alt="Offset between C~T~* calculate from mean A~T~ and  mean A~T~ + 2 SD of A~T~, displayed as mean vertical profiles per cruise day across all stations." width="672" />
 <p class="caption">
-Mean vertical profiles per cruise day across all stations.
+Offset between C<sub>T</sub>* calculate from mean A<sub>T</sub> and mean A<sub>T</sub> + 2 SD of A<sub>T</sub>, displayed as mean vertical profiles per cruise day across all stations.
 </p>
 </div>
+</div>
+<div id="all-individual-profiles-per-cruise-day" class="section level3" number="4.2.4">
+<h3 number="4.2.4"><span class="header-section-number">4.2.4</span> All individual profiles per cruise day</h3>
 <pre class="r"><code>profiles_min_max &lt;- tm_profiles %&gt;%
   group_by(dep) %&gt;%
   summarise(max_CT = max(CT_star),
@@ -1768,93 +1813,7 @@ Mean vertical profiles per cruise day across all stations.
             min_tem = min(tem)) %&gt;%
   ungroup()
 
-
 p_CT &lt;-
-  tm_profiles_ID_long %&gt;%
-  filter(var %in% c(&quot;CT_star&quot;)) %&gt;%
-  ggplot() +
-  geom_ribbon(data = profiles_min_max,
-              aes(xmin = min_CT,
-                  xmax = max_CT,
-                  y = dep),
-              alpha = 0.2) +
-  geom_ribbon(aes(
-    xmin = value - sd,
-    xmax = value + sd,
-    y = dep,
-    fill = ID
-  ), alpha = 0.5) +
-  geom_path(aes(value, dep, col = ID)) +
-  scale_y_reverse() +
-  scale_color_viridis_d(labels = cruise_dates$date_ID,
-                        name = &quot;Cruise mean \u00B1 SD&quot;) +
-  scale_fill_viridis_d(labels = cruise_dates$date_ID,
-                       name = &quot;Cruise mean \u00B1 SD&quot;) +
-  facet_grid(ID ~ .) +
-  labs(x = expression(paste(C[T], &quot;*&quot;, ~ (µmol ~ kg ^ {-1}))),
-  y = &quot;Depth (m)&quot;) +
-  theme(strip.background = element_blank(),
-        strip.text = element_blank(),
-        legend.position = &quot;none&quot;)
-
-p_tem &lt;-
-  tm_profiles_ID_long %&gt;%
-  filter(var %in% c(&quot;tem&quot;)) %&gt;%
-  ggplot() +
-  geom_ribbon(data = profiles_min_max,
-              aes(xmin = min_tem,
-                  xmax = max_tem,
-                  y = dep),
-              alpha = 0.2) +
-  geom_ribbon(aes(
-    xmin = value - sd,
-    xmax = value + sd,
-    y = dep,
-    fill = ID
-  ), alpha = 0.5) +
-  geom_path(aes(value, dep, col = ID)) +
-  scale_y_reverse() +
-  scale_color_viridis_d(labels = cruise_dates$date_ID,
-                        name = &quot;Cruise mean \u00B1 SD&quot;) +
-  scale_fill_viridis_d(labels = cruise_dates$date_ID,
-                       name = &quot;Cruise mean \u00B1 SD&quot;) +
-  facet_grid(ID ~ .) +
-  labs(x = &quot;Temperature (\u00B0C)&quot;,
-       y = &quot;Depth (m)&quot;) +
-  theme(strip.background = element_blank(),
-        strip.text = element_blank(),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank())
-
-p_CT | p_tem</code></pre>
-<div class="figure" style="text-align: center">
-<img src="figure/NCP_best_guess.Rmd/CT_star_profiles_individual_pub_V1-1.png" alt="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect." width="672" />
-<p class="caption">
-Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.
-</p>
-</div>
-<pre class="r"><code># ggsave(
-#   here::here(
-#     &quot;output/Plots/Figures_publication/appendix&quot;,
-#     &quot;Fig_A5_V1.pdf&quot;
-#   ),
-#   width = 140,
-#   height = 250,
-#   dpi = 300,
-#   units = &quot;mm&quot;
-# )
-# 
-# ggsave(
-#   here::here(
-#     &quot;output/Plots/Figures_publication/appendix&quot;,
-#     &quot;Fig_A5_V1.png&quot;
-#   ),
-#   width = 140,
-#   height = 250,
-#   dpi = 300,
-#   units = &quot;mm&quot;
-# )</code></pre>
-<pre class="r"><code>p_CT &lt;-
   tm_profiles %&gt;%
   ggplot() +
   geom_ribbon(data = profiles_min_max,
@@ -1937,10 +1896,6 @@ rm(p_CT_star, p_tem, cruise_labels, profiles_min_max)</code></pre>
 <ul>
 <li>the standard deviation of C<sub>T</sub> in the upper 10m increases on June 30.</li>
 </ul>
-</div>
-</div>
-<div id="individual-profiles" class="section level2" number="4.4">
-<h2 number="4.4"><span class="header-section-number">4.4</span> Individual profiles</h2>
 <p>C<sub>T</sub>, pCO<sub>2</sub>, S, and T profiles were plotted individually <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a> and grouped by ID <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_ID_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a>. The later gives an idea of the differences between stations at one point in time.</p>
 <pre class="r"><code># tm_profiles_highres &lt;- tm_profiles_highres %&gt;% 
 #   filter(phase == &quot;down&quot;)
@@ -2062,8 +2017,8 @@ dev.off()
 
 rm(i_ID, tm_profiles_long)</code></pre>
 </div>
-<div id="profiles-of-incremental-changes" class="section level2" number="4.5">
-<h2 number="4.5"><span class="header-section-number">4.5</span> Profiles of incremental changes</h2>
+<div id="incremental-changes" class="section level3" number="4.2.5">
+<h3 number="4.2.5"><span class="header-section-number">4.2.5</span> Incremental changes</h3>
 <p>Changes of seawater vars at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.</p>
 <pre class="r"><code>tm_profiles_ID_long &lt;- tm_profiles_ID_long %&gt;%
   group_by(var, dep) %&gt;%
@@ -2089,8 +2044,8 @@ rm(i_ID, tm_profiles_long)</code></pre>
   labs(x = &quot;Change of value inbetween cruises per day&quot;)</code></pre>
 <p><img src="figure/NCP_best_guess.Rmd/incremental_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="profiles-of-cumulative-changes" class="section level2" number="4.6">
-<h2 number="4.6"><span class="header-section-number">4.6</span> Profiles of cumulative changes</h2>
+<div id="cumulative-changes" class="section level3" number="4.2.6">
+<h3 number="4.2.6"><span class="header-section-number">4.2.6</span> Cumulative changes</h3>
 <p>Cumulative changes of seawater vars were calculated at each depth relative to the first cruise day on July 5.</p>
 <pre class="r"><code>tm_profiles_ID_long %&gt;%
   arrange(dep) %&gt;%
@@ -2126,6 +2081,7 @@ rm(i_ID, tm_profiles_long)</code></pre>
   facet_wrap( ~ interaction(sign, var), scales = &quot;free_x&quot;, ncol = 4) +
   labs(x = &quot;Cumulative directional change of value&quot;)</code></pre>
 <p><img src="figure/NCP_best_guess.Rmd/cumulative_directional_changes_profiles-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 </div>
 <div id="timeseries" class="section level1" number="5">
@@ -3191,7 +3147,7 @@ Hovmoeller plotm of absolute changes in C<sub>T</sub> and temperature.
 </div>
 <pre class="r"><code>rm(p_CT_star_hov, bin_CT_star, p_tem_hov, bin_Tem)</code></pre>
 </div>
-<div id="incremental-changes" class="section level3" number="5.2.2">
+<div id="incremental-changes-1" class="section level3" number="5.2.2">
 <h3 number="5.2.2"><span class="header-section-number">5.2.2</span> Incremental changes</h3>
 <pre class="r"><code>bin_CT_star &lt;- 2.5
 
@@ -3254,7 +3210,7 @@ Hovmoeller plotm of daily changes in C<sub>T</sub> and temperature. Note that ca
 </div>
 <pre class="r"><code>rm(CT_star_hov, bin_CT_star, Tem_hov, bin_Tem)</code></pre>
 </div>
-<div id="cumulative-changes" class="section level3" number="5.2.3">
+<div id="cumulative-changes-1" class="section level3" number="5.2.3">
 <h3 number="5.2.3"><span class="header-section-number">5.2.3</span> Cumulative changes</h3>
 <pre class="r"><code>bin_CT_star &lt;- 20
 
