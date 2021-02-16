@@ -567,16 +567,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree23e959a14548529f4707a0fdc511d37bdedc9131targetblank23e959aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/23e959a14548529f4707a0fdc511d37bdedc9131" target="_blank">23e959a</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeec6ed6bd77e19bfb2efb45442231041d9cf8beb0targetblankec6ed6ba"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ec6ed6bd77e19bfb2efb45442231041d9cf8beb0" target="_blank">ec6ed6b</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree23e959a14548529f4707a0fdc511d37bdedc9131targetblank23e959aa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeec6ed6bd77e19bfb2efb45442231041d9cf8beb0targetblankec6ed6ba" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/23e959a14548529f4707a0fdc511d37bdedc9131" target="_blank">23e959a</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ec6ed6bd77e19bfb2efb45442231041d9cf8beb0" target="_blank">ec6ed6b</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -587,6 +587,9 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    data/
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
+
+Untracked files:
+    Untracked:  output/Plots/NCP_best_guess/
 
 </code></pre>
 <p>
@@ -625,6 +628,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/ec6ed6bd77e19bfb2efb45442231041d9cf8beb0/analysis/NCP_best_guess.Rmd" target="_blank">ec6ed6b</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-16
+</td>
+<td>
+created all profiles pdfs
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/4ab2a500d47720e45d2859ebc2f85899eaf0fc44/docs/NCP_best_guess.html" target="_blank">4ab2a50</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -872,7 +909,7 @@ library(ggnewscale)</code></pre>
 <ul>
 <li>Analyse field data recorded on board SV Tina V<br />
 </li>
-<li>derive a best guess estimate for net community production (NCP)</li>
+<li>Derive a best guess estimate for net community production (NCP)</li>
 </ul>
 </div>
 <div id="sensor-data" class="section level1" number="2">
@@ -881,14 +918,14 @@ library(ggnewscale)</code></pre>
 <h2 number="2.1"><span class="header-section-number">2.1</span> Data preparation</h2>
 <p>Profile data are prepared by:</p>
 <ul>
-<li>Ignoring those made on June 16 (pCO2 sensor not in operation)</li>
+<li>Ignoring those made on June 16 (pCO<sub>2</sub> sensor not in operation)</li>
 <li>Removing HydroC Flush and Zeroing periods</li>
 <li>Selecting only continuous downcast periods</li>
 <li>Gridding profiles to 1m depth intervals</li>
-<li>removing grids with pCO2 &lt; 0 µatm (presumably RT correction artifact after zeroing)</li>
+<li>Removing grids with pCO2 &lt; 0 µatm (presumably RT correction artifact after zeroing)</li>
 <li>Discarding profiles with 20 or more observation missing within upper 25m</li>
-<li>assigning mean date_time_ID value to all profiles belonging to one cruise</li>
-<li>discarding “coastal” station P01, P13, P14</li>
+<li>Assigning mean date_time_ID value to all profiles belonging to one cruise</li>
+<li>Discarding “coastal” station P01, P13, P14</li>
 <li>Restricting profiles to upper 25m</li>
 </ul>
 <p>Please note that:</p>
@@ -1074,8 +1111,8 @@ Overview pCO<sub>2</sub> profiles at stations (P02-P12) and cruise dates (ID). y
   select(-c(select, phase)) %&gt;% 
   filter(dep &lt; parameters$max_dep)</code></pre>
 </div>
-<div id="cruise-dates" class="section level2" number="2.4">
-<h2 number="2.4"><span class="header-section-number">2.4</span> Cruise dates</h2>
+<div id="calculate-mean-cruise-dates" class="section level2" number="2.4">
+<h2 number="2.4"><span class="header-section-number">2.4</span> Calculate mean cruise dates</h2>
 <pre class="r"><code># assign mean date_time stamp
 cruise_dates &lt;- tm_profiles %&gt;% 
   group_by(ID) %&gt;% 
@@ -1433,7 +1470,7 @@ rm(cover)</code></pre>
 </div>
 <div id="bottle-ct-and-at" class="section level1" number="3">
 <h1 number="3"><span class="header-section-number">3</span> Bottle C<sub>T</sub> and A<sub>T</sub></h1>
-<p>At stations P07 and P10 discrete samples for lab measurmentm of C<sub>T</sub> and A<sub>T</sub> were collected. Please note that - in contrast to the pCO<sub>2</sub> profiles - samples were taken on June 16, but removed here for harmonization of results.</p>
+<p>At stations P07 and P10 discrete samples for lab measurments of C<sub>T</sub> and A<sub>T</sub> were collected. Please note that - in contrast to the pCO<sub>2</sub> profiles - samples were taken on June 16, but removed here for harmonization of results.</p>
 <pre class="r"><code># read files
 tb &lt;-
   read_csv(
@@ -1491,7 +1528,7 @@ tb_fix %&gt;%
 </div>
 <div id="ct-calculation" class="section level2" number="3.3">
 <h2 number="3.3"><span class="header-section-number">3.3</span> C<sub>T</sub>* calculation</h2>
-<p>The alkalinity-normalized C<sub>T</sub>, C<sub>T</sub>*, was calculated.</p>
+<p>The alkalinity-normalized C<sub>T</sub>, C<sub>T</sub>*, was calculated for discrete samples.</p>
 <pre class="r"><code># calculate CT*, referred to as CT_star in the code
 tb &lt;- tb %&gt;% 
   mutate(CT_star = CT/AT * AT_mean)</code></pre>
@@ -1897,7 +1934,7 @@ Offset between C<sub>T</sub>* calculate from mean A<sub>T</sub> and mean A<sub>T
             min_tem = min(tem)) %&gt;%
   ungroup()
 
-p_CT &lt;-
+p_CT_star &lt;-
   tm_profiles %&gt;%
   ggplot() +
   geom_ribbon(data = profiles_min_max,
@@ -1946,7 +1983,7 @@ p_tem &lt;-
   theme(axis.title.y = element_blank(),
         axis.text.y = element_blank())
 
-p_CT | p_tem</code></pre>
+p_CT_star | p_tem</code></pre>
 <div class="figure" style="text-align: center">
 <img src="figure/NCP_best_guess.Rmd/CT_star_profiles_individual-1.png" alt="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect." width="672" />
 <p class="caption">
@@ -1980,13 +2017,12 @@ rm(p_CT_star, p_tem, cruise_labels, profiles_min_max)</code></pre>
 <ul>
 <li>the standard deviation of C<sub>T</sub> in the upper 10m increases on June 30.</li>
 </ul>
-<p>C<sub>T</sub>, pCO<sub>2</sub>, S, and T profiles were plotted individually <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a> and grouped by ID <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_ID_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a>. The later gives an idea of the differences between stations at one point in time.</p>
-<pre class="r"><code># tm_profiles_highres &lt;- tm_profiles_highres %&gt;% 
-#   filter(phase == &quot;down&quot;)
-
-pdf(file=here::here(&quot;output/Plots/CT_dynamics&quot;,
+<p>C<sub>T</sub>, pCO<sub>2</sub>, S, and T profiles were plotted individually <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/NCP_best_guess/tm_profiles_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a> and grouped by ID <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/NCP_best_guess/tm_profiles_ID_pCO2_tem_sal_CT.pdf" target="_blank">pdf here</a>. The later gives an idea of the differences between stations at one point in time.</p>
+<pre class="r"><code># create pdf file
+pdf(file=here::here(&quot;output/Plots/NCP_best_guess&quot;,
     &quot;tm_profiles_pCO2_tem_sal_CT.pdf&quot;), onefile = TRUE, width = 9, height = 5)
 
+# loop across all stations and cruise days and create profile plots
 for(i_ID in unique(tm_profiles$ID)){
   for(i_station in unique(tm_profiles$station)){
 
@@ -2065,14 +2101,17 @@ for(i_ID in unique(tm_profiles$ID)){
 dev.off()
 
 rm(i_ID, i_station)</code></pre>
-<pre class="r"><code>tm_profiles_long &lt;- tm_profiles %&gt;%
+<pre class="r"><code># convert data to long format
+tm_profiles_long &lt;- tm_profiles %&gt;%
   select(-c(lat, lon, pCO2_corr)) %&gt;% 
   pivot_longer(sal:CT_star, values_to = &quot;value&quot;, names_to = &quot;var&quot;)
 
-
-pdf(file=here::here(&quot;output/Plots/CT_dynamics&quot;,
+# create pdf file
+pdf(file=here::here(&quot;output/Plots/NCP_best_guess&quot;,
     &quot;tm_profiles_ID_pCO2_tem_sal_CT.pdf&quot;), onefile = TRUE, width = 9, height = 5)
 
+
+# loop across all cruise days and create profile plots
 for(i_ID in unique(tm_profiles$ID)){
 
   #i_ID &lt;- unique(tm_profiles$ID)[1]
@@ -2103,7 +2142,8 @@ rm(i_ID, tm_profiles_long)</code></pre>
 </div>
 <div id="all-excluded-individual-profiles-per-cruise-day" class="section level2" number="5.5">
 <h2 number="5.5"><span class="header-section-number">5.5</span> All excluded individual profiles per cruise day</h2>
-<pre class="r"><code>profiles_min_max &lt;- tm_profiles %&gt;%
+<pre class="r"><code># calculate overall min/max profiles from included stations
+profiles_min_max &lt;- tm_profiles %&gt;%
   group_by(dep, ID) %&gt;%
   summarise(max_CT = max(CT_star),
             min_CT = min(CT_star),
@@ -2111,6 +2151,7 @@ rm(i_ID, tm_profiles_long)</code></pre>
             min_tem = min(tem)) %&gt;%
   ungroup()
 
+# calculate overall mean +/- SD profiles from included stations
 profiles_sd &lt;- tm_profiles %&gt;%
   group_by(dep, ID) %&gt;%
   summarise(max_CT = mean(CT_star) + sd(CT_star),
@@ -2119,10 +2160,12 @@ profiles_sd &lt;- tm_profiles %&gt;%
             min_tem = mean(tem) - sd(tem)) %&gt;%
   ungroup()
 
+# filter downcast from relevant excluded stations
 tm_profiles_stations_out &lt;- tm_profiles_stations_out %&gt;%
   filter(ID %in% unique(tm_profiles$ID),
          phase == &quot;down&quot;)
 
+# plot profiles
 p_CT &lt;-
   tm_profiles_stations_out %&gt;%
   ggplot() +
@@ -2201,7 +2244,7 @@ Mean vertical profiles per cruise day across all stations plotted indivdually. R
 </div>
 <div id="incremental-changes" class="section level2" number="5.6">
 <h2 number="5.6"><span class="header-section-number">5.6</span> Incremental changes</h2>
-<p>Changes of seawater vars at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.</p>
+<p>Changes of seawater variables at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.</p>
 <pre class="r"><code>tm_profiles_ID_long &lt;- tm_profiles_ID_long %&gt;%
   group_by(var, dep) %&gt;%
   arrange(date_time_ID) %&gt;%
@@ -2244,6 +2287,9 @@ Mean vertical profiles per cruise day across all stations plotted indivdually. R
 <ul>
 <li>Salinity in the upper 10m decreases by &gt;0.1 on June 30, and returns to average conditions already on Aug 02.</li>
 </ul>
+</div>
+<div id="cumulative-changes-by-sign" class="section level2" number="5.8">
+<h2 number="5.8"><span class="header-section-number">5.8</span> Cumulative changes by sign</h2>
 <p>Cumulative positive and negative changes of seawater vars were calculated separately at each depth relative to the first cruise day on July 5.</p>
 <pre class="r"><code>tm_profiles_ID_long &lt;- tm_profiles_ID_long %&gt;%
   mutate(sign = if_else(value_diff &lt; 0, &quot;neg&quot;, &quot;pos&quot;)) %&gt;%
@@ -3124,9 +3170,10 @@ tem
 </div>
 <pre class="r"><code>rm(tm_profiles_ID_long_grid)</code></pre>
 </div>
-<div id="ct-sensitivity-to-mean-at-1" class="section level2" number="6.2">
-<h2 number="6.2"><span class="header-section-number">6.2</span> C<sub>T</sub>* sensitivity to mean A<sub>T</sub></h2>
-<p>Mean seawater CT were calculated for 5m depth intervals based on two AT values.</p>
+</div>
+<div id="ct-sensitivity-to-mean-at-1" class="section level1" number="7">
+<h1 number="7"><span class="header-section-number">7</span> C<sub>T</sub>* sensitivity to mean A<sub>T</sub></h1>
+<p>Mean seawater C<sub>T</sub>* were calculated for 5m depth intervals, based on two A<sub>T</sub> values (regular mean + 2 SD).</p>
 <pre class="r"><code>tm_profiles_ID_long_grid &lt;- tm_profiles_ID_long_test %&gt;%
   mutate(dep = cut(dep, seq(0, 30, 5))) %&gt;%
   group_by(ID, date_time_ID, dep, var)  %&gt;%
@@ -3187,12 +3234,14 @@ CT_star_delta_mean &lt;- CT_star_sens %&gt;%
   pull(CT_star_delta)
 
 CT_star_sens &lt;- CT_star_sens %&gt;%
-  mutate(CT_star_delta_offset = CT_star_delta - CT_star_delta_mean,
-         CT_star_delta_offset_rel = CT_star_delta / CT_star_delta_mean *100,
-         AT_offset = AT - AT_mean)
+  mutate(
+    CT_star_delta_offset = CT_star_delta - CT_star_delta_mean,
+    CT_star_delta_offset_rel = CT_star_delta / CT_star_delta_mean * 100,
+    AT_offset = AT - AT_mean
+  )
 
 CT_star_delta_sd &lt;- CT_star_sens %&gt;%
-  filter(factor == 1) %&gt;% 
+  filter(factor == 1) %&gt;%
   pull(CT_star_delta_offset)
 
 
@@ -3216,7 +3265,7 @@ CT_star_sens %&gt;%
   ) +
   geom_vline(xintercept = 0, linetype = 2) +
   geom_hline(yintercept = 0, linetype = 2) +
-  geom_line(col=&quot;red&quot;) +
+  geom_line(col = &quot;red&quot;) +
   scale_y_continuous(
     expression(paste(
       &quot;Absolute bias &quot;, Delta ~ C[T], &quot;*&quot;,  ~ (µmol ~ kg ^ {
@@ -3232,16 +3281,15 @@ CT_star_sens %&gt;%
   scale_x_continuous(expression(paste(&quot;Absolute bias &quot;, A[T]  ~ (µmol ~ kg ^ {
     -1
   }))),
-  sec.axis = sec_axis(~ . / AT_mean * 100,
-                      name = expression(paste(
-                        &quot;Relative bias &quot;, A[T], &quot; (%)&quot;)),
-      breaks = seq(-10, 10, 1)))</code></pre>
+  sec.axis = sec_axis(
+    ~ . / AT_mean * 100,
+    name = expression(paste(&quot;Relative bias &quot;, A[T], &quot; (%)&quot;)),
+    breaks = seq(-10, 10, 1)
+  ))</code></pre>
 <p><img src="figure/NCP_best_guess.Rmd/CT_calculation_sensitivity-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggsave(
-  here::here(
-    &quot;output/Plots/Figures_publication/appendix&quot;,
-    &quot;Fig_C1.pdf&quot;
-  ),
+  here::here(&quot;output/Plots/Figures_publication/appendix&quot;,
+             &quot;Fig_C1.pdf&quot;),
   width = 83,
   height = 60,
   dpi = 300,
@@ -3249,21 +3297,18 @@ CT_star_sens %&gt;%
 )
 
 ggsave(
-  here::here(
-    &quot;output/Plots/Figures_publication/appendix&quot;,
-    &quot;Fig_C1.png&quot;
-  ),
+  here::here(&quot;output/Plots/Figures_publication/appendix&quot;,
+             &quot;Fig_C1.png&quot;),
   width = 83,
   height = 60,
   dpi = 300,
   units = &quot;mm&quot;
 )</code></pre>
 </div>
-</div>
-<div id="hovmoeller-plots" class="section level1" number="7">
-<h1 number="7"><span class="header-section-number">7</span> Hovmoeller plots</h1>
-<div id="absolute-values" class="section level2" number="7.1">
-<h2 number="7.1"><span class="header-section-number">7.1</span> Absolute values</h2>
+<div id="hovmoeller-plots" class="section level1" number="8">
+<h1 number="8"><span class="header-section-number">8</span> Hovmoeller plots</h1>
+<div id="absolute-values" class="section level2" number="8.1">
+<h2 number="8.1"><span class="header-section-number">8.1</span> Absolute values</h2>
 <pre class="r"><code>bin_CT_star &lt;- 30
 
 p_CT_star_hov &lt;- tm_profiles_ID_long %&gt;%
@@ -3418,8 +3463,8 @@ ggsave(
 
 rm(p_CT_star_hov, bin_CT_star, p_tem_hov, bin_Tem, p_CT_star_ID_cum, p_tem_ID_cum)</code></pre>
 </div>
-<div id="incremental-changes-1" class="section level2" number="7.2">
-<h2 number="7.2"><span class="header-section-number">7.2</span> Incremental changes</h2>
+<div id="incremental-changes-1" class="section level2" number="8.2">
+<h2 number="8.2"><span class="header-section-number">8.2</span> Incremental changes</h2>
 <pre class="r"><code>bin_CT_star &lt;- 2.5
 
 CT_star_hov &lt;- tm_profiles_ID_long %&gt;%
@@ -3472,8 +3517,8 @@ Hovmoeller plotm of daily changes in C<sub>T</sub> and temperature. Note that ca
 </div>
 <pre class="r"><code>rm(CT_star_hov, bin_CT_star, Tem_hov, bin_Tem)</code></pre>
 </div>
-<div id="cumulative-changes-1" class="section level2" number="7.3">
-<h2 number="7.3"><span class="header-section-number">7.3</span> Cumulative changes</h2>
+<div id="cumulative-changes-1" class="section level2" number="8.3">
+<h2 number="8.3"><span class="header-section-number">8.3</span> Cumulative changes</h2>
 <pre class="r"><code>bin_CT_star &lt;- 20
 
 CT_star_hov &lt;- tm_profiles_ID_long %&gt;%
@@ -3531,20 +3576,20 @@ Hovmoeller plotm of cumulative changes in C<sub>T</sub> and temperature.
 <pre class="r"><code>rm(CT_star_hov, bin_CT_star, Tem_hov, bin_Tem)</code></pre>
 </div>
 </div>
-<div id="depth-integration-ct" class="section level1" number="8">
-<h1 number="8"><span class="header-section-number">8</span> Depth-integration C<sub>T</sub>*</h1>
-<p>A critical first step for the determination of net community production (NCP) is the integration of observed changes in nC<sub>T</sub> over depth. Two approaches were tested:</p>
+<div id="depth-integration-ct" class="section level1" number="9">
+<h1 number="9"><span class="header-section-number">9</span> Depth-integration C<sub>T</sub>*</h1>
+<p>A critical first step for the determination of net community production (NCP) is the integration of observed changes in C<sub>T</sub>* over depth. Two approaches were tested:</p>
 <ul>
-<li>Integration of changes in nC<sub>T</sub> over a predefined, fixed water depth</li>
-<li>Integration of changes in nC<sub>T</sub> over a mixed layer depth (MLD)</li>
+<li>Integration of changes in C<sub>T</sub>* over a predefined, fixed water depth</li>
+<li>Integration of changes in C<sub>T</sub>* over a mixed layer depth (MLD)</li>
 </ul>
-<p>Both aproaches deliver depth-integrated, incremental changes of C<sub>T</sub> inbetween cruise dates. Those were summed up to derive a trajectory of cummulative integrated nC<sub>T</sub> changes.</p>
-<div id="fixed-depths-approach" class="section level2" number="8.1">
-<h2 number="8.1"><span class="header-section-number">8.1</span> Fixed depths approach</h2>
-<p>Incremental and cumulative nC<sub>T</sub> changes inbetween cruise dates were integrated across the water colums down to predefined depth limits. This was done separately for observed positive/negative changes in C<sub>T</sub>, as well as for the total observed changes.</p>
-<p>Predefined integration depth levels in metres are: 9, 10, 11, 12, 13</p>
-<div id="calculate-ict" class="section level3" number="8.1.1">
-<h3 number="8.1.1"><span class="header-section-number">8.1.1</span> Calculate iC<sub>T</sub>*</h3>
+<p>Both approaches deliver depth-integrated, incremental changes of C<sub>T</sub>* between cruise dates. Those were summed up to derive a trajectory of cumulative integrated C<sub>T</sub>* changes.</p>
+<div id="fixed-depths-approach" class="section level2" number="9.1">
+<h2 number="9.1"><span class="header-section-number">9.1</span> Fixed depths approach</h2>
+<p>Incremental and cumulative C<sub>T</sub>* changes between cruise dates were integrated across the water columns down to predefined depth limits. This was done separately for observed positive/negative changes in C<sub>T</sub>, as well as for the total observed changes.</p>
+<p>Predefined integration depth levels in meters are: 9, 10, 11, 12, 13</p>
+<div id="calculate-ict" class="section level3" number="9.1.1">
+<h3 number="9.1.1"><span class="header-section-number">9.1.1</span> Calculate iC<sub>T</sub>*</h3>
 <pre class="r"><code>iCT_star_grid_sign &lt;- tm_profiles_ID_long %&gt;% 
   select(ID, date_time_ID, date_time_ID_ref) %&gt;% 
   unique() %&gt;% 
@@ -3611,8 +3656,8 @@ iCT_star &lt;- iCT_star %&gt;%
 iCT_star_fixed_dep &lt;- iCT_star
 rm(iCT_star, i_dep)</code></pre>
 </div>
-<div id="time-series" class="section level3" number="8.1.2">
-<h3 number="8.1.2"><span class="header-section-number">8.1.2</span> Time series</h3>
+<div id="time-series" class="section level3" number="9.1.2">
+<h3 number="9.1.2"><span class="header-section-number">9.1.2</span> Time series</h3>
 <pre class="r"><code>iCT_star_fixed_dep %&gt;%
   ggplot() +
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
@@ -3631,11 +3676,11 @@ rm(iCT_star, i_dep)</code></pre>
 <p><img src="figure/NCP_best_guess.Rmd/iCT_star_fixed_depth_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="mld-approach" class="section level2" number="8.2">
-<h2 number="8.2"><span class="header-section-number">8.2</span> MLD approach</h2>
+<div id="mld-approach" class="section level2" number="9.2">
+<h2 number="9.2"><span class="header-section-number">9.2</span> MLD approach</h2>
 <p>As an alternative to fixed depth levels, vertical integration as low as the mixed layer depth was tested.</p>
-<div id="density-calculation" class="section level3" number="8.2.1">
-<h3 number="8.2.1"><span class="header-section-number">8.2.1</span> Density calculation</h3>
+<div id="density-calculation" class="section level3" number="9.2.1">
+<h3 number="9.2.1"><span class="header-section-number">9.2.1</span> Density calculation</h3>
 <p>Seawater density Rho was determined from S, T, and p according to TEOS-10.</p>
 <pre class="r"><code>tm_profiles &lt;- tm_profiles %&gt;%
   mutate(rho = swSigma(
@@ -3644,8 +3689,8 @@ rm(iCT_star, i_dep)</code></pre>
     pressure = dep / 10
   ))</code></pre>
 </div>
-<div id="density-profiles" class="section level3" number="8.2.2">
-<h3 number="8.2.2"><span class="header-section-number">8.2.2</span> Density profiles</h3>
+<div id="density-profiles" class="section level3" number="9.2.2">
+<h3 number="9.2.2"><span class="header-section-number">9.2.2</span> Density profiles</h3>
 <pre class="r"><code>tm_profiles_ID_mean_hydro &lt;- tm_profiles %&gt;%
   select(-c(station, lat, lon, pCO2_corr, pCO2, CT_star, date_time)) %&gt;%
   group_by(ID, date_time_ID, date_ID, dep) %&gt;%
@@ -3689,8 +3734,8 @@ Mean vertical profiles per cruise day across all stations.
 </p>
 </div>
 </div>
-<div id="mld-calculation" class="section level3" number="8.2.3">
-<h3 number="8.2.3"><span class="header-section-number">8.2.3</span> MLD calculation</h3>
+<div id="mld-calculation" class="section level3" number="9.2.3">
+<h3 number="9.2.3"><span class="header-section-number">9.2.3</span> MLD calculation</h3>
 <p>Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria</p>
 <pre class="r"><code>tm_profiles_ID_hydro &lt;- expand_grid(tm_profiles_ID_hydro, rho_lim = c(0.1,0.2,0.5))
 
@@ -3702,8 +3747,8 @@ MLD &lt;- tm_profiles_ID_hydro  %&gt;%
   summarise(MLD = min(dep)) %&gt;% 
   ungroup()</code></pre>
 </div>
-<div id="daily-density-profiles" class="section level3" number="8.2.4">
-<h3 number="8.2.4"><span class="header-section-number">8.2.4</span> Daily density profiles</h3>
+<div id="daily-density-profiles" class="section level3" number="9.2.4">
+<h3 number="9.2.4"><span class="header-section-number">9.2.4</span> Daily density profiles</h3>
 <pre class="r"><code>tm_profiles_ID_hydro &lt;-
   full_join(tm_profiles_ID_hydro, MLD)
 
@@ -3723,8 +3768,8 @@ Mean density profiles and MLD per cruise dates (ID).
 </p>
 </div>
 </div>
-<div id="mld-timeseries" class="section level3" number="8.2.5">
-<h3 number="8.2.5"><span class="header-section-number">8.2.5</span> MLD timeseries</h3>
+<div id="mld-timeseries" class="section level3" number="9.2.5">
+<h3 number="9.2.5"><span class="header-section-number">9.2.5</span> MLD timeseries</h3>
 <pre class="r"><code>MLD %&gt;%
   ggplot(aes(date_time_ID, MLD, col = as.factor(rho_lim))) +
   geom_hline(yintercept = 0) +
@@ -3736,8 +3781,8 @@ Mean density profiles and MLD per cruise dates (ID).
   labs(x = &quot;&quot;)</code></pre>
 <p><img src="figure/NCP_best_guess.Rmd/MLD_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="ict_star-calculation" class="section level3" number="8.2.6">
-<h3 number="8.2.6"><span class="header-section-number">8.2.6</span> iCT_star calculation</h3>
+<div id="ict_star-calculation" class="section level3" number="9.2.6">
+<h3 number="9.2.6"><span class="header-section-number">9.2.6</span> iCT_star calculation</h3>
 <pre class="r"><code>iCT_star &lt;- tm_profiles_ID_long %&gt;% 
   filter(var == &quot;CT_star&quot;)
 
@@ -3764,8 +3809,8 @@ iCT_star_MLD &lt;- iCT_star
 
 rm(iCT_star, MLD, tm_profiles_ID_hydro, tm_profiles_ID_hydro_long)</code></pre>
 </div>
-<div id="time-series-1" class="section level3" number="8.2.7">
-<h3 number="8.2.7"><span class="header-section-number">8.2.7</span> Time series</h3>
+<div id="time-series-1" class="section level3" number="9.2.7">
+<h3 number="9.2.7"><span class="header-section-number">9.2.7</span> Time series</h3>
 <pre class="r"><code>iCT_star_MLD %&gt;%
   ggplot() +
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
@@ -3783,9 +3828,9 @@ rm(iCT_star, MLD, tm_profiles_ID_hydro, tm_profiles_ID_hydro_long)</code></pre>
 <p><img src="figure/NCP_best_guess.Rmd/iCT_star_MLD_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="comparison-of-approaches" class="section level2" number="8.3">
-<h2 number="8.3"><span class="header-section-number">8.3</span> Comparison of approaches</h2>
-<p>In the following, all cummulative iC<sub>T</sub> trajectories are displayed. Highlighted are those obtained for the fixed depth approach with 10 m limit, and the MLD approach with a high density threshold of 0.5 kg/m3.</p>
+<div id="comparison-of-approaches" class="section level2" number="9.3">
+<h2 number="9.3"><span class="header-section-number">9.3</span> Comparison of approaches</h2>
+<p>In the following, all cumulative iC<sub>T</sub> trajectories are displayed. Highlighted are those obtained for the fixed depth approach with 10 m limit, and the MLD approach with a high density threshold of 0.5 kg/m3.</p>
 <pre class="r"><code>iCT_star &lt;- full_join(iCT_star_fixed_dep, iCT_star_MLD)
 
 iCT_star &lt;- iCT_star %&gt;%
@@ -3815,8 +3860,8 @@ iCT_star %&gt;%
 <pre class="r"><code>rm(iCT_star, iCT_star_MLD)</code></pre>
 </div>
 </div>
-<div id="ncp-determination" class="section level1" number="9">
-<h1 number="9"><span class="header-section-number">9</span> NCP determination</h1>
+<div id="ncp-determination" class="section level1" number="10">
+<h1 number="10"><span class="header-section-number">10</span> NCP determination</h1>
 <p>In order to derive an estimate of the net community production NCP (which is equivalent to the formed organic matter that can be exported from the investigated surface layer), two steps are required:</p>
 <ul>
 <li><p>decision about the most appropiate iC<sub>T</sub> trajectory</p></li>
@@ -3827,9 +3872,9 @@ iCT_star %&gt;%
 <li>CO<sub>2</sub> fluxes due to lateral transport of water masses (not corrected here)</li>
 </ul></li>
 </ul>
-<div id="best-ict-estimate" class="section level2" number="9.1">
-<h2 number="9.1"><span class="header-section-number">9.1</span> Best iC<sub>T</sub> estimate</h2>
-<p>To determine the optimum depth for the nC<sub>T</sub> integration we investigated the vertical distribution of cumulative temperature and nC<sub>T</sub> changes on the peak of the productivity signal on June 23:</p>
+<div id="best-ict-estimate" class="section level2" number="10.1">
+<h2 number="10.1"><span class="header-section-number">10.1</span> Best iC<sub>T</sub> estimate</h2>
+<p>To determine the optimum depth for the C<sub>T</sub>* integration we investigated the vertical distribution of cumulative temperature and C<sub>T</sub>* changes on the peak of the productivity signal on June 23:</p>
 <pre class="r"><code>tm_profiles_ID_long_180723 &lt;- tm_profiles_ID_long %&gt;%
   filter(ID == 180723,
          var == &quot;CT_star&quot;)
@@ -3922,17 +3967,17 @@ p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel</code></pre>
 <ul>
 <li><p>During the first productivity pulse that lasted until July 23:</p>
 <ul>
-<li>no negative nC<sub>T</sub> changes were detected below that depth</li>
-<li>cumulative nC<sub>T</sub> switch sign at that depth</li>
+<li>no negative C<sub>T</sub>* changes were detected below that depth</li>
+<li>cumulative C<sub>T</sub>* switch sign at that depth</li>
 <li>95% of the cumulative warming signal appears across that depth</li>
 </ul></li>
 <li><p>MLD were too shallow to cover all observed negative C<sub>T</sub> changes</p></li>
 </ul>
 </div>
-<div id="air-sea-co2-flux" class="section level2" number="9.2">
-<h2 number="9.2"><span class="header-section-number">9.2</span> Air-Sea CO<sub>2</sub> flux</h2>
-<div id="surface-water-data" class="section level3" number="9.2.1">
-<h3 number="9.2.1"><span class="header-section-number">9.2.1</span> Surface water data</h3>
+<div id="air-sea-co2-flux" class="section level2" number="10.2">
+<h2 number="10.2"><span class="header-section-number">10.2</span> Air-Sea CO<sub>2</sub> flux</h2>
+<div id="surface-water-data" class="section level3" number="10.2.1">
+<h3 number="10.2.1"><span class="header-section-number">10.2.1</span> Surface water data</h3>
 <p>The cruise mean pCO<sub>2</sub> recorded in profiling-mode (stations only) and depths &lt; 6m was used for gas exchange calculations.</p>
 <pre class="r"><code>tm_profiles_surface_long &lt;- tm_profiles %&gt;%
   filter(dep &lt; parameters$surface_dep) %&gt;%
@@ -4683,8 +4728,8 @@ tem
 </table>
 </div>
 </div>
-<div id="wind-and-atm.-pco2" class="section level3" number="9.2.2">
-<h3 number="9.2.2"><span class="header-section-number">9.2.2</span> Wind and atm. pCO<sub>2</sub></h3>
+<div id="wind-and-atm.-pco2" class="section level3" number="10.2.2">
+<h3 number="10.2.2"><span class="header-section-number">10.2.2</span> Wind and atm. pCO<sub>2</sub></h3>
 <p>Metrological data were recorded on the flux tower located on Ostergarnsholm island.</p>
 <pre class="r"><code>og &lt;-
   read_csv(here::here(&quot;data/intermediate/_summarized_data_files&quot;,
@@ -4696,8 +4741,8 @@ og &lt;- og %&gt;%
 
 rm(end, start)</code></pre>
 </div>
-<div id="conversion-to-u10" class="section level3" number="9.2.3">
-<h3 number="9.2.3"><span class="header-section-number">9.2.3</span> Conversion to U10</h3>
+<div id="conversion-to-u10" class="section level3" number="10.2.3">
+<h3 number="10.2.3"><span class="header-section-number">10.2.3</span> Conversion to U<sub>10</sub></h3>
 <p>Wind speed was determined at 12 and converted to 10 m above sea level, to be used for gas exchange calculation.</p>
 <pre class="r"><code>og &lt;- og %&gt;%
   mutate(wind = wind.scale.base(wnd = wind, wnd.z = 12))</code></pre>
@@ -4751,8 +4796,8 @@ p_pCO2_atm + p_wind +
   plot_layout(guides = &#39;collect&#39;)</code></pre>
 <p><img src="figure/NCP_best_guess.Rmd/Ostergarn_tower_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="air-sea-fluxes" class="section level3" number="9.2.4">
-<h3 number="9.2.4"><span class="header-section-number">9.2.4</span> Air-sea fluxes</h3>
+<div id="air-sea-fluxes" class="section level3" number="10.2.4">
+<h3 number="10.2.4"><span class="header-section-number">10.2.4</span> Air-sea fluxes</h3>
 <p>F = k * dCO2</p>
 <p>with</p>
 <p>dCO2 = K0 * dpCO2 and</p>
@@ -4810,14 +4855,12 @@ rm(Sc_W14)</code></pre>
     plot.margin = margin(0, 0, 0, 0, &quot;cm&quot;)
   )</code></pre>
 <pre class="r"><code># scale flux to time interval
-
 tm_og &lt;- tm_og %&gt;%
   mutate(scale = 24 * 2) %&gt;%
   mutate(flux_scale = flux / scale) %&gt;%
   arrange(date_time) %&gt;%
   mutate(flux_cum = cumsum(flux_scale)) %&gt;%
   ungroup()
-
 
 p_flux_cum &lt;- tm_og %&gt;%
   ggplot(aes(x = date_time)) +
@@ -4840,8 +4883,8 @@ p_flux_daily + p_flux_cum +
 <p><img src="figure/NCP_best_guess.Rmd/flux_air_sea_cumulative_CO2-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="ict-correction" class="section level2" number="9.3">
-<h2 number="9.3"><span class="header-section-number">9.3</span> iC<sub>T</sub> correction</h2>
+<div id="ict-correction" class="section level2" number="10.3">
+<h2 number="10.3"><span class="header-section-number">10.3</span> iC<sub>T</sub> correction</h2>
 <p>The cumulative integrated CT_star (iCT_star) time series obtained through integration across the upper 12m of the water column was used for further calculations of NCP.</p>
 <p>Correction of iCT_star for air-sea CO2 fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014).</p>
 <p>To derive an integrated NCP estimated, the observed change in iCT_star must be corrected for the air-sea flux of CO2. iCT_star was determined for the upper 12m of the water column. The MLD was always shallower 12m, except for the last cruise day. Therefore:</p>
@@ -4862,8 +4905,8 @@ NCP &lt;- NCP %&gt;%
 
 # date of the second last cruise
 date_180806 &lt;- unique(NCP$date_time)[7]</code></pre>
-<div id="air-sea-fluxes-1" class="section level3" number="9.3.1">
-<h3 number="9.3.1"><span class="header-section-number">9.3.1</span> Air-sea fluxes</h3>
+<div id="air-sea-fluxes-1" class="section level3" number="10.3.1">
+<h3 number="10.3.1"><span class="header-section-number">10.3.1</span> Air-sea fluxes</h3>
 <pre class="r"><code># calculate cumulative air-sea fluxes affecting surface water column
 tm_og_flux &lt;- tm_og %&gt;%
   mutate(
@@ -4913,8 +4956,8 @@ NCP_flux_diff &lt;- NCP_flux %&gt;%
                names_to = &quot;var&quot;,
                values_to = &quot;value_diff&quot;)</code></pre>
 </div>
-<div id="vertical-mixing" class="section level3" number="9.3.2">
-<h3 number="9.3.2"><span class="header-section-number">9.3.2</span> Vertical mixing</h3>
+<div id="vertical-mixing" class="section level3" number="10.3.2">
+<h3 number="10.3.2"><span class="header-section-number">10.3.2</span> Vertical mixing</h3>
 <p>The aim is to approximate the CT entrainment flux between Aug 06 and 15. The relevant profiles are:</p>
 <pre class="r"><code>CT_mix &lt;- tm_profiles_ID_long %&gt;%
       filter(ID %in% c(&quot;180806&quot;),
@@ -5137,8 +5180,8 @@ NCP_flux_mix_diff %&gt;%
 </div>
 </div>
 </div>
-<div id="open-tasks-questions" class="section level1" number="10">
-<h1 number="10"><span class="header-section-number">10</span> Open tasks / questions</h1>
+<div id="open-tasks-questions" class="section level1" number="11">
+<h1 number="11"><span class="header-section-number">11</span> Open tasks / questions</h1>
 <ul>
 <li><p>clean and harmonize chunk labeling (label: plot, 1 plot per chunk, etc)</p></li>
 <li><p>included removed stations in coverage plot</p></li>
