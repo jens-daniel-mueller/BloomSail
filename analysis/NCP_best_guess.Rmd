@@ -883,8 +883,26 @@ Alkalinity normalized C~T~ (C~T~*) profiles were calculated from sensor pCO~2~ a
 
 ```{r CT_star_calculation}
 
-# calculate CT_star
+# calculate CT_star for included profiles
 tm_profiles <- tm_profiles %>%
+  mutate(
+    CT_star = carb(
+      24,
+      var1 = pCO2,
+      var2 = AT_mean * 1e-6,
+      S = sal_mean,
+      T = tem,
+      P = dep / 10,
+      k1k2 = "m10",
+      kf = "dg",
+      ks = "d",
+      gas = "insitu"
+    )[, 16] * 1e6
+  )
+
+# calculate CT_star for excluded profiles
+tm_profiles_stations_out <- tm_profiles_stations_out %>%
+  drop_na() %>% 
   mutate(
     CT_star = carb(
       24,
@@ -1086,7 +1104,7 @@ tm_profiles_ID_mean_test %>%
 
 ## All individual profiles per cruise day
 
-```{r CT_star_profiles_individual_pub_V2, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
+```{r CT_star_profiles_individual, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
 
 profiles_min_max <- tm_profiles %>%
   group_by(dep) %>%
@@ -1307,6 +1325,105 @@ dev.off()
 rm(i_ID, tm_profiles_long)
 
 ```
+
+
+## All excluded individual profiles per cruise day
+
+```{r excluded_CT_star_profiles_individual, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
+
+profiles_min_max <- tm_profiles %>%
+  group_by(dep, ID) %>%
+  summarise(max_CT = max(CT_star),
+            min_CT = min(CT_star),
+            max_tem = max(tem),
+            min_tem = min(tem)) %>%
+  ungroup()
+
+profiles_sd <- tm_profiles %>%
+  group_by(dep, ID) %>%
+  summarise(max_CT = mean(CT_star) + sd(CT_star),
+            min_CT = mean(CT_star) - sd(CT_star),
+            max_tem = mean(tem) + sd(tem),
+            min_tem = mean(tem) - sd(tem)) %>%
+  ungroup()
+
+tm_profiles_stations_out <- tm_profiles_stations_out %>%
+  filter(ID %in% unique(tm_profiles$ID),
+         phase == "down")
+
+p_CT <-
+  tm_profiles_stations_out %>%
+  ggplot() +
+  geom_ribbon(data = profiles_min_max,
+              aes(xmin = min_CT,
+                  xmax = max_CT,
+                  y = dep,
+                  fill = "Min/Max"),
+              alpha = 0.2) +
+  geom_ribbon(data = profiles_sd,
+              aes(xmin = min_CT,
+                  xmax = max_CT,
+                  y = dep,
+                  fill = "SD"),
+              alpha = 0.2) +
+  scale_fill_manual(values = c("black", "purple"), name = "") +
+  geom_path(aes(CT_star, dep, col = station)) +
+  scale_y_reverse() +
+  facet_grid(ID ~ .) +
+  labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {
+    -1
+  }))),
+  y = "Depth (m)") +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_blank(),
+    legend.position = "none"
+  )
+
+cruise_labels <- c(
+  `180705` = cruise_dates$date_ID[1],
+  `180709` = cruise_dates$date_ID[2],
+  `180718` = cruise_dates$date_ID[3],
+  `180723` = cruise_dates$date_ID[4],
+  `180730` = cruise_dates$date_ID[5],
+  `180802` = cruise_dates$date_ID[6],
+  `180806` = cruise_dates$date_ID[7],
+  `180815` = cruise_dates$date_ID[8]
+)
+
+p_tem <-
+  tm_profiles_stations_out %>%
+  ggplot() +
+  geom_ribbon(data = profiles_min_max,
+              aes(xmin = min_tem,
+                  xmax = max_tem,
+                  y = dep,
+                  fill = "Min/Max"),
+              alpha = 0.2) +
+  geom_ribbon(data = profiles_sd,
+              aes(xmin = min_tem,
+                  xmax = max_tem,
+                  y = dep,
+                  fill = "SD"),
+              alpha = 0.2) +
+  geom_path(aes(tem, dep, col = station)) +
+  scale_y_reverse() +
+  scale_fill_manual(values = c("black", "purple"), name = "") +
+  scale_color_discrete(name = "Station") +
+  guides(color = guide_legend(order = 1)) +
+  facet_grid(ID ~ .,
+             labeller = labeller(ID = cruise_labels)) +
+  labs(x = "Temperature (\u00B0C)",
+       y = "Depth (m)") +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+
+p_CT | p_tem
+
+rm(p_CT_star, p_tem, cruise_labels, profiles_min_max)
+
+```
+
 
 ## Incremental changes
 
@@ -1587,68 +1704,7 @@ ggsave(
 
 ## Absolute values
 
-```{r plot_hovmoeller_absolut, fig.cap="Hovmoeller plotm of absolute changes in C~T~ and temperature."}
-
-bin_CT_star <- 30
-
-p_CT_star_hov <- tm_profiles_ID_long %>%
-  filter(var == "CT_star") %>%
-  ggplot() +
-  geom_contour_fill(aes(x = date_time_ID, y = dep, z = value),
-                    breaks = MakeBreaks(bin_CT_star),
-                    col = "black") +
-  geom_point(
-    aes(x = date_time_ID, y = c(24.5)),
-    size = 3,
-    shape = 24,
-    fill = "white"
-  ) +
-  scale_fill_scico(
-    breaks = MakeBreaks(bin_CT_star),
-    guide = "colorstrip",
-    name = "CT_star (µmol/kg)",
-    palette = "davos",
-    direction = -1
-  ) +
-  scale_y_reverse() +
-  scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  labs(y = "Depth (m)") +
-  coord_cartesian(expand = 0) +
-  theme(axis.title.x = element_blank())
-
-bin_Tem <- 2
-
-p_tem_hov <- tm_profiles_ID_long %>%
-  filter(var == "tem") %>%
-  ggplot() +
-  geom_contour_fill(aes(x = date_time_ID, y = dep, z = value),
-                    breaks = MakeBreaks(bin_Tem),
-                    col = "black") +
-  geom_point(
-    aes(x = date_time_ID, y = c(24.5)),
-    size = 3,
-    shape = 24,
-    fill = "white"
-  ) +
-  scale_fill_viridis_c(
-    breaks = MakeBreaks(bin_Tem),
-    guide = "colorstrip",
-    name = "Tem (°C)",
-    option = "inferno"
-  ) +
-  scale_y_reverse() +
-  scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  labs(y = "Depth (m)") +
-  coord_cartesian(expand = 0) +
-  theme(axis.title.x = element_blank())
-
-p_CT_star_hov / p_tem_hov
-
-rm(p_CT_star_hov, bin_CT_star, p_tem_hov, bin_Tem)
-
-```
-
-```{r pub_fig_CT_star_tem_hov_abs_profiles_cum}
+```{r plot_hovmoeller_absolut_plus_cum_profiles, fig.cap="Hovmoeller plotm of absolute changes in C~T~ and temperature, combined with profile plots of cumulative changes."}
 
 bin_CT_star <- 30
 
@@ -1818,17 +1874,12 @@ CT_star_hov <- tm_profiles_ID_long %>%
   ) +
   geom_point(
     aes(x = date_time_ID, y = c(24.5)),
-    size = 3,
-    shape = 24,
-    fill = "white"
+    size = 3, shape = 24, fill = "white"
   ) +
   scale_fill_divergent(breaks = MakeBreaks(bin_CT_star),
-                       guide = "colorstrip",
-                       name = "CT_star (µmol/kg)") +
+                       guide = "colorstrip") +
   scale_y_reverse() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  theme_bw() +
-  labs(y = "Depth (m)") +
   coord_cartesian(expand = 0) +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())
@@ -1845,18 +1896,14 @@ Tem_hov <- tm_profiles_ID_long %>%
   ) +
   geom_point(
     aes(x = date_time_ID, y = c(24.5)),
-    size = 3,
-    shape = 24,
-    fill = "white"
+    size = 3, shape = 24, fill = "white"
   ) +
   scale_fill_divergent(breaks = MakeBreaks(bin_Tem),
-                       guide = "colorstrip",
-                       name = "Tem (°C)") +
+                       guide = "colorstrip") +
   scale_y_reverse() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  theme_bw() +
-  labs(x = "", y = "Depth (m)") +
-  coord_cartesian(expand = 0)
+  coord_cartesian(expand = 0) +
+  theme(axis.title.x = element_blank())
 
 CT_star_hov / Tem_hov
 
@@ -1886,12 +1933,9 @@ CT_star_hov <- tm_profiles_ID_long %>%
     fill = "white"
   ) +
   scale_fill_divergent(breaks = MakeBreaks(bin_CT_star),
-                       guide = "colorstrip",
-                       name = "CT_star (µmol/kg)") +
+                       guide = "colorstrip") +
   scale_y_reverse() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  theme_bw() +
-  labs(y = "Depth (m)") +
   coord_cartesian(expand = 0) +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank())
@@ -1913,13 +1957,11 @@ Tem_hov <- tm_profiles_ID_long %>%
     fill = "white"
   ) +
   scale_fill_divergent(breaks = MakeBreaks(bin_Tem),
-                       guide = "colorstrip",
-                       name = "Tem (°C)") +
+                       guide = "colorstrip") +
   scale_y_reverse() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  theme_bw() +
-  labs(x = "", y = "Depth (m)") +
-  coord_cartesian(expand = 0)
+  coord_cartesian(expand = 0) +
+  theme(axis.title.x = element_blank())
 
 CT_star_hov / Tem_hov
 
@@ -1927,7 +1969,7 @@ rm(CT_star_hov, bin_CT_star, Tem_hov, bin_Tem)
 
 ```
 
-# Depth-integration C~T~
+# Depth-integration C~T~*
 
 A critical first step for the determination of net community production (NCP) is the integration of observed changes in nC~T~ over depth. Two approaches were tested:
 
@@ -1942,7 +1984,7 @@ Incremental and cumulative nC~T~ changes inbetween cruise dates were integrated 
 
 Predefined integration depth levels in metres are: `r parameters$fixed_integration_depths`
 
-### Calculate inC~T~
+### Calculate iC~T~*
 
 ```{r calculate_iCT_star_fixed_depth}
 
