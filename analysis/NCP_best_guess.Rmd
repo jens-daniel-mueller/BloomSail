@@ -51,7 +51,7 @@ parameters <-
 # Scope of this script
 
 -  Analyse field data recorded on board SV Tina V  
--  derive a best guess estimate for net community production (NCP)
+-  Derive a best guess estimate for net community production (NCP)
 
 
 # Sensor data
@@ -60,14 +60,14 @@ parameters <-
 
 Profile data are prepared by:
 
--   Ignoring those made on June 16 (pCO2 sensor not in operation)
+-   Ignoring those made on June 16 (pCO~2~ sensor not in operation)
 -   Removing HydroC Flush and Zeroing periods
 -   Selecting only continuous downcast periods
 -   Gridding profiles to `r parameters$dep_grid`m depth intervals
--   removing grids with pCO2 \< 0 µatm (presumably RT correction artifact after zeroing)
+-   Removing grids with pCO2 \< 0 µatm (presumably RT correction artifact after zeroing)
 -   Discarding profiles with `r parameters$max_dep_gap` or more observation missing within upper `r parameters$max_dep`m
--   assigning mean date_time_ID value to all profiles belonging to one cruise
--   discarding "coastal" station P01, P13, P14
+-   Assigning mean date_time_ID value to all profiles belonging to one cruise
+-   Discarding "coastal" station P01, P13, P14
 -   Restricting profiles to upper `r parameters$max_dep`m
 
 Please note that:
@@ -255,7 +255,7 @@ tm_profiles <- tm_profiles %>%
 
 ```
 
-## Cruise dates
+## Calculate mean cruise dates
 
 ```{r mean_cruise_dates}
 
@@ -623,7 +623,7 @@ rm(cover)
 
 # Bottle C~T~ and A~T~
 
-At stations P07 and P10 discrete samples for lab measurmentm of C~T~ and A~T~ were collected. Please note that - in contrast to the pCO~2~ profiles - samples were taken on June 16, but removed here for harmonization of results.
+At stations P07 and P10 discrete samples for lab measurments of C~T~ and A~T~ were collected. Please note that - in contrast to the pCO~2~ profiles - samples were taken on June 16, but removed here for harmonization of results.
 
 ```{r read_bottle_CO2}
 
@@ -700,7 +700,7 @@ tb_fix %>%
 
 ## C~T~* calculation
 
-The alkalinity-normalized C~T~, C~T~*, was calculated.
+The alkalinity-normalized C~T~, C~T~*, was calculated for discrete samples.
 
 ```{r CT_star_bottle_calculation}
 
@@ -1114,7 +1114,7 @@ profiles_min_max <- tm_profiles %>%
             min_tem = min(tem)) %>%
   ungroup()
 
-p_CT <-
+p_CT_star <-
   tm_profiles %>%
   ggplot() +
   geom_ribbon(data = profiles_min_max,
@@ -1163,7 +1163,7 @@ p_tem <-
   theme(axis.title.y = element_blank(),
         axis.text.y = element_blank())
 
-p_CT | p_tem
+p_CT_star | p_tem
 
 ggsave(
   here::here(
@@ -1195,16 +1195,15 @@ Important notes:
 
 -   the standard deviation of C~T~ in the upper 10m increases on June 30.
 
-C~T~, pCO~2~, S, and T profiles were plotted individually [pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_pCO2_tem_sal_CT.pdf){target="_blank"} and grouped by ID [pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/CT_dynamics/tm_profiles_ID_pCO2_tem_sal_CT.pdf){target="_blank"}. The later gives an idea of the differences between stations at one point in time.
+C~T~, pCO~2~, S, and T profiles were plotted individually [pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/NCP_best_guess/tm_profiles_pCO2_tem_sal_CT.pdf){target="_blank"} and grouped by ID [pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/NCP_best_guess/tm_profiles_ID_pCO2_tem_sal_CT.pdf){target="_blank"}. The later gives an idea of the differences between stations at one point in time.
 
 ```{r plot_all_discretized_profiles_individual, eval=FALSE}
 
-# tm_profiles_highres <- tm_profiles_highres %>% 
-#   filter(phase == "down")
-
-pdf(file=here::here("output/Plots/CT_dynamics",
+# create pdf file
+pdf(file=here::here("output/Plots/NCP_best_guess",
     "tm_profiles_pCO2_tem_sal_CT.pdf"), onefile = TRUE, width = 9, height = 5)
 
+# loop across all stations and cruise days and create profile plots
 for(i_ID in unique(tm_profiles$ID)){
   for(i_station in unique(tm_profiles$station)){
 
@@ -1288,14 +1287,17 @@ rm(i_ID, i_station)
 
 ```{r plot_all_discretized_profiles_by_ID, eval=FALSE}
 
+# convert data to long format
 tm_profiles_long <- tm_profiles %>%
   select(-c(lat, lon, pCO2_corr)) %>% 
   pivot_longer(sal:CT_star, values_to = "value", names_to = "var")
 
-
-pdf(file=here::here("output/Plots/CT_dynamics",
+# create pdf file
+pdf(file=here::here("output/Plots/NCP_best_guess",
     "tm_profiles_ID_pCO2_tem_sal_CT.pdf"), onefile = TRUE, width = 9, height = 5)
 
+
+# loop across all cruise days and create profile plots
 for(i_ID in unique(tm_profiles$ID)){
 
   #i_ID <- unique(tm_profiles$ID)[1]
@@ -1331,6 +1333,7 @@ rm(i_ID, tm_profiles_long)
 
 ```{r excluded_CT_star_profiles_individual, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
 
+# calculate overall min/max profiles from included stations
 profiles_min_max <- tm_profiles %>%
   group_by(dep, ID) %>%
   summarise(max_CT = max(CT_star),
@@ -1339,6 +1342,7 @@ profiles_min_max <- tm_profiles %>%
             min_tem = min(tem)) %>%
   ungroup()
 
+# calculate overall mean +/- SD profiles from included stations
 profiles_sd <- tm_profiles %>%
   group_by(dep, ID) %>%
   summarise(max_CT = mean(CT_star) + sd(CT_star),
@@ -1347,10 +1351,12 @@ profiles_sd <- tm_profiles %>%
             min_tem = mean(tem) - sd(tem)) %>%
   ungroup()
 
+# filter downcast from relevant excluded stations
 tm_profiles_stations_out <- tm_profiles_stations_out %>%
   filter(ID %in% unique(tm_profiles$ID),
          phase == "down")
 
+# plot profiles
 p_CT <-
   tm_profiles_stations_out %>%
   ggplot() +
@@ -1427,7 +1433,7 @@ rm(p_CT_star, p_tem, cruise_labels, profiles_min_max)
 
 ## Incremental changes
 
-Changes of seawater vars at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.
+Changes of seawater variables at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.
 
 ```{r calculate_profiles_incremental_cumulative_changes}
 
@@ -1484,6 +1490,8 @@ tm_profiles_ID_long %>%
 Important notes:
 
 -   Salinity in the upper 10m decreases by \>0.1 on June 30, and returns to average conditions already on Aug 02.
+
+## Cumulative changes by sign
 
 Cumulative positive and negative changes of seawater vars were calculated separately at each depth relative to the first cruise day on July 5.
 
@@ -1555,9 +1563,9 @@ rm(tm_profiles_ID_long_grid)
 
 ```
 
-## C~T~* sensitivity to mean A~T~
+# C~T~* sensitivity to mean A~T~
 
-Mean seawater CT were calculated for 5m depth intervals based on two AT values.
+Mean seawater C~T~* were calculated for 5m depth intervals, based on two A~T~ values (regular mean + 2 SD).
 
 ```{r observed_timeseries_CT_star_delta}
 
@@ -1582,6 +1590,7 @@ rm(tm_profiles_ID_long_grid)
 Calculate C~T~* changes for range of A~T~ errors
 
 ```{r CT_calculation_sensitivity}
+
 
 CT_star_sens <- tm_profiles %>%
   filter(dep < parameters$surface_dep,
@@ -1626,12 +1635,14 @@ CT_star_delta_mean <- CT_star_sens %>%
   pull(CT_star_delta)
 
 CT_star_sens <- CT_star_sens %>%
-  mutate(CT_star_delta_offset = CT_star_delta - CT_star_delta_mean,
-         CT_star_delta_offset_rel = CT_star_delta / CT_star_delta_mean *100,
-         AT_offset = AT - AT_mean)
+  mutate(
+    CT_star_delta_offset = CT_star_delta - CT_star_delta_mean,
+    CT_star_delta_offset_rel = CT_star_delta / CT_star_delta_mean * 100,
+    AT_offset = AT - AT_mean
+  )
 
 CT_star_delta_sd <- CT_star_sens %>%
-  filter(factor == 1) %>% 
+  filter(factor == 1) %>%
   pull(CT_star_delta_offset)
 
 
@@ -1655,7 +1666,7 @@ CT_star_sens %>%
   ) +
   geom_vline(xintercept = 0, linetype = 2) +
   geom_hline(yintercept = 0, linetype = 2) +
-  geom_line(col="red") +
+  geom_line(col = "red") +
   scale_y_continuous(
     expression(paste(
       "Absolute bias ", Delta ~ C[T], "*",  ~ (µmol ~ kg ^ {
@@ -1671,16 +1682,15 @@ CT_star_sens %>%
   scale_x_continuous(expression(paste("Absolute bias ", A[T]  ~ (µmol ~ kg ^ {
     -1
   }))),
-  sec.axis = sec_axis(~ . / AT_mean * 100,
-                      name = expression(paste(
-                        "Relative bias ", A[T], " (%)")),
-      breaks = seq(-10, 10, 1)))
+  sec.axis = sec_axis(
+    ~ . / AT_mean * 100,
+    name = expression(paste("Relative bias ", A[T], " (%)")),
+    breaks = seq(-10, 10, 1)
+  ))
 
 ggsave(
-  here::here(
-    "output/Plots/Figures_publication/appendix",
-    "Fig_C1.pdf"
-  ),
+  here::here("output/Plots/Figures_publication/appendix",
+             "Fig_C1.pdf"),
   width = 83,
   height = 60,
   dpi = 300,
@@ -1688,10 +1698,8 @@ ggsave(
 )
 
 ggsave(
-  here::here(
-    "output/Plots/Figures_publication/appendix",
-    "Fig_C1.png"
-  ),
+  here::here("output/Plots/Figures_publication/appendix",
+             "Fig_C1.png"),
   width = 83,
   height = 60,
   dpi = 300,
@@ -1971,18 +1979,18 @@ rm(CT_star_hov, bin_CT_star, Tem_hov, bin_Tem)
 
 # Depth-integration C~T~*
 
-A critical first step for the determination of net community production (NCP) is the integration of observed changes in nC~T~ over depth. Two approaches were tested:
+A critical first step for the determination of net community production (NCP) is the integration of observed changes in C~T~* over depth. Two approaches were tested:
 
--   Integration of changes in nC~T~ over a predefined, fixed water depth
--   Integration of changes in nC~T~ over a mixed layer depth (MLD)
+-   Integration of changes in C~T~* over a predefined, fixed water depth
+-   Integration of changes in C~T~* over a mixed layer depth (MLD)
 
-Both aproaches deliver depth-integrated, incremental changes of C~T~ inbetween cruise dates. Those were summed up to derive a trajectory of cummulative integrated nC~T~ changes.
+Both approaches deliver depth-integrated, incremental changes of C~T~* between cruise dates. Those were summed up to derive a trajectory of cumulative integrated C~T~* changes.
 
 ## Fixed depths approach
 
-Incremental and cumulative nC~T~ changes inbetween cruise dates were integrated across the water colums down to predefined depth limits. This was done separately for observed positive/negative changes in C~T~, as well as for the total observed changes.
+Incremental and cumulative C~T~* changes between cruise dates were integrated across the water columns down to predefined depth limits. This was done separately for observed positive/negative changes in C~T~, as well as for the total observed changes.
 
-Predefined integration depth levels in metres are: `r parameters$fixed_integration_depths`
+Predefined integration depth levels in meters are: `r parameters$fixed_integration_depths`
 
 ### Calculate iC~T~*
 
@@ -2253,7 +2261,7 @@ iCT_star_MLD %>%
 
 ## Comparison of approaches
 
-In the following, all cummulative iC~T~ trajectories are displayed. Highlighted are those obtained for the fixed depth approach with 10 m limit, and the MLD approach with a high density threshold of 0.5 kg/m3.
+In the following, all cumulative iC~T~ trajectories are displayed. Highlighted are those obtained for the fixed depth approach with 10 m limit, and the MLD approach with a high density threshold of 0.5 kg/m3.
 
 ```{r iCT_star_comparison}
 
@@ -2301,7 +2309,7 @@ In order to derive an estimate of the net community production NCP (which is equ
 
 ## Best iC~T~ estimate
 
-To determine the optimum depth for the nC~T~ integration we investigated the vertical distribution of cumulative temperature and nC~T~ changes on the peak of the productivity signal on June 23:
+To determine the optimum depth for the C~T~* integration we investigated the vertical distribution of cumulative temperature and C~T~* changes on the peak of the productivity signal on June 23:
 
 ```{r CT_star_cum_profiles_180723}
 
@@ -2407,8 +2415,8 @@ The cummulative iC~T~ trajectory determined by integration of C~T~ to a fixed wa
 
 -   During the first productivity pulse that lasted until July 23:
 
-    -   no negative nC~T~ changes were detected below that depth
-    -   cumulative nC~T~ switch sign at that depth
+    -   no negative C~T~* changes were detected below that depth
+    -   cumulative C~T~* switch sign at that depth
     -   95% of the cumulative warming signal appears across that depth
 
 -   MLD were too shallow to cover all observed negative C~T~ changes
@@ -2582,7 +2590,7 @@ rm(end, start)
 
 ```
 
-### Conversion to U10
+### Conversion to U~10~
 
 Wind speed was determined at 12 and converted to 10 m above sea level, to be used for gas exchange calculation.
 
@@ -2735,15 +2743,14 @@ p_flux_daily <- tm_og %>%
 ```
 
 ```{r flux_air_sea_cumulative_CO2, fig.asp=0.3}
-# scale flux to time interval
 
+# scale flux to time interval
 tm_og <- tm_og %>%
   mutate(scale = 24 * 2) %>%
   mutate(flux_scale = flux / scale) %>%
   arrange(date_time) %>%
   mutate(flux_cum = cumsum(flux_scale)) %>%
   ungroup()
-
 
 p_flux_cum <- tm_og %>%
   ggplot(aes(x = date_time)) +
