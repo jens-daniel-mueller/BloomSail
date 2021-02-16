@@ -877,9 +877,7 @@ Note:
 
 - C~T~* drop and temporal patterns agree well with those found in the C~T~* time series derived from pCO~2~ measurements (below).
 
-# C~T~* profiles
-
-## Calculation from pCO~2~
+# C~T~* calculation from pCO~2~
 
 Alkalinity normalized C~T~ (C~T~*) profiles were calculated from sensor pCO~2~ and T profiles, and constant mean salinity and mean alkalinity values. Note that the impact of fixed vs. measured salinity has only a negligible impact on C~T~ profiles.
 
@@ -931,9 +929,9 @@ tm_profiles <- tm_profiles %>%
 
 ```
 
-## Profile plots
+# Profile plots
 
-### All individual profiles
+## All individual profiles
 
 ```{r profiles_all_by_date, fig.asp=0.5, fig.cap="Individual vertical profiles per cruise day and station."}
 
@@ -1012,7 +1010,7 @@ rm(p_tem, p_pCO2, p_CT_star)
 
 ```
 
-### Mean profiles
+## Mean profiles
 
 Mean vertical profiles were calculated for each cruise day (ID).
 
@@ -1073,7 +1071,7 @@ tm_profiles_ID_long %>%
   
 ```
 
-### C~T~* sensitivity to mean A~T~
+## C~T~* sensitivity to mean A~T~
 
 ```{r CT_star_profiles_delta, fig.cap="Offset between C~T~* calculate from mean A~T~ and  mean A~T~ + 2 SD of A~T~, displayed as mean vertical profiles per cruise day across all stations."}
 
@@ -1086,7 +1084,7 @@ tm_profiles_ID_mean_test %>%
   
 ```
 
-### All individual profiles per cruise day
+## All individual profiles per cruise day
 
 ```{r CT_star_profiles_individual_pub_V2, fig.cap="Mean vertical profiles per cruise day across all stations plotted indivdually. Ribbons indicate the standard deviation observed across all profiles at each depth and transect.", fig.asp=1.5}
 
@@ -1310,7 +1308,7 @@ rm(i_ID, tm_profiles_long)
 
 ```
 
-### Incremental changes
+## Incremental changes
 
 Changes of seawater vars at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.
 
@@ -1347,7 +1345,7 @@ tm_profiles_ID_long %>%
   
 ```
 
-### Cumulative changes
+## Cumulative changes
 
 Cumulative changes of seawater vars were calculated at each depth relative to the first cruise day on July 5.
 
@@ -1399,9 +1397,9 @@ tm_profiles_ID_long %>%
 
 ```
 
-# Timeseries
+# Time series plots
 
-## Timeseries depth intervals
+## Depth intervals
 
 Mean seawater parameters were calculated for 5m depth intervals.
 
@@ -1440,7 +1438,7 @@ rm(tm_profiles_ID_long_grid)
 
 ```
 
-### Test AT sensitivity
+## C~T~* sensitivity to mean A~T~
 
 Mean seawater CT were calculated for 5m depth intervals based on two AT values.
 
@@ -1464,7 +1462,7 @@ tm_profiles_ID_long_grid %>%
 rm(tm_profiles_ID_long_grid)
 ```
 
-Calculate CT\* changes for range of AT errors
+Calculate C~T~* changes for range of A~T~ errors
 
 ```{r CT_calculation_sensitivity}
 
@@ -1585,12 +1583,11 @@ ggsave(
 
 ```
 
-## Hovmoeller plots
+# Hovmoeller plots
 
-### Absolute values
+## Absolute values
 
 ```{r plot_hovmoeller_absolut, fig.cap="Hovmoeller plotm of absolute changes in C~T~ and temperature."}
-
 
 bin_CT_star <- 30
 
@@ -1615,11 +1612,9 @@ p_CT_star_hov <- tm_profiles_ID_long %>%
   ) +
   scale_y_reverse() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  theme_bw() +
   labs(y = "Depth (m)") +
   coord_cartesian(expand = 0) +
-  theme(axis.title.x = element_blank(),
-        legend.position = "left")
+  theme(axis.title.x = element_blank())
 
 bin_Tem <- 2
 
@@ -1645,8 +1640,7 @@ p_tem_hov <- tm_profiles_ID_long %>%
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
   labs(y = "Depth (m)") +
   coord_cartesian(expand = 0) +
-  theme(axis.title.x = element_blank(),
-        legend.position = "left")
+  theme(axis.title.x = element_blank())
 
 p_CT_star_hov / p_tem_hov
 
@@ -1654,7 +1648,7 @@ rm(p_CT_star_hov, bin_CT_star, p_tem_hov, bin_Tem)
 
 ```
 
-```{r pub_fig_CT_star_tem_hov_abs_profiles_cum, include=FALSE}
+```{r pub_fig_CT_star_tem_hov_abs_profiles_cum}
 
 bin_CT_star <- 30
 
@@ -1807,7 +1801,7 @@ rm(p_CT_star_hov, bin_CT_star, p_tem_hov, bin_Tem, p_CT_star_ID_cum, p_tem_ID_cu
 
 ```
 
-### Incremental changes
+## Incremental changes
 
 ```{r plot_hovmoeller_daily, fig.cap="Hovmoeller plotm of daily changes in C~T~ and temperature. Note that calculated  value of change (in contrast to absolute and cumulative values) are referred to the mean dates inbetween cruise, and are not extrapolated to the full observational period."}
 
@@ -1870,7 +1864,7 @@ rm(CT_star_hov, bin_CT_star, Tem_hov, bin_Tem)
 
 ```
 
-### Cumulative changes
+## Cumulative changes
 
 ```{r plot_hovmoeller_cumulative, fig.cap="Hovmoeller plotm of cumulative changes in C~T~ and temperature."}
 
