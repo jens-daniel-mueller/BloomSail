@@ -565,16 +565,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree54ddb867d1fbd52a82879857ddb5b8f08b03c57atargetblank54ddb86a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/54ddb867d1fbd52a82879857ddb5b8f08b03c57a" target="_blank">54ddb86</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree955ac1de960780e2310e919552b3ce19329685c3targetblank955ac1da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/955ac1de960780e2310e919552b3ce19329685c3" target="_blank">955ac1d</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree54ddb867d1fbd52a82879857ddb5b8f08b03c57atargetblank54ddb86a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree955ac1de960780e2310e919552b3ce19329685c3targetblank955ac1da" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/54ddb867d1fbd52a82879857ddb5b8f08b03c57a" target="_blank">54ddb86</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/955ac1de960780e2310e919552b3ce19329685c3" target="_blank">955ac1d</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -623,6 +623,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/955ac1de960780e2310e919552b3ce19329685c3/analysis/NCP_reconstruction.Rmd" target="_blank">955ac1d</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-18
+</td>
+<td>
+cleaning
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/43f9d47137d6bc9487a8ffb4016386d46d269144/docs/NCP_reconstruction.html" target="_blank">43f9d47</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2618,11 +2652,7 @@ p_surface + p_integrated + p_pen_dep +
   &lt;chr&gt;        &lt;dbl&gt;    &lt;dbl&gt;
 1 CT_star       10.2     1.04
 2 tem           11.5     2.46</code></pre>
-<pre class="r"><code>CPD &lt;- PD %&gt;%
-  filter(var == &quot;CT_star&quot;) %&gt;%
-  drop_na()
-
-rm(p_surface, p_integrated, p_pen_dep)
+<pre class="r"><code>rm(p_surface, p_integrated, p_pen_dep)
 rm(PD, PD_mean, tm_profiles_ID_long)</code></pre>
 </div>
 </div>
@@ -3242,10 +3272,10 @@ MLD &lt;- full_join(MLD, MLD_mean)
 rm(MLD_mean)</code></pre>
 </div>
 </div>
-<div id="temperature-penetration-depth" class="section level2" number="6.2">
-<h2 number="6.2"><span class="header-section-number">6.2</span> Temperature penetration depth</h2>
-<div id="tpd-calculation" class="section level3" number="6.2.1">
-<h3 number="6.2.1"><span class="header-section-number">6.2.1</span> TPD calculation</h3>
+<div id="tpd" class="section level2" number="6.2">
+<h2 number="6.2"><span class="header-section-number">6.2</span> TPD</h2>
+<div id="cumulative-changes" class="section level3" number="6.2.1">
+<h3 number="6.2.1"><span class="header-section-number">6.2.1</span> Cumulative changes</h3>
 <pre class="r"><code>tm_fm_gt_long &lt;- tm_fm_gt %&gt;%
   select(-c(sal)) %&gt;%
   pivot_longer(c(&quot;tem&quot;, &quot;CT_star&quot;),
@@ -3266,8 +3296,8 @@ tm_fm_gt_long &lt;- tm_fm_gt_long %&gt;%
   filter(var == &quot;tem&quot;) %&gt;%
   select(-var)</code></pre>
 </div>
-<div id="cumulative-temperature-profile" class="section level3" number="6.2.2">
-<h3 number="6.2.2"><span class="header-section-number">6.2.2</span> Cumulative temperature profile</h3>
+<div id="temperature-profiles" class="section level3" number="6.2.2">
+<h3 number="6.2.2"><span class="header-section-number">6.2.2</span> Temperature profiles</h3>
 <p>Please note that the cumulative temperature profile of GETM shows a deep maximum below 20m, which must be attributed to water mass exchange rather than surface warming to radiation or heat uptake, which we want to capture here. Therefore, the integration depth of the GETM data was manually restricted to 19m.</p>
 <pre class="r"><code>tm_fm_gt_long %&gt;%
   filter(date_time_ID == date_CT_min) %&gt;%
@@ -3289,8 +3319,8 @@ Profiles of cumulative temperature changes from the GETM model (label fm) and as
 </p>
 </div>
 </div>
-<div id="calculate-cumulative-changes" class="section level3" number="6.2.3">
-<h3 number="6.2.3"><span class="header-section-number">6.2.3</span> Calculate cumulative changes</h3>
+<div id="cumulative-tpd" class="section level3" number="6.2.3">
+<h3 number="6.2.3"><span class="header-section-number">6.2.3</span> Cumulative TPD</h3>
 <pre class="r"><code># subset data at CT* minimum
 tm_fm_gt_long_day &lt;- tm_fm_gt_long %&gt;%
   filter(date_time_ID == date_CT_min) %&gt;%
@@ -3334,9 +3364,6 @@ TPD &lt;- TPD %&gt;%
   mutate(i_dep = value_cum_i / value_surface)
 
 rm(value_cum, value_surface)</code></pre>
-</div>
-<div id="cumulative-profiles-july-24" class="section level3" number="6.2.4">
-<h3 number="6.2.4"><span class="header-section-number">6.2.4</span> Cumulative profiles July 24</h3>
 <pre class="r"><code>p_tm_fm_gt_long &lt;- tm_fm_gt_long_day %&gt;%
   arrange(dep) %&gt;%
   ggplot(aes(value_cum, dep)) +
@@ -3378,8 +3405,8 @@ TPD_cum &lt;- TPD
 
 rm(TPD)</code></pre>
 </div>
-<div id="calculate-incremental-tpd" class="section level3" number="6.2.5">
-<h3 number="6.2.5"><span class="header-section-number">6.2.5</span> Calculate incremental TPD</h3>
+<div id="incremental-tpd" class="section level3" number="6.2.4">
+<h3 number="6.2.4"><span class="header-section-number">6.2.4</span> Incremental TPD</h3>
 <pre class="r"><code># incremental changes of surface values
 diff_surface &lt;- tm_fm_gt_long %&gt;%
   filter(dep &lt; parameters$surface_dep) %&gt;%
@@ -3458,7 +3485,7 @@ p_TPD &lt;- TPD %&gt;%
 
 p_surface + p_integrated + p_TPD +
   plot_layout(ncol = 1)</code></pre>
-<p><img src="figure/NCP_reconstruction.Rmd/TPD_daily-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/NCP_reconstruction.Rmd/incremental_TPD-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>TPD_mean</code></pre>
 <pre><code># A tibble: 2 x 3
   source i_dep_sd i_dep
@@ -3466,6 +3493,9 @@ p_surface + p_integrated + p_TPD +
 1 fm         2.31  11.4
 2 tm         2.46  12.3</code></pre>
 <pre class="r"><code>rm(p_surface, p_integrated, p_TPD)</code></pre>
+</div>
+<div id="join-tpd-estimates" class="section level3" number="6.2.5">
+<h3 number="6.2.5"><span class="header-section-number">6.2.5</span> Join TPD estimates</h3>
 <pre class="r"><code>TPD &lt;- TPD %&gt;%
   select(date_time_ID, source, i_dep) %&gt;%
   mutate(i_method = &quot;TPD&quot;, i_res = &quot;daily&quot;) %&gt;%
@@ -3488,21 +3518,18 @@ TPD &lt;- full_join(TPD, TPD_cum)
 TPD &lt;- full_join(TPD, TPD_mean)
 
 rm(TPD_cum, TPD_mean)</code></pre>
+</div>
+</div>
+<div id="join-tpd-and-mld" class="section level2" number="6.3">
+<h2 number="6.3"><span class="header-section-number">6.3</span> Join TPD and MLD</h2>
 <pre class="r"><code>i_dep &lt;- full_join(MLD, TPD)
 rm(MLD, TPD)</code></pre>
+</div>
+<div id="hovmoeller-mldtpd" class="section level2" number="6.4">
+<h2 number="6.4"><span class="header-section-number">6.4</span> Hovmoeller + MLD/TPD</h2>
 <pre class="r"><code>bin &lt;- 2
 
-CPD &lt;- CPD %&gt;%
-  mutate(source = &quot;tm&quot;)
-
-CPD &lt;- CPD %&gt;%
-  mutate(source = factor(source, c(&quot;tm&quot;, &quot;fm&quot;))) %&gt;%
-  mutate(source = fct_recode(
-    source,
-    `SOOP Finnmaid + GETM model` = &quot;fm&quot;,
-    `SV Tina V (surface only)` = &quot;tm&quot;
-  ))
-
+# prepare data sets
 i_dep &lt;- i_dep %&gt;%
   mutate(source = factor(source, c(&quot;tm&quot;, &quot;fm&quot;))) %&gt;%
   mutate(source = fct_recode(
@@ -3562,16 +3589,18 @@ p_hov_dep</code></pre>
 <pre class="r"><code>rm(bin)</code></pre>
 </div>
 </div>
-</div>
-<div id="surface-obs-integration-depths" class="section level1" number="7">
-<h1 number="7"><span class="header-section-number">7</span> Surface obs + integration depths</h1>
-<pre class="r"><code>tm_fm_gt_surface &lt;- tm_fm_gt %&gt;%
+<div id="surface-data-integr.-depth" class="section level1" number="7">
+<h1 number="7"><span class="header-section-number">7</span> Surface data + integr. depth</h1>
+<p>Here, we restrict all C<sub>T</sub>* observations to surface waters, and merge with the integrations depth estimates.</p>
+<pre class="r"><code># calculate surface water time series
+tm_fm_gt_surface &lt;- tm_fm_gt %&gt;%
   filter(dep &lt; parameters$surface_dep) %&gt;%
   select(source, date_time_ID, sensor, CT_star) %&gt;%
   group_by(source, date_time_ID, sensor) %&gt;%
   summarise(CT_star = mean(CT_star, na.rm = TRUE)) %&gt;%
   ungroup()
 
+# calculate incremental and cumulative changes
 tm_fm_gt_surface &lt;- tm_fm_gt_surface %&gt;%
   group_by(source) %&gt;%
   arrange(date_time_ID) %&gt;%
@@ -3584,19 +3613,31 @@ tm_fm_gt_surface &lt;- tm_fm_gt_surface %&gt;%
 <pre class="r"><code>iCT &lt;- full_join(tm_fm_gt_surface, i_dep)
 rm(tm_fm_gt_surface)</code></pre>
 </div>
-<div id="ict" class="section level1" number="8">
-<h1 number="8"><span class="header-section-number">8</span> iC<sub>T</sub></h1>
-<pre class="r"><code>iCT &lt;- iCT %&gt;% 
+<div id="ncp-reconstruction" class="section level1" number="8">
+<h1 number="8"><span class="header-section-number">8</span> NCP reconstruction</h1>
+<div id="integration-of-ct" class="section level2" number="8.1">
+<h2 number="8.1"><span class="header-section-number">8.1</span> Integration of C<sub>T</sub>*</h2>
+<p>Incremental depth-integrated changes of C<sub>T</sub>* are calculated as the product of incremental changes of surface C<sub>T</sub>* and the integration depth parameter.</p>
+<pre class="r"><code># integrate incremental CT* changes across depth
+iCT &lt;- iCT %&gt;% 
   mutate(CT_i_diff = CT_star_diff * i_dep)
 
+# calculate cumulative changes
 iCT &lt;- iCT %&gt;% 
   group_by(source, i_method, i_res) %&gt;%
   arrange(date_time_ID) %&gt;%
   mutate(CT_star_i_cum = cumsum(CT_i_diff/1000)) %&gt;% 
   ungroup()</code></pre>
+</div>
+<div id="read-best-guess-ncp" class="section level2" number="8.2">
+<h2 number="8.2"><span class="header-section-number">8.2</span> Read best-guess NCP</h2>
 <pre class="r"><code>tm_NCP_cum &lt;- read_csv(here::here(&quot;data/intermediate/_merged_data_files/CT_dynamics&quot;,
                                   &quot;tm_NCP_cum.csv&quot;))</code></pre>
-<pre class="r"><code>tm_NCP_cum_flux &lt;- tm_NCP_cum %&gt;%
+</div>
+<div id="adapt-air-sea-flux" class="section level2" number="8.3">
+<h2 number="8.3"><span class="header-section-number">8.3</span> Adapt air sea flux</h2>
+<pre class="r"><code># prepare air sea flux data from best-guess approach
+tm_NCP_cum_flux &lt;- tm_NCP_cum %&gt;%
   select(date_time, flux_cum)
 
 tm_NCP_cum_flux &lt;-
@@ -3622,7 +3663,12 @@ NCP_flux_int &lt;- NCP_flux %&gt;%
   fill(flux_cum) %&gt;%
   mutate(CT_star_i_flux_cum = CT_star_i_cum + flux_cum) %&gt;%
   ungroup()</code></pre>
-<pre class="r"><code>iCT &lt;- iCT %&gt;% 
+</div>
+<div id="time-series" class="section level2" number="8.4">
+<h2 number="8.4"><span class="header-section-number">8.4</span> Time series</h2>
+<div id="without-mixing-corrrection" class="section level3" number="8.4.1">
+<h3 number="8.4.1"><span class="header-section-number">8.4.1</span> Without mixing corrrection</h3>
+<pre class="r"><code>iCT &lt;- iCT %&gt;%
   mutate(sensor = if_else(sensor == &quot;BloomSail&quot;, sensor, &quot;VOS&quot;))
 
 p_CT_star &lt;- iCT %&gt;%
@@ -3634,7 +3680,7 @@ p_CT_star &lt;- iCT %&gt;%
   scale_x_datetime(breaks = &quot;week&quot;,
                    date_labels = &quot;%d %b&quot;,
                    expand = c(0, 0)) +
-  facet_wrap(~ source) +
+  facet_wrap( ~ source) +
   labs(y = expression(atop(paste(C[T], &quot;*&quot;), (mu * mol ~ kg ^ {
     -1
   })))) +
@@ -3647,8 +3693,15 @@ p_CT_star &lt;- iCT %&gt;%
 p_iCT &lt;- iCT %&gt;%
   ggplot() +
   geom_hline(yintercept = 0) +
-  geom_path(data = tm_NCP_cum, aes(date_time, CT_star_i_cum), col = &quot;black&quot;) +
-  geom_path(aes(date_time_ID, CT_star_i_cum, col = i_method, linetype = i_res)) +
+  geom_path(data = tm_NCP_cum,
+            aes(date_time, CT_star_i_cum),
+            col = &quot;black&quot;) +
+  geom_path(aes(
+    date_time_ID,
+    CT_star_i_cum,
+    col = i_method,
+    linetype = i_res
+  )) +
   scale_color_discrete(name = &quot;Reconstruction&quot;) +
   scale_x_datetime(
     breaks = &quot;week&quot;,
@@ -3657,7 +3710,7 @@ p_iCT &lt;- iCT %&gt;%
     expand = c(0, 0)
   ) +
   scale_linetype(name = &quot;Resolution&quot;) +
-  facet_wrap( ~ source) +
+  facet_wrap(~ source) +
   labs(y = expression(atop(Integrated ~ nC[T], (mol ~ m ^ {
     -2
   })))) +
@@ -3671,6 +3724,9 @@ p_iCT &lt;- iCT %&gt;%
 
 p_CT_star / p_hov_dep / p_iCT</code></pre>
 <p><img src="figure/NCP_reconstruction.Rmd/iCT_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="with-mixing-corrrection" class="section level3" number="8.4.2">
+<h3 number="8.4.2"><span class="header-section-number">8.4.2</span> With mixing corrrection</h3>
 <pre class="r"><code>NCP_flux &lt;- NCP_flux %&gt;%
   mutate(i_res = factor(i_res, c(&quot;mean&quot;, &quot;cumulative&quot;, &quot;daily&quot;)))
 
@@ -3678,9 +3734,11 @@ p_NCP &lt;- NCP_flux_int %&gt;%
   filter(i_res %in% c(&quot;daily&quot;)) %&gt;%
   ggplot() +
   geom_hline(yintercept = 0) +
-  geom_path(data = tm_NCP_cum,
-            aes(date_time, CT_star_i_flux_mix_cum, linetype = &quot;best \U2013 guess&quot;),
-            col = &quot;black&quot;) +
+  geom_path(
+    data = tm_NCP_cum,
+    aes(date_time, CT_star_i_flux_mix_cum, linetype = &quot;best \U2013 guess&quot;),
+    col = &quot;black&quot;
+  ) +
   geom_path(aes(
     date_time,
     CT_star_i_flux_cum,
@@ -3695,8 +3753,8 @@ p_NCP &lt;- NCP_flux_int %&gt;%
     expand = c(0, 0)
   ) +
   scale_linetype_manual(name = &quot;NCP estimate&quot;,
-                        values = c(2,1)) +
-  facet_wrap( ~ source) +
+                        values = c(2, 1)) +
+  facet_wrap(~ source) +
   labs(y = expression(atop(NCP, (mol ~ m ^ {
     -2
   })))) +
@@ -3713,10 +3771,8 @@ p_CT_star / p_hov_dep / p_NCP +
   plot_annotation(tag_levels = &#39;a&#39;)</code></pre>
 <p><img src="figure/NCP_reconstruction.Rmd/NCP_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggsave(
-  here::here(
-    &quot;output/Plots/Figures_publication/article&quot;,
-    &quot;Fig_6.pdf&quot;
-  ),
+  here::here(&quot;output/Plots/Figures_publication/article&quot;,
+             &quot;Fig_6.pdf&quot;),
   width = 160,
   height = 155,
   dpi = 300,
@@ -3724,10 +3780,8 @@ p_CT_star / p_hov_dep / p_NCP +
 )
 
 ggsave(
-  here::here(
-    &quot;output/Plots/Figures_publication/article&quot;,
-    &quot;Fig_6.png&quot;
-  ),
+  here::here(&quot;output/Plots/Figures_publication/article&quot;,
+             &quot;Fig_6.png&quot;),
   width = 160,
   height = 155,
   dpi = 300,
@@ -3780,6 +3834,8 @@ loaded via a namespace (and not attached):
 [57] R6_2.5.0           knitr_1.30         utf8_1.1.4         rprojroot_2.0.2   
 [61] stringi_1.5.3      Rcpp_1.0.5         vctrs_0.3.6        dbplyr_2.0.0      
 [65] tidyselect_1.1.0   xfun_0.19         </code></pre>
+</div>
+</div>
 </div>
 </div>
 
