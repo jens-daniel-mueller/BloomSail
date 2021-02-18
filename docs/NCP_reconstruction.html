@@ -565,16 +565,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree93a094cfa9be7d2067f8a6d090d88e057a6b8ad2targetblank93a094ca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/93a094cfa9be7d2067f8a6d090d88e057a6b8ad2" target="_blank">93a094c</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec8328699aad58943843fa411ebf3e4a6866a312btargetblankc832869a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c8328699aad58943843fa411ebf3e4a6866a312b" target="_blank">c832869</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree93a094cfa9be7d2067f8a6d090d88e057a6b8ad2targetblank93a094ca" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec8328699aad58943843fa411ebf3e4a6866a312btargetblankc832869a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/93a094cfa9be7d2067f8a6d090d88e057a6b8ad2" target="_blank">93a094c</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c8328699aad58943843fa411ebf3e4a6866a312b" target="_blank">c832869</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -623,6 +623,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/c8328699aad58943843fa411ebf3e4a6866a312b/analysis/NCP_reconstruction.Rmd" target="_blank">c832869</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-18
+</td>
+<td>
+cleaning
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/3e9465696553c8ef5a1b5310b88c17f4a7cd4838/docs/NCP_reconstruction.html" target="_blank">3e94656</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2161,23 +2195,26 @@ library(metR)</code></pre>
 <p>Note: The reconstruction of C<sub>T</sub>* profiles and the integration across the temperature penetration depth should produce very similar results. However, the latter avoids to create misinterpretable information about the vertical distribution of C<sub>T</sub>*.</p>
 <p>The integration depth parameterizations were tested on two data sets, namely:</p>
 <ul>
-<li>BloomSail observations were restricted to those made in surface water and<br />
-</li>
-<li>SOOP Finnmaid + GETM hydrographical model</li>
+<li>BloomSail observations, restricted to C<sub>T</sub>* data in surface water</li>
+<li>SOOP Finnmaid pCO<sub>2</sub> + vertical hydrographical data from GETM model</li>
 </ul>
 <pre class="r"><code>date_CT_min &lt;- ymd_hms(&quot;2018-07-24 07:58:29&quot;)
 date_tem_max &lt;- ymd_hms(&quot;2018-08-04 00:00:00&quot;)</code></pre>
 </div>
-<div id="bloomsail-data" class="section level1" number="2">
-<h1 number="2"><span class="header-section-number">2</span> BloomSail data</h1>
+<div id="bloomsail" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> BloomSail</h1>
 <p>1m gridded, downcast profiles were used.</p>
 <p>Mean CO<sub>2</sub> data from upper 6 meters were used as surface values.</p>
-<pre class="r"><code>tm_profiles_ID &lt;-
+<pre class="r"><code># read data
+tm_profiles_ID &lt;-
   read_csv(here::here(&quot;data/intermediate/_merged_data_files/CT_dynamics&quot;, &quot;tm_profiles_ID.csv&quot;))
 
 tm_profiles_ID &lt;- tm_profiles_ID %&gt;% 
-  select(-c(date_ID))</code></pre>
-<pre class="r"><code>tm_profiles_ID_long &lt;- tm_profiles_ID %&gt;%
+  select(-c(date_ID))
+
+# calculate cumulative changes
+
+tm_profiles_ID_long &lt;- tm_profiles_ID %&gt;%
   select(-c(pCO2, sal)) %&gt;% 
   pivot_longer(c(&quot;tem&quot;, &quot;CT_star&quot;), values_to = &quot;value&quot;, names_to = &quot;var&quot;) %&gt;% 
   group_by(var, dep) %&gt;%
@@ -2276,8 +2313,8 @@ p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel</code></pre>
    p_tm_profiles_ID_long,
    p_tm_profiles_ID_long_rel)</code></pre>
 </div>
-<div id="daily-profile" class="section level3" number="2.1.2">
-<h3 number="2.1.2"><span class="header-section-number">2.1.2</span> Daily profile</h3>
+<div id="daily-profile-on-july-09" class="section level3" number="2.1.2">
+<h3 number="2.1.2"><span class="header-section-number">2.1.2</span> Daily profile on July 09</h3>
 <pre class="r"><code>col_value &lt;- &quot;red&quot;
 
 p_CT_star &lt;-
@@ -2387,8 +2424,9 @@ ggsave(
 
 rm(PD, tm_profiles_ID_long_day, p_tem, p_CT_star)</code></pre>
 </div>
-<div id="daily-time-series" class="section level3" number="2.1.3">
-<h3 number="2.1.3"><span class="header-section-number">2.1.3</span> Daily time series</h3>
+<div id="daily-incremental-time-series" class="section level3" number="2.1.3">
+<h3 number="2.1.3"><span class="header-section-number">2.1.3</span> Daily, incremental time series</h3>
+<p>A time series of TPD and CPD was calculated, based on the incremental (ie from cruise day to cruise day) changes of temperature / C<sub>T</sub>*, taking only pos. / neg. changes of both parameters into account.</p>
 <pre class="r"><code># surface values
 diff_surface &lt;- tm_profiles_ID_long %&gt;%
   filter(dep &lt; parameters$surface_dep) %&gt;%
@@ -2406,9 +2444,8 @@ diff_surface &lt;- tm_profiles_ID_long %&gt;%
 tm_profiles_ID_long &lt;- full_join(tm_profiles_ID_long, diff_surface)
 rm(diff_surface)
 
-# calculate penetration depths
-
-TPD &lt;- tm_profiles_ID_long %&gt;%
+# calculate penetration depths for T and C
+PD &lt;- tm_profiles_ID_long %&gt;%
   mutate(
     value_diff = if_else(value_diff &gt; 0 &amp; var == &quot;CT_star&quot;,
                          NaN, value_diff),
@@ -2423,12 +2460,13 @@ TPD &lt;- tm_profiles_ID_long %&gt;%
   ungroup() %&gt;%
   mutate(i_dep = value_diff_int / value_diff_surface)
 
-TPD_mean &lt;- TPD %&gt;%
+# calculate temporal mean
+PD_mean &lt;- PD %&gt;%
   group_by(var) %&gt;%
   summarise(i_dep_mean = mean(i_dep, na.rm = TRUE),
             i_dep_sd = sd(i_dep, na.rm = TRUE)) %&gt;%
   ungroup()</code></pre>
-<pre class="r"><code>p_surface &lt;- TPD %&gt;%
+<pre class="r"><code>p_surface &lt;- PD %&gt;%
   ggplot(aes(date_time_ID, value_diff_surface)) +
   geom_hline(yintercept = 0) +
   geom_line() +
@@ -2440,7 +2478,7 @@ TPD_mean &lt;- TPD %&gt;%
         legend.title = element_blank()) +
   facet_grid(var ~ ., scales = &quot;free_y&quot;)
 
-p_integrated &lt;- TPD %&gt;%
+p_integrated &lt;- PD %&gt;%
   ggplot(aes(date_time_ID, value_diff_int)) +
   geom_hline(yintercept = 0) +
   geom_line() +
@@ -2452,10 +2490,10 @@ p_integrated &lt;- TPD %&gt;%
         legend.title = element_blank()) +
   facet_grid(var ~ ., scales = &quot;free_y&quot;)
 
-p_pen_dep &lt;- TPD %&gt;%
+p_pen_dep &lt;- PD %&gt;%
   ggplot(aes(date_time_ID, i_dep, col = var)) +
   geom_hline(yintercept = 0) +
-  geom_hline(data = TPD_mean,
+  geom_hline(data = PD_mean,
              aes(
                yintercept = i_dep_mean,
                col = var,
@@ -2472,24 +2510,24 @@ p_pen_dep &lt;- TPD %&gt;%
 
 p_surface + p_integrated + p_pen_dep +
   plot_layout(ncol = 1)</code></pre>
-<p><img src="figure/NCP_reconstruction.Rmd/TPD_daily_tm_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>TPD_mean</code></pre>
+<p><img src="figure/NCP_reconstruction.Rmd/PD_daily_tm_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>PD_mean</code></pre>
 <pre><code># A tibble: 2 x 3
   var     i_dep_mean i_dep_sd
   &lt;chr&gt;        &lt;dbl&gt;    &lt;dbl&gt;
 1 CT_star       10.2     1.04
 2 tem           11.5     2.46</code></pre>
-<pre class="r"><code>CPD &lt;- TPD %&gt;%
+<pre class="r"><code>CPD &lt;- PD %&gt;%
   filter(var == &quot;CT_star&quot;) %&gt;%
   drop_na()
 
 rm(p_surface, p_integrated, p_pen_dep)
-rm(TPD, TPD_mean, tm_profiles_ID_long)</code></pre>
+rm(PD, PD_mean, tm_profiles_ID_long)</code></pre>
 </div>
 </div>
 </div>
-<div id="getm" class="section level1" number="3">
-<h1 number="3"><span class="header-section-number">3</span> GETM</h1>
+<div id="getm-model" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> GETM model</h1>
 <div id="subsetting-criteria" class="section level2" number="3.1">
 <h2 number="3.1"><span class="header-section-number">3.1</span> Subsetting criteria</h2>
 <pre class="r"><code>fixed_values &lt;- 
