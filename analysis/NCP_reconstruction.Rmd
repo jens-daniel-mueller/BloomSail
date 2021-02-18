@@ -52,8 +52,8 @@ Note: The reconstruction of C~T~* profiles and the integration across the temper
 
 The integration depth parameterizations were tested on two data sets, namely:
 
-- BloomSail observations were restricted to those made in surface water and  
-- SOOP Finnmaid + GETM hydrographical model
+- BloomSail observations, restricted to C~T~* data in surface water
+- SOOP Finnmaid pCO~2~ + vertical hydrographical data from GETM model
 
 
 ```{r subsetting criteria}
@@ -64,24 +64,23 @@ date_tem_max <- ymd_hms("2018-08-04 00:00:00")
 ```
 
 
-# BloomSail data
+# BloomSail
 
 1m gridded, downcast profiles were used.
 
 Mean CO~2~ data from upper `r parameters$surface_dep` meters were used as surface values.
 
 
-```{r read_tm}
+```{r read_prepare_tm}
 
+# read data
 tm_profiles_ID <-
   read_csv(here::here("data/intermediate/_merged_data_files/CT_dynamics", "tm_profiles_ID.csv"))
 
 tm_profiles_ID <- tm_profiles_ID %>% 
   select(-c(date_ID))
 
-```
-
-```{r calculate_cumulative_changes_tm}
+# calculate cumulative changes
 
 tm_profiles_ID_long <- tm_profiles_ID %>%
   select(-c(pCO2, sal)) %>% 
@@ -104,7 +103,7 @@ Temperature penetration depth (TPD) and C~T~* penetration depth (CPD) were inves
 
 ### Cumulative on July 09
 
-```{r calculate_TPD_cumulative_tm, fig.asp=1}
+```{r calculate_TPD_cumulative_tm}
 
 # subset date for cumulative assesment
 tm_profiles_ID_long_day <- tm_profiles_ID_long %>%
@@ -154,7 +153,7 @@ rm(value_cum, value_surface)
 ```
 
 
-```{r PD_cumulative_tm_profiles}
+```{r PD_cumulative_tm_profiles, fig.asp=1}
 
 p_tm_profiles_ID_long <- tm_profiles_ID_long_day %>%
   arrange(dep) %>%
@@ -194,7 +193,7 @@ rm(tm_profiles_ID_long_day_dep,
 
 ```
 
-### Daily profile
+### Daily profile on July 09
 
 ```{r PD_CPD_cumulative_tm_profiles_example}
 
@@ -310,10 +309,11 @@ rm(PD, tm_profiles_ID_long_day, p_tem, p_CT_star)
 ```
 
 
-### Daily time series
+### Daily, incremental time series
+
+A time series of TPD and CPD was calculated, based on the incremental (ie from cruise day to cruise day) changes of temperature / C~T~*, taking only pos. / neg. changes of both parameters into account.
 
 ```{r calculate_TPD_daily_tm}
-
 
 # surface values
 diff_surface <- tm_profiles_ID_long %>%
@@ -332,9 +332,8 @@ diff_surface <- tm_profiles_ID_long %>%
 tm_profiles_ID_long <- full_join(tm_profiles_ID_long, diff_surface)
 rm(diff_surface)
 
-# calculate penetration depths
-
-TPD <- tm_profiles_ID_long %>%
+# calculate penetration depths for T and C
+PD <- tm_profiles_ID_long %>%
   mutate(
     value_diff = if_else(value_diff > 0 & var == "CT_star",
                          NaN, value_diff),
@@ -349,7 +348,8 @@ TPD <- tm_profiles_ID_long %>%
   ungroup() %>%
   mutate(i_dep = value_diff_int / value_diff_surface)
 
-TPD_mean <- TPD %>%
+# calculate temporal mean
+PD_mean <- PD %>%
   group_by(var) %>%
   summarise(i_dep_mean = mean(i_dep, na.rm = TRUE),
             i_dep_sd = sd(i_dep, na.rm = TRUE)) %>%
@@ -358,9 +358,9 @@ TPD_mean <- TPD %>%
 
 ```
 
-```{r TPD_daily_tm_time_series, fig.asp=1}
+```{r PD_daily_tm_time_series, fig.asp=1}
 
-p_surface <- TPD %>%
+p_surface <- PD %>%
   ggplot(aes(date_time_ID, value_diff_surface)) +
   geom_hline(yintercept = 0) +
   geom_line() +
@@ -372,7 +372,7 @@ p_surface <- TPD %>%
         legend.title = element_blank()) +
   facet_grid(var ~ ., scales = "free_y")
 
-p_integrated <- TPD %>%
+p_integrated <- PD %>%
   ggplot(aes(date_time_ID, value_diff_int)) +
   geom_hline(yintercept = 0) +
   geom_line() +
@@ -384,10 +384,10 @@ p_integrated <- TPD %>%
         legend.title = element_blank()) +
   facet_grid(var ~ ., scales = "free_y")
 
-p_pen_dep <- TPD %>%
+p_pen_dep <- PD %>%
   ggplot(aes(date_time_ID, i_dep, col = var)) +
   geom_hline(yintercept = 0) +
-  geom_hline(data = TPD_mean,
+  geom_hline(data = PD_mean,
              aes(
                yintercept = i_dep_mean,
                col = var,
@@ -405,20 +405,19 @@ p_pen_dep <- TPD %>%
 p_surface + p_integrated + p_pen_dep +
   plot_layout(ncol = 1)
 
-TPD_mean
+PD_mean
 
-CPD <- TPD %>%
+CPD <- PD %>%
   filter(var == "CT_star") %>%
   drop_na()
 
 rm(p_surface, p_integrated, p_pen_dep)
-rm(TPD, TPD_mean, tm_profiles_ID_long)
+rm(PD, PD_mean, tm_profiles_ID_long)
 
 ```
 
 
-
-# GETM
+# GETM model
 
 ## Subsetting criteria
 
