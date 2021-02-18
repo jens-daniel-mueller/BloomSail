@@ -14,7 +14,7 @@ editor_options:
 
 
 ```{r global_options, include = FALSE}
-knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 
 ```{r packages}
@@ -32,6 +32,9 @@ parameters <-
                        "parameters.rds"))
 ```
 
+# Scope of this script
+
+-  Read and plot phytoplankton data
 
 # Phytoplankton cell counts
 
@@ -40,12 +43,14 @@ parameters <-
 
 ```{r read_prepare_sensor_data}
 
+# read file
 tp <- read_csv(
   here::here("data/intermediate/_summarized_data_files",
              "tp.csv"),
   col_types = cols(ID = col_character())
 )
 
+# read cruise dates
 cruise_dates <-
   read_csv(
     here::here(
@@ -55,9 +60,7 @@ cruise_dates <-
     col_types = cols(ID = col_character())
   )
 
-
-#### calculate mean total phytoplanton biomass in different water depth intervals
-
+# filter relevant data
 tp <- tp %>%
   filter(
     station %in% parameters$stations_in_phytoplankton,
@@ -66,6 +69,7 @@ tp <- tp %>%
   ) %>%
   mutate(ID = if_else(ID == "180722", "180723", ID))
 
+# calculate mean total phytoplankton biomass in different water depth intervals
 tp <- tp %>%
   mutate(dep_grid = cut(
     dep,
@@ -74,24 +78,18 @@ tp <- tp %>%
   )) %>%
   drop_na()
 
+# calculate mean biomass in depth interval
 tp_ID_grid <- tp %>%
   group_by(ID, dep_grid, Species) %>%
   summarise(value = mean(value, na.rm = TRUE)) %>%
   ungroup()
 
-
+# join with cruise dates
 tp_ID_grid <- full_join(cruise_dates, tp_ID_grid)
 
 ```
 
-```{r convert_biomass_unit}
-
-tp_ID_grid <- tp_ID_grid
-
-
-```
-
-
+## Time series plot
 
 ```{r phytoplankton_time_series, fig.asp=0.8}
 
