@@ -580,10 +580,8 @@ ggsave(
   units = "mm"
 )
 
-rm(map, map_low_res,
-   fm, tm_track)
-
-rm(tm)
+rm(map, map_low_res, p_map, p_MODIS,
+   fm, tm_track, tm, EGS)
 
 ```
 
@@ -1216,7 +1214,7 @@ Important notes:
 
 -   the standard deviation of C~T~ in the upper 10m increases on June 30.
 
-C~T~, pCO~2~, S, and T profiles were plotted individually [pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/NCP_best_guess/tm_profiles_pCO2_tem_sal_CT.pdf){target="_blank"} and grouped by ID [pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/NCP_best_guess/tm_profiles_ID_pCO2_tem_sal_CT.pdf){target="_blank"}. The later gives an idea of the differences between stations at one point in time.
+C~T~, pCO~2~, S, and T profiles were plotted individually [pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/NCP_best_guess/tm_profiles_pCO2_tem_sal_CT.pdf){target="_blank"} and grouped by ID [pdf here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/NCP_best_guess/tm_profiles_ID_pCO2_tem_sal_CT.pdf){target="_blank"}. The later gives an idea of the differences between stations at one point in time.
 
 ```{r plot_all_discretized_profiles_individual, eval=FALSE}
 
@@ -1447,7 +1445,8 @@ p_tem <-
 
 p_CT | p_tem
 
-rm(p_CT_star, p_tem, cruise_labels, profiles_min_max)
+rm(p_CT_star, p_tem, cruise_labels, profiles_min_max,
+   profiles_sd, p_CT)
 
 ```
 
@@ -1457,7 +1456,6 @@ rm(p_CT_star, p_tem, cruise_labels, profiles_min_max)
 Changes of seawater variables at each depth are calculated from one cruise day to the next and divided by the number of days inbetween.
 
 ```{r calculate_profiles_incremental_cumulative_changes}
-
 
 tm_profiles_ID_long <- tm_profiles_ID_long %>%
   group_by(var, dep) %>%
@@ -1551,6 +1549,7 @@ Mean seawater parameters were calculated for 5m depth intervals.
 
 ```{r observed_timeseries, fig.asp=1.3}
 
+# cut into 5m depth intervals
 tm_profiles_ID_long_grid <- tm_profiles_ID_long %>%
   mutate(dep = cut(dep, seq(0, 30, 5))) %>%
   group_by(ID, date_time_ID, dep, var)  %>%
@@ -1590,6 +1589,7 @@ Mean seawater C~T~* were calculated for 5m depth intervals, based on two A~T~ va
 
 ```{r observed_timeseries_CT_star_delta}
 
+# cut into 5m depth intervals
 tm_profiles_ID_long_grid <- tm_profiles_ID_long_test %>%
   mutate(dep = cut(dep, seq(0, 30, 5))) %>%
   group_by(ID, date_time_ID, dep, var)  %>%
@@ -1613,6 +1613,7 @@ To further illustrate the robustness of C~T~* to errors in mean A~T~, we calcula
 
 ```{r CT_calculation_sensitivity}
 
+# prepare data set with peak values of cyano bloom
 CT_star_sens <- tm_profiles %>%
   filter(dep < parameters$surface_dep,
          date_ID %in% c("Jul 06", "Jul 24")) %>%
@@ -1621,11 +1622,13 @@ CT_star_sens <- tm_profiles %>%
   summarise_all(mean, na.rm = TRUE) %>%
   ungroup()
 
+# create range of AT values spanning +/- 3 SD
 CT_star_sens <- expand_grid(CT_star_sens, factor = seq(-3, 3, 0.2))
 
 CT_star_sens <- CT_star_sens %>%
   mutate(AT = (AT_mean + factor * AT_sd) * 1e-6)
 
+# calculate C* for range of AT values
 CT_star_sens <- CT_star_sens %>%
   mutate(
     CT_star = carb(
@@ -1641,6 +1644,7 @@ CT_star_sens <- CT_star_sens %>%
     )[, 16] * 1e6
   )
 
+# calculate change of CT* for various AT values 
 CT_star_sens <- CT_star_sens %>%
   mutate(AT = AT * 1e6) %>%
   select(date_ID, factor, AT, CT_star) %>%
@@ -1726,6 +1730,9 @@ ggsave(
   dpi = 300,
   units = "mm"
 )
+
+rm(CT_star_delta_mean, CT_star_delta_sd,
+   CT_star_sens)
 
 ```
 
@@ -2021,6 +2028,7 @@ Predefined integration depth levels in meters are: `r parameters$fixed_integrati
 
 ```{r calculate_iCT_star_fixed_depth}
 
+# create time series grid data frames
 iCT_star_grid_sign <- tm_profiles_ID_long %>%
   select(ID, date_time_ID, date_time_ID_ref) %>%
   unique() %>%
@@ -2031,7 +2039,12 @@ iCT_star_grid_total <- tm_profiles_ID_long %>%
   unique() %>%
   expand_grid(sign = c("total"))
 
+# calculate integrated CT* time series for each fixed integration depth
 for (i_dep in parameters$fixed_integration_depths) {
+  
+  # calculations for pos/neg changes separately
+  
+  # integrate (ie sum up) across depth
   iCT_star_sign_temp <- tm_profiles_ID_long %>%
     filter(var == "CT_star", dep < i_dep) %>%
     mutate(sign = if_else(ID == "180705" &
@@ -2040,40 +2053,48 @@ for (i_dep in parameters$fixed_integration_depths) {
     summarise(CT_star_i_diff = sum(value_diff) / 1000) %>%
     ungroup()
   
+  # calculate cumulative values
   iCT_star_sign_temp <- iCT_star_sign_temp %>%
     group_by(sign) %>%
     arrange(date_time_ID) %>%
     mutate(CT_star_i_cum = cumsum(CT_star_i_diff)) %>%
     ungroup()
   
+  # fill empty values
   iCT_star_sign_temp <-
     full_join(iCT_star_sign_temp, iCT_star_grid_sign) %>%
     arrange(sign, date_time_ID) %>%
     fill(CT_star_i_cum)
   
+  # calculations for total changes
   
+  # integrate (ie sum up) across depth
   iCT_star_total_temp <- tm_profiles_ID_long %>%
     filter(var == "CT_star", dep < i_dep) %>%
     group_by(ID, date_time_ID, date_time_ID_ref) %>%
     summarise(CT_star_i_diff = sum(value_diff) / 1000) %>%
     ungroup()
   
+  # calculate cumulative values
   iCT_star_total_temp <- iCT_star_total_temp %>%
     arrange(date_time_ID) %>%
     mutate(CT_star_i_cum = cumsum(CT_star_i_diff)) %>%
     ungroup() %>%
     mutate(sign = "total")
   
+  # fill empty values
   iCT_star_total_temp <-
     full_join(iCT_star_total_temp, iCT_star_grid_total) %>%
     arrange(sign, date_time_ID) %>%
     fill(CT_star_i_cum)
   
+  
+  # join data frames
   iCT_star_temp <-
     bind_rows(iCT_star_sign_temp, iCT_star_total_temp) %>%
     mutate(i_dep = i_dep)
   
-  
+  # bind data for various integration depths
   if (exists("iCT_star")) {
     iCT_star <- bind_rows(iCT_star, iCT_star_temp)
   } else {
@@ -2098,7 +2119,7 @@ rm(iCT_star, i_dep)
 
 As the bulk changes of C~T~* occur in the surface water, the choice of the exact fixed integration depth has only minor impact on the derived depth integrated time series.
 
-```{r iCT_star_fixed_depth_time_series, fig.asp=1.1, fig.asp="Time series of integrated changes of C~T~*. Columns indicated incremental changes between cruise days, and lines indicate cummulative changes."}
+```{r iCT_star_fixed_depth_time_series, fig.asp=1.1, fig.asp="Time series of integrated changes of C~T~*. Columns indicated incremental changes between cruise days, and lines indicate cummulative changes. Panels show results for total changes vs separated changes by sign."}
 
 iCT_star_fixed_dep %>%
   ggplot() +
@@ -2109,10 +2130,9 @@ iCT_star_fixed_dep %>%
     alpha = 0.3
   ) +
   geom_line(aes(date_time_ID, CT_star_i_cum, col = i_dep)) +
-  scale_color_viridis_d(name = "Depth limit (m)") +
-  scale_fill_viridis_d(name = "Depth limit (m)") +
+  scale_color_viridis_d() +
+  scale_fill_viridis_d() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  labs(y = "iCT_star (mol/m2)", x = "") +
   facet_grid(sign ~ ., scales = "free_y", space = "free_y") +
   theme_bw()
 
@@ -2137,31 +2157,37 @@ tm_profiles <- tm_profiles %>%
 
 ```
 
-### Density profiles
+### Hydrographical profiles
 
 ```{r calculate_profiles_hydrographical_mean}
 
+# hydrographical profiles cruise mean 
 tm_profiles_ID_mean_hydro <- tm_profiles %>%
   select(-c(station, lat, lon, pCO2_corr, pCO2, CT_star, date_time)) %>%
   group_by(ID, date_time_ID, date_ID, dep) %>%
   summarise_all(list(mean), na.rm = TRUE) %>%
   ungroup()
 
+# hydrographical profiles cruise SD
 tm_profiles_ID_sd_hydro <- tm_profiles %>%
   select(-c(station, lat, lon, pCO2_corr, pCO2, CT_star, date_time)) %>%
   group_by(ID, date_time_ID, date_ID, dep) %>%
   summarise_all(list(sd), na.rm = TRUE) %>%
   ungroup()
 
+# convert to long format
 tm_profiles_ID_sd_hydro_long <- tm_profiles_ID_sd_hydro %>%
   pivot_longer(sal:rho, names_to = "var", values_to = "sd")
 
+# convert to long format
 tm_profiles_ID_mean_hydro_long <- tm_profiles_ID_mean_hydro %>%
   pivot_longer(sal:rho, names_to = "var", values_to = "value")
 
+# join data frames
 tm_profiles_ID_hydro_long <-
   inner_join(tm_profiles_ID_mean_hydro_long,
              tm_profiles_ID_sd_hydro_long)
+
 tm_profiles_ID_hydro <- tm_profiles_ID_mean_hydro
 
 rm(
@@ -2187,18 +2213,21 @@ tm_profiles_ID_hydro_long %>%
 
 ### MLD calculation
 
-Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria
+Mixed layer depth (MLD) was determined based on the difference between density at the surface and at depth, for a range of density criteria: `r parameters$rho_lim_integration_depths`
 
 ```{r calculate_MLD}
 
-tm_profiles_ID_hydro <- expand_grid(tm_profiles_ID_hydro, rho_lim = c(0.1,0.2,0.5))
+tm_profiles_ID_hydro <-
+  expand_grid(tm_profiles_ID_hydro,
+              rho_lim = parameters$rho_lim_integration_depths)
 
-MLD <- tm_profiles_ID_hydro  %>% 
-  arrange(dep) %>% 
-  group_by(ID, date_time_ID, rho_lim) %>% 
-  mutate(d_rho = rho - first(rho)) %>% 
-  filter(d_rho > rho_lim) %>% 
-  summarise(MLD = min(dep)) %>% 
+# calculate MLD for each rho threshold
+MLD <- tm_profiles_ID_hydro  %>%
+  arrange(dep) %>%
+  group_by(ID, date_time_ID, rho_lim) %>%
+  mutate(d_rho = rho - first(rho)) %>%
+  filter(d_rho > rho_lim) %>%
+  summarise(MLD = min(dep)) %>%
   ungroup()
 
 ```
@@ -2208,15 +2237,16 @@ MLD <- tm_profiles_ID_hydro  %>%
 ```{r density_profiles_MLD_per_ID, fig.cap="Mean density profiles and MLD per cruise dates (ID).", fig.asp=1.2}
 
 tm_profiles_ID_hydro <-
-  full_join(tm_profiles_ID_hydro, MLD)
+  full_join(tm_profiles_ID_hydro, MLD) %>% 
+  mutate(rho_lim = as.factor(rho_lim))
 
 tm_profiles_ID_hydro %>%
   arrange(dep) %>%
   ggplot(aes(rho, dep)) +
-  geom_hline(aes(yintercept = MLD, col = as.factor(rho_lim))) +
+  geom_hline(aes(yintercept = MLD, col = rho_lim)) +
   geom_path() +
   scale_y_reverse() +
-  scale_color_brewer(palette = "Set1", name = "Rho limit") +
+  scale_color_brewer(palette = "Set1") +
   facet_wrap( ~ ID) +
   theme_bw()
 
@@ -2226,43 +2256,47 @@ tm_profiles_ID_hydro %>%
 
 ```{r MLD_time_series, fig.asp=0.4}
 
+MLD <- MLD %>% 
+  mutate(rho_lim = as.factor(rho_lim))
+
 MLD %>%
-  ggplot(aes(date_time_ID, MLD, col = as.factor(rho_lim))) +
+  ggplot(aes(date_time_ID, MLD, col = rho_lim)) +
   geom_hline(yintercept = 0) +
   geom_point() +
   geom_path() +
-  scale_color_brewer(palette = "Set1", name = "Rho limit") +
+  scale_color_brewer(palette = "Set1") +
   scale_y_reverse() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
   labs(x = "")
 
 ```
 
-### iCT_star calculation
+### Calculate iC~T~*
 
 ```{r calculate_iCT_star_MLD}
 
 iCT_star <- tm_profiles_ID_long %>% 
   filter(var == "CT_star")
 
+# join CT and MLD data frame
 iCT_star <- full_join(iCT_star, MLD)
 
+# filter data at depth below MLD
 iCT_star <- iCT_star %>% 
   filter(dep <= MLD)
 
+# calculate incremental changes
 iCT_star <- iCT_star %>% 
   group_by(ID, date_time_ID, date_time_ID_ref, rho_lim) %>% 
   summarise(CT_star_i_diff = sum(value_diff)/1000) %>% 
   ungroup()
 
+# calculate cumulative changes
 iCT_star <- iCT_star %>% 
   group_by(rho_lim) %>% 
   arrange(date_time_ID) %>% 
   mutate(CT_star_i_cum = cumsum(CT_star_i_diff)) %>% 
   ungroup()
-
-iCT_star <- iCT_star %>% 
-  mutate(rho_lim = as.factor(rho_lim))
 
 iCT_star_MLD <- iCT_star
 
@@ -2272,7 +2306,7 @@ rm(iCT_star, MLD, tm_profiles_ID_hydro, tm_profiles_ID_hydro_long)
 
 ### Time series
 
-```{r iCT_star_MLD_time_series}
+```{r iCT_star_MLD_time_series, fig.asp="Time series of integrated changes of C~T~*. Columns indicated incremental changes between cruise days, and lines indicate cummulative changes."}
 
 iCT_star_MLD %>%
   ggplot() +
@@ -2283,22 +2317,23 @@ iCT_star_MLD %>%
     alpha = 0.3
   ) +
   geom_line(aes(date_time_ID, CT_star_i_cum, col = rho_lim)) +
-  scale_color_viridis_d(name = "Rho limit") +
-  scale_fill_viridis_d(name = "Rho limit") +
+  scale_color_viridis_d() +
+  scale_fill_viridis_d() +
   scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  labs(y = "iCT_star [mol/m2]", x = "") +
   theme_bw()
 
 ```
 
 ## Comparison of approaches
 
-In the following, all cumulative iC~T~ trajectories are displayed. Highlighted are those obtained for the fixed depth approach with 10 m limit, and the MLD approach with a high density threshold of 0.5 kg/m3.
+In the following, all cumulative iC~T~* trajectories are displayed. Highlighted are those obtained for the fixed depth approach with 12 m limit, and the MLD approach with a standard density threshold of 0.1 kg/m3.
 
-```{r iCT_star_comparison}
+```{r iCT_star_comparison, fig.asp="Comparison of MLD and fixed integration depth appraoch for iC~T~* calculation. Highlighted are two thresholds for each approach."}
 
+# join data frames with MLD and fixed integration depth
 iCT_star <- full_join(iCT_star_fixed_dep, iCT_star_MLD)
 
+# change column types
 iCT_star <- iCT_star %>%
   mutate(group = paste(
     as.character(sign),
@@ -2310,7 +2345,6 @@ iCT_star %>%
   arrange(date_time_ID) %>%
   ggplot() +
   geom_hline(yintercept = 0) +
-  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
   geom_line(aes(date_time_ID, CT_star_i_cum,
                 group = group), col = "grey") +
   geom_line(
@@ -2319,15 +2353,15 @@ iCT_star %>%
   ) +
   geom_line(data = iCT_star_MLD %>% filter(rho_lim == 0.1),
             aes(date_time_ID, CT_star_i_cum, col = "MLD - 0.1")) +
-  scale_color_brewer(palette = "Set1", name = "") +
-  scale_x_datetime(breaks = "week", date_labels = "%d %b") +
-  labs(y = "iCT_star [mol/m2]", x = "")
+  scale_color_brewer(palette = "Set1", name = "Integration depth") +
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
+  scale_x_datetime(breaks = "week", date_labels = "%d %b")
 
 rm(iCT_star, iCT_star_MLD)
 
 ```
 
-# NCP determination
+# Best--guess NCP estimate
 
 In order to derive an estimate of the net community production NCP (which is equivalent to the formed organic matter that can be exported from the investigated surface layer), two steps are required:
 
@@ -2339,7 +2373,7 @@ In order to derive an estimate of the net community production NCP (which is equ
     -   CO~2~ fluxes due to vertical mixing
     -   CO~2~ fluxes due to lateral transport of water masses (not corrected here)
 
-## Best iC~T~ estimate
+## Best iC~T~* estimate
 
 To determine the optimum depth for the C~T~* integration we investigated the vertical distribution of cumulative temperature and C~T~* changes on the peak of the productivity signal on June 23:
 
