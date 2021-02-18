@@ -40,15 +40,20 @@ parameters <-
 ```
 
 
-# Approach
+# Scope of this script
 
-In order to test how (and how well) the depth-integrated C~T~ estimates can be reproduced if only surface CO~2~ data were available, the BloomSail observations were restricted to those made in surface water and following reconstruction approaches were tested:
+In order to test how well the depth-integrated C~T~* estimates can be reproduced if only surface CO~2~ data were available, the following reconstruction approaches were tested:
 
-- Mixed layer depth: Integration of surface observation across the MLD, assuming homogenious vertical patterns
+- Mixed layer depth: Integration of surface observation across the MLD, assuming homogeneous vertical patterns
 - C~T~ profile reconstruction: Vertical reconstruction of incremental C~T~ changes based on profiles of incremental changes in temperature
 - Temperature penetration depth:  Integration of surface observation across the temperature penetration depth, assuming similar vertical extension as for C~T~ drawdown.
 
-Note: The reconstruction of C~T~ profiles and the integration across the temperature penetration depth should produce very similar results. However, the latter avoids to create misinterpretable information about the vertical distribution of C~T~.
+Note: The reconstruction of C~T~* profiles and the integration across the temperature penetration depth should produce very similar results. However, the latter avoids to create misinterpretable information about the vertical distribution of C~T~*.
+
+The integration depth parameterizations were tested on two data sets, namely:
+
+- BloomSail observations were restricted to those made in surface water and  
+- SOOP Finnmaid + GETM hydrographical model
 
 
 ```{r subsetting criteria}
@@ -62,7 +67,8 @@ date_tem_max <- ymd_hms("2018-08-04 00:00:00")
 # BloomSail data
 
 1m gridded, downcast profiles were used.
-Mean CO~2~ data from upper 6 metres were used as surface values.
+
+Mean CO~2~ data from upper `r parameters$surface_dep` meters were used as surface values.
 
 
 ```{r read_tm}
@@ -92,16 +98,21 @@ tm_profiles_ID_long <- tm_profiles_ID %>%
 
 ```
 
-## C~T~ and tem penetration depth
+## TPD and CPD
+
+Temperature penetration depth (TPD) and C~T~* penetration depth (CPD) were investigated based on the BloomSail data.
 
 ### Cumulative on July 09
 
-```{r calculate_TPD_cumulative_tm}
+```{r calculate_TPD_cumulative_tm, fig.asp=1}
 
-tm_profiles_ID_long_180723 <- tm_profiles_ID_long %>%
+# subset date for cumulative assesment
+tm_profiles_ID_long_day <- tm_profiles_ID_long %>%
   filter(ID == 180709)
 
-tm_profiles_ID_long_180723_dep <- tm_profiles_ID_long_180723 %>%
+# calculate integrated value of pos/neg changes for Temp/CT*
+# and relative contribution with increasing water depth 
+tm_profiles_ID_long_day_dep <- tm_profiles_ID_long_day %>%
   select(var, dep, value_cum) %>%
   mutate(
     value_cum = if_else(value_cum > 0 & var == "CT_star",
@@ -118,21 +129,24 @@ tm_profiles_ID_long_180723_dep <- tm_profiles_ID_long_180723 %>%
   ) %>%
   ungroup()
 
-value_cum <- tm_profiles_ID_long_180723_dep %>%
+# cumulative integrated values
+value_cum <- tm_profiles_ID_long_day_dep %>%
   group_by(var) %>%
   summarise(value_cum_i = mean(value_cum_i)) %>%
   ungroup()
 
-value_surface <- tm_profiles_ID_long_180723 %>%
+# cumulative surface values
+value_surface <- tm_profiles_ID_long_day %>%
   select(var, dep, value_cum) %>%
   filter(dep < parameters$surface_dep) %>%
   group_by(var) %>%
   summarise(value_surface = mean(value_cum)) %>%
   ungroup()
 
-TPD <- full_join(value_cum, value_surface)
-TPD <- TPD %>%
-  mutate(TPD = value_cum_i / value_surface)
+# calculate penentration depth for T and C
+PD <- full_join(value_cum, value_surface)
+PD <- PD %>%
+  mutate(PD = value_cum_i / value_surface)
 
 rm(value_cum, value_surface)
 
@@ -140,14 +154,13 @@ rm(value_cum, value_surface)
 ```
 
 
-```{r TPD_cumulative_tm_profiles}
+```{r PD_cumulative_tm_profiles}
 
-
-p_tm_profiles_ID_long <- tm_profiles_ID_long_180723 %>%
+p_tm_profiles_ID_long <- tm_profiles_ID_long_day %>%
   arrange(dep) %>%
   ggplot(aes(value_cum, dep)) +
   geom_hline(aes(yintercept = parameters$i_dep_lim, col = "integration")) +
-  geom_hline(data = TPD, aes(yintercept = TPD, col = "penetration")) +
+  geom_hline(data = PD, aes(yintercept = PD, col = "penetration")) +
   geom_vline(xintercept = 0) +
   geom_point() +
   geom_path() +
@@ -157,10 +170,10 @@ p_tm_profiles_ID_long <- tm_profiles_ID_long_180723 %>%
   theme(legend.position = "left") +
   facet_wrap(var ~ ., ncol = 1, scales = "free_x")
 
-p_tm_profiles_ID_long_rel <- tm_profiles_ID_long_180723_dep %>%
+p_tm_profiles_ID_long_rel <- tm_profiles_ID_long_day_dep %>%
   ggplot(aes(value_cum_i_rel, dep)) +
   geom_hline(aes(yintercept = parameters$i_dep_lim, col = "integration")) +
-  geom_hline(data = TPD, aes(yintercept = TPD, col = "penetration")) +
+  geom_hline(data = PD, aes(yintercept = PD, col = "penetration")) +
   geom_vline(xintercept = 90) +
   geom_point() +
   geom_line() +
@@ -173,27 +186,27 @@ p_tm_profiles_ID_long_rel <- tm_profiles_ID_long_180723_dep %>%
 
 p_tm_profiles_ID_long + p_tm_profiles_ID_long_rel
 
-TPD
+PD
 
-rm(tm_profiles_ID_long_180723_dep,
+rm(tm_profiles_ID_long_day_dep,
    p_tm_profiles_ID_long,
    p_tm_profiles_ID_long_rel)
 
 ```
 
+### Daily profile
 
-```{r TPD_CPD_cumulative_tm_profiles_example}
-
+```{r PD_CPD_cumulative_tm_profiles_example}
 
 col_value <- "red"
 
 p_CT_star <-
-  tm_profiles_ID_long_180723 %>%
+  tm_profiles_ID_long_day %>%
   filter(var == "CT_star") %>%
   arrange(dep) %>%
   ggplot() +
   geom_col(
-    data = tm_profiles_ID_long_180723 %>%
+    data = tm_profiles_ID_long_day %>%
       filter(var == "CT_star", value_diff_daily < 0),
     aes(x = value_diff_daily, y = dep),
     width = 1,
@@ -219,8 +232,8 @@ p_CT_star <-
   ) +
   geom_point(aes(value_diff_daily, dep)) +
   geom_path(aes(value_diff_daily, dep)) +
-  geom_hline(data = TPD %>% filter(var == "CT_star"),
-             aes(yintercept = TPD),
+  geom_hline(data = PD %>% filter(var == "CT_star"),
+             aes(yintercept = PD),
              col = col_value) +
   labs(y = "Depth (m)", x = expression(paste(Delta ~ C[T], "*") ~ (µmol ~ kg ^ {
     -1
@@ -233,12 +246,12 @@ p_CT_star <-
   )
 
 p_tem <-
-  tm_profiles_ID_long_180723 %>%
+  tm_profiles_ID_long_day %>%
   filter(var == "tem") %>%
   arrange(dep) %>%
   ggplot() +
   geom_col(
-    data = tm_profiles_ID_long_180723 %>%
+    data = tm_profiles_ID_long_day %>%
       filter(var == "tem", value_diff_daily > 0),
     aes(x = value_diff_daily, y = dep),
     width = 1,
@@ -251,7 +264,7 @@ p_tem <-
     "text",
     x = 0.4,
     y = 11,
-    label = "TPD",
+    label = "PD",
     col = col_value,
     size = geom_text_size
   ) +
@@ -264,8 +277,8 @@ p_tem <-
   ) +
   geom_point(aes(value_diff_daily, dep)) +
   geom_path(aes(value_diff_daily, dep)) +
-  geom_hline(data = TPD %>% filter(var == "tem"),
-             aes(yintercept = TPD),
+  geom_hline(data = PD %>% filter(var == "tem"),
+             aes(yintercept = PD),
              col = col_value) +
   labs(y = "Depth (m)", x = expression(Delta ~ Temperature ~ (degree * C))) +
   theme(legend.title = element_blank())
@@ -292,12 +305,12 @@ ggsave(
   units = "mm"
 )
 
-rm(TPD, tm_profiles_ID_long_180723, p_tem, p_CT_star)
+rm(PD, tm_profiles_ID_long_day, p_tem, p_CT_star)
 
 ```
 
 
-### Daily
+### Daily time series
 
 ```{r calculate_TPD_daily_tm}
 
@@ -345,7 +358,7 @@ TPD_mean <- TPD %>%
 
 ```
 
-```{r TPD_daily_tm_time_series}
+```{r TPD_daily_tm_time_series, fig.asp=1}
 
 p_surface <- TPD %>%
   ggplot(aes(date_time_ID, value_diff_surface)) +
