@@ -1144,14 +1144,18 @@ tm_fm_gt_long <- tm_fm_gt %>%
   ) %>%
   ungroup()
 
+# select only temperature data
 tm_fm_gt_long <- tm_fm_gt_long %>%
   filter(var == "tem") %>%
   select(-var)
 
 ```
 
+### Cumulative temperature profile
 
-```{r cumulative_tem_profile}
+Please note that the cumulative temperature profile of GETM shows a deep maximum below 20m, which must be attributed to water mass exchange rather than surface warming to radiation or heat uptake, which we want to capture here. Therefore, the integration depth of the GETM data was manually restricted to `r parameters$getm_i_dep`m.
+
+```{r cumulative_tem_profile, fig.cap="Profiles of cumulative temperature changes from the GETM model (label fm) and as measured in the field (label tm)."}
 
 tm_fm_gt_long %>%
   filter(date_time_ID == date_CT_min) %>%
@@ -1162,28 +1166,31 @@ tm_fm_gt_long %>%
   geom_point() +
   geom_path() +
   scale_y_reverse() +
-  labs(y = "Depth (m)", x = "Cumulative change") +
+  labs(x = "Cumulative tem change",
+       title = as.Date(date_CT_min)) +
   theme(legend.position = "left") +
   facet_grid(. ~ source, scales = "free_x")
 
 ```
 
 
-### Cumulative changes
+### Calculate cumulative changes
 
 ```{r calculation_TPD_cumulative}
 
-
-tm_fm_gt_long_180723 <- tm_fm_gt_long %>%
+# subset data at CT* minimum
+tm_fm_gt_long_day <- tm_fm_gt_long %>%
   filter(date_time_ID == date_CT_min) %>%
   mutate(
     value_cum = if_else(value_cum < 0,
                         NaN, value_cum),
-    value_cum = if_else(source == "fm" & dep > parameters$getm_i_dep,
+    value_cum = if_else(source == "fm" &
+                          dep > parameters$getm_i_dep,
                         NaN, value_cum)
   )
 
-tm_fm_gt_long_180723_dep <- tm_fm_gt_long_180723 %>%
+# integrate cumulative changes
+tm_fm_gt_long_day_dep <- tm_fm_gt_long_day %>%
   select(source, dep, value_cum) %>%
   group_by(source) %>%
   arrange(dep) %>%
@@ -1194,18 +1201,21 @@ tm_fm_gt_long_180723_dep <- tm_fm_gt_long_180723 %>%
   ) %>%
   ungroup()
 
-value_cum <- tm_fm_gt_long_180723_dep %>%
+# extract integrated cumulative value
+value_cum <- tm_fm_gt_long_day_dep %>%
   group_by(source) %>%
   summarise(value_cum_i = mean(value_cum_i)) %>%
   ungroup()
 
-value_surface <- tm_fm_gt_long_180723 %>%
+# extract surface cumulative value
+value_surface <- tm_fm_gt_long_day %>%
   select(source, dep, value_cum) %>%
   filter(dep < parameters$surface_dep) %>%
   group_by(source) %>%
   summarise(value_surface = mean(value_cum)) %>%
   ungroup()
 
+# calculate TPD
 TPD <- full_join(value_cum, value_surface)
 TPD <- TPD %>%
   mutate(i_dep = value_cum_i / value_surface)
@@ -1215,34 +1225,33 @@ rm(value_cum, value_surface)
 ```
 
 
-### Cumulative on July 23
+### Cumulative profiles July 24
 
 ```{r TPD_cumulative_profiles_180723}
 
-
-p_tm_fm_gt_long <- tm_fm_gt_long_180723 %>%
+p_tm_fm_gt_long <- tm_fm_gt_long_day %>%
   arrange(dep) %>%
   ggplot(aes(value_cum, dep)) +
-  geom_hline(aes(yintercept = parameters$i_dep_lim, col = "integration")) +
-  geom_hline(data = TPD, aes(yintercept = i_dep, col = "penetration")) +
+  geom_hline(aes(yintercept = parameters$i_dep_lim, col = "fixed\nintegration\ndepth")) +
+  geom_hline(data = TPD, aes(yintercept = i_dep, col = "TPD\nestimate")) +
   geom_vline(xintercept = 0) +
   geom_point() +
   geom_path() +
   scale_y_reverse() +
   scale_color_brewer(palette = "Dark2", guide = FALSE) +
-  labs(y = "Depth (m)", x = "Cumulative change") +
+  labs(x = "Cumulative change") +
   theme(legend.position = "left") +
   facet_wrap(. ~ source, ncol = 1, scales = "free_x")
 
-p_tm_fm_gt_long_rel <- tm_fm_gt_long_180723_dep %>%
+p_tm_fm_gt_long_rel <- tm_fm_gt_long_day_dep %>%
   ggplot(aes(value_cum_i_rel, dep)) +
-  geom_hline(aes(yintercept = parameters$i_dep_lim, col = "integration")) +
-  geom_hline(data = TPD, aes(yintercept = i_dep, col = "penetration")) +
+  geom_hline(aes(yintercept = parameters$i_dep_lim, col = "fixed\nintegration\ndepth")) +
+  geom_hline(data = TPD, aes(yintercept = i_dep, col = "TPD\nestimate")) +
   geom_vline(xintercept = 90) +
   geom_point() +
   geom_line() +
   scale_y_reverse(limits = c(25, 0)) +
-  scale_color_brewer(palette = "Dark2", name = "Depth") +
+  scale_color_brewer(palette = "Dark2", name = "") +
   scale_x_continuous(limits = c(0, NA)) +
   labs(x = "Relative contribution (%)") +
   facet_wrap(. ~ source, ncol = 1, scales = "free_x") +
@@ -1251,8 +1260,8 @@ p_tm_fm_gt_long_rel <- tm_fm_gt_long_180723_dep %>%
 p_tm_fm_gt_long + p_tm_fm_gt_long_rel
 
 rm(
-  tm_fm_gt_long_180723,
-  tm_fm_gt_long_180723_dep,
+  tm_fm_gt_long_day,
+  tm_fm_gt_long_day_dep,
   p_tm_fm_gt_long,
   p_tm_fm_gt_long_rel
 )
@@ -1264,12 +1273,11 @@ rm(TPD)
 ```
 
 
-### Daily
+### Calculate incremental TPD
 
 ```{r TPD_daily}
 
-
-# surface values
+# incremental changes of surface values
 diff_surface <- tm_fm_gt_long %>%
   filter(dep < parameters$surface_dep) %>%
   group_by(date_time_ID, source) %>%
@@ -1282,7 +1290,6 @@ tm_fm_gt_long <- full_join(tm_fm_gt_long, diff_surface)
 rm(diff_surface)
 
 # calculate penetration depths
-
 TPD <- tm_fm_gt_long %>%
   mutate(
     value_diff = if_else(value_diff < 0,
@@ -1298,6 +1305,7 @@ TPD <- tm_fm_gt_long %>%
   ungroup() %>%
   mutate(i_dep = value_diff_int / value_diff_surface)
 
+# calculate mean TPD across bloom period
 TPD_mean <- TPD %>%
   filter(date_time_ID <= date_CT_min) %>%
   group_by(source) %>%
@@ -1578,10 +1586,6 @@ p_CT_star <- iCT %>%
     plot.margin = margin(0, 0, 0, 0, "cm")
   )
 
-# iCT <- iCT %>%
-#   mutate(i_res = fct_recode(i_res, `cumulative` = "cum")) %>%
-#   mutate(i_res = factor(i_res, c("mean", "cumulative", "daily")))
-
 p_iCT <- iCT %>%
   ggplot() +
   geom_hline(yintercept = 0) +
@@ -1609,28 +1613,7 @@ p_iCT <- iCT %>%
 
 p_CT_star / p_hov_dep / p_iCT
 
-# ggsave(
-#   here::here(
-#     "output/Plots/Figures_publication/article",
-#     "reconstruction_iCT_timeseries.pdf"
-#   ),
-#   width = 190,
-#   height = 200,
-#   dpi = 300,
-#   units = "mm"
-# )
-# 
-# ggsave(
-#   here::here(
-#     "output/Plots/Figures_publication/article",
-#     "reconstruction_iCT_timeseries.png"
-#   ),
-#   width = 190,
-#   height = 200,
-#   dpi = 300,
-#   units = "mm"
-# )
-  
+
 ```
 
 ```{r NCP_time_series}
