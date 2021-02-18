@@ -406,10 +406,6 @@ p_surface + p_integrated + p_pen_dep +
 
 PD_mean
 
-CPD <- PD %>%
-  filter(var == "CT_star") %>%
-  drop_na()
-
 rm(p_surface, p_integrated, p_pen_dep)
 rm(PD, PD_mean, tm_profiles_ID_long)
 
@@ -1123,9 +1119,9 @@ rm(MLD_mean)
 ```
 
 
-## Temperature penetration depth
+## TPD
 
-### TPD calculation
+### Cumulative changes
 
 ```{r calculate_cumulative_changes}
 
@@ -1151,7 +1147,7 @@ tm_fm_gt_long <- tm_fm_gt_long %>%
 
 ```
 
-### Cumulative temperature profile
+### Temperature profiles
 
 Please note that the cumulative temperature profile of GETM shows a deep maximum below 20m, which must be attributed to water mass exchange rather than surface warming to radiation or heat uptake, which we want to capture here. Therefore, the integration depth of the GETM data was manually restricted to `r parameters$getm_i_dep`m.
 
@@ -1173,8 +1169,7 @@ tm_fm_gt_long %>%
 
 ```
 
-
-### Calculate cumulative changes
+### Cumulative TPD
 
 ```{r calculation_TPD_cumulative}
 
@@ -1224,9 +1219,6 @@ rm(value_cum, value_surface)
 
 ```
 
-
-### Cumulative profiles July 24
-
 ```{r TPD_cumulative_profiles_180723}
 
 p_tm_fm_gt_long <- tm_fm_gt_long_day %>%
@@ -1273,9 +1265,9 @@ rm(TPD)
 ```
 
 
-### Calculate incremental TPD
+### Incremental TPD
 
-```{r TPD_daily}
+```{r incremental_TPD}
 
 # incremental changes of surface values
 diff_surface <- tm_fm_gt_long %>%
@@ -1362,6 +1354,8 @@ rm(p_surface, p_integrated, p_TPD)
 
 ```
 
+### Join TPD estimates
+
 ```{r join_TPD_estimates}
 
 TPD <- TPD %>%
@@ -1389,6 +1383,8 @@ rm(TPD_cum, TPD_mean)
 
 ```
 
+## Join TPD and MLD
+
 ```{r join_i_dep_estimates}
 
 i_dep <- full_join(MLD, TPD)
@@ -1396,23 +1392,13 @@ rm(MLD, TPD)
 
 ```
 
+## Hovmoeller + MLD/TPD
 
-```{r tm_fm_gt_hovmoeller_tem_MLD_TPD}
-
+```{r tm_fm_gt_hovmoeller_tem_MLD_TPD, fig.asp=0.5}
 
 bin <- 2
 
-CPD <- CPD %>%
-  mutate(source = "tm")
-
-CPD <- CPD %>%
-  mutate(source = factor(source, c("tm", "fm"))) %>%
-  mutate(source = fct_recode(
-    source,
-    `SOOP Finnmaid + GETM model` = "fm",
-    `SV Tina V (surface only)` = "tm"
-  ))
-
+# prepare data sets
 i_dep <- i_dep %>%
   mutate(source = factor(source, c("tm", "fm"))) %>%
   mutate(source = fct_recode(
@@ -1472,13 +1458,13 @@ p_hov_dep
 rm(bin)
 ```
 
+# Surface data + integr. depth
 
-
-
-# Surface obs + integration depths
+Here, we restrict all C~T~* observations to surface waters, and merge with the integrations depth estimates.
 
 ```{r restrict_to_surface_CO2}
 
+# calculate surface water time series
 tm_fm_gt_surface <- tm_fm_gt %>%
   filter(dep < parameters$surface_dep) %>%
   select(source, date_time_ID, sensor, CT_star) %>%
@@ -1486,6 +1472,7 @@ tm_fm_gt_surface <- tm_fm_gt %>%
   summarise(CT_star = mean(CT_star, na.rm = TRUE)) %>%
   ungroup()
 
+# calculate incremental and cumulative changes
 tm_fm_gt_surface <- tm_fm_gt_surface %>%
   group_by(source) %>%
   arrange(date_time_ID) %>%
@@ -1506,14 +1493,19 @@ rm(tm_fm_gt_surface)
 
 ```
 
-# iC~T~
+# NCP reconstruction
 
+## Integration of C~T~*
+
+Incremental depth-integrated changes of C~T~* are calculated as the product of incremental changes of surface C~T~* and the integration depth parameter.
 
 ```{r calculate_iCT}
 
+# integrate incremental CT* changes across depth
 iCT <- iCT %>% 
   mutate(CT_i_diff = CT_star_diff * i_dep)
 
+# calculate cumulative changes
 iCT <- iCT %>% 
   group_by(source, i_method, i_res) %>%
   arrange(date_time_ID) %>%
@@ -1522,6 +1514,8 @@ iCT <- iCT %>%
 
 ```
 
+## Read best-guess NCP
+
 ```{r read_NCP_best_guess}
 
 tm_NCP_cum <- read_csv(here::here("data/intermediate/_merged_data_files/CT_dynamics",
@@ -1529,8 +1523,12 @@ tm_NCP_cum <- read_csv(here::here("data/intermediate/_merged_data_files/CT_dynam
 
 ```
 
+## Adapt air sea flux
+
+
 ```{r add_CO2_flux}
 
+# prepare air sea flux data from best-guess approach
 tm_NCP_cum_flux <- tm_NCP_cum %>%
   select(date_time, flux_cum)
 
@@ -1558,13 +1556,16 @@ NCP_flux_int <- NCP_flux %>%
   mutate(CT_star_i_flux_cum = CT_star_i_cum + flux_cum) %>%
   ungroup()
 
+
 ```
 
+## Time series
 
+### Without mixing corrrection
 
 ```{r iCT_time_series}
 
-iCT <- iCT %>% 
+iCT <- iCT %>%
   mutate(sensor = if_else(sensor == "BloomSail", sensor, "VOS"))
 
 p_CT_star <- iCT %>%
@@ -1576,7 +1577,7 @@ p_CT_star <- iCT %>%
   scale_x_datetime(breaks = "week",
                    date_labels = "%d %b",
                    expand = c(0, 0)) +
-  facet_wrap(~ source) +
+  facet_wrap( ~ source) +
   labs(y = expression(atop(paste(C[T], "*"), (mu * mol ~ kg ^ {
     -1
   })))) +
@@ -1589,8 +1590,15 @@ p_CT_star <- iCT %>%
 p_iCT <- iCT %>%
   ggplot() +
   geom_hline(yintercept = 0) +
-  geom_path(data = tm_NCP_cum, aes(date_time, CT_star_i_cum), col = "black") +
-  geom_path(aes(date_time_ID, CT_star_i_cum, col = i_method, linetype = i_res)) +
+  geom_path(data = tm_NCP_cum,
+            aes(date_time, CT_star_i_cum),
+            col = "black") +
+  geom_path(aes(
+    date_time_ID,
+    CT_star_i_cum,
+    col = i_method,
+    linetype = i_res
+  )) +
   scale_color_discrete(name = "Reconstruction") +
   scale_x_datetime(
     breaks = "week",
@@ -1599,7 +1607,7 @@ p_iCT <- iCT %>%
     expand = c(0, 0)
   ) +
   scale_linetype(name = "Resolution") +
-  facet_wrap( ~ source) +
+  facet_wrap(~ source) +
   labs(y = expression(atop(Integrated ~ nC[T], (mol ~ m ^ {
     -2
   })))) +
@@ -1613,10 +1621,13 @@ p_iCT <- iCT %>%
 
 p_CT_star / p_hov_dep / p_iCT
 
-
 ```
 
+
+### With mixing corrrection
+
 ```{r NCP_time_series}
+
 
 
 NCP_flux <- NCP_flux %>%
@@ -1626,9 +1637,11 @@ p_NCP <- NCP_flux_int %>%
   filter(i_res %in% c("daily")) %>%
   ggplot() +
   geom_hline(yintercept = 0) +
-  geom_path(data = tm_NCP_cum,
-            aes(date_time, CT_star_i_flux_mix_cum, linetype = "best \U2013 guess"),
-            col = "black") +
+  geom_path(
+    data = tm_NCP_cum,
+    aes(date_time, CT_star_i_flux_mix_cum, linetype = "best \U2013 guess"),
+    col = "black"
+  ) +
   geom_path(aes(
     date_time,
     CT_star_i_flux_cum,
@@ -1643,8 +1656,8 @@ p_NCP <- NCP_flux_int %>%
     expand = c(0, 0)
   ) +
   scale_linetype_manual(name = "NCP estimate",
-                        values = c(2,1)) +
-  facet_wrap( ~ source) +
+                        values = c(2, 1)) +
+  facet_wrap(~ source) +
   labs(y = expression(atop(NCP, (mol ~ m ^ {
     -2
   })))) +
@@ -1661,10 +1674,8 @@ p_CT_star / p_hov_dep / p_NCP +
   plot_annotation(tag_levels = 'a')
 
 ggsave(
-  here::here(
-    "output/Plots/Figures_publication/article",
-    "Fig_6.pdf"
-  ),
+  here::here("output/Plots/Figures_publication/article",
+             "Fig_6.pdf"),
   width = 160,
   height = 155,
   dpi = 300,
@@ -1672,10 +1683,8 @@ ggsave(
 )
 
 ggsave(
-  here::here(
-    "output/Plots/Figures_publication/article",
-    "Fig_6.png"
-  ),
+  here::here("output/Plots/Figures_publication/article",
+             "Fig_6.png"),
   width = 160,
   height = 155,
   dpi = 300,
