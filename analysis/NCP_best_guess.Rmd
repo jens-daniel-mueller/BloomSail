@@ -938,7 +938,7 @@ tm_profiles_stations_out <- tm_profiles_stations_out %>%
 tm_profiles %>%
   write_csv(
     here::here(
-      "data/intermediate/_merged_data_files/CT_dynamics",
+      "data/intermediate/_merged_data_files/NCP_best_guess",
       "tm_profiles.csv"
     )
   )
@@ -1086,7 +1086,7 @@ tm_profiles <- tm_profiles %>%
   select(-CT_star_test)
 
 tm_profiles_ID_mean %>%
-  write_csv(here::here("data/intermediate/_merged_data_files/CT_dynamics", "tm_profiles_ID.csv"))
+  write_csv(here::here("data/intermediate/_merged_data_files/NCP_best_guess", "tm_profiles_ID.csv"))
 
 rm(
   tm_profiles_ID_sd_long,
@@ -3161,7 +3161,7 @@ p_iCT_star
 NCP_flux_mix %>%
   write_csv(
     here::here(
-      "data/intermediate/_merged_data_files/CT_dynamics",
+      "data/intermediate/_merged_data_files/NCP_best_guess",
       "tm_NCP_cum.csv"
     )
   )
@@ -3169,7 +3169,7 @@ NCP_flux_mix %>%
 NCP_flux_mix_diff %>%
   write_csv(
     here::here(
-      "data/intermediate/_merged_data_files/CT_dynamics",
+      "data/intermediate/_merged_data_files/NCP_best_guess",
       "tm_NCP_inc.csv"
     )
   )

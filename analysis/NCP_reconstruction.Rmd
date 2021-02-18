@@ -75,7 +75,12 @@ Mean CO~2~ data from upper `r parameters$surface_dep` meters were used as surfac
 
 # read data
 tm_profiles_ID <-
-  read_csv(here::here("data/intermediate/_merged_data_files/CT_dynamics", "tm_profiles_ID.csv"))
+  read_csv(
+    here::here(
+      "data/intermediate/_merged_data_files/NCP_best_guess",
+      "tm_profiles_ID.csv"
+    )
+  )
 
 tm_profiles_ID <- tm_profiles_ID %>% 
   select(-c(date_ID))
@@ -716,7 +721,7 @@ Read original profile data and calculate surface mean and sd values.
 tm_profiles <-
   read_csv(
     here::here(
-      "data/intermediate/_merged_data_files/CT_dynamics",
+      "data/intermediate/_merged_data_files/NCP_best_guess",
       "tm_profiles.csv"
     )
   )
@@ -1518,7 +1523,7 @@ iCT <- iCT %>%
 
 ```{r read_NCP_best_guess}
 
-tm_NCP_cum <- read_csv(here::here("data/intermediate/_merged_data_files/CT_dynamics",
+tm_NCP_cum <- read_csv(here::here("data/intermediate/_merged_data_files/NCP_best_guess",
                                   "tm_NCP_cum.csv"))
 
 ```
@@ -1563,7 +1568,7 @@ NCP_flux_int <- NCP_flux %>%
 
 ### Without mixing corrrection
 
-```{r iCT_time_series}
+```{r NCP_time_series_without_mixing}
 
 iCT <- iCT %>%
   mutate(sensor = if_else(sensor == "BloomSail", sensor, "VOS"))
@@ -1626,7 +1631,7 @@ p_CT_star / p_hov_dep / p_iCT
 
 ### With mixing corrrection
 
-```{r NCP_time_series}
+```{r NCP_time_seriess_with_mixing}
 
 
 
