@@ -565,16 +565,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree955ac1de960780e2310e919552b3ce19329685c3targetblank955ac1da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/955ac1de960780e2310e919552b3ce19329685c3" target="_blank">955ac1d</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree233bbc16d88a38e8d6585584768b86c8acfd5d4etargetblank233bbc1a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/233bbc16d88a38e8d6585584768b86c8acfd5d4e" target="_blank">233bbc1</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree955ac1de960780e2310e919552b3ce19329685c3targetblank955ac1da" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree233bbc16d88a38e8d6585584768b86c8acfd5d4etargetblank233bbc1a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/955ac1de960780e2310e919552b3ce19329685c3" target="_blank">955ac1d</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/233bbc16d88a38e8d6585584768b86c8acfd5d4e" target="_blank">233bbc1</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -585,6 +585,24 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    data/
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
+
+Unstaged changes:
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_A1.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_A2.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_B1.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_B2.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_C1.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_C2.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_C3.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_C4.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_C4.png
+    Modified:   output/Plots/Figures_publication/Article/Fig_1.pdf
+    Modified:   output/Plots/Figures_publication/Article/Fig_2.pdf
+    Modified:   output/Plots/Figures_publication/Article/Fig_3.pdf
+    Modified:   output/Plots/Figures_publication/Article/Fig_4.pdf
+    Modified:   output/Plots/Figures_publication/Article/Fig_5.pdf
+    Modified:   output/Plots/Figures_publication/Article/Fig_6.pdf
+    Modified:   output/Plots/response_time/tau_determination_pCO2_corr_flushperiods_nls.pdf
 
 </code></pre>
 <p>
@@ -623,6 +641,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/233bbc16d88a38e8d6585584768b86c8acfd5d4e/analysis/NCP_reconstruction.Rmd" target="_blank">233bbc1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-18
+</td>
+<td>
+rerun all with empty folders
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/184f00b36b6ee9d282bd85b0d2558fdf473d6316/docs/NCP_reconstruction.html" target="_blank">184f00b</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2343,7 +2395,12 @@ date_tem_max &lt;- ymd_hms(&quot;2018-08-04 00:00:00&quot;)</code></pre>
 <p>Mean CO<sub>2</sub> data from upper 6 meters were used as surface values.</p>
 <pre class="r"><code># read data
 tm_profiles_ID &lt;-
-  read_csv(here::here(&quot;data/intermediate/_merged_data_files/CT_dynamics&quot;, &quot;tm_profiles_ID.csv&quot;))
+  read_csv(
+    here::here(
+      &quot;data/intermediate/_merged_data_files/NCP_best_guess&quot;,
+      &quot;tm_profiles_ID.csv&quot;
+    )
+  )
 
 tm_profiles_ID &lt;- tm_profiles_ID %&gt;% 
   select(-c(date_ID))
@@ -2927,7 +2984,7 @@ fm &lt;- fm %&gt;%
 <pre class="r"><code>tm_profiles &lt;-
   read_csv(
     here::here(
-      &quot;data/intermediate/_merged_data_files/CT_dynamics&quot;,
+      &quot;data/intermediate/_merged_data_files/NCP_best_guess&quot;,
       &quot;tm_profiles.csv&quot;
     )
   )
@@ -3631,7 +3688,7 @@ iCT &lt;- iCT %&gt;%
 </div>
 <div id="read-best-guess-ncp" class="section level2" number="8.2">
 <h2 number="8.2"><span class="header-section-number">8.2</span> Read best-guess NCP</h2>
-<pre class="r"><code>tm_NCP_cum &lt;- read_csv(here::here(&quot;data/intermediate/_merged_data_files/CT_dynamics&quot;,
+<pre class="r"><code>tm_NCP_cum &lt;- read_csv(here::here(&quot;data/intermediate/_merged_data_files/NCP_best_guess&quot;,
                                   &quot;tm_NCP_cum.csv&quot;))</code></pre>
 </div>
 <div id="adapt-air-sea-flux" class="section level2" number="8.3">
@@ -3723,7 +3780,7 @@ p_iCT &lt;- iCT %&gt;%
   )
 
 p_CT_star / p_hov_dep / p_iCT</code></pre>
-<p><img src="figure/NCP_reconstruction.Rmd/iCT_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/NCP_reconstruction.Rmd/NCP_time_series_without_mixing-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="with-mixing-corrrection" class="section level3" number="8.4.2">
 <h3 number="8.4.2"><span class="header-section-number">8.4.2</span> With mixing corrrection</h3>
@@ -3769,7 +3826,7 @@ p_NCP &lt;- NCP_flux_int %&gt;%
 
 p_CT_star / p_hov_dep / p_NCP +
   plot_annotation(tag_levels = &#39;a&#39;)</code></pre>
-<p><img src="figure/NCP_reconstruction.Rmd/NCP_time_series-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/NCP_reconstruction.Rmd/NCP_time_seriess_with_mixing-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggsave(
   here::here(&quot;output/Plots/Figures_publication/article&quot;,
              &quot;Fig_6.pdf&quot;),

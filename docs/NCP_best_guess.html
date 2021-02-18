@@ -567,16 +567,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec909ee0946f5856ddfd55ce67bd0bdd4e220bd8etargetblankc909ee0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c909ee0946f5856ddfd55ce67bd0bdd4e220bd8e" target="_blank">c909ee0</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree233bbc16d88a38e8d6585584768b86c8acfd5d4etargetblank233bbc1a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/233bbc16d88a38e8d6585584768b86c8acfd5d4e" target="_blank">233bbc1</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreec909ee0946f5856ddfd55ce67bd0bdd4e220bd8etargetblankc909ee0a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree233bbc16d88a38e8d6585584768b86c8acfd5d4etargetblank233bbc1a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/c909ee0946f5856ddfd55ce67bd0bdd4e220bd8e" target="_blank">c909ee0</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/233bbc16d88a38e8d6585584768b86c8acfd5d4e" target="_blank">233bbc1</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -587,6 +587,14 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    data/
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
+
+Unstaged changes:
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_A1.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_A2.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_C4.pdf
+    Modified:   output/Plots/Figures_publication/Appendix/Fig_C4.png
+    Modified:   output/Plots/Figures_publication/Article/Fig_6.pdf
+    Modified:   output/Plots/response_time/tau_determination_pCO2_corr_flushperiods_nls.pdf
 
 </code></pre>
 <p>
@@ -625,6 +633,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/233bbc16d88a38e8d6585584768b86c8acfd5d4e/analysis/NCP_best_guess.Rmd" target="_blank">233bbc1</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-18
+</td>
+<td>
+rerun all with empty folders
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/3d08cdad926ee8878280a92372842a92b2bbf1d3/docs/NCP_best_guess.html" target="_blank">3d08cda</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1965,7 +2007,7 @@ tm_profiles_stations_out &lt;- tm_profiles_stations_out %&gt;%
 tm_profiles %&gt;%
   write_csv(
     here::here(
-      &quot;data/intermediate/_merged_data_files/CT_dynamics&quot;,
+      &quot;data/intermediate/_merged_data_files/NCP_best_guess&quot;,
       &quot;tm_profiles.csv&quot;
     )
   )
@@ -2108,7 +2150,7 @@ tm_profiles &lt;- tm_profiles %&gt;%
   select(-CT_star_test)
 
 tm_profiles_ID_mean %&gt;%
-  write_csv(here::here(&quot;data/intermediate/_merged_data_files/CT_dynamics&quot;, &quot;tm_profiles_ID.csv&quot;))
+  write_csv(here::here(&quot;data/intermediate/_merged_data_files/NCP_best_guess&quot;, &quot;tm_profiles_ID.csv&quot;))
 
 rm(
   tm_profiles_ID_sd_long,
@@ -5396,7 +5438,7 @@ NCP_flux_mix &lt;- NCP_flux_mix %&gt;%
 <pre class="r"><code>NCP_flux_mix %&gt;%
   write_csv(
     here::here(
-      &quot;data/intermediate/_merged_data_files/CT_dynamics&quot;,
+      &quot;data/intermediate/_merged_data_files/NCP_best_guess&quot;,
       &quot;tm_NCP_cum.csv&quot;
     )
   )
@@ -5404,7 +5446,7 @@ NCP_flux_mix &lt;- NCP_flux_mix %&gt;%
 NCP_flux_mix_diff %&gt;%
   write_csv(
     here::here(
-      &quot;data/intermediate/_merged_data_files/CT_dynamics&quot;,
+      &quot;data/intermediate/_merged_data_files/NCP_best_guess&quot;,
       &quot;tm_NCP_inc.csv&quot;
     )
   )</code></pre>
