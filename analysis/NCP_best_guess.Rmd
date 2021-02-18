@@ -2365,9 +2365,9 @@ rm(iCT_star, iCT_star_MLD)
 
 In order to derive an estimate of the net community production NCP (which is equivalent to the formed organic matter that can be exported from the investigated surface layer), two steps are required:
 
--   decision about the most appropiate iC~T~ trajectory
+-   decision about the most appropriate iC~T~ trajectory
 
--   correction of quantifyable CO~2~ fluxes in and out of the investigated water volume during the period of interest, this includes:
+-   correction of quantifiable CO~2~ fluxes in and out of the investigated water volume during the period of interest, this includes:
 
     -   Air-sea CO~2~ fluxes
     -   CO~2~ fluxes due to vertical mixing
@@ -2488,6 +2488,24 @@ The cummulative iC~T~* trajectory determined by integration of C~T~* to a fixed 
     -   95% of the cumulative warming signal appears across that depth
 
 -   MLD were too shallow to cover all observed negative C~T~* changes
+
+```{r prepare_NCP_data_set}
+
+# extract CT data for fixed depth approach, depth limit 10m
+NCP <- iCT_star_fixed_dep %>%
+  filter(i_dep == parameters$i_dep_lim, sign == "total") %>%
+  select(-c(sign, i_dep))
+
+rm(iCT_star_fixed_dep)
+
+NCP <- NCP %>%
+  select(ID, date_time = date_time_ID, date_time_ID_ref, CT_star_i_diff, CT_star_i_cum)
+
+# date of the second last cruise
+date_180806 <- unique(NCP$date_time)[7]
+
+```
+
 
 ## Air-Sea CO~2~ flux
 
@@ -2610,7 +2628,6 @@ start <- min(tm_profiles_surface_long_ID$date_time)
 end   <- max(tm_profiles_surface_long_ID$date_time)
 
 ```
-
 
 ### Surface water table
 
@@ -2851,37 +2868,13 @@ p_flux_daily + p_flux_cum +
 
 ```
 
-## iC~T~ correction
 
-The cumulative integrated C~T~* (iC~T~*) time series obtained through integration across the upper 12m of the water column was used for further calculations of NCP.
+### Air-sea flux correction
 
-Correction of iC~T~* for air-sea CO~2~ fluxes will be based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014).
-
-To derive an integrated NCP estimated, the observed change in iC~T~* must be corrected for the air-sea flux of CO~2~. iC~T~* was determined for the upper 12m of the water column. The MLD was always shallower 12m, except for the last cruise day. Therefore:
+Correction of iC~T~* for air-sea CO~2~ fluxes are based on estimates derived from observation with 30min measurement interval and calculation according to Wanninkhof (2014). The MLD was always shallower 12m, except for the last cruise day. Therefore:
 
 -   Cumulative air-sea fluxes can be added completely to iC~T~* before Aug 7.
 -   Between Aug 7 and the last cruise on Aug 15 it was assumed, that the CO~2~ flux was homogeneously mixed down to the deepened thermocline at 17m. The flux correction applied to the upper 12m can therefore be scaled with a factor 12/17.
-
-During the last cruise, deeper mixing up to 17m water depth was observed, resulting in increased iC~T~* at 0-12 m and a decrease of iC~T~* in 12-17m. The loss of C~T~* in 12-17m can be assumed to be entirely cause by mixing with low C~T~* surface water. However, some of the observed iC~T~* loss is balanced through C~T~* input attributable to the air-sea flux. Therefore, the observed loss, corrected for 5/17 of the air-sea-flux, was added to the iC~T~* changes in 0-12m.
-
-```{r prepare_NCP_data_set}
-
-# extract CT data for fixed depth approach, depth limit 10m
-NCP <- iCT_star_fixed_dep %>%
-  filter(i_dep == parameters$i_dep_lim, sign == "total") %>%
-  select(-c(sign, i_dep))
-
-rm(iCT_star_fixed_dep)
-
-NCP <- NCP %>%
-  select(ID, date_time = date_time_ID, date_time_ID_ref, CT_star_i_diff, CT_star_i_cum)
-
-# date of the second last cruise
-date_180806 <- unique(NCP$date_time)[7]
-
-```
-
-### Air-sea fluxes
 
 ```{r calculate_flux_correction}
 
@@ -2898,16 +2891,6 @@ tm_og_flux <- tm_og %>%
   mutate(flux_cum = cumsum(flux_scale)) %>%
   select(date_time, flux_cum)
 
-# calculate cumulative air-sea fluxes affecting deepened mixed layer
-# tm_og_flux_dep <- tm_og %>%
-#   filter(date_time > date_180806) %>%
-#   mutate(
-#     flux_scale =
-#       (parameters$i_dep_mix_lim - parameters$i_dep_lim) / parameters$i_dep_mix_lim * flux_scale
-#   ) %>%
-#   arrange(date_time) %>%
-#   mutate(flux_cum = cumsum(flux_scale)) %>%
-#   select(date_time, flux_cum)
 
 NCP_flux <- full_join(NCP, tm_og_flux) %>%
   arrange(date_time)
@@ -2937,9 +2920,13 @@ NCP_flux_diff <- NCP_flux %>%
 
 ```
 
-### Vertical mixing
+## Vertical mixing
 
-The aim is to approximate the C~T~* entrainment flux between Aug 06 and 15. The relevant profiles are:
+During the last cruise, deeper mixing up to 17m water depth was observed. The entrainment of C~T~* into the surface layer, was estimated from comparing the actual concentration of C~T~* in 12-17m before the mixing, to a hypothetical concentration if instantaneous mixing to 17m had happened.
+
+### Profiles
+
+The aim is to approximate the C~T~* entrainment flux between Aug 07 and 16. The relevant profiles are:
 
 ```{r profiles_entrainment}
 
@@ -3056,7 +3043,9 @@ rm(p_tem, p_CT_star, CT_profile, tm_profiles_ID_long_temp)
 
 ```
 
-The effect of mixing was derived from the mean concentration difference on Aug 07.
+### Mixing correction
+
+The effect of mixing was derived from the integrated difference between C~T~* and C~T~* across 12-17m on Aug 07.
 
 ```{r calculate_mixing_mass_conservation}
 
@@ -3072,8 +3061,6 @@ NCP_mix_deep <- tm_profiles_ID_long %>%
   summarise(value_diff = sum(CT_star_delta_mix) / 1000) %>%
   mutate(ID = "180815")
 
-# rm(tm_og_flux_dep)
-
 NCP_mix_deep_diff <- NCP_mix_deep %>%
   mutate(var = "mixing")
 
@@ -3087,7 +3074,6 @@ NCP_mix_deep <- NCP_mix_deep %>%
   rename(mix_cum = value_diff) %>%
   select(ID, mix_cum)
 
-
 # join flux and mixing correction time series data: cumulative
 NCP_flux_mix <-
   full_join(NCP_flux,
@@ -3099,6 +3085,7 @@ rm(NCP_mix_deep,
    NCP_flux_diff,
    date_180806)
 
+# apply mixing correction
 NCP_flux_mix <- NCP_flux_mix %>%
   arrange(date_time) %>%
   fill(ID) %>%
@@ -3107,6 +3094,10 @@ NCP_flux_mix <- NCP_flux_mix %>%
     mix_cum = na.approx(mix_cum),
     CT_star_i_flux_mix_cum = CT_star_i_flux_cum + mix_cum
   )
+
+```
+
+```{r plot_iCT_star_time_series, include=FALSE}
 
 # reorder factors for plotting
 NCP_flux_mix_diff <- NCP_flux_mix_diff %>%
@@ -3161,6 +3152,12 @@ p_iCT_star <- NCP_flux_mix_long %>%
 
 p_iCT_star
 
+```
+
+## Write NCP files
+
+```{r write_NCP_best_guess_file}
+
 NCP_flux_mix %>%
   write_csv(
     here::here(
@@ -3179,7 +3176,8 @@ NCP_flux_mix_diff %>%
 
 ```
 
-```{r plot_iCT_star_time_series, include=FALSE}
+
+```{r plot_all_NCP_series, include=FALSE}
 
 p_pCO2_surf + p_tem_surf + p_CT_star_surf +
   p_pCO2_atm + p_wind + p_flux_daily + p_flux_cum + 
