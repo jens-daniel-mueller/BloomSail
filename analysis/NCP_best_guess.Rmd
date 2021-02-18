@@ -2348,10 +2348,10 @@ iCT_star %>%
   geom_line(aes(date_time_ID, CT_star_i_cum,
                 group = group), col = "grey") +
   geom_line(
-    data = iCT_star_fixed_dep %>% filter(i_dep == 12, sign == "total"),
+    data = iCT_star_fixed_dep %>% filter(i_dep == parameters$i_dep_lim, sign == "total"),
     aes(date_time_ID, CT_star_i_cum, col = "12m - total")
   ) +
-  geom_line(data = iCT_star_MLD %>% filter(rho_lim == 0.1),
+  geom_line(data = iCT_star_MLD %>% filter(rho_lim == parameters$rho_lim),
             aes(date_time_ID, CT_star_i_cum, col = "MLD - 0.1")) +
   scale_color_brewer(palette = "Set1", name = "Integration depth") +
   geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +

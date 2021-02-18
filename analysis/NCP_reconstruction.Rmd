@@ -88,7 +88,6 @@ tm_profiles_ID_long <- tm_profiles_ID %>%
   group_by(var, dep) %>%
   arrange(date_time_ID) %>%
   mutate(date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
-         date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID))/2,
          value_diff = value     - lag(value, default = first(value)),
          value_diff_daily = value_diff / date_time_ID_diff,
          value_cum = cumsum(value_diff)) %>% 
@@ -101,7 +100,7 @@ tm_profiles_ID_long <- tm_profiles_ID %>%
 
 Temperature penetration depth (TPD) and C~T~* penetration depth (CPD) were investigated based on the BloomSail data.
 
-### Cumulative profile on July 09
+### Cumulative profile July 9
 
 ```{r calculate_TPD_cumulative_tm}
 
@@ -193,7 +192,7 @@ rm(tm_profiles_ID_long_day_dep,
 
 ```
 
-### Incremental profile on July 09
+### Incremental profile July 9
 
 ```{r PD_CPD_cumulative_tm_profiles_example}
 
@@ -1031,7 +1030,7 @@ tm_fm_gt %>%
 rm(bin)
 ```
 
-### MLD
+### MLD calculation
 
 ```{r calculate_MLD}
 
@@ -1079,13 +1078,12 @@ tm_fm_gt %>%
 rm(bin)
 ```
 
+### Select rho criterion
 
 ```{r filter_rho_lim}
 
-rho_lim_value <- 0.1
-
 MLD <- tm_fm_gt_MLD %>%
-  filter(rho_lim == rho_lim_value) %>%
+  filter(rho_lim == parameters$rho_lim) %>%
   select(-rho_lim) %>%
   rename(i_dep = MLD) %>%
   mutate(i_method = "MLD", i_res = "daily")
@@ -1094,21 +1092,24 @@ rm(tm_fm_gt_MLD)
 
 ```
 
+### Mean MLD
 
 ```{r mean_MLD}
 
-MLD %>%
+# Filter data before temperature peak, and calculate mean
+MLD_mean <- MLD %>%
   filter(date_time_ID <= date_tem_max) %>%
   group_by(source) %>%
   summarise(MLD_mean = mean(i_dep, na.rm = TRUE),
             MLD_sd = sd(i_dep, na.rm = TRUE)) %>%
   ungroup()
 
-MLD_mean <- MLD %>%
-  filter(date_time_ID <= date_tem_max) %>%
-  group_by(source) %>%
-  summarise(i_dep = mean(i_dep, na.rm = TRUE)) %>%
-  ungroup() %>%
+MLD_mean
+
+# format mean MLD data frame
+MLD_mean <- MLD_mean %>%
+  select(-MLD_sd) %>% 
+  rename(i_dep = MLD_mean) %>%
   mutate(i_method = "MLD", i_res = "mean")
 
 MLD_dates <- MLD %>%
@@ -1122,20 +1123,22 @@ rm(MLD_mean)
 ```
 
 
-## Penetration depth
+## Temperature penetration depth
+
+### TPD calculation
 
 ```{r calculate_cumulative_changes}
 
 tm_fm_gt_long <- tm_fm_gt %>%
   select(-c(sal)) %>%
-  pivot_longer(c("tem", "CT_star"), values_to = "value", names_to = "var") %>%
+  pivot_longer(c("tem", "CT_star"),
+               values_to = "value",
+               names_to = "var") %>%
   group_by(source, var, dep) %>%
   arrange(date_time_ID) %>%
   mutate(
     date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
-    date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID)) /
-      2,
-    value_diff = value     - lag(value, default = first(value)),
+    value_diff = value - lag(value, default = first(value)),
     value_diff_daily = value_diff / date_time_ID_diff,
     value_cum = cumsum(value_diff)
   ) %>%
@@ -1480,8 +1483,6 @@ tm_fm_gt_surface <- tm_fm_gt_surface %>%
   arrange(date_time_ID) %>%
   mutate(
     date_time_ID_diff = as.numeric(date_time_ID - lag(date_time_ID)),
-    date_time_ID_ref  = date_time_ID - (date_time_ID - lag(date_time_ID)) /
-      2,
     CT_star_diff = CT_star - lag(CT_star, default = first(CT_star)),
     CT_star_cum = cumsum(CT_star_diff)
   ) %>%
