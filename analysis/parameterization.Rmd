@@ -88,6 +88,9 @@ parameters <-
     # density thresholds for integration depths tested for NCP quantification
     rho_lim_integration_depths = c(0.1,0.2,0.5),
     
+    # density thresholds for integration depths used for NCP quantification
+    rho_lim = 0.1,
+    
     # integration depth for NCP quantification
     i_dep_lim = 12,
     

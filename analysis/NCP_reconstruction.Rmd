@@ -101,7 +101,7 @@ tm_profiles_ID_long <- tm_profiles_ID %>%
 
 Temperature penetration depth (TPD) and C~T~* penetration depth (CPD) were investigated based on the BloomSail data.
 
-### Cumulative on July 09
+### Cumulative profile on July 09
 
 ```{r calculate_TPD_cumulative_tm}
 
@@ -193,7 +193,7 @@ rm(tm_profiles_ID_long_day_dep,
 
 ```
 
-### Daily profile on July 09
+### Incremental profile on July 09
 
 ```{r PD_CPD_cumulative_tm_profiles_example}
 
@@ -304,12 +304,12 @@ ggsave(
   units = "mm"
 )
 
-rm(PD, tm_profiles_ID_long_day, p_tem, p_CT_star)
+rm(PD, tm_profiles_ID_long_day, p_tem, p_CT_star, col_value)
 
 ```
 
 
-### Daily, incremental time series
+### Incremental time series
 
 A time series of TPD and CPD was calculated, based on the incremental (ie from cruise day to cruise day) changes of temperature / C~T~*, taking only pos. / neg. changes of both parameters into account.
 
@@ -419,112 +419,103 @@ rm(PD, PD_mean, tm_profiles_ID_long)
 
 # GETM model
 
-## Subsetting criteria
-
-```{r load_bottle_data}
-
-fixed_values <- 
-  read_csv(here::here("data/intermediate/_summarized_data_files", "tb_fix.csv"))
-
-
-```
-
 ## Read netcdf file
 
 ```{r read_gt_3d_sal_tem_age}
 
-nc <- nc_open(here::here("data/input/GETM", "Finnmaid.E.3d.2018.nc"))
+# read netcdf file
+nc <- 
+  nc_open(here::here("data/input/GETM", "Finnmaid.E.3d.2018.nc"))
 
+# extract latitude vector
 lat <- ncvar_get(nc, "latc")
 
-time_units <- nc$dim$time$units %>%     #we read the time unit from the netcdf file to calibrate the time 
-    substr(start = 15, stop = 33) %>%   #calculation, we take the relevant information from the string
-    ymd_hms()                           # and transform it to the right format
-t <- time_units + ncvar_get(nc, "time") # read time vector
-rm(time_units)
+# extract start time
+time_start <- nc$dim$time$units %>%
+  substr(start = 15, stop = 33) %>%
+  ymd_hms()
 
-d <- ncvar_get(nc, "zax") # read depths vector
+# create time vecotr
+t <- time_start + ncvar_get(nc, "time")
+rm(time_start)
 
-for (var_3d in c("salt", "temp", "SurfaceAge")) {
+# extract depths vector
+d <- ncvar_get(nc, "zax")
+
+# read model data
+for (var_3d in c("salt", "temp")) {
   
-array <- ncvar_get(nc, var_3d) # store the data in a 3-dimensional array
-#dim(array) # should be 3d with dimensions: 544 coordinates, 51 depths, and number of days of month
-
-fillvalue <- ncatt_get(nc, var_3d, "_FillValue")
-
-# Working with the data
-array[array == fillvalue$value] <- NA
-
-    for (i in seq(1,length(t),1)){
-      
-      # i <- 3
-      array_slice <- array[, , i] # slices data from one day
-      
-      array_slice_df <- as.data.frame(t(array_slice))
-      array_slice_df <- as_tibble(array_slice_df)
-      
-      gt_3d_part <- array_slice_df %>%
-        set_names(as.character(lat)) %>%
-        mutate(dep = -d) %>%
-        gather("lat", "value", 1:length(lat)) %>%
-        mutate(lat = as.numeric(lat)) %>%
-        filter(lat > parameters$getm_low_lat, lat < parameters$getm_high_lat,
-               dep <= parameters$max_dep) %>%
-        mutate(var = var_3d,
-               date_time=t[i]) %>% 
-        select(date_time, dep, value, var)
-
-      
-      if (exists("gt_3d")) {
-        gt_3d <- bind_rows(gt_3d, gt_3d_part)
-        } else {gt_3d <- gt_3d_part}
-      
-  rm(array_slice, array_slice_df, gt_3d_part)
-      
+  # store the data in a 3-dimensional array
+  array <-
+    ncvar_get(nc, var_3d) 
+  
+  # find NA value
+  fillvalue <- ncatt_get(nc, var_3d, "_FillValue")
+  
+  # replace NA value with NA
+  array[array == fillvalue$value] <- NA
+  
+  for (i in seq(1, length(t), 1)) {
+    # i <- 3
+    array_slice <- array[, , i] # slices data from one day
+    
+    # convert to tibble
+    array_slice_df <- as.data.frame(t(array_slice))
+    array_slice_df <- as_tibble(array_slice_df)
+    
+    # rename, format and subset data
+    gt_3d_part <- array_slice_df %>%
+      set_names(as.character(lat)) %>%
+      mutate(dep = -d) %>%
+      gather("lat", "value", 1:length(lat)) %>%
+      mutate(lat = as.numeric(lat)) %>%
+      filter(
+        lat > parameters$getm_low_lat,
+        lat < parameters$getm_high_lat,
+        dep <= parameters$max_dep
+      ) %>%
+      mutate(var = var_3d,
+             date_time = t[i]) %>%
+      select(date_time, dep, value, var)
+    
+    
+    if (exists("gt_3d")) {
+      gt_3d <- bind_rows(gt_3d, gt_3d_part)
+    } else {
+      gt_3d <- gt_3d_part
     }
-rm(array, fillvalue)
-
+    
+    rm(array_slice, array_slice_df, gt_3d_part)
+    
+  }
+  rm(array, fillvalue)
+  
 }
 
 nc_close(nc)
 rm(nc)
 
-gt_3d_long <- gt_3d %>% 
-  filter(date_time >= parameters$getm_start_date & date_time <= parameters$getm_end_date) %>% 
-  group_by(date_time, var, dep) %>% 
-  summarise_all(list(value=~mean(.,na.rm=TRUE))) %>% # regional averaging
+# subset time period
+# calculate daily, regional mean profile in study area
+gt_3d_long <- gt_3d %>%
+  filter(date_time >= parameters$getm_start_date &
+           date_time <= parameters$getm_end_date) %>%
+  group_by(date_time, var, dep) %>%
+  summarise_all(list(value =  ~ mean(., na.rm = TRUE))) %>% # regional averaging
   ungroup()
 
-gt_3d_long %>%
-  write_csv(here::here("data/intermediate/_summarized_data_files", 
-                       file = "gt_3d_long.csv"))
+gt_3d <- gt_3d_long %>%
+  pivot_wider(values_from = value, names_from = var) %>%
+  rename(sal = salt, tem = temp)
 
 
-rm(gt_3d, gt_3d_long, i, lat, d, t, var_3d)
+rm(i, lat, d, t, var_3d)
 
 ```
 
 ## Sal and tem profiles
 
-```{r re-read_gt_3d}
-
-gt_3d_long <-
-  read_csv(here::here(
-    "data/intermediate/_summarized_data_files",
-    "gt_3d_long.csv"
-  ))
-
-gt_3d <- gt_3d_long %>%
-  pivot_wider(values_from = value, names_from = var) %>%
-  select(-SurfaceAge) %>%
-  rename(sal = salt, tem = temp)
-
-```
-
 ```{r gt_profiles_sal_tem}
-
-gt_3d_long <- gt_3d %>%
-  pivot_longer(c(sal, tem), values_to = "value", names_to = "var")
 
 gt_3d_long %>%
   ggplot(aes(value, dep,
@@ -541,11 +532,12 @@ rm(gt_3d_long)
 
 ## Comparison BloomSail
 
-Vertical, 1m-gridded BloomSail CTD profiles were used for comparison with GETM results. Note that the sampling location does match exactly.
+Vertical, 1m-gridded BloomSail CTD profiles were used for comparison with GETM results. Note that the sampling location does not match exactly.
 
-GETM results were linearly interpolated to the mean BloomSail time stamp.
+### Interpolate GETM to BloomSail
 
-### Interpolate gt dep grid
+GETM results were linearly interpolated to the BloomSail depth levels and the mean cruise dates.
+
 
 ```{r interpolate_gt_3d_dep_grid}
 
@@ -567,6 +559,7 @@ rm(gt_3d)
 
 ```{r merge_gt_ts_profiles}
 
+# join GETM and BloomSail profiles
 tm_gt_3d <- full_join(
   gt_3d_int,
   tm_profiles_ID %>% select(date_time = date_time_ID,
@@ -575,6 +568,7 @@ tm_gt_3d <- full_join(
   suffix = c("_gt", "_tm")
 )
 
+# calculate density profiles
 tm_gt_3d <- tm_gt_3d  %>%
   mutate(
     rho_gt = swSigma(
@@ -589,6 +583,7 @@ tm_gt_3d <- tm_gt_3d  %>%
     )
   )
 
+# interpolate to BloomSail time stamp
 tm_gt_3d <- tm_gt_3d %>%
   arrange(date_time) %>%
   group_by(dep) %>%
@@ -602,9 +597,11 @@ tm_gt_3d <- tm_gt_3d %>%
 
 ```
 
+### S, T, rho profiles
 
 ```{r gt_ts_profiles_salt_temp_rho, fig.asp=0.8, fig.cap="STD profiles modeled with GETM (upper panels, gt) and measured during BloomSail campaign (lower panels, ts)"}
 
+# convert to long format
 tm_gt_3d_long <- tm_gt_3d %>%
   pivot_longer(
     sal_gt:rho_tm,
@@ -624,7 +621,9 @@ tm_gt_3d_long %>%
 
 ```
 
-```{r gt_ts_profiles_diff_salt_temp_rho, fig.asp=0.5}
+### S, T, rho offset profiles
+
+```{r gt_ts_profiles_diff_salt_temp_rho, fig.asp=0.5, fig.cap="Offset STD profiles comparing modeled with GETM (upper panels, gt) and measured during BloomSail campaign (lower panels, ts)"}
 
 tm_gt_3d <- tm_gt_3d_long %>%
   pivot_wider(values_from = "value", names_from = "source") %>%
@@ -646,11 +645,9 @@ rm(tm_gt_3d, tm_gt_3d_long)
 ```
 
 
-# Finnmaid
+# SOOP Finnmaid
 
 ## Data preparation
-
-Finnmaid data, including reconstructed data during LICOS operation failure.
 
 ```{r read_Finnmaid}
 
@@ -666,12 +663,17 @@ fm <- fm %>%
 
 ```
 
-### C~T~ calculation
+### C~T~* calculation
 
-Calculate nC~T~ based on fixed A~T~ and salinity mean values. 
+Calculate C~T~* based on fixed A~T~ and salinity mean values. 
 
 ```{r CT_calculation}
 
+# read mean bottle data
+fixed_values <- 
+  read_csv(here::here("data/intermediate/_summarized_data_files", "tb_fix.csv"))
+
+# calculate CT*
 fm <- fm %>%
   mutate(
     CT_star = carb(
@@ -724,6 +726,7 @@ tm_profiles <-
     )
   )
 
+# surface mean calculation
 tm_profiles_ID_long_surface <- tm_profiles %>%
   filter(dep < parameters$surface_dep) %>%
   select(-c(dep, date_ID, station, date_time, lat, lon, pCO2_corr)) %>%
@@ -783,27 +786,30 @@ fm_ID %>%
 
 ```
 
-## Missing observations
+### Missing observations
 
-The observational gaps in the Finnmaid SST and C~T~ time series were filled with:
+The observational gaps in the Finnmaid SST and C~T~* time series were filled with:
 
 - two BloomSail observations
-- an interpolated finnmaid value to match the starting date
+- an interpolated Finnmaid value to match the starting date
 
 The time series was restricted to the period where BloomSail observations are available.
 
 ```{r fm_interpolate_starting_values}
 
+# create data frame with start dates
 tm_start_date <- tm_profiles_ID_long_surface %>% 
   filter(ID %in% c("180705"),
          var %in% c("tem", "CT_star")) %>% 
   select(date_time_ID, ID, var) %>% 
   mutate(sensor = "interpolated")
 
+# add start dates to Finnmaid data
 fm_tm_ID <- full_join(fm_ID, tm_start_date) %>% 
   arrange(date_time_ID) %>% 
   filter(var %in% c("tem", "CT_star"))
 
+# interpolate Finnmaid to BloomSail start date
 fm_tm_ID <- fm_tm_ID %>% 
   group_by(var) %>% 
   mutate(value = approxfun(date_time_ID, value)(date_time_ID)) %>% 
@@ -816,12 +822,14 @@ rm(tm_start_date)
 
 ```{r fm_fill_gap_with_tm}
 
+# subset BloomSail data in Finnmaid gap
 tm_gap <- tm_profiles_ID_long_surface %>%
   filter(ID %in% c("180718", "180723"),
          var %in% c("tem", "CT_star")) %>%
   select(date_time_ID, ID, var, value = mean) %>%
   mutate(sensor = "BloomSail")
 
+# add data to fill Finnmaid gap
 fm_tm_ID <- full_join(fm_tm_ID, tm_gap) %>%
   arrange(date_time_ID) %>%
   select(-sd) %>%
@@ -832,14 +840,16 @@ fm_tm_ID <- full_join(fm_tm_ID, tm_gap) %>%
     period = if_else(date_time_ID > fixed_values$end, "post-BloomSail", period)
   )
 
-
+# filter only Finnmaid data within BloomSail period
 fm_tm_ID <- fm_tm_ID %>%
   filter(period == "BloomSail") %>%
   select(-period)
 
-rm(fm_ID, fm, tm_gap, tm_profiles_ID_long_surface, tm_profiles)
+rm(fm_ID, fm, tm_gap, tm_profiles_ID_long_surface, tm_profiles, fixed_values)
 
 ```
+
+### Final time series
 
 ```{r fm_time_series_filled}
 
@@ -858,19 +868,20 @@ fm_tm_ID %>%
 
 # Merge all data sets
 
-
 ## Merge fm and gt
 
 ```{r fm_gt_merge}
 
+# convert to wide format
 fm_tm_ID_wide <- fm_tm_ID %>%
   filter(var %in% c("CT_star")) %>%
   select(date_time_ID, var, sensor, value) %>%
   pivot_wider(values_from = value, names_from = var)
 
-
+# extend surface data with depth grid
 fm_gt <- expand_grid(fm_tm_ID_wide, dep = unique(gt_3d_int$dep))
 
+# join Finnmaid and GETM data
 fm_gt <- full_join(fm_gt,
                    gt_3d_int %>% rename(date_time_ID = date_time)) %>%
   arrange(date_time_ID)
@@ -879,7 +890,9 @@ rm(fm_tm_ID_wide, fm_tm_ID, gt_3d_int)
 
 ```
 
-## Interpolate gt time stamp
+## Interpolate gt time stamp to fm
+
+GETM data are interpolated to the time of Finnmaid observations.
 
 ```{r fm_gt_interpolate_time_stamp}
 
@@ -894,32 +907,37 @@ fm_gt <- fm_gt %>%
   arrange(dep) %>%
   filter(!is.na(CT_star))
 
-
 ```
 
 ## Bind tm and fm_gt
 
+Here, we merge the in-situ sensor data from SV Tina V with the Finnmaid+GETM data set, in order to perform following computations only once.
+
 ```{r tm_fm_gt_bind}
 
+# subset relevant columns and assign source label
 tm_profiles_ID <- tm_profiles_ID %>%
   select(-c(ID, pCO2)) %>%
-  mutate(source = "tm")
+  mutate(source = "tm",
+         sensor = "BloomSail")
 
 fm_gt <- fm_gt %>%
   mutate(source = "fm")
 
-tm_profiles_ID <- tm_profiles_ID %>% 
-  mutate(sensor = "BloomSail")
-
+# Merge data sets
 tm_fm_gt <- bind_rows(tm_profiles_ID, fm_gt)
-
 
 rm(fm_gt, tm_profiles_ID)
 
 ```
 
+## Comparison
+
+### Surface time series
+
 ```{r tm_fm_gt_time_series}
 
+# convert to long format
 tm_fm_gt_long <- tm_fm_gt %>%
   pivot_longer(sal:CT_star, values_to = "value", names_to = "var")
 
@@ -936,6 +954,8 @@ tm_fm_gt_long %>%
 
 ```
 
+### Hovmoeller temperature
+
 ```{r tm_fm_gt_hovmoeller_tem}
 
 bin <- 2
@@ -947,7 +967,7 @@ tm_fm_gt %>%
              col = "white",
              linetype = "1f") +
   scale_fill_viridis_c(
-    name = "Tem (°C)",
+    name = "tem",
     option = "B",
     guide = "colorstrip",
     breaks = MakeBreaks(bin)
@@ -956,7 +976,6 @@ tm_fm_gt %>%
   scale_x_datetime(date_breaks = "week",
                    date_labels = "%b %d") +
   coord_cartesian(expand = 0) +
-  labs(y = "Depth (m)") +
   theme(axis.title.x = element_blank()) +
   facet_grid(source ~ .)
 
@@ -968,7 +987,7 @@ rm(bin)
 
 ## MLD
 
-### Density
+### Density calculation
 
 ```{r calculate_density}
 
@@ -982,6 +1001,8 @@ tm_fm_gt <- tm_fm_gt %>%
 ```
 
 
+### Hovmoeller density
+
 ```{r tm_fm_gt_hovmoeller_rho}
 
 bin <- 0.5
@@ -994,7 +1015,7 @@ tm_fm_gt %>%
              col = "white",
              linetype = "1f") +
   scale_fill_viridis_c(
-    name = "Rho",
+    name = "rho",
     option = "B",
     guide = "colorstrip",
     breaks = MakeBreaks(bin),
@@ -1004,7 +1025,6 @@ tm_fm_gt %>%
   scale_x_datetime(date_breaks = "week",
                    date_labels = "%b %d") +
   coord_cartesian(expand = 0) +
-  labs(y = "Depth (m)") +
   theme(axis.title.x = element_blank()) +
   facet_grid(source ~ .)
 
@@ -1015,7 +1035,7 @@ rm(bin)
 
 ```{r calculate_MLD}
 
-tm_fm_gt_MLD <- expand_grid(tm_fm_gt, rho_lim = seq(0.1, 0.5, 0.1))
+tm_fm_gt_MLD <- expand_grid(tm_fm_gt, rho_lim = parameters$rho_lim_integration_depths)
 
 tm_fm_gt_MLD <- tm_fm_gt_MLD %>%
   arrange(dep) %>%
@@ -1027,6 +1047,8 @@ tm_fm_gt_MLD <- tm_fm_gt_MLD %>%
   mutate(rho_lim = as.factor(rho_lim))
 
 ```
+
+### Hovmoeller MLD
 
 ```{r tm_fm_gt_hovmoeller_tem_MLD}
 
@@ -1059,7 +1081,6 @@ rm(bin)
 
 
 ```{r filter_rho_lim}
-
 
 rho_lim_value <- 0.1
 
