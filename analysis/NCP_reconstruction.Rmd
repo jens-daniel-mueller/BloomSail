@@ -1530,6 +1530,8 @@ tm_NCP_cum <- read_csv(here::here("data/intermediate/_merged_data_files/NCP_best
 
 ## Adapt air sea flux
 
+The air-sea fluxes of CO~2~ previously calculated for the NCP best-guess were also applied to all reconstructed estimates
+
 
 ```{r add_CO2_flux}
 
@@ -1567,6 +1569,8 @@ NCP_flux_int <- NCP_flux %>%
 ## Time series
 
 ### Without mixing corrrection
+
+Below, we compare all derived NCP reconstructions to the best-guess time series of integrated C~T~* changes, which were only corrected for air-sea fluxes but not for mixing.
 
 ```{r NCP_time_series_without_mixing}
 
@@ -1630,6 +1634,9 @@ p_CT_star / p_hov_dep / p_iCT
 
 
 ### With mixing corrrection
+
+
+Below, we compare four NCP reconstructions based on daily incremental integration depth estimates to the best-guess NCP time series, ie the integrated C~T~* changes, which were corrected for air-sea fluxes and for mixing.
 
 ```{r NCP_time_seriess_with_mixing}
 

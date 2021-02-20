@@ -176,8 +176,8 @@ tm_profiles <- tm_profiles %>%
   select(-dep, dep = dep_grid)
 
 # Remove zero pCO2 data
-tm_profiles <- tm_profiles %>%
-  filter(pCO2 >= 0)
+# tm_profiles <- tm_profiles %>%
+#   filter(pCO2 >= 0)
 
 
 # subset complete profiles of stations not included in analysis
@@ -3097,7 +3097,7 @@ NCP_flux_mix <- NCP_flux_mix %>%
 
 ```
 
-```{r plot_iCT_star_time_series, include=FALSE}
+```{r plot_iCT_star_time_series}
 
 # reorder factors for plotting
 NCP_flux_mix_diff <- NCP_flux_mix_diff %>%

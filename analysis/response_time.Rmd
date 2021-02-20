@@ -994,14 +994,6 @@ for (i_ID in unique(tm$ID)) {
   
 }
 
-# tm_RT %>%
-#   write_csv(
-#     here::here(
-#       "data/intermediate/_merged_data_files/response_time",
-#       "tm_RT_profiles_by_tau_factor.csv"
-#     )
-#   )
-
 tm <- tm_RT
 
 rm(i_ID, freq, RT_corr, tau_fit, tau_resid, tm_RT)
@@ -1029,22 +1021,6 @@ First, we analyze all profiles individually. Later we'll merge the information a
 
 ```{r plot_optimized_RT_corrected_profiles_example, fig.cap="Example plot of response time corrected and raw pCO~2~ profiles. Panels highlight the effect of constant vs T-dependent tau estimates (columns) and the optimization by applying a constant factor (rows).", fig.asp = 2.3}
 
-
-# tm <-
-#   read_csv(
-#     here::here(
-#       "data/intermediate/_merged_data_files/response_time",
-#       "tm_RT_profiles_by_tau_factor.csv"
-#     ),
-#     col_types = cols(
-#       ID = col_character(),
-#       Zero = col_factor(),
-#       Flush = col_factor(),
-#       p_type = col_factor(),
-#       Zero_counter = col_integer(),
-#       deployment = col_integer()
-#     )
-#   )
 
 equi_cast <- tm_pCO2_equi %>%
   filter(ID == parameters$example_ID,
@@ -1160,12 +1136,6 @@ tm_grid <- tm %>%
 
 
 
-# tm_grid %>% 
-#  write_csv(here::here("data/intermediate/_merged_data_files/response_time",
-#                       "tm_grid.csv"))
-
-
-
 ```
 
 ```{r calculate_pCO2_offset_to_equi_value}
@@ -1176,10 +1146,6 @@ tm_pCO2_equi_grid <- tm_pCO2_equi %>%
   )))) %>%
   select(ID, station, dep_grid, pCO2_equi = pCO2_corr)
 
-
-# tm_pCO2_equi_grid %>% 
-#  write_csv(here::here("data/intermediate/_merged_data_files/response_time",
-#                       "tm_pCO2_equi_grid.csv"))
 ```
 
 ```{r plot_corrected_discretized_pCO2_profiles_example, fig.cap="Example plot of discretized, response time corrected and raw pCO~2~ profiles. Panels highlight the effect of constant vs T-dependent tau estimates (columns) and the optimization by applying a constant factor (rows). The black point indicates the reference pCO~2~ value.", fig.asp = 2.3}
@@ -1532,10 +1498,6 @@ meta <- read_csv(here::here("data/input/TinaV/Sensor",
                  col_types = cols(ID = col_character()))
 
 tm_grid_stat <- full_join(meta, tm_grid_stat)
-
-# tm_grid_stat  %>% 
-#  write_csv(here::here("data/intermediate/_merged_data_files/response_time",
-#                       "tm_grid_stat_meta.csv"))
 
 rm(tm_grid_stat, meta)
 
@@ -1995,7 +1957,42 @@ rm(RT_corr, i_ID, freq)
 tm_corr <- tm_corr %>%
   select(-c(tau, tau_factor, tau_test, window))
 
+rm(tm)
+
+```
+
+## Histogram
+
+Below, histograms of RT corrected pCO~2~ are shown, for selected ranges of pCO~2~.
+
+```{r histograms_pCO2_RT_corrected}
+
+tm_corr %>% 
+  ggplot(aes(pCO2)) +
+  geom_histogram()
+
+tm_corr %>% 
+  filter(pCO2 < 0) %>% 
+  ggplot(aes(pCO2)) +
+  geom_histogram()
+
+tm_corr %>% 
+  filter(pCO2 < 200,
+         pCO2 > 0) %>% 
+  ggplot(aes(pCO2)) +
+  geom_histogram()
+
+```
+
+
+# Write summary file
+
+Response time corrected pCO~2~ data with absolute values >50 are written to file for further analysis. Negative pCO~2~ readings are considered artefacts of the response time correction.
+
+```{r write_RT_corrected_pCO2_data}
+
 tm_corr %>%
+  filter(pCO2 > 50) %>% 
   write_csv(
     here::here(
       "data/intermediate/_merged_data_files/response_time",
@@ -2003,9 +2000,9 @@ tm_corr %>%
     )
   )
 
-rm(tm, tm_corr)
-
 ```
+
+
 
 # Sensitivity considerations
 
