@@ -1053,7 +1053,7 @@ rm(equi_cast)
 
 ```
 
-A pdf with all timeseries plots of profiling depth and pCO~2~ can be accessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/RT_correction_pCO2_profiles.pdf){target="_blank"}
+A pdf with all timeseries plots of profiling depth and pCO~2~ can be accessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/profiles_pCO2.pdf){target="_blank"}
 
 ```{r plot_optimized_RT_corrected_profiles, eval=FALSE}
 
@@ -1381,7 +1381,7 @@ tm_grid %>%
       
 ```
 
-A pdf with all relative pCO~2~ offset profiles can be assessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/RT_correction_delta_pCO2_relative_profiles_discrete.pdf){target="_blank"}.
+A pdf with all relative pCO~2~ offset profiles can be assessed [here](https://github.com/jens-daniel-mueller/BloomSail/tree/master/output/Plots/response_time/profiles_pCO2_delta_rel_grid.pdf){target="_blank"}.
 
 ```{r plot_delta_pCO2_relative_profiles, eval=FALSE}
 
