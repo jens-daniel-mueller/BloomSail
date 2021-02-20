@@ -28,7 +28,8 @@ R environment
 
 -   source
 
-    -   tx: data recorded on SV Tina V, where x stands for:
+    -   tx: data recorded on SV Tina V, where x is replaced and
+        indicates following data sets:
 
         -   s: Sea-Bird SBE 16 sensor
         -   h: Contros HydroC CO2 sensor
@@ -69,12 +70,14 @@ R environment
     -   date_time_ID_diff: time differences in between cruises
     -   date_time_ID_ref: mean date in between cruises corresponding to
         observed incremental changes
-    -   station
+    -   station: sampling location
     -   ID: character identifying starting date of cruise as YYMMDD
-    -   dep: 1m depth intervals
+        (this is often one day before the date_time_ID, because cruises
+        usually lasted for 1-2 days)
+    -   dep: water depth in meters, can be gridded to 1m depth intervals
     -   lat
     -   lon
-    -   deployment
+    -   deployment: running number of deployments
     -   Zero: Zeroing period of HydroC Sensor
     -   Flush: Period following zero, reading recovers to ambient value
     -   mixing: Two phases of the Flush period
@@ -129,19 +132,3 @@ R environment
     -   rel: relative to some absolute value
 
 -   p_XXX: ggplot object
-
-# Code chunk labelling
-
--   read\_: read data
--   calc\_: perform calculations, mutate variables, etc
--   chunks for plotting are labeled according to plot content, because
-    name controls plot file name
-
-# ToD0
-
-Github repo Explain subsetting of deployments Explain metadata creation
-
-CT dynamics Map data preparation in read-in file
-
-Reconstruction fm + gt in read_in und merging section implement exact
-subsetting coordinated for getm data

@@ -10,10 +10,12 @@ editor_options:
 
 On this website, you find code and explanations to quantify the net community production (NCP) during a cyanobacteria bloom in the Baltic Sea through vertically resolved pCO~2~ measurements.
 
-The outcome of this study was submitted to Copernicus Journal Biogeosciences and is available under: XXX
+The outcome of this study was submitted to the Copernicus Journal **Biogeosciences** where it is handled as: bg-2021-40
 
 Please navigate trough the navbar on top to take a look at the various chapters of this project.
 
 The links in the upper right corner bring you to the source code of this project and back to Jens' main homepage.
+
+To re-run the analysis presented here, a copy of all code together with all relevant data sets is available through Zenodo.org: 
 
 Dr. Jens Daniel Müller, `r format(Sys.time(), '%Y')`
