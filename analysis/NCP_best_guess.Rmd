@@ -175,11 +175,6 @@ tm_profiles <- tm_profiles %>%
   ungroup() %>%
   select(-dep, dep = dep_grid)
 
-# Remove zero pCO2 data
-# tm_profiles <- tm_profiles %>%
-#   filter(pCO2 >= 0)
-
-
 # subset complete profiles of stations not included in analysis
 profiles_stations_out <- tm_profiles %>% 
   filter(station %in% c("P14", "P13", "P01"))
