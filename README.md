@@ -4,7 +4,7 @@ In this repository, you find code and explanations to quantify the net community
 
 The outcome of this study was submitted to the Copernicus Journal \*\*Biogeosciences\*\* where it is handled as: bg-2021-40
 
-The data set required to re-run the analysis is not included in the Github repository, but a copy of copy of the code together with all relevant data sets is available through Zenodo.org under doi: [10.5281/zenodo.4553314](%5Bhttps://doi.org/10.5281/zenodo.4553314){target="\_blank"}](<https://doi.org/10.5281/zenodo.4553314>){target="\_blank"})
+The data set required to re-run the analysis is not included in the Github repository, but a copy of copy of the code together with all relevant data sets is available through Zenodo.org under doi: <https://doi.org/10.5281/zenodo.4553314>
 
 General comments concerning the use of the scripts:
 
