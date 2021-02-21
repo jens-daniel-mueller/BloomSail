@@ -14,8 +14,8 @@ The outcome of this study was submitted to the Copernicus Journal **Biogeoscienc
 
 Please navigate trough the navbar on top to take a look at the various chapters of this project.
 
-The links in the upper right corner bring you to the source code of this project and back to Jens' main homepage.
+The links in the upper right corner direct you to the source code of this project stored in a Github repository; and to Jens' main homepage.
 
-To re-run the analysis presented here, a copy of all code together with all relevant data sets is available through Zenodo.org: 
+The data set required to re-run the analysis is not included in the Github repository, but a copy of copy of the code together with all relevant data sets is available through Zenodo.org under doi: [10.5281/zenodo.4553314](https://doi.org/10.5281/zenodo.4553314){target="_blank"}
 
 Dr. Jens Daniel Müller, `r format(Sys.time(), '%Y')`
