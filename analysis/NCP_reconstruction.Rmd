@@ -1667,7 +1667,7 @@ p_NCP <- NCP_flux_int %>%
     sec.axis = dup_axis(),
     expand = c(0, 0)
   ) +
-  scale_linetype_manual(name = "- NCP estimate",
+  scale_linetype_manual(name = expression(- NCP~estimate),
                         values = c(2, 1)) +
   facet_wrap(~ source) +
   labs(y = expression(atop(- NCP, (mol ~ m ^ {

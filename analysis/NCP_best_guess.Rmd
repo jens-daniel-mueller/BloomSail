@@ -3112,7 +3112,7 @@ NCP_flux_mix_long <- NCP_flux_mix %>%
       var,
       observed = "CT_star_i_cum",
       `air-sea flux corrected` = "CT_star_i_flux_cum",
-      `air-sea flux + mixing\ncorrected (-NCP)` = "CT_star_i_flux_mix_cum"
+      `air-sea flux + mixing\ncorrected (- NCP)` = "CT_star_i_flux_mix_cum"
     )
   )
 
