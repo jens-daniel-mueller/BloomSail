@@ -2817,7 +2817,7 @@ p_flux_daily <- tm_og %>%
   geom_path(aes(y = flux)) +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(F["daily"], (mol ~ m ^ {
+  labs(y = expression(atop(F["air-sea, daily"], (mol ~ m ^ {
     -2
   } ~ d ^ {
     -1
@@ -2848,7 +2848,7 @@ p_flux_cum <- tm_og %>%
   scale_fill_discrete(guide = FALSE) +
   scale_x_datetime(date_breaks = "week",
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(F["cum"],
+  labs(y = expression(atop(F["air-sea, cum"],
                            (mol ~ m ^ {
                              -2
                            })))) +
@@ -2910,7 +2910,8 @@ NCP_flux_diff <- NCP_flux %>%
   select(ID, date_time_ID_ref, observed = CT_star_i_diff, flux = flux_diff) %>%
   pivot_longer(cols = "observed":"flux",
                names_to = "var",
-               values_to = "value_diff")
+               values_to = "value_diff") %>% 
+  mutate(var = if_else(var == "flux", "air-sea flux", var))
 
 
 ```
@@ -3096,7 +3097,7 @@ NCP_flux_mix <- NCP_flux_mix %>%
 
 # reorder factors for plotting
 NCP_flux_mix_diff <- NCP_flux_mix_diff %>%
-  mutate(var = factor(var, c("observed", "flux", "mixing")))
+  mutate(var = factor(var, c("observed", "air-sea flux", "mixing")))
 
 NCP_flux_mix_long <- NCP_flux_mix %>%
   select(date_time,
@@ -3110,8 +3111,8 @@ NCP_flux_mix_long <- NCP_flux_mix %>%
     var = fct_recode(
       var,
       observed = "CT_star_i_cum",
-      `flux corrected` = "CT_star_i_flux_cum",
-      `flux + mixing\ncorrected (NCP)` = "CT_star_i_flux_mix_cum"
+      `air-sea flux corrected` = "CT_star_i_flux_cum",
+      `air-sea flux + mixing\ncorrected (-NCP)` = "CT_star_i_flux_mix_cum"
     )
   )
 

@@ -8,7 +8,7 @@
 
 # commit regular changes (locally) and rebuild site
 # this command determines which .Rmd files were changed
-wflow_publish(all = TRUE, message = "cleaning")
+wflow_publish(all = TRUE, message = "revised figure according to RC1")
 
 # rerun one specific .Rmd file
 wflow_publish(c(
