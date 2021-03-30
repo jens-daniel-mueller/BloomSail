@@ -451,7 +451,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">NCP best guess</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">20 February, 2021</h4>
+<h4 class="date">30 March, 2021</h4>
 
 </div>
 
@@ -476,7 +476,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-02-20
+<strong>Last updated:</strong> 2021-03-30
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -567,16 +567,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeac99c61419331b909c4f08f84ae624f9da63f239targetblankac99c61a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ac99c61419331b909c4f08f84ae624f9da63f239" target="_blank">ac99c61</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea520c10a35968558466784d6cc65530aebe15742targetblanka520c10a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a520c10a35968558466784d6cc65530aebe15742" target="_blank">a520c10</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeac99c61419331b909c4f08f84ae624f9da63f239targetblankac99c61a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreea520c10a35968558466784d6cc65530aebe15742targetblanka520c10a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/ac99c61419331b909c4f08f84ae624f9da63f239" target="_blank">ac99c61</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/a520c10a35968558466784d6cc65530aebe15742" target="_blank">a520c10</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -587,6 +587,9 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    data/
     Ignored:    output/Plots/Figures_publication/.tmp.drivedownload/
+
+Untracked files:
+    Untracked:  data_os-2020-120_submission.zip
 
 </code></pre>
 <p>
@@ -625,6 +628,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/a520c10a35968558466784d6cc65530aebe15742/analysis/NCP_best_guess.Rmd" target="_blank">a520c10</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-03-30
+</td>
+<td>
+revised figure according to RC1
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/82145cc414443ab6939af304b470387a9f4a775f/docs/NCP_best_guess.html" target="_blank">82145cc</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-02-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -5235,7 +5272,7 @@ rm(Sc_W14)</code></pre>
   geom_path(aes(y = flux)) +
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(F[&quot;daily&quot;], (mol ~ m ^ {
+  labs(y = expression(atop(F[&quot;air-sea, daily&quot;], (mol ~ m ^ {
     -2
   } ~ d ^ {
     -1
@@ -5261,7 +5298,7 @@ p_flux_cum &lt;- tm_og %&gt;%
   scale_fill_discrete(guide = FALSE) +
   scale_x_datetime(date_breaks = &quot;week&quot;,
                    sec.axis = dup_axis()) +
-  labs(y = expression(atop(F[&quot;cum&quot;],
+  labs(y = expression(atop(F[&quot;air-sea, cum&quot;],
                            (mol ~ m ^ {
                              -2
                            })))) +
@@ -5319,7 +5356,8 @@ NCP_flux_diff &lt;- NCP_flux %&gt;%
   select(ID, date_time_ID_ref, observed = CT_star_i_diff, flux = flux_diff) %&gt;%
   pivot_longer(cols = &quot;observed&quot;:&quot;flux&quot;,
                names_to = &quot;var&quot;,
-               values_to = &quot;value_diff&quot;)</code></pre>
+               values_to = &quot;value_diff&quot;) %&gt;% 
+  mutate(var = if_else(var == &quot;flux&quot;, &quot;air-sea flux&quot;, var))</code></pre>
 </div>
 </div>
 <div id="vertical-mixing" class="section level2" number="10.3">
@@ -5488,7 +5526,7 @@ NCP_flux_mix &lt;- NCP_flux_mix %&gt;%
   )</code></pre>
 <pre class="r"><code># reorder factors for plotting
 NCP_flux_mix_diff &lt;- NCP_flux_mix_diff %&gt;%
-  mutate(var = factor(var, c(&quot;observed&quot;, &quot;flux&quot;, &quot;mixing&quot;)))
+  mutate(var = factor(var, c(&quot;observed&quot;, &quot;air-sea flux&quot;, &quot;mixing&quot;)))
 
 NCP_flux_mix_long &lt;- NCP_flux_mix %&gt;%
   select(date_time,
@@ -5502,8 +5540,8 @@ NCP_flux_mix_long &lt;- NCP_flux_mix %&gt;%
     var = fct_recode(
       var,
       observed = &quot;CT_star_i_cum&quot;,
-      `flux corrected` = &quot;CT_star_i_flux_cum&quot;,
-      `flux + mixing\ncorrected (NCP)` = &quot;CT_star_i_flux_mix_cum&quot;
+      `air-sea flux corrected` = &quot;CT_star_i_flux_cum&quot;,
+      `air-sea flux + mixing\ncorrected (-NCP)` = &quot;CT_star_i_flux_mix_cum&quot;
     )
   )
 
@@ -5598,7 +5636,7 @@ loaded via a namespace (and not attached):
  [4] class_7.3-17        rprojroot_2.0.2     fs_1.5.0           
  [7] rstudioapi_0.13     farver_2.0.3        fansi_0.4.1        
 [10] xml2_1.3.2          codetools_0.2-16    knitr_1.30         
-[13] jsonlite_1.7.2      broom_0.7.3         dbplyr_2.0.0       
+[13] jsonlite_1.7.2      broom_0.7.5         dbplyr_2.0.0       
 [16] png_0.1-7           compiler_4.0.3      httr_1.4.2         
 [19] backports_1.2.1     assertthat_0.2.1    cli_2.2.0          
 [22] later_1.1.0.1       htmltools_0.5.0     tools_4.0.3        
