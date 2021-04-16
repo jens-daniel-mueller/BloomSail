@@ -901,16 +901,23 @@ The executed response time correction featured the following aspects:
 
 ```{r RT_correction}
 
-# Define function for response time correction after Bittig, 2018
+# # Define function for response time correction after Bittig et al, 2018
+# 
+# RT_corr <- function(c1, c0, dt, tau) {
+#   (1 / (2 * ((1 + (
+#     2 * tau / dt
+#   )) ^ (-1)))) * (c1 - (1 - (2 * ((
+#     1 + (2 * tau / dt)
+#   ) ^ (
+#     -1
+#   )))) * c0)
+# }
+
+# Define function for response time correction after Fiedler et al, 2013
 
 RT_corr <- function(c1, c0, dt, tau) {
-  (1 / (2 * ((1 + (
-    2 * tau / dt
-  )) ^ (-1)))) * (c1 - (1 - (2 * ((
-    1 + (2 * tau / dt)
-  ) ^ (
-    -1
-  )))) * c0)
+(c1 - (c0 * exp(-dt/tau)) ) /
+    (1 - exp(-dt/tau))
 }
 
 
@@ -1823,17 +1830,23 @@ Finally, the response time correction was applied to the full data set (not only
 
 ```{r RT_correction_all}
 
-# Response time correction approach after Bittig et al, 2018
-RT_corr <- function(c1, c0, dt, tau) {
-  (1 / (2 * ((1 + (
-    2 * tau / dt
-  )) ^ (-1)))) * (c1 - (1 - (2 * ((
-    1 + (2 * tau / dt)
-  ) ^ (
-    -1
-  )))) * c0)
-}
+# # Response time correction approach after Bittig et al, 2018
+# RT_corr <- function(c1, c0, dt, tau) {
+#   (1 / (2 * ((1 + (
+#     2 * tau / dt
+#   )) ^ (-1)))) * (c1 - (1 - (2 * ((
+#     1 + (2 * tau / dt)
+#   ) ^ (
+#     -1
+#   )))) * c0)
+# }
 
+# Define function for response time correction after Fiedler et al, 2013
+
+RT_corr <- function(c1, c0, dt, tau) {
+(c1 - (c0 * exp(-dt/tau)) ) /
+    (1 - exp(-dt/tau))
+}
 
 
 tm <-
