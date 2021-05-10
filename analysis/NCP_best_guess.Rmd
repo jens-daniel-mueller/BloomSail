@@ -774,7 +774,7 @@ p_AT <- tb_long_mean %>%
   geom_vline(data = tb_fix, aes(xintercept = AT), linetype = 2) +
   geom_path(aes(col = ID)) +
   geom_point(aes(fill = ID), shape = 21) +
-  scale_y_reverse(sec.axis = dup_axis()) +
+  scale_y_reverse() +
   labs(x = expression(A[T] ~ (µmol ~ kg ^ {
     -1
   })),
@@ -782,7 +782,8 @@ p_AT <- tb_long_mean %>%
   scale_fill_viridis_d(guide = FALSE) +
   scale_color_viridis_d(guide = FALSE) +
   theme(axis.text.y.right = element_blank(),
-        axis.title.y.right = element_blank())
+        axis.title.y.right = element_blank(),
+    panel.grid.minor = element_blank())
 
 p_CT <- tb_long_mean %>%
   filter(dep_grid < parameters$max_dep, var == "CT") %>%
@@ -797,14 +798,16 @@ p_CT <- tb_long_mean %>%
   scale_fill_viridis_d(guide = FALSE) +
   scale_color_viridis_d(guide = FALSE) +
   theme(axis.text.y = element_blank(),
-        axis.title.y = element_blank())
+    axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+    panel.grid.minor = element_blank())
 
 p_CT_star <- tb_long_mean %>%
   filter(dep_grid < parameters$max_dep, var == "CT_star") %>%
   ggplot(aes(value, dep_grid)) +
   geom_path(aes(col = ID)) +
   geom_point(aes(fill = ID), shape = 21) +
-  scale_y_reverse(sec.axis = dup_axis()) +
+  scale_y_reverse() +
   labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {-1}))),
        y = "Depth (m)") +
   scale_fill_viridis_d(labels = cruise_dates$date_ID,
@@ -813,7 +816,9 @@ p_CT_star <- tb_long_mean %>%
                         name = "Mean\ncruise date") +
   theme(
     axis.text.y = element_blank(),
-    axis.title.y = element_blank()
+    axis.title.y = element_blank(), 
+    axis.ticks.y = element_blank(),
+    panel.grid.minor = element_blank()
   )
 
 p_AT + p_CT + p_CT_star +
@@ -824,7 +829,7 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_B1.pdf"
   ),
-  width = 150,
+  width = 160,
   height = 80,
   dpi = 300,
   units = "mm"
@@ -835,7 +840,7 @@ ggsave(
     "output/Plots/Figures_publication/appendix",
     "Fig_B1.png"
   ),
-  width = 150,
+  width = 160,
   height = 80,
   dpi = 300,
   units = "mm"

@@ -8,7 +8,7 @@
 
 # commit regular changes (locally) and rebuild site
 # this command determines which .Rmd files were changed
-wflow_publish(all = TRUE, message = "revised figure according to RC1")
+wflow_publish(all = TRUE, message = "removed grid lines")
 
 # rerun one specific .Rmd file
 wflow_publish(c(
@@ -16,17 +16,21 @@ wflow_publish(c(
 ), message = "XXX")
 
 # commit changes including _site.yml (locally) and rebuild site
-wflow_publish(c(
-  "analysis/index.Rmd",
-  "analysis/nomenclature.Rmd",
-  "analysis/parameterization.Rmd",
-  "analysis/read-in.Rmd",
-  "analysis/merging_interpolation.Rmd",
-  "analysis/response_time.Rmd",
-  "analysis/NCP_best_guess.Rmd",
-  "analysis/Phytoplankton.Rmd",
-  "analysis/NCP_reconstruction.Rmd"
-), message = "rerun with early exclusion of negative pCO2", republish = TRUE)
+wflow_publish(
+  c(
+    "analysis/index.Rmd",
+    "analysis/nomenclature.Rmd",
+    "analysis/parameterization.Rmd",
+    "analysis/read-in.Rmd",
+    "analysis/merging_interpolation.Rmd",
+    "analysis/response_time.Rmd",
+    "analysis/NCP_best_guess.Rmd",
+    "analysis/Phytoplankton.Rmd",
+    "analysis/NCP_reconstruction.Rmd"
+  ),
+  message = "rerun with Fiedler 2013 RT correction",
+  republish = TRUE
+)
 
 
  # Push latest version to GitHub

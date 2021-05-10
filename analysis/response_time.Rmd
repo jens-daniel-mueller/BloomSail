@@ -185,7 +185,8 @@ augment(fit) %>%
   geom_hline(yintercept = pCO2_corr_start + 0.63 * (pCO2_corr_delta)) +
   geom_point(shape = 21) +
   geom_line(aes(y = .fitted), col = "red") +
-  labs(y = expression(italic(p)*CO[2] ~ (µatm)), x = "time (sec)")
+  labs(y = expression(italic(p)*CO[2] ~ (µatm)), x = "time (sec)") +
+  theme(panel.grid = element_blank())
 
 ggsave(
   here::here(
@@ -894,16 +895,16 @@ rm(downcast, downcast_speed)
 
 The executed response time correction featured the following aspects:
 
--   Correction according to Bittig et al. (2018, supplement)
+-   Correction according to Fiedler et al. (2013)
 -   RT: T-dependent response times applied
 -   tau_factor: Factors of `r parameters$tau_factors` were applied to determined tau values
 -   Post-smoothing: `r parameters$smoothing_duration` sec running mean (eg across 15 observations at 2 sec measurement frequency)
 
 ```{r RT_correction}
 
-# # Define function for response time correction after Bittig et al, 2018
-# 
-# RT_corr <- function(c1, c0, dt, tau) {
+# Define function for response time correction after Bittig et al, 2018
+
+# RT_corr_Bit <- function(c1, c0, dt, tau) {
 #   (1 / (2 * ((1 + (
 #     2 * tau / dt
 #   )) ^ (-1)))) * (c1 - (1 - (2 * ((
@@ -976,8 +977,11 @@ for (i_ID in unique(tm$ID)) {
     mutate(
       pCO2_RT = RT_corr(pCO2_corr, lag(pCO2_corr), dt, tau_test),
       pCO2_RT = if_else(pCO2_RT %in% c(Inf,-Inf), NaN, pCO2_RT),
+      # pCO2_RT_Bit = RT_corr_Bit(pCO2_corr, lag(pCO2_corr), dt, tau_test),
+      # pCO2_RT_Bit = if_else(pCO2_RT_Bit %in% c(Inf,-Inf), NaN, pCO2_RT_Bit),
       window = window,
       pCO2 = rolling_mean(pCO2_RT)
+      # pCO2_Bit = rolling_mean(pCO2_RT_Bit)
     ) %>%
     ungroup()
   
@@ -1009,6 +1013,20 @@ rm(i_ID, freq, RT_corr, tau_fit, tau_resid, tm_RT)
 
 
 # Diagnosis
+
+```{r Bittig_vs_Fiedler, eval=FALSE}
+
+tm %>% 
+  ggplot(aes(pCO2_RT - pCO2_RT_Bit)) +
+  geom_histogram(binwidth = 5) +
+  scale_y_log10() +
+  scale_x_continuous(limits = c(-20,20))
+
+min(tm$pCO2_RT - tm$pCO2_RT_Bit, na.rm = TRUE)
+max(tm$pCO2_RT - tm$pCO2_RT_Bit, na.rm = TRUE)
+
+```
+
 
 
 In the following, the success of the response time correction is assessed through the
@@ -1215,7 +1233,8 @@ p_profile_corr <- tm_grid %>%
   theme(
     legend.title = element_blank(),
     legend.position = c(0.8, 0.75),
-    legend.background = element_rect(colour = "black")
+    legend.background = element_rect(colour = "black"),
+    panel.grid = element_blank()
   )
 
       
@@ -1596,7 +1615,8 @@ p_delta_pCO2 <- tm_grid_shallow_sum %>%
     legend.position = c(0.8, 0.8),
     legend.background = element_rect(colour = "black"),
     axis.title.y = element_blank(),
-    axis.text.y = element_blank()
+    axis.text.y = element_blank(),
+    panel.grid = element_blank()
   )
 
 p_profile_corr + p_delta_pCO2 +
@@ -1831,6 +1851,7 @@ Finally, the response time correction was applied to the full data set (not only
 ```{r RT_correction_all}
 
 # # Response time correction approach after Bittig et al, 2018
+
 # RT_corr <- function(c1, c0, dt, tau) {
 #   (1 / (2 * ((1 + (
 #     2 * tau / dt
