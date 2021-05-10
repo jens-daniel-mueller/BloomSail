@@ -1616,6 +1616,7 @@ p_delta_pCO2 <- tm_grid_shallow_sum %>%
     legend.background = element_rect(colour = "black"),
     axis.title.y = element_blank(),
     axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
     panel.grid = element_blank()
   )
 
