@@ -186,7 +186,7 @@ augment(fit) %>%
   geom_point(shape = 21) +
   geom_line(aes(y = .fitted), col = "red") +
   labs(y = expression(italic(p)*CO[2] ~ (µatm)), x = "time (sec)") +
-  theme(panel.grid = element_blank())
+  theme(panel.grid.minor = element_blank())
 
 ggsave(
   here::here(
@@ -1234,7 +1234,7 @@ p_profile_corr <- tm_grid %>%
     legend.title = element_blank(),
     legend.position = c(0.8, 0.75),
     legend.background = element_rect(colour = "black"),
-    panel.grid = element_blank()
+    panel.grid.minor = element_blank()
   )
 
       
@@ -1617,7 +1617,7 @@ p_delta_pCO2 <- tm_grid_shallow_sum %>%
     axis.title.y = element_blank(),
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
-    panel.grid = element_blank()
+    panel.grid.minor = element_blank()
   )
 
 p_profile_corr + p_delta_pCO2 +
