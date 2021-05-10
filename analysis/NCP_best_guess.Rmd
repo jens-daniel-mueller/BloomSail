@@ -604,7 +604,9 @@ cover %>%
   scale_x_datetime(date_breaks = "week",
                    date_labels = "%b %d") +
   labs(y = "Station") +
-  theme(axis.title.x = element_blank())
+  theme(axis.title.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank())
 
 ggsave(
   here::here(
@@ -781,9 +783,11 @@ p_AT <- tb_long_mean %>%
   y = "Depth (m)") +
   scale_fill_viridis_d(guide = FALSE) +
   scale_color_viridis_d(guide = FALSE) +
-  theme(axis.text.y.right = element_blank(),
-        axis.title.y.right = element_blank(),
-    panel.grid.minor = element_blank())
+  theme(
+    axis.text.y.right = element_blank(),
+    axis.title.y.right = element_blank(),
+    panel.grid = element_blank()
+  )
 
 p_CT <- tb_long_mean %>%
   filter(dep_grid < parameters$max_dep, var == "CT") %>%
@@ -797,10 +801,12 @@ p_CT <- tb_long_mean %>%
   y = "Depth (m)") +
   scale_fill_viridis_d(guide = FALSE) +
   scale_color_viridis_d(guide = FALSE) +
-  theme(axis.text.y = element_blank(),
+  theme(
+    axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-    panel.grid.minor = element_blank())
+    axis.title.y = element_blank(),
+    panel.grid = element_blank()
+  )
 
 p_CT_star <- tb_long_mean %>%
   filter(dep_grid < parameters$max_dep, var == "CT_star") %>%
@@ -816,9 +822,9 @@ p_CT_star <- tb_long_mean %>%
                         name = "Mean\ncruise date") +
   theme(
     axis.text.y = element_blank(),
-    axis.title.y = element_blank(), 
+    axis.title.y = element_blank(),
     axis.ticks.y = element_blank(),
-    panel.grid.minor = element_blank()
+    panel.grid = element_blank()
   )
 
 p_AT + p_CT + p_CT_star +
@@ -981,7 +987,8 @@ p_tem <-
   scale_y_reverse(expand = c(0, 0)) +
   labs(x = "Temperature (\u00B0C)",
        y = "Depth (m)") +
-  scale_color_viridis_d(guide = FALSE)
+  scale_color_viridis_d(guide = FALSE) +
+  theme(panel.grid.minor = element_blank())
 
 
 # create pCO2 profiles plots
@@ -995,7 +1002,8 @@ p_pCO2 <-
   theme(
     axis.text.y = element_blank(),
     axis.title.y = element_blank(),
-    axis.ticks.y = element_blank()
+    axis.ticks.y = element_blank(),
+    panel.grid.minor = element_blank()
   )
 
 # create CT* profiles plots
@@ -1004,13 +1012,15 @@ p_CT_star <-
   ggplot(aes(CT_star, dep, col = ID, group = interaction(station, ID))) +
   geom_path() +
   scale_y_reverse(expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1390, NA)) +
   labs(x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {-1})))) +
   scale_color_viridis_d(labels = cruise_dates$date_ID,
                         name = "Mean\ncruise date") +
   theme(
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
-    axis.title.y = element_blank()
+    axis.title.y = element_blank(),
+    panel.grid.minor = element_blank()
   )
 
 
@@ -1023,7 +1033,7 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_3.pdf"
   ),
-  width = 150,
+  width = 160,
   height = 80,
   dpi = 300,
   units = "mm"
@@ -1034,7 +1044,7 @@ ggsave(
     "output/Plots/Figures_publication/article",
     "Fig_3.png"
   ),
-  width = 150,
+  width = 160,
   height = 80,
   dpi = 300,
   units = "mm"
@@ -1148,7 +1158,8 @@ p_CT_star <-
   y = "Depth (m)") +
   theme(strip.background = element_blank(),
         strip.text = element_blank(),
-        legend.position = "none")
+        legend.position = "none",
+        panel.grid.minor = element_blank())
 
 cruise_labels <- c(
   `180705` = cruise_dates$date_ID[1],
@@ -1180,7 +1191,9 @@ p_tem <-
   labs(x = "Temperature (\u00B0C)",
        y = "Depth (m)") +
   theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank())
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.minor = element_blank())
 
 p_CT_star | p_tem
 
@@ -1711,7 +1724,8 @@ CT_star_sens %>%
     ~ . / AT_mean * 100,
     name = expression(paste("Relative bias ", A[T], " (%)")),
     breaks = seq(-10, 10, 1)
-  ))
+  )) +
+  theme(panel.grid = element_blank())
 
 ggsave(
   here::here("output/Plots/Figures_publication/appendix",
@@ -1766,15 +1780,13 @@ p_CT_star_hov <- tm_profiles_ID_long %>%
                                  frame.colour = "black",
                                  ticks = TRUE,
                                  ticks.colour = "black")) +
-  scale_y_reverse(sec.axis = dup_axis()) +
+  scale_y_reverse() +
   scale_x_datetime(breaks = "week",
                    date_labels = "%b %d") +
   labs(y = "Depth (m)") +
   coord_cartesian(expand = 0) +
   theme(
     axis.title.x = element_blank(),
-    axis.title.y.right = element_blank(),
-    axis.text.y.right = element_blank(),
     legend.position = "bottom",
     legend.margin = margin(0, 0, 0, 0),
     legend.box.margin = margin(0, 0, 0, 0)
@@ -1795,7 +1807,7 @@ p_tem_hov <- tm_profiles_ID_long %>%
   scale_fill_viridis_c(
     breaks = MakeBreaks(bin_Tem),
     guide = "colorstrip",
-    name = expression(Temperature~("\u00B0" * C)),
+    name = expression(Temp.~("\u00B0" * C)),
     option = "inferno"
   ) +
   guides(fill = guide_colorsteps(barheight = unit(3, "mm"),
@@ -1803,15 +1815,13 @@ p_tem_hov <- tm_profiles_ID_long %>%
                                  frame.colour = "black",
                                  ticks = TRUE,
                                  ticks.colour = "black")) +
-  scale_y_reverse(sec.axis = dup_axis()) +
+  scale_y_reverse() +
   scale_x_datetime(breaks = "week",
                    date_labels = "%b %d") +
   labs(y = "Depth (m)") +
   coord_cartesian(expand = 0) +
   theme(
     axis.title.x = element_blank(),
-    axis.title.y.right = element_blank(),
-    axis.text.y.right = element_blank(),
     legend.position = "top",
     legend.margin = margin(0, 0, 0, 0),
     legend.box.margin = margin(0, 0, 0, 0)
@@ -1827,16 +1837,14 @@ p_CT_star_ID_cum <-
   geom_path() +
   geom_point(shape = 21, col = "black") +
   scale_y_reverse(expand = c(0, 0),
-                  position = "right",
-                  sec.axis = dup_axis()) +
-  labs(x = expression(paste(C[T],"*", ~ cum. ~ changes ~ (µmol ~ kg ^ {
+                  position = "right") +
+  labs(x = expression(paste(Delta~C[T],"*", ~ cumulative ~ (µmol ~ kg ^ {
     -1
   }))),
   y = "Depth (m)") +
   scale_color_viridis_d(labels = cruise_dates$date_ID, guide = FALSE) +
   scale_fill_viridis_d(labels = cruise_dates$date_ID, guide = FALSE) +
-  theme(axis.title.y.left = element_blank(),
-        axis.text.y.left = element_blank())
+  theme(panel.grid.minor = element_blank())
 
 
 
@@ -1848,19 +1856,17 @@ p_tem_ID_cum <-
   geom_path() +
   geom_point(shape = 21, col = "black") +
   scale_y_reverse(expand = c(0, 0),
-                  position = "right",
-                  sec.axis = dup_axis()) +
-  labs(x = "Temperature cum. changes (\u00B0C)",
+                  position = "right") +
+  labs(x = expression(Delta~"Temp. cumulative (\u00B0C)"),
        y = "Depth (m)") +
   scale_color_viridis_d(labels = cruise_dates$date_ID) +
   scale_fill_viridis_d(labels = cruise_dates$date_ID) +
   theme(
     legend.position = "top",
-    axis.title.y.left = element_blank(),
-    axis.text.y.left = element_blank(),
     legend.title = element_blank(),
     legend.key.size = unit(4, "mm"),
-    legend.key.width = unit(4,"mm") 
+    legend.key.width = unit(4,"mm"),
+    panel.grid.minor = element_blank()
   )
 
 ((p_tem_hov | p_tem_ID_cum ) + plot_layout(tag_level = 'new', widths = c(2.3, 1))) / 
@@ -2533,23 +2539,36 @@ rm(tm_profiles_surface_long)
 p_pCO2_surf <- tm_profiles_surface_long_ID %>%
   filter(var == "pCO2") %>%
   ggplot(aes(x = date_time)) +
-  geom_ribbon(aes(ymin = mean - sd, ymax = mean + sd,
-                  fill = "\u00B1 SD"), alpha = 0.2) +
+  geom_vline(data = cruise_dates, aes(xintercept = date_time_ID), col = "grey92") +
+  geom_ribbon(aes(
+    ymin = mean - sd,
+    ymax = mean + sd,
+    fill = "\u00B1 SD"
+  ), alpha = 0.2) +
   geom_path(aes(y = mean)) +
   geom_point(aes(y = mean)) +
-  scale_color_manual(name = "", values = "black", guide = FALSE) +
-  scale_fill_manual(name = "", values = "black", guide = FALSE) +
-  scale_x_datetime(date_breaks = "week",
-                   sec.axis = dup_axis()) +
-  labs(y = expression(atop(italic(p)*CO[2], (mu * atm)))) +
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
+  scale_color_manual(name = "",
+                     values = "black",
+                     guide = FALSE) +
+  scale_fill_manual(name = "",
+                    values = "black",
+                    guide = FALSE) +
+  scale_x_datetime(date_breaks = "week") +
+  labs(y = expression(atop(italic(p) * CO[2], (mu * atm)))) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
     legend.title = element_blank(),
-    plot.margin = margin(0, 0, 0, 0, "cm"))
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank()
+  )
 
 p_tem_surf <- tm_profiles_surface_long_ID %>%
   filter(var == "tem") %>%
   ggplot(aes(x = date_time)) +
+  geom_vline(data = cruise_dates, aes(xintercept = date_time_ID), col = "grey92") +
   geom_ribbon(aes(
     ymin = mean - sd,
     ymax = mean + sd,
@@ -2560,15 +2579,17 @@ p_tem_surf <- tm_profiles_surface_long_ID %>%
   geom_point(aes(y = mean, col = "Mean \u00B1 SD")) +
   scale_color_manual(name = "Sensor data", values = "black") +
   scale_fill_manual(name = "Sensor data", values = "black") +
-  scale_x_datetime(date_breaks = "week",
-                   sec.axis = dup_axis()) +
+  scale_x_datetime(date_breaks = "week") +
   labs(y = expression(atop("SST", "(\u00B0C)"))) +
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
     legend.key.height = unit(5, "mm"),
     legend.key.width = unit(5,"mm"),
-    plot.margin = margin(0, 0, 0, 0, "cm")
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank()
   )
 
 
@@ -2576,6 +2597,7 @@ p_CT_star_surf <-
   tm_profiles_surface_long_ID %>%
   filter(var == "CT_star") %>%
   ggplot() +
+  geom_vline(data = cruise_dates, aes(xintercept = date_time_ID), col = "grey92") +
   geom_ribbon(aes(
     x = date_time,
     ymin = mean - sd,
@@ -2606,8 +2628,7 @@ p_CT_star_surf <-
         color = "Mean \u00B1 SD")
   ) +
   scale_color_manual(name = "Bottle data", values = "red") +
-  scale_x_datetime(date_breaks = "week",
-                   sec.axis = dup_axis()) +
+  scale_x_datetime(date_breaks = "week") +
   labs(y = expression(atop(paste(C[T], "*"),
                            (mu * mol ~ kg ^ {
                              -1
@@ -2615,9 +2636,12 @@ p_CT_star_surf <-
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
     legend.key.height = unit(5, "mm"),
     legend.key.width = unit(5,"mm"),
-    plot.margin = margin(0, 0, 0, 0, "cm")
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank()
   )
 
 
@@ -2698,30 +2722,37 @@ og <- og %>%
 
 ```{r Ostergarn_tower_time_series}
 
-
 p_pCO2_atm <- og %>%
   ggplot(aes(x = date_time)) +
+  geom_vline(data = cruise_dates, aes(xintercept = date_time_ID), col = "grey92") +
   geom_path(aes(y = pCO2_atm)) +
-  scale_x_datetime(date_breaks = "week",
-                   sec.axis = dup_axis()) +
-  labs(y = expression(atop(italic(p)*CO["2,atm"], (mu * atm)))) +
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
-    plot.margin = margin(0, 0, 0, 0, "cm"))
+  scale_x_datetime(date_breaks = "week") +
+  labs(y = expression(atop(italic(p) * CO["2,atm"], (mu * atm)))) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank()
+  )
 
 p_wind <- og %>%
   ggplot(aes(x = date_time)) +
+  geom_vline(data = cruise_dates, aes(xintercept = date_time_ID), col = "grey92") +
   geom_path(aes(y = wind)) +
-  scale_x_datetime(date_breaks = "week",
-                   sec.axis = dup_axis()) +
+  scale_x_datetime(date_breaks = "week") +
   labs(y = expression(atop(U["10"], (m ~ s ^ {
     -1
   })))) +
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
     legend.title = element_blank(),
-    plot.margin = margin(0, 0, 0, 0, "cm")
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank()
   )
 
 p_pCO2_atm + p_wind +
@@ -2819,9 +2850,9 @@ rm(Sc_W14)
 
 p_flux_daily <- tm_og %>%
   ggplot(aes(x = date_time)) +
+  geom_vline(data = cruise_dates, aes(xintercept = date_time_ID), col = "grey92") +
   geom_path(aes(y = flux)) +
-  scale_x_datetime(date_breaks = "week",
-                   sec.axis = dup_axis()) +
+  scale_x_datetime(date_breaks = "week") +
   labs(y = expression(atop(F["air-sea, daily"], (mol ~ m ^ {
     -2
   } ~ d ^ {
@@ -2830,8 +2861,11 @@ p_flux_daily <- tm_og %>%
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
     legend.title = element_blank(),
-    plot.margin = margin(0, 0, 0, 0, "cm")
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank()
   )
 
 ```
@@ -2849,10 +2883,10 @@ tm_og <- tm_og %>%
 
 p_flux_cum <- tm_og %>%
   ggplot(aes(x = date_time)) +
+  geom_vline(data = cruise_dates, aes(xintercept = date_time_ID), col = "grey92") +
   geom_path(aes(y = flux_cum)) +
   scale_fill_discrete(guide = FALSE) +
-  scale_x_datetime(date_breaks = "week",
-                   sec.axis = dup_axis()) +
+  scale_x_datetime(date_breaks = "week") +
   labs(y = expression(atop(F["air-sea, cum"],
                            (mol ~ m ^ {
                              -2
@@ -2860,7 +2894,10 @@ p_flux_cum <- tm_og %>%
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
-    plot.margin = margin(0, 0, 0, 0, "cm")
+    axis.ticks.x = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank()
   )
 
 p_flux_daily + p_flux_cum +
@@ -2931,6 +2968,8 @@ The aim is to approximate the C~T~* entrainment flux between Aug 07 and 16. The 
 
 ```{r profiles_entrainment}
 
+viridis_tail <- tail(hcl.colors(nrow(cruise_dates), "viridis"),2)
+
 # calculate mean volume weighted CT* before micing
 CT_mix <- tm_profiles_ID_long %>%
   filter(ID == "180806",
@@ -2979,11 +3018,11 @@ p_CT_star <- CT_profile %>%
     y = 14.5,
     size = geom_text_size
   ) +
-  geom_point(aes(CT_star, dep, fill = ID), shape = 21) +
   geom_path(aes(CT_star, dep, col = ID)) +
+  geom_point(aes(CT_star, dep, fill = ID), shape = 21) +
   scale_y_reverse() +
-  scale_fill_viridis_d() +
-  scale_color_viridis_d() +
+  scale_fill_manual(values = viridis_tail) +
+  scale_color_manual(values = viridis_tail) +
   labs(y = "Depth (m)", x = expression(paste(C[T], "*", ~ (µmol ~ kg ^ {
     -1
   })))) +
@@ -2992,7 +3031,8 @@ p_CT_star <- CT_profile %>%
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
     axis.title.y = element_blank(),
-    legend.position = "none"
+    legend.position = "none",
+    panel.grid.minor = element_blank()
   )
 
 # subset temperature profiles before and after mixing
@@ -3012,9 +3052,10 @@ p_tem <- tm_profiles_ID_long_temp  %>%
   geom_path(aes(value, dep, col = date_ID)) +
   geom_point(aes(value, dep, fill = date_ID), shape = 21) +
   scale_y_reverse() +
-  scale_color_viridis_d(name = "Mean\ncruise date") +
-  scale_fill_viridis_d(name = "Mean\ncruise date") +
-  labs(y = "Depth (m)", x = expression(paste(Temperature ~ "(\u00B0C)")))
+  scale_color_manual(values = viridis_tail, name = "Mean\ncruise date") +
+  scale_fill_manual(values = viridis_tail, name = "Mean\ncruise date") +
+  labs(y = "Depth (m)", x = expression(paste(Temperature ~ "(\u00B0C)"))) +
+  theme(panel.grid.minor = element_blank())
 
 p_tem + p_CT_star +
   plot_layout(guides = 'collect') +
@@ -3039,7 +3080,7 @@ ggsave(
 )
 
 
-rm(p_tem, p_CT_star, CT_profile, tm_profiles_ID_long_temp)
+rm(p_tem, p_CT_star, CT_profile, tm_profiles_ID_long_temp, viridis_tail)
 
 
 ```
@@ -3131,25 +3172,25 @@ p_iCT_star <- NCP_flux_mix_long %>%
     position = position_dodge2(preserve = "single"),
     alpha = 0.5
   ) +
+  geom_vline(data = cruise_dates, aes(xintercept = date_time_ID), col = "grey92") +
+  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 3) +
   geom_hline(yintercept = 0) +
-  geom_point(data = cruise_dates, aes(date_time_ID, 0), shape = 21) +
   geom_line(aes(date_time, value, col = var)) +
   scale_x_datetime(date_breaks = "week",
-                   date_labels = "%b %d",
-                   sec.axis = dup_axis()) +
+                   date_labels = "%b %d") +
   scale_fill_brewer(palette = "Dark2", name = "Incremental changes") +
   scale_color_brewer(palette = "Dark2", name = "Cumulative changes") +
-  labs(y = expression(atop(Integrated ~ paste(C[T], "*"), (mol ~ m ^ {
+  labs(y = expression(atop(Integrated ~ Delta ~ paste(C[T], "*"), (mol ~ m ^ {
     -2
   })))) +
   guides(fill = guide_legend(order = 2)) +
   theme(
     axis.title.x = element_blank(),
-    axis.text.x.top = element_blank(),
     legend.key.height = unit(5, "mm"),
     legend.key.width = unit(5, "mm"),
-    plot.margin = margin(0, 0, 0, 0, "cm")
-  )
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank())
 
 p_iCT_star
 
