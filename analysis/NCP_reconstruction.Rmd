@@ -245,7 +245,8 @@ p_CT_star <-
     legend.title = element_blank(),
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
-    axis.title.y = element_blank()
+    axis.title.y = element_blank(),
+    panel.grid.minor = element_blank()
   )
 
 p_tem <-
@@ -267,7 +268,7 @@ p_tem <-
     "text",
     x = 0.4,
     y = 11,
-    label = "PD",
+    label = "TPD",
     col = col_value,
     size = geom_text_size
   ) +
@@ -283,8 +284,9 @@ p_tem <-
   geom_hline(data = PD %>% filter(var == "tem"),
              aes(yintercept = PD),
              col = col_value) +
-  labs(y = "Depth (m)", x = expression(Delta ~ Temperature ~ (degree * C))) +
-  theme(legend.title = element_blank())
+  labs(y = "Depth (m)", x = expression(Delta ~ Temp. ~ (degree * C))) +
+  theme(legend.title = element_blank(),
+        panel.grid.minor = element_blank())
 
 p_tem + p_CT_star +
   plot_layout(guides = 'collect') +
@@ -1444,16 +1446,15 @@ p_hov_dep <-
   scale_color_discrete(name = "Reconstruction", guide = FALSE) +
   scale_y_reverse() +
   scale_x_datetime(date_breaks = "week",
-                   date_labels = "%b %d",
-                   sec.axis = dup_axis()) +
+                   date_labels = "%b %d") +
   coord_cartesian(expand = 0) +
   labs(y = expression(atop(Depth, (m)))) +
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
     strip.background = element_blank(),
     strip.text.x = element_blank(),
-    axis.text.x.top = element_blank(),
     plot.margin = margin(0, 0, 0, 0, "cm")
   ) +
   facet_wrap( ~ source)
@@ -1593,7 +1594,9 @@ p_CT_star <- iCT %>%
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
-    plot.margin = margin(0, 0, 0, 0, "cm")
+    axis.ticks.x = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    panel.grid.minor = element_blank()
   )
 
 p_iCT <- iCT %>%
@@ -1664,7 +1667,6 @@ p_NCP <- NCP_flux_int %>%
   scale_x_datetime(
     breaks = "week",
     date_labels = "%d %b",
-    sec.axis = dup_axis(),
     expand = c(0, 0)
   ) +
   scale_linetype_manual(name = "NCP estimate",
@@ -1678,8 +1680,8 @@ p_NCP <- NCP_flux_int %>%
     axis.title.x = element_blank(),
     strip.background = element_blank(),
     strip.text.x = element_blank(),
-    axis.text.x.top = element_blank(),
-    plot.margin = margin(0, 0, 0, 0, "cm")
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    panel.grid.minor = element_blank()
   )
 
 p_CT_star / p_hov_dep / p_NCP +
