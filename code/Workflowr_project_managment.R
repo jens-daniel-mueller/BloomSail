@@ -28,7 +28,7 @@ wflow_publish(
     "analysis/Phytoplankton.Rmd",
     "analysis/NCP_reconstruction.Rmd"
   ),
-  message = "rerun with Fiedler 2013 RT correction",
+  message = "rerun for resubmission, pdfs recreated",
   republish = TRUE
 )
 
