@@ -1758,16 +1758,22 @@ rm(CT_star_delta_mean, CT_star_delta_sd,
 
 bin_CT_star <- 30
 
-p_CT_star_hov <- tm_profiles_ID_long %>%
+grid_raster <- expand_grid(cruise_dates,
+                      dep = seq(5,20,5)) 
+
+p_CT_star_hov <- 
+  tm_profiles_ID_long %>%
   filter(var == "CT_star") %>%
   ggplot() +
   geom_contour_fill(aes(x = date_time_ID, y = dep, z = value),
                     breaks = MakeBreaks(bin_CT_star),
                     col = "black",
                     size = 0.1) +
-  geom_vline(aes(xintercept = date_time_ID),
+  geom_point(data = grid_raster,
+             aes(date_time_ID, dep),
              col = "white",
-             linetype = "1f") +
+             shape = 3,
+             size = 0.7) +
   scale_fill_scico(
     breaks = MakeBreaks(bin_CT_star),
     guide = "colorstrip",
@@ -1801,9 +1807,11 @@ p_tem_hov <- tm_profiles_ID_long %>%
                     breaks = MakeBreaks(bin_Tem),
                     col = "black",
                     size = 0.1) +
-  geom_vline(aes(xintercept = date_time_ID),
+  geom_point(data = grid_raster,
+             aes(date_time_ID, dep),
              col = "white",
-             linetype = "1f") +
+             shape = 3,
+             size = 0.7) +
   scale_fill_viridis_c(
     breaks = MakeBreaks(bin_Tem),
     guide = "colorstrip",
@@ -1827,13 +1835,16 @@ p_tem_hov <- tm_profiles_ID_long %>%
     legend.box.margin = margin(0, 0, 0, 0)
   )
 
-
+cum_cruise_dates <- cruise_dates %>% filter(ID != "180705")
+viridis_cum_cruise_dates <- hcl.colors(nrow(cruise_dates))[2:8]
 
 p_CT_star_ID_cum <-
   tm_profiles_ID_long %>%
-  filter(var == "CT_star") %>%
+  filter(var == "CT_star",
+         ID != "180705") %>%
   ggplot(aes(value_cum, dep, col = ID, fill = ID)) +
   geom_hline(yintercept = 12, col = "red") +
+  geom_vline(xintercept = 0) +
   geom_path() +
   geom_point(shape = 21, col = "black") +
   scale_y_reverse(expand = c(0, 0),
@@ -1842,25 +1853,33 @@ p_CT_star_ID_cum <-
     -1
   }))),
   y = "Depth (m)") +
-  scale_color_viridis_d(labels = cruise_dates$date_ID, guide = FALSE) +
-  scale_fill_viridis_d(labels = cruise_dates$date_ID, guide = FALSE) +
+  scale_color_viridis_d(labels = cum_cruise_dates$date_ID, guide = FALSE) +
+  scale_fill_viridis_d(labels = cum_cruise_dates$date_ID, guide = FALSE) +
+  # scale_color_manual(values = viridis_cum_cruise_dates,
+  #                    labels = cum_cruise_dates$date_ID,
+  #                    guide = FALSE) +
+  # scale_fill_manual(values = viridis_cum_cruise_dates,
+  #                   labels = cum_cruise_dates$date_ID,
+  #                   guide = FALSE) +
   theme(panel.grid.minor = element_blank())
-
-
 
 p_tem_ID_cum <-
   tm_profiles_ID_long %>%
-  filter(var == "tem") %>%
+  filter(var == "tem",
+         ID != "180705") %>%
   ggplot(aes(value_cum, dep, col = ID, fill = ID)) +
   geom_hline(yintercept = 12, col = "red") +
+  geom_vline(xintercept = 0) +
   geom_path() +
   geom_point(shape = 21, col = "black") +
   scale_y_reverse(expand = c(0, 0),
                   position = "right") +
   labs(x = expression(Delta~"Temp. cumulative (\u00B0C)"),
        y = "Depth (m)") +
-  scale_color_viridis_d(labels = cruise_dates$date_ID) +
-  scale_fill_viridis_d(labels = cruise_dates$date_ID) +
+  scale_color_manual(values = viridis_cum_cruise_dates,
+                     labels = cum_cruise_dates$date_ID) +
+  scale_fill_manual(values = viridis_cum_cruise_dates,
+                     labels = cum_cruise_dates$date_ID) +
   theme(
     legend.position = "top",
     legend.title = element_blank(),
@@ -1895,7 +1914,8 @@ ggsave(
   units = "mm"
 )
 
-rm(p_CT_star_hov, bin_CT_star, p_tem_hov, bin_Tem, p_CT_star_ID_cum, p_tem_ID_cum)
+rm(p_CT_star_hov, bin_CT_star, p_tem_hov, bin_Tem, p_CT_star_ID_cum, p_tem_ID_cum,
+   cum_cruise_dates, viridis_cum_cruise_dates, grid_raster)
 
 ```
 
