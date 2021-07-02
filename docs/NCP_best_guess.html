@@ -451,7 +451,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">NCP best guess</h1>
 <h4 class="author">Jens Daniel Müller</h4>
-<h4 class="date">30 June, 2021</h4>
+<h4 class="date">02 July, 2021</h4>
 
 </div>
 
@@ -476,7 +476,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-06-30
+<strong>Last updated:</strong> 2021-07-02
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -567,16 +567,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeaa9fd37a60907ca39628de2d44bda078fd284054targetblankaa9fd37a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/aa9fd37a60907ca39628de2d44bda078fd284054" target="_blank">aa9fd37</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree386d322c45eb4aba7f013efa2c8a23739d6db11atargetblank386d322a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/386d322c45eb4aba7f013efa2c8a23739d6db11a" target="_blank">386d322</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtreeaa9fd37a60907ca39628de2d44bda078fd284054targetblankaa9fd37a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjensdanielmuellerBloomSailtree386d322c45eb4aba7f013efa2c8a23739d6db11atargetblank386d322a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/aa9fd37a60907ca39628de2d44bda078fd284054" target="_blank">aa9fd37</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jens-daniel-mueller/BloomSail/tree/386d322c45eb4aba7f013efa2c8a23739d6db11a" target="_blank">386d322</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -628,6 +628,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jens-daniel-mueller/BloomSail/blob/386d322c45eb4aba7f013efa2c8a23739d6db11a/analysis/NCP_best_guess.Rmd" target="_blank">386d322</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-07-02
+</td>
+<td>
+test without NE stations
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jens-daniel-mueller/BloomSail/ae96bc062575a111a9ce485d1b1e33f179ca3af9/docs/NCP_best_guess.html" target="_blank">ae96bc0</a>
+</td>
+<td>
+jens-daniel-mueller
+</td>
+<td>
+2021-06-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1505,7 +1539,8 @@ tm_profiles &lt;- tm %&gt;%
          Flush == &quot;0&quot;,
          Zero == &quot;0&quot;,
          !ID %in% parameters$dates_out,
-         !(station %in% c(&quot;PX1&quot;, &quot;PX2&quot;))) %&gt;%
+         !(station %in% c(&quot;PX1&quot;, &quot;PX2&quot;)),
+         !(station %in% c(&quot;P07&quot;, &quot;P08&quot;, &quot;P09&quot;, &quot;P10&quot;))) %&gt;%
   select(date_time,
          ID,
          station,
@@ -1640,8 +1675,8 @@ Overview pCO<sub>2</sub> profiles at stations (P02-P12) and cruise dates (ID). y
 <pre><code># A tibble: 2 x 2
   select    nr
   &lt;chr&gt;  &lt;int&gt;
-1 in        79
-2 out        7</code></pre>
+1 in        52
+2 out        3</code></pre>
 </div>
 <div id="subset" class="section level2" number="2.3">
 <h2 number="2.3"><span class="header-section-number">2.3</span> Subset</h2>
@@ -2951,10 +2986,10 @@ tem
 (0,5]
 </td>
 <td style="text-align:right;">
-1528.4
+1533.7
 </td>
 <td style="text-align:right;">
-98.3
+102.0
 </td>
 <td style="text-align:right;">
 6.9
@@ -2971,10 +3006,10 @@ tem
 (5,10]
 </td>
 <td style="text-align:right;">
-1541.9
+1545.9
 </td>
 <td style="text-align:right;">
-106.0
+109.2
 </td>
 <td style="text-align:right;">
 6.9
@@ -2991,10 +3026,130 @@ tem
 (10,15]
 </td>
 <td style="text-align:right;">
-1562.9
+1561.3
 </td>
 <td style="text-align:right;">
-123.3
+122.1
+</td>
+<td style="text-align:right;">
+6.9
+</td>
+<td style="text-align:right;">
+14.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-06
+</td>
+<td style="text-align:left;">
+(15,20]
+</td>
+<td style="text-align:right;">
+1571.1
+</td>
+<td style="text-align:right;">
+132.4
+</td>
+<td style="text-align:right;">
+7.0
+</td>
+<td style="text-align:right;">
+14.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-06
+</td>
+<td style="text-align:left;">
+(20,25]
+</td>
+<td style="text-align:right;">
+1584.5
+</td>
+<td style="text-align:right;">
+147.6
+</td>
+<td style="text-align:right;">
+7.1
+</td>
+<td style="text-align:right;">
+13.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-10
+</td>
+<td style="text-align:left;">
+(0,5]
+</td>
+<td style="text-align:right;">
+1493.6
+</td>
+<td style="text-align:right;">
+82.9
+</td>
+<td style="text-align:right;">
+6.9
+</td>
+<td style="text-align:right;">
+17.3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-10
+</td>
+<td style="text-align:left;">
+(5,10]
+</td>
+<td style="text-align:right;">
+1511.3
+</td>
+<td style="text-align:right;">
+90.1
+</td>
+<td style="text-align:right;">
+6.9
+</td>
+<td style="text-align:right;">
+16.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-10
+</td>
+<td style="text-align:left;">
+(10,15]
+</td>
+<td style="text-align:right;">
+1551.9
+</td>
+<td style="text-align:right;">
+116.0
+</td>
+<td style="text-align:right;">
+6.9
+</td>
+<td style="text-align:right;">
+14.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-10
+</td>
+<td style="text-align:left;">
+(15,20]
+</td>
+<td style="text-align:right;">
+1577.6
+</td>
+<td style="text-align:right;">
+140.0
 </td>
 <td style="text-align:right;">
 6.9
@@ -3005,119 +3160,19 @@ tem
 </tr>
 <tr>
 <td style="text-align:left;">
-2018-07-06
-</td>
-<td style="text-align:left;">
-(15,20]
-</td>
-<td style="text-align:right;">
-1575.1
-</td>
-<td style="text-align:right;">
-136.5
-</td>
-<td style="text-align:right;">
-7.0
-</td>
-<td style="text-align:right;">
-13.9
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2018-07-06
+2018-07-10
 </td>
 <td style="text-align:left;">
 (20,25]
 </td>
 <td style="text-align:right;">
-1589.1
+1586.2
 </td>
 <td style="text-align:right;">
-153.4
+151.6
 </td>
 <td style="text-align:right;">
 7.0
-</td>
-<td style="text-align:right;">
-13.7
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2018-07-10
-</td>
-<td style="text-align:left;">
-(0,5]
-</td>
-<td style="text-align:right;">
-1500.2
-</td>
-<td style="text-align:right;">
-86.0
-</td>
-<td style="text-align:right;">
-6.9
-</td>
-<td style="text-align:right;">
-17.0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2018-07-10
-</td>
-<td style="text-align:left;">
-(5,10]
-</td>
-<td style="text-align:right;">
-1517.0
-</td>
-<td style="text-align:right;">
-93.4
-</td>
-<td style="text-align:right;">
-6.9
-</td>
-<td style="text-align:right;">
-15.9
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2018-07-10
-</td>
-<td style="text-align:left;">
-(10,15]
-</td>
-<td style="text-align:right;">
-1561.0
-</td>
-<td style="text-align:right;">
-124.7
-</td>
-<td style="text-align:right;">
-6.9
-</td>
-<td style="text-align:right;">
-14.4
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2018-07-10
-</td>
-<td style="text-align:left;">
-(15,20]
-</td>
-<td style="text-align:right;">
-1584.4
-</td>
-<td style="text-align:right;">
-148.5
-</td>
-<td style="text-align:right;">
-6.9
 </td>
 <td style="text-align:right;">
 14.0
@@ -3125,42 +3180,22 @@ tem
 </tr>
 <tr>
 <td style="text-align:left;">
-2018-07-10
-</td>
-<td style="text-align:left;">
-(20,25]
-</td>
-<td style="text-align:right;">
-1596.2
-</td>
-<td style="text-align:right;">
-163.9
-</td>
-<td style="text-align:right;">
-7.0
-</td>
-<td style="text-align:right;">
-13.5
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
 2018-07-19
 </td>
 <td style="text-align:left;">
 (0,5]
 </td>
 <td style="text-align:right;">
-1466.8
+1463.6
 </td>
 <td style="text-align:right;">
-79.1
+76.7
 </td>
 <td style="text-align:right;">
-6.9
+7.0
 </td>
 <td style="text-align:right;">
-20.5
+20.3
 </td>
 </tr>
 <tr>
@@ -3171,16 +3206,16 @@ tem
 (5,10]
 </td>
 <td style="text-align:right;">
-1479.3
+1472.5
 </td>
 <td style="text-align:right;">
-81.5
+78.2
 </td>
 <td style="text-align:right;">
 7.0
 </td>
 <td style="text-align:right;">
-19.0
+19.3
 </td>
 </tr>
 <tr>
@@ -3191,16 +3226,16 @@ tem
 (10,15]
 </td>
 <td style="text-align:right;">
-1553.9
+1543.6
 </td>
 <td style="text-align:right;">
-124.4
+115.5
 </td>
 <td style="text-align:right;">
-7.0
+7.1
 </td>
 <td style="text-align:right;">
-15.5
+15.9
 </td>
 </tr>
 <tr>
@@ -3211,10 +3246,10 @@ tem
 (15,20]
 </td>
 <td style="text-align:right;">
-1586.9
+1583.6
 </td>
 <td style="text-align:right;">
-155.0
+150.3
 </td>
 <td style="text-align:right;">
 7.1
@@ -3231,16 +3266,16 @@ tem
 (20,25]
 </td>
 <td style="text-align:right;">
-1597.8
+1593.1
 </td>
 <td style="text-align:right;">
-168.3
+161.6
 </td>
 <td style="text-align:right;">
 7.2
 </td>
 <td style="text-align:right;">
-13.9
+14.1
 </td>
 </tr>
 <tr>
@@ -3251,10 +3286,10 @@ tem
 (0,5]
 </td>
 <td style="text-align:right;">
-1440.0
+1437.5
 </td>
 <td style="text-align:right;">
-69.1
+68.0
 </td>
 <td style="text-align:right;">
 7.0
@@ -3271,16 +3306,16 @@ tem
 (5,10]
 </td>
 <td style="text-align:right;">
-1453.4
+1451.4
 </td>
 <td style="text-align:right;">
-73.2
+72.2
 </td>
 <td style="text-align:right;">
 7.0
 </td>
 <td style="text-align:right;">
-20.7
+20.6
 </td>
 </tr>
 <tr>
@@ -3291,10 +3326,10 @@ tem
 (10,15]
 </td>
 <td style="text-align:right;">
-1565.5
+1564.8
 </td>
 <td style="text-align:right;">
-141.8
+140.5
 </td>
 <td style="text-align:right;">
 7.0
@@ -3311,10 +3346,10 @@ tem
 (15,20]
 </td>
 <td style="text-align:right;">
-1609.3
+1609.9
 </td>
 <td style="text-align:right;">
-190.8
+191.2
 </td>
 <td style="text-align:right;">
 7.1
@@ -3331,16 +3366,16 @@ tem
 (20,25]
 </td>
 <td style="text-align:right;">
-1619.2
+1613.6
 </td>
 <td style="text-align:right;">
-207.1
+194.7
 </td>
 <td style="text-align:right;">
 7.1
 </td>
 <td style="text-align:right;">
-13.6
+13.8
 </td>
 </tr>
 <tr>
@@ -3351,16 +3386,16 @@ tem
 (0,5]
 </td>
 <td style="text-align:right;">
-1474.7
+1459.9
 </td>
 <td style="text-align:right;">
-100.3
+89.0
 </td>
 <td style="text-align:right;">
-6.8
+6.9
 </td>
 <td style="text-align:right;">
-24.3
+24.2
 </td>
 </tr>
 <tr>
@@ -3371,16 +3406,16 @@ tem
 (5,10]
 </td>
 <td style="text-align:right;">
-1484.4
+1474.5
 </td>
 <td style="text-align:right;">
-99.2
+91.6
 </td>
 <td style="text-align:right;">
-6.8
+6.9
 </td>
 <td style="text-align:right;">
-22.3
+22.2
 </td>
 </tr>
 <tr>
@@ -3391,10 +3426,10 @@ tem
 (10,15]
 </td>
 <td style="text-align:right;">
-1582.6
+1581.7
 </td>
 <td style="text-align:right;">
-165.6
+165.7
 </td>
 <td style="text-align:right;">
 6.9
@@ -3411,16 +3446,16 @@ tem
 (15,20]
 </td>
 <td style="text-align:right;">
-1626.7
+1626.9
 </td>
 <td style="text-align:right;">
-226.6
+227.3
 </td>
 <td style="text-align:right;">
 7.0
 </td>
 <td style="text-align:right;">
-14.0
+14.1
 </td>
 </tr>
 <tr>
@@ -3431,16 +3466,16 @@ tem
 (20,25]
 </td>
 <td style="text-align:right;">
-1645.6
+1638.5
 </td>
 <td style="text-align:right;">
-277.0
+258.1
 </td>
 <td style="text-align:right;">
-7.0
+7.1
 </td>
 <td style="text-align:right;">
-12.9
+13.5
 </td>
 </tr>
 <tr>
@@ -3451,16 +3486,16 @@ tem
 (0,5]
 </td>
 <td style="text-align:right;">
-1457.3
+1445.2
 </td>
 <td style="text-align:right;">
-90.7
+83.3
 </td>
 <td style="text-align:right;">
 6.9
 </td>
 <td style="text-align:right;">
-24.9
+25.0
 </td>
 </tr>
 <tr>
@@ -3471,16 +3506,16 @@ tem
 (5,10]
 </td>
 <td style="text-align:right;">
-1470.6
+1462.0
 </td>
 <td style="text-align:right;">
-92.8
+86.3
 </td>
 <td style="text-align:right;">
 6.9
 </td>
 <td style="text-align:right;">
-23.3
+23.1
 </td>
 </tr>
 <tr>
@@ -3491,16 +3526,16 @@ tem
 (10,15]
 </td>
 <td style="text-align:right;">
-1588.2
+1581.6
 </td>
 <td style="text-align:right;">
-174.5
+165.6
 </td>
 <td style="text-align:right;">
 6.9
 </td>
 <td style="text-align:right;">
-15.9
+16.0
 </td>
 </tr>
 <tr>
@@ -3511,16 +3546,16 @@ tem
 (15,20]
 </td>
 <td style="text-align:right;">
-1634.7
+1634.4
 </td>
 <td style="text-align:right;">
-245.5
+245.4
 </td>
 <td style="text-align:right;">
-6.9
+7.0
 </td>
 <td style="text-align:right;">
-13.9
+14.0
 </td>
 </tr>
 <tr>
@@ -3531,16 +3566,16 @@ tem
 (20,25]
 </td>
 <td style="text-align:right;">
-1651.7
+1650.5
 </td>
 <td style="text-align:right;">
-291.4
+289.1
 </td>
 <td style="text-align:right;">
-7.0
+7.1
 </td>
 <td style="text-align:right;">
-12.8
+13.0
 </td>
 </tr>
 <tr>
@@ -3551,13 +3586,13 @@ tem
 (0,5]
 </td>
 <td style="text-align:right;">
-1473.8
+1465.7
 </td>
 <td style="text-align:right;">
-92.4
+87.6
 </td>
 <td style="text-align:right;">
-6.9
+7.0
 </td>
 <td style="text-align:right;">
 23.0
@@ -3571,16 +3606,16 @@ tem
 (5,10]
 </td>
 <td style="text-align:right;">
-1483.4
+1470.4
 </td>
 <td style="text-align:right;">
-98.6
+89.7
 </td>
 <td style="text-align:right;">
-6.9
+7.0
 </td>
 <td style="text-align:right;">
-22.5
+22.8
 </td>
 </tr>
 <tr>
@@ -3591,16 +3626,16 @@ tem
 (10,15]
 </td>
 <td style="text-align:right;">
-1605.2
+1596.4
 </td>
 <td style="text-align:right;">
-200.1
+188.6
 </td>
 <td style="text-align:right;">
-6.9
+7.0
 </td>
 <td style="text-align:right;">
-15.5
+15.9
 </td>
 </tr>
 <tr>
@@ -3611,16 +3646,16 @@ tem
 (15,20]
 </td>
 <td style="text-align:right;">
-1638.8
+1636.3
 </td>
 <td style="text-align:right;">
-257.3
+251.9
 </td>
 <td style="text-align:right;">
-7.0
+7.1
 </td>
 <td style="text-align:right;">
-14.0
+14.1
 </td>
 </tr>
 <tr>
@@ -3631,30 +3666,30 @@ tem
 (20,25]
 </td>
 <td style="text-align:right;">
-1651.3
+1643.9
 </td>
 <td style="text-align:right;">
-293.4
+270.6
 </td>
 <td style="text-align:right;">
 7.1
 </td>
 <td style="text-align:right;">
-12.7
+13.2
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-2018-08-16
+2018-08-15
 </td>
 <td style="text-align:left;">
 (0,5]
 </td>
 <td style="text-align:right;">
-1556.0
+1559.3
 </td>
 <td style="text-align:right;">
-140.7
+143.9
 </td>
 <td style="text-align:right;">
 7.0
@@ -3665,82 +3700,82 @@ tem
 </tr>
 <tr>
 <td style="text-align:left;">
-2018-08-16
+2018-08-15
 </td>
 <td style="text-align:left;">
 (5,10]
 </td>
 <td style="text-align:right;">
-1561.3
+1566.0
 </td>
 <td style="text-align:right;">
-146.8
+151.6
 </td>
 <td style="text-align:right;">
 7.0
 </td>
 <td style="text-align:right;">
-18.5
+18.4
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-2018-08-16
+2018-08-15
 </td>
 <td style="text-align:left;">
 (10,15]
 </td>
 <td style="text-align:right;">
-1581.8
+1586.6
 </td>
 <td style="text-align:right;">
-173.5
+179.4
 </td>
 <td style="text-align:right;">
 7.0
 </td>
 <td style="text-align:right;">
-17.7
+17.6
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-2018-08-16
+2018-08-15
 </td>
 <td style="text-align:left;">
 (15,20]
 </td>
 <td style="text-align:right;">
-1638.9
+1637.0
 </td>
 <td style="text-align:right;">
-276.9
+269.2
 </td>
 <td style="text-align:right;">
 7.0
 </td>
 <td style="text-align:right;">
-14.8
+14.9
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-2018-08-16
+2018-08-15
 </td>
 <td style="text-align:left;">
 (20,25]
 </td>
 <td style="text-align:right;">
-1679.2
+1679.7
 </td>
 <td style="text-align:right;">
-404.0
+408.7
 </td>
 <td style="text-align:right;">
 7.1
 </td>
 <td style="text-align:right;">
-11.6
+11.7
 </td>
 </tr>
 </tbody>
@@ -4803,19 +4838,19 @@ max
 180705
 </td>
 <td style="text-align:left;">
-2018-07-06 11:14:37
+2018-07-06 10:22:29
 </td>
 <td style="text-align:left;">
 CT_star
 </td>
 <td style="text-align:right;">
-1529.05101
+1534.37095
 </td>
 <td style="text-align:right;">
-8.2883766
+4.4167833
 </td>
 <td style="text-align:right;">
-1511.47632
+1527.16661
 </td>
 <td style="text-align:right;">
 1542.59218
@@ -4826,22 +4861,22 @@ CT_star
 180709
 </td>
 <td style="text-align:left;">
-2018-07-10 08:45:38
+2018-07-10 10:09:35
 </td>
 <td style="text-align:left;">
 CT_star
 </td>
 <td style="text-align:right;">
-1500.58938
+1493.91021
 </td>
 <td style="text-align:right;">
-15.3560456
+15.2099911
 </td>
 <td style="text-align:right;">
 1471.05824
 </td>
 <td style="text-align:right;">
-1520.34626
+1516.14265
 </td>
 </tr>
 <tr>
@@ -4849,22 +4884,22 @@ CT_star
 180718
 </td>
 <td style="text-align:left;">
-2018-07-19 10:01:48
+2018-07-19 07:24:46
 </td>
 <td style="text-align:left;">
 CT_star
 </td>
 <td style="text-align:right;">
-1466.23938
+1463.34879
 </td>
 <td style="text-align:right;">
-11.6934378
+10.4618817
 </td>
 <td style="text-align:right;">
 1447.28428
 </td>
 <td style="text-align:right;">
-1498.63509
+1481.41439
 </td>
 </tr>
 <tr>
@@ -4872,22 +4907,22 @@ CT_star
 180723
 </td>
 <td style="text-align:left;">
-2018-07-24 07:58:29
+2018-07-24 05:52:34
 </td>
 <td style="text-align:left;">
 CT_star
 </td>
 <td style="text-align:right;">
-1439.95418
+1437.59702
 </td>
 <td style="text-align:right;">
-8.8650660
+8.1073786
 </td>
 <td style="text-align:right;">
 1415.45950
 </td>
 <td style="text-align:right;">
-1455.43971
+1450.80396
 </td>
 </tr>
 <tr>
@@ -4895,22 +4930,22 @@ CT_star
 180730
 </td>
 <td style="text-align:left;">
-2018-07-31 03:45:31
+2018-07-31 01:55:04
 </td>
 <td style="text-align:left;">
 CT_star
 </td>
 <td style="text-align:right;">
-1474.15099
+1459.94582
 </td>
 <td style="text-align:right;">
-25.0365019
+12.8210176
 </td>
 <td style="text-align:right;">
 1440.83302
 </td>
 <td style="text-align:right;">
-1519.20433
+1483.12672
 </td>
 </tr>
 <tr>
@@ -4918,22 +4953,22 @@ CT_star
 180802
 </td>
 <td style="text-align:left;">
-2018-08-03 04:13:45
+2018-08-03 02:09:15
 </td>
 <td style="text-align:left;">
 CT_star
 </td>
 <td style="text-align:right;">
-1456.68067
+1445.07664
 </td>
 <td style="text-align:right;">
-21.4027858
+10.5164171
 </td>
 <td style="text-align:right;">
 1431.16303
 </td>
 <td style="text-align:right;">
-1508.09978
+1465.41009
 </td>
 </tr>
 <tr>
@@ -4941,22 +4976,22 @@ CT_star
 180806
 </td>
 <td style="text-align:left;">
-2018-08-07 09:28:50
+2018-08-07 11:15:21
 </td>
 <td style="text-align:left;">
 CT_star
 </td>
 <td style="text-align:right;">
-1473.58590
+1465.42702
 </td>
 <td style="text-align:right;">
-13.0806501
+7.6959170
 </td>
 <td style="text-align:right;">
 1447.00955
 </td>
 <td style="text-align:right;">
-1491.52912
+1472.72152
 </td>
 </tr>
 <tr>
@@ -4964,19 +4999,19 @@ CT_star
 180815
 </td>
 <td style="text-align:left;">
-2018-08-16 00:08:48
+2018-08-15 22:29:59
 </td>
 <td style="text-align:left;">
 CT_star
 </td>
 <td style="text-align:right;">
-1556.16806
+1559.41921
 </td>
 <td style="text-align:right;">
-8.4373691
+4.2002867
 </td>
 <td style="text-align:right;">
-1540.84549
+1553.57529
 </td>
 <td style="text-align:right;">
 1570.11761
@@ -4987,19 +5022,19 @@ CT_star
 180705
 </td>
 <td style="text-align:left;">
-2018-07-06 11:14:37
+2018-07-06 10:22:29
 </td>
 <td style="text-align:left;">
 pCO2
 </td>
 <td style="text-align:right;">
-98.47996
+102.24683
 </td>
 <td style="text-align:right;">
-6.0910301
+4.5795652
 </td>
 <td style="text-align:right;">
-87.19089
+95.62470
 </td>
 <td style="text-align:right;">
 110.24034
@@ -5010,16 +5045,16 @@ pCO2
 180709
 </td>
 <td style="text-align:left;">
-2018-07-10 08:45:38
+2018-07-10 10:09:35
 </td>
 <td style="text-align:left;">
 pCO2
 </td>
 <td style="text-align:right;">
-86.07135
+82.85424
 </td>
 <td style="text-align:right;">
-7.6184441
+7.6460623
 </td>
 <td style="text-align:right;">
 72.44729
@@ -5033,22 +5068,22 @@ pCO2
 180718
 </td>
 <td style="text-align:left;">
-2018-07-19 10:01:48
+2018-07-19 07:24:46
 </td>
 <td style="text-align:left;">
 pCO2
 </td>
 <td style="text-align:right;">
-78.60290
+76.57471
 </td>
 <td style="text-align:right;">
-6.4959027
+4.5561887
 </td>
 <td style="text-align:right;">
 69.81329
 </td>
 <td style="text-align:right;">
-101.52258
+85.08199
 </td>
 </tr>
 <tr>
@@ -5056,22 +5091,22 @@ pCO2
 180723
 </td>
 <td style="text-align:left;">
-2018-07-24 07:58:29
+2018-07-24 05:52:34
 </td>
 <td style="text-align:left;">
 pCO2
 </td>
 <td style="text-align:right;">
-68.93034
+67.87604
 </td>
 <td style="text-align:right;">
-3.6813844
+3.2282749
 </td>
 <td style="text-align:right;">
 59.87285
 </td>
 <td style="text-align:right;">
-75.31610
+74.28937
 </td>
 </tr>
 <tr>
@@ -5079,22 +5114,22 @@ pCO2
 180730
 </td>
 <td style="text-align:left;">
-2018-07-31 03:45:31
+2018-07-31 01:55:04
 </td>
 <td style="text-align:left;">
 pCO2
 </td>
 <td style="text-align:right;">
-99.46161
+88.54958
 </td>
 <td style="text-align:right;">
-18.7131469
+7.4894230
 </td>
 <td style="text-align:right;">
 79.74148
 </td>
 <td style="text-align:right;">
-134.65088
+102.31247
 </td>
 </tr>
 <tr>
@@ -5102,22 +5137,22 @@ pCO2
 180802
 </td>
 <td style="text-align:left;">
-2018-08-03 04:13:45
+2018-08-03 02:09:15
 </td>
 <td style="text-align:left;">
 pCO2
 </td>
 <td style="text-align:right;">
-90.30475
+83.18466
 </td>
 <td style="text-align:right;">
-13.7987160
+5.5300216
 </td>
 <td style="text-align:right;">
 76.75694
 </td>
 <td style="text-align:right;">
-126.69686
+94.50553
 </td>
 </tr>
 <tr>
@@ -5125,22 +5160,22 @@ pCO2
 180806
 </td>
 <td style="text-align:left;">
-2018-08-07 09:28:50
+2018-08-07 11:15:21
 </td>
 <td style="text-align:left;">
 pCO2
 </td>
 <td style="text-align:right;">
-92.32443
+87.40408
 </td>
 <td style="text-align:right;">
-7.6007064
+3.8149647
 </td>
 <td style="text-align:right;">
 78.38499
 </td>
 <td style="text-align:right;">
-103.82754
+91.30747
 </td>
 </tr>
 <tr>
@@ -5148,19 +5183,19 @@ pCO2
 180815
 </td>
 <td style="text-align:left;">
-2018-08-16 00:08:48
+2018-08-15 22:29:59
 </td>
 <td style="text-align:left;">
 pCO2
 </td>
 <td style="text-align:right;">
-140.90864
+144.07728
 </td>
 <td style="text-align:right;">
-7.9648078
+4.0446234
 </td>
 <td style="text-align:right;">
-126.49526
+138.67411
 </td>
 <td style="text-align:right;">
 154.87771
@@ -5171,22 +5206,22 @@ pCO2
 180705
 </td>
 <td style="text-align:left;">
-2018-07-06 11:14:37
+2018-07-06 10:22:29
 </td>
 <td style="text-align:left;">
 tem
 </td>
 <td style="text-align:right;">
-15.33978
+15.29271
 </td>
 <td style="text-align:right;">
-0.4458508
+0.4308974
 </td>
 <td style="text-align:right;">
 14.56363
 </td>
 <td style="text-align:right;">
-16.25533
+16.07855
 </td>
 </tr>
 <tr>
@@ -5194,16 +5229,16 @@ tem
 180709
 </td>
 <td style="text-align:left;">
-2018-07-10 08:45:38
+2018-07-10 10:09:35
 </td>
 <td style="text-align:left;">
 tem
 </td>
 <td style="text-align:right;">
-16.98802
+17.20354
 </td>
 <td style="text-align:right;">
-0.4766441
+0.4445928
 </td>
 <td style="text-align:right;">
 16.06309
@@ -5217,22 +5252,22 @@ tem
 180718
 </td>
 <td style="text-align:left;">
-2018-07-19 10:01:48
+2018-07-19 07:24:46
 </td>
 <td style="text-align:left;">
 tem
 </td>
 <td style="text-align:right;">
-20.39976
+20.28203
 </td>
 <td style="text-align:right;">
-0.4285885
+0.3003286
 </td>
 <td style="text-align:right;">
-19.76884
+19.94858
 </td>
 <td style="text-align:right;">
-21.24747
+20.82118
 </td>
 </tr>
 <tr>
@@ -5240,16 +5275,16 @@ tem
 180723
 </td>
 <td style="text-align:left;">
-2018-07-24 07:58:29
+2018-07-24 05:52:34
 </td>
 <td style="text-align:left;">
 tem
 </td>
 <td style="text-align:right;">
-21.42724
+21.43321
 </td>
 <td style="text-align:right;">
-0.5108960
+0.5442244
 </td>
 <td style="text-align:right;">
 21.00930
@@ -5263,16 +5298,16 @@ tem
 180730
 </td>
 <td style="text-align:left;">
-2018-07-31 03:45:31
+2018-07-31 01:55:04
 </td>
 <td style="text-align:left;">
 tem
 </td>
 <td style="text-align:right;">
-24.24527
+24.11650
 </td>
 <td style="text-align:right;">
-0.4602385
+0.4593520
 </td>
 <td style="text-align:right;">
 23.64305
@@ -5286,16 +5321,16 @@ tem
 180802
 </td>
 <td style="text-align:left;">
-2018-08-03 04:13:45
+2018-08-03 02:09:15
 </td>
 <td style="text-align:left;">
 tem
 </td>
 <td style="text-align:right;">
-24.88713
+24.97499
 </td>
 <td style="text-align:right;">
-0.1846099
+0.1713630
 </td>
 <td style="text-align:right;">
 24.53541
@@ -5309,19 +5344,19 @@ tem
 180806
 </td>
 <td style="text-align:left;">
-2018-08-07 09:28:50
+2018-08-07 11:15:21
 </td>
 <td style="text-align:left;">
 tem
 </td>
 <td style="text-align:right;">
-22.95573
+23.03119
 </td>
 <td style="text-align:right;">
-0.2038156
+0.1797214
 </td>
 <td style="text-align:right;">
-22.60425
+22.69631
 </td>
 <td style="text-align:right;">
 23.35020
@@ -5332,22 +5367,22 @@ tem
 180815
 </td>
 <td style="text-align:left;">
-2018-08-16 00:08:48
+2018-08-15 22:29:59
 </td>
 <td style="text-align:left;">
 tem
 </td>
 <td style="text-align:right;">
-18.62651
+18.56469
 </td>
 <td style="text-align:right;">
-0.2752079
+0.1941428
 </td>
 <td style="text-align:right;">
 18.13858
 </td>
 <td style="text-align:right;">
-19.01634
+18.81098
 </td>
 </tr>
 </tbody>
@@ -5382,7 +5417,7 @@ SD_mean
 CT_star
 </td>
 <td style="text-align:right;">
-11.0507315
+9.5490087
 </td>
 </tr>
 <tr>
@@ -5390,7 +5425,7 @@ CT_star
 pCO2
 </td>
 <td style="text-align:right;">
-5.9716903
+5.0025228
 </td>
 </tr>
 <tr>
@@ -5398,7 +5433,7 @@ pCO2
 tem
 </td>
 <td style="text-align:right;">
-0.4654949
+0.4300108
 </td>
 </tr>
 </tbody>
