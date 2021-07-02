@@ -105,7 +105,8 @@ tm_profiles <- tm %>%
          Flush == "0",
          Zero == "0",
          !ID %in% parameters$dates_out,
-         !(station %in% c("PX1", "PX2"))) %>%
+         !(station %in% c("PX1", "PX2")),
+         !(station %in% c("P07", "P08", "P09", "P10"))) %>%
   select(date_time,
          ID,
          station,

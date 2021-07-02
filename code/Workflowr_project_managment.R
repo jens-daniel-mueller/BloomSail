@@ -8,7 +8,7 @@
 
 # commit regular changes (locally) and rebuild site
 # this command determines which .Rmd files were changed
-wflow_publish(all = TRUE, message = "adapted plot design")
+wflow_publish(all = TRUE, message = "test without NE stations")
 
 # rerun one specific .Rmd file
 wflow_publish(c(
