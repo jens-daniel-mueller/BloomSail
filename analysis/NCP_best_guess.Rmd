@@ -105,8 +105,11 @@ tm_profiles <- tm %>%
          Flush == "0",
          Zero == "0",
          !ID %in% parameters$dates_out,
-         !(station %in% c("PX1", "PX2")),
-         !(station %in% c("P07", "P08", "P09", "P10"))) %>%
+         !(station %in% c("PX1", "PX2"))
+         # by uncommenting the line below, you can run the analysis
+         # without the NE stations which were affected by lateral water mass exchange
+         # ,!(station %in% c("P07", "P08", "P09", "P10"))
+         ) %>%
   select(date_time,
          ID,
          station,
